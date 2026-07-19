@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HBGBs HQ</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230b0f0c'/%3E%3Crect x='6' y='6' width='20' height='20' fill='%2363bf5a'/%3E%3Crect x='12' y='12' width='8' height='8' fill='%230b0f0c'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap">
+  <link rel="stylesheet" href="style.css?v=4">
+</head>
+<body>
+  <header>
+    <h1>THE HBGBS <span class="hq">/ HQ</span></h1>
+    <div class="chips">
+      <span class="chip" id="state-chip">connecting…</span>
+      <span class="chip" id="league-chip">league…</span>
+    </div>
+    <div class="spacer"></div>
+    <div class="header-right">
+      <span class="asof" id="asof"></span>
+      <button id="refresh-btn" class="refresh-btn" aria-label="Refresh live data" title="Refresh live data">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 12a9 9 0 1 1-2.64-6.36M21 3v6h-6"/>
+        </svg>
+      </button>
+    </div>
+    <span class="readonly-note">read-only · no actions are ever executed from this page</span>
+  </header>
+
+  <main>
+    <div class="col">
+      <section class="panel" aria-labelledby="updates-h">
+        <div class="panel-head">
+          <h2 id="updates-h">NFL updates</h2>
+          <span class="meta" id="updates-meta"></span>
+          <div class="filters" role="group" aria-label="Filter updates">
+            <button data-f="all" aria-pressed="true">all</button>
+            <button data-f="injury" aria-pressed="false">injuries</button>
+            <button data-f="role" aria-pressed="false">roles</button>
+            <button data-f="coach" aria-pressed="false">coaching</button>
+            <button data-f="market" aria-pressed="false">market</button>
+          </div>
+        </div>
+        <div class="panel-body" id="updates-body">
+          <div class="stale-slot"></div>
+          <div id="updates-list"><div class="loading">Loading updates…</div></div>
+        </div>
+      </section>
+
+      <section class="panel" aria-labelledby="standings-h">
+        <div class="panel-head"><h2 id="standings-h">Standings</h2></div>
+        <div class="panel-body" id="standings-body"><div class="loading">Loading standings…</div></div>
+      </section>
+    </div>
+
+    <div class="col">
+      <section class="panel" aria-labelledby="waivers-h">
+        <div class="panel-head">
+          <h2 id="waivers-h">Waiver board</h2>
+          <span class="meta" id="waivers-meta"></span>
+        </div>
+        <div class="panel-body" id="waivers-body"><div class="loading">Loading…</div></div>
+      </section>
+
+      <section class="panel" aria-labelledby="brief-h">
+        <div class="panel-head">
+          <h2 id="brief-h">Latest brief — so what</h2>
+          <span class="meta" id="brief-meta"></span>
+        </div>
+        <div class="panel-body" id="brief-body"><div class="loading">Loading…</div></div>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    Live data: Sleeper public API (read-only). NFL updates: published by the daily events routine.
+    Waiver board &amp; brief: published by the /waivers and /brief commands — this page never generates
+    analysis on its own, and shows explicit errors instead of stale or invented data.
+  </footer>
+
+  <script src="config.js?v=2"></script>
+  <script src="app.js?v=2"></script>
+</body>
+</html>
