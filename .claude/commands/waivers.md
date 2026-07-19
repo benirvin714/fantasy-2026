@@ -20,6 +20,7 @@ In-season waiver analysis for The HBGBs. Read CLAUDE.md rules first (read-only S
    - **A specific drop candidate from my roster** with reasoning; flag if the drop is scoopable by rivals (StoneBone69 especially).
 6. **Output**: ranked table + bid plan. End with total FAAB committed if all claims hit, and what remains.
 7. **Publish to the dashboard**: write the same ranked targets to `data/site/waivers.json` (schema: `{generated: "YYYY-MM-DD", mode, faab_remaining, note, targets: [{rank, player, pos, team, why, bid, competition, drop}]}`). The HBGBs HQ site (`site/`) renders this file and flags it stale after 7 days.
+8. **Push live**: commit and push so the hosted dashboard updates (Cloudflare Pages auto-deploys from GitHub): `git add data/site/waivers.json && git commit -m "Publish waiver board YYYY-MM-DD" && git push`. The live dashboard is https://hbgbs-hq.pages.dev/site/ (login-gated). If the push fails, say so — the local file is written but the live site is stale until pushed.
 
 ## Degradation
 - No web search → Sleeper-only mode: trending adds + roster math, clearly labeled as lacking role/injury verification.

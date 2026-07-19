@@ -19,6 +19,7 @@ Produce a current-NFL-landscape briefing for The HBGBs league. Read CLAUDE.md ru
 5. **Save to `briefs/YYYY-MM-DD.md`** (today's date). If a brief for today already exists, overwrite it but say so.
 6. **Diff against the previous brief**: find the most recent earlier file in `briefs/`. In your chat response, present ONLY what changed since that brief (new items, resolved items, reversals) plus the full "So what for this league" section. If no previous brief exists, present the full brief and say it's the baseline.
 7. **Publish to the dashboard**: write `data/site/latest-brief.json` (schema: `{date: "YYYY-MM-DD", so_what: [string, ...]}`) with condensed one-sentence versions of the "So what" items. The HBGBs HQ site (`site/`) renders this file.
+8. **Push live**: commit and push so the hosted dashboard updates (Cloudflare Pages auto-deploys from GitHub): `git add briefs/ data/site/latest-brief.json && git commit -m "Publish brief YYYY-MM-DD" && git push`. The live dashboard is https://hbgbs-hq.pages.dev/site/ (login-gated). If the push fails, say so — the local file is written but the live site is stale until pushed.
 
 ## Degradation
 - No web search available → say so and stop; a brief without current sources is worthless and must not be written from memory.
