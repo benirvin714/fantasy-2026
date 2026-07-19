@@ -17,6 +17,7 @@ Half PPR (0.5/rec), 1pt/10 rush+rec yds, 6pt TDs from scrimmage; passing 1pt/25y
 - `league-profile.md` — rules + how the format distorts consensus value (draft/trade doctrine).
 - `league-tendencies.md` — 6 seasons of owner dossiers, FAAB market prices, trade-partner map, self-scout.
 - `data/raw/` — raw Sleeper JSON 2020–2025 (leagues, rosters, drafts, transactions, brackets). Refresh via `scripts/fetch-league-data.ps1` (read-only GETs; update its `$leagueId` for 2026).
+- `data/faab-market.json` — compact FAAB pricing model (per-owner price-to-beat, bands, sample sizes). /waivers reads THIS for bids, never the raw transactions. Regenerate on demand: `node scripts/build-faab-model.mjs`.
 - `briefs/` — dated outputs of /brief.
 - Commands: `.claude/commands/` — brief, waivers, startsit, trade. /waivers and /brief also publish JSON to `data/site/` for the dashboard.
 - `site/` — HBGBs HQ dashboard (static; serve project root on :8642, open /site/). League ID lives in `site/config.js` too — update BOTH at renewal.

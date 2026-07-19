@@ -1,0 +1,250 @@
+{
+ "generated": "2026-07-19",
+ "method": "flat bid-event list; contested groups keyed (season,week,player); see scripts/build-faab-model.mjs",
+ "small_sample_rule": "if an owner's n_contested < 8, ignore price_to_beat and use bands.contested_routine",
+ "league": {
+  "seasons_covered": [
+   "2020",
+   "2021",
+   "2022",
+   "2023",
+   "2024",
+   "2025"
+  ],
+  "winning_bids": 633,
+  "median_winning_bid": 5,
+  "mean_winning_bid": 7.5,
+  "pct_uncontested_wins": 64.3,
+  "avg_contested_win_margin": 5.2,
+  "peak_add_weeks": [
+   {
+    "week": 7,
+    "adds": 150
+   },
+   {
+    "week": 5,
+    "adds": 122
+   },
+   {
+    "week": 6,
+    "adds": 122
+   }
+  ],
+  "adds_weeks_15_17_total": 124,
+  "frenzy_bids_30_plus": {
+   "2020": {
+    "count": 4,
+    "max": 44
+   },
+   "2021": {
+    "count": 7,
+    "max": 51
+   },
+   "2022": {
+    "count": 3,
+    "max": 56
+   },
+   "2023": {
+    "count": 5,
+    "max": 85
+   },
+   "2024": {
+    "count": 4,
+    "max": 73
+   },
+   "2025": {
+    "count": 3,
+    "max": 48
+   }
+  }
+ },
+ "owners": {
+  "ENOTS": {
+   "tag": "volume-aggressor",
+   "n_bids": 141,
+   "n_wins": 88,
+   "n_failed": 53,
+   "median_bid": 3,
+   "p90_bid": 17,
+   "max_bid": {
+    "amount": 48,
+    "season": "2025",
+    "week": 4,
+    "won": true
+   },
+   "n_contested": 73,
+   "avg_contested_win_margin": 7.3,
+   "price_to_beat": 27,
+   "adds_per_season": 36.3
+  },
+  "Sladsous": {
+   "tag": "hoard-then-burn",
+   "n_bids": 106,
+   "n_wins": 61,
+   "n_failed": 45,
+   "median_bid": 4.5,
+   "p90_bid": 22,
+   "max_bid": {
+    "amount": 73,
+    "season": "2024",
+    "week": 13,
+    "won": true
+   },
+   "n_contested": 62,
+   "avg_contested_win_margin": 3.7,
+   "price_to_beat": 27,
+   "adds_per_season": 24.7
+  },
+  "pauldag": {
+   "tag": "hoarder-sniper",
+   "n_bids": 44,
+   "n_wins": 19,
+   "n_failed": 25,
+   "median_bid": 2.5,
+   "p90_bid": 17.4,
+   "max_bid": {
+    "amount": 66,
+    "season": "2023",
+    "week": 2,
+    "won": true
+   },
+   "n_contested": 35,
+   "avg_contested_win_margin": 6.6,
+   "price_to_beat": 18,
+   "adds_per_season": 28.8
+  },
+  "mfkr": {
+   "tag": "early-burner",
+   "n_bids": 129,
+   "n_wins": 73,
+   "n_failed": 56,
+   "median_bid": 3,
+   "p90_bid": 18,
+   "max_bid": {
+    "amount": 85,
+    "season": "2023",
+    "week": 3,
+    "won": true
+   },
+   "n_contested": 79,
+   "avg_contested_win_margin": 5.8,
+   "price_to_beat": 21,
+   "adds_per_season": 31.5
+  },
+  "DiaperDutyDaddy": {
+   "tag": "late-frenzy",
+   "n_bids": 110,
+   "n_wins": 75,
+   "n_failed": 35,
+   "median_bid": 3,
+   "p90_bid": 15.3,
+   "max_bid": {
+    "amount": 55,
+    "season": "2024",
+    "week": 15,
+    "won": true
+   },
+   "n_contested": 50,
+   "avg_contested_win_margin": 5.2,
+   "price_to_beat": 21,
+   "adds_per_season": 34.7
+  },
+  "ThatWasButtery": {
+   "tag": "disciplined-mid",
+   "n_bids": 87,
+   "n_wins": 61,
+   "n_failed": 26,
+   "median_bid": 5,
+   "p90_bid": 16.8,
+   "max_bid": {
+    "amount": 45,
+    "season": "2023",
+    "week": 3,
+    "won": false
+   },
+   "n_contested": 40,
+   "avg_contested_win_margin": 4.4,
+   "price_to_beat": 19,
+   "adds_per_season": 21.3
+  },
+  "DadKing": {
+   "tag": "capped-25",
+   "n_bids": 107,
+   "n_wins": 68,
+   "n_failed": 39,
+   "median_bid": 5,
+   "p90_bid": 15,
+   "max_bid": {
+    "amount": 25,
+    "season": "2020",
+    "week": 8,
+    "won": true
+   },
+   "n_contested": 65,
+   "avg_contested_win_margin": 4.4,
+   "price_to_beat": 16,
+   "adds_per_season": 21
+  },
+  "StoneBone69": {
+   "tag": "volume-sprayer",
+   "n_bids": 239,
+   "n_wins": 103,
+   "n_failed": 136,
+   "median_bid": 2,
+   "p90_bid": 15.2,
+   "max_bid": {
+    "amount": 52,
+    "season": "2023",
+    "week": 2,
+    "won": false
+   },
+   "n_contested": 126,
+   "avg_contested_win_margin": 3.3,
+   "price_to_beat": 23,
+   "adds_per_season": 32.7
+  },
+  "bwalsh89": {
+   "tag": "rare-but-big",
+   "n_bids": 56,
+   "n_wins": 32,
+   "n_failed": 24,
+   "median_bid": 11,
+   "p90_bid": 24.5,
+   "max_bid": {
+    "amount": 56,
+    "season": "2022",
+    "week": 10,
+    "won": true
+   },
+   "n_contested": 32,
+   "avg_contested_win_margin": 9,
+   "price_to_beat": 28,
+   "adds_per_season": 18.7
+  },
+  "Stipe": {
+   "tag": "passive-low-ceiling",
+   "n_bids": 82,
+   "n_wins": 53,
+   "n_failed": 29,
+   "median_bid": 4.5,
+   "p90_bid": 21,
+   "max_bid": {
+    "amount": 41,
+    "season": "2024",
+    "week": 13,
+    "won": false
+   },
+   "n_contested": 47,
+   "avg_contested_win_margin": 5.9,
+   "price_to_beat": 23,
+   "adds_per_season": 25.2
+  }
+ },
+ "bands": {
+  "routine_uncontested": "1-3",
+  "contested_routine": "8-12",
+  "beat_capped_owner": 26,
+  "frenzy_floor": 60,
+  "note": "Frenzy = injury-replacement RB weeks; historical clearing 30-85. Money is near-dead after week 14."
+ }
+}

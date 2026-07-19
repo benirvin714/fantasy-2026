@@ -129,10 +129,12 @@
           <span class="rank">${t.rank}.</span>
           <span class="name">${esc(t.player)}</span>
           <span class="pos">${esc(t.pos)} · ${esc(t.team)}</span>
+          ${t.verdict ? `<span class="verdict verdict-${esc(t.verdict)}">${esc(t.verdict)}</span>` : ""}
           <span class="bid">${esc(t.bid)}</span>
         </div>
         <div class="why">${esc(t.why)}</div>
-        <div class="sub"><b>competition:</b> ${esc(t.competition)} &nbsp;·&nbsp; <b>drop:</b> ${esc(t.drop)}</div>
+        ${t.my_team_impact ? `<div class="impact">↳ ${esc(t.my_team_impact)}</div>` : ""}
+        <div class="sub"><b>competition:</b> ${t.pressure ? `<span class="pressure pressure-${esc(t.pressure)}">${esc(t.pressure).toUpperCase()}</span> — ` : ""}${esc(t.competition)} &nbsp;·&nbsp; <b>drop:</b> ${esc(t.drop)}</div>
       </div>`).join("") + (d.note ? `<p class="sub" style="color:var(--faint);font-size:12px;margin:10px 0 0">${esc(d.note)}</p>` : "");
   }
 
