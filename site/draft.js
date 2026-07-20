@@ -85,6 +85,9 @@
     const gapCls = p.gap == null ? "" : p.gap >= 5 ? "gap-value" : p.gap <= -5 ? "gap-reach" : "gap-fair";
     const nameCls = p.gap == null ? "" : p.gap >= 5 ? "name-value" : p.gap <= -5 ? "name-reach" : "";
     const gapTxt = p.gap == null ? "–" : (p.gap > 0 ? "+" : "") + Math.round(p.gap);
+    const bc = p.fftiers;
+    const bcTxt = bc ? `${bc.rank}<span class="bctier">T${bc.tier}</span>` : "–";
+    const bcTitle = bc ? `Boris Chen half-PPR consensus: overall #${bc.rank}, tier ${bc.tier} (avg ${bc.avg_rank}, range ${bc.best_rank}-${bc.worst_rank})` : "not in fftiers top-200";
     const badges = [
       ...p.flagged.map((f) => badge(f.slice(0, 3).toUpperCase(), "rbadge-risk", `${f} risk — see detail`)),
       p.unvetted ? badge("unvetted", "rbadge-unvetted", "Risk flags not yet researched — null, not clean") : "",
@@ -101,6 +104,7 @@
         <span class="dval mono">${p.value ?? "–"}</span>
         <span class="dadp mono" title="ADP (half-PPR, ${esc(board.players ? p.adp?.updated : "")})">${p.adp?.half_ppr ?? "–"}</span>
         <span class="dgap mono ${gapCls}">${gapTxt}</span>
+        <span class="dbc mono" title="${esc(bcTitle)}">${bcTxt}</span>
       </button>
       ${isOpen ? detailHTML(p) : ""}
     </div>`;
@@ -149,6 +153,11 @@
         <div><b>method:</b> ${esc(p.projection.method)}</div>
         <div><b>sleeper half-PPR anchor:</b> ${p.projection.sleeper_half_ppr ?? "–"}</div>
         <div><b>ADP:</b> ${p.adp?.half_ppr ?? "–"} <span class="faint">(as of ${esc(p.adp?.updated ?? "?")})</span></div>
+        <h4>Boris Chen (fftiers)</h4>
+        ${p.fftiers ? `<div><b>consensus rank:</b> #${p.fftiers.rank} · tier ${p.fftiers.tier}</div>
+        <div><b>expert avg:</b> ${p.fftiers.avg_rank} <span class="faint">(range ${p.fftiers.best_rank}–${p.fftiers.worst_rank}, std ${p.fftiers.std_dev})</span></div>
+        <div class="faint">FantasyPros consensus, GMM-clustered tiers, half-PPR · as of ${esc(board.fftiers?.updated ?? "?")}</div>`
+          : `<div>${noData} — not in Boris Chen's top-200 (free agent or deep)</div>`}
       </div>
       <div class="dcol">
         <h4>Availability</h4>
@@ -173,7 +182,7 @@
     <div class="drow dhead" aria-hidden="true">
       <span></span>
       <span class="dmain-head"><span class="dr">#</span><span class="dname">player</span><span class="dpos">pos</span>
-      <span class="dval">value</span><span class="dadp">adp</span><span class="dgap">gap</span></span>
+      <span class="dval">value</span><span class="dadp">adp</span><span class="dgap">gap</span><span class="dbc">BC</span></span>
     </div>`;
 
   /* ---------- views ---------- */
@@ -188,10 +197,14 @@
   function paint() {
     const list = visible();
     if (view === "board") {
-      $("#board-title").textContent = (pos === "ALL" ? "Value board" : `Value board — ${pos}`) + (sort === "adp" ? " · by ADP" : " · by value");
-      const sorted = [...list].sort((a, b) => sort === "adp"
-        ? (a.adp?.half_ppr ?? Infinity) - (b.adp?.half_ppr ?? Infinity)
-        : (b.value ?? -1) - (a.value ?? -1));
+      const sortLabel = { value: "by value", adp: "by ADP", bc: "by Boris Chen rank" }[sort] ?? "by value";
+      $("#board-title").textContent = (pos === "ALL" ? "Value board" : `Value board — ${pos}`) + " · " + sortLabel;
+      const sortFns = {
+        adp: (a, b) => (a.adp?.half_ppr ?? Infinity) - (b.adp?.half_ppr ?? Infinity),
+        bc: (a, b) => (a.fftiers?.rank ?? Infinity) - (b.fftiers?.rank ?? Infinity),
+        value: (a, b) => (b.value ?? -1) - (a.value ?? -1),
+      };
+      const sorted = [...list].sort(sortFns[sort] ?? sortFns.value);
       $("#board-body").innerHTML = headerHTML +
         sorted.map((p) => rowHTML(p, p.valueRank ?? "–")).join("") +
         `<div class="boardfoot">gap = ADP − value rank · name in <span class="name-value">light&nbsp;blue</span> = market prices them later than their value (bargain, +gap) · <span class="name-reach">red</span> = priced above value (reach, −gap). # column is value rank in both sorts.</div>`;

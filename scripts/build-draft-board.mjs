@@ -37,6 +37,42 @@ const researchFile = fs.existsSync(researchPath) ? JSON.parse(fs.readFileSync(re
 const research = researchFile.players ?? {};
 const cleanIds = new Set(researchFile.clean_researched?.ids ?? []);
 
+// ---- fftiers overlay: Boris Chen half-PPR consensus rank + tiers (build-time fetch) ----------
+// Source: fftiers (github.com/borisachen/fftiers) via his S3 output. FantasyPros expert consensus,
+// GMM-clustered tiers, in MY league's half-PPR format. Baked in at build time (the deployed page's
+// CSP blocks external fetch). Degrades to null on fetch failure — never fabricated.
+const FFTIERS_URL = "https://s3-us-west-1.amazonaws.com/fftiers/out/weekly-ALL-HALF-PPR.csv";
+const normName = (s) => String(s ?? "").toLowerCase()
+  .replace(/\./g, "").replace(/'/g, "")
+  .replace(/\b(jr|sr|ii|iii|iv)\b/g, "")
+  .replace(/[^a-z0-9 ]/g, " ").replace(/\s+/g, " ").trim();
+const parseCsvLine = (line) => {
+  const out = []; let cur = "", q = false;
+  for (const ch of line) {
+    if (ch === '"') q = !q;
+    else if (ch === "," && !q) { out.push(cur); cur = ""; }
+    else cur += ch;
+  }
+  out.push(cur); return out;
+};
+let fftMap = new Map(), fftStatus = "ok";
+try {
+  const csv = await (await fetch(FFTIERS_URL)).text();
+  const lines = csv.trim().split("\n");
+  const header = parseCsvLine(lines[0]).map((h) => h.replace(/"/g, ""));
+  const col = (n) => header.indexOf(n);
+  for (const line of lines.slice(1)) {
+    const c = parseCsvLine(line);
+    const name = c[col("Player.Name")];
+    if (!name) continue;
+    fftMap.set(normName(name), {
+      rank: +c[col("Rank")], tier: +c[col("Tier")], pos: c[col("Position")],
+      avg_rank: +c[col("Avg.Rank")], best_rank: +c[col("Best.Rank")],
+      worst_rank: +c[col("Worst.Rank")], std_dev: +c[col("Std.Dev")],
+    });
+  }
+} catch (e) { fftStatus = `fetch failed: ${e.message}`; }
+
 // ---- projection re-scoring with THIS league's settings ----------------------
 // Skill stat keys map 1:1 onto scoring_settings keys. Kicker: projection aggregates
 // 50+ as fgm_50p — league pays 5 (50-59) / 6 (60+); we score fgm_50p at 5 and note
@@ -150,6 +186,7 @@ const rows = [...skill, ...kickers, ...defs].map(([id, p]) => {
     risk_flags: rx.risk_flags ?? { suspension: null, contract: null, legal: null, researched: false, notes: [] },
     adp: { half_ppr: adp, updated: TODAY },
     adp_commentary: rx.adp_commentary ?? null,
+    fftiers: fftMap.get(normName(name)) ?? null, // Boris Chen half-PPR consensus rank+tier; null = not in his top-200
     context: { contract_year: null, rookie_capital: null, team_win_total: null, playoff_sos: null },
   };
 });
@@ -158,6 +195,7 @@ const board = {
   generated: TODAY,
   scoring_basis: "HBGBs 2025 scoring_settings (data/raw/league-2025.json); re-verify at 2026 renewal",
   pool: `top ${POOL_SIZE} by Sleeper search_rank + 32 DEF`,
+  fftiers: { source: "Boris Chen fftiers (FantasyPros consensus, GMM tiers), half-PPR draft board", status: fftStatus, updated: TODAY, matched: rows.filter((r) => r.fftiers).length },
   gaps: [
     { field: "availability.injury_history", status: `researched for top ~35 (overlay); ${Object.keys(research).length} players in draft-research.json`, fill: "extend the web research pass deeper than ~35 as draft nears" },
     { field: "availability.score (rookies)", status: "null by design", fill: "no NFL history exists; page shows no-data" },
@@ -178,3 +216,8 @@ console.log(`Wrote ${OUT} (${(fs.statSync(OUT).size / 1024).toFixed(0)}KB): ${ro
 const sanity = rows.filter((r) => r.projection.pts != null && r.projection.sleeper_half_ppr && !["K", "DEF"].includes(r.pos))
   .map((r) => Math.abs(r.projection.pts - r.projection.sleeper_half_ppr));
 console.log(`skill re-score vs sleeper_half_ppr: max diff ${Math.max(...sanity).toFixed(1)}, mean ${(sanity.reduce((a, b) => a + b, 0) / sanity.length).toFixed(2)}`);
+console.log(`fftiers: status=${fftStatus}, csv-rows=${fftMap.size}, matched to board=${rows.filter((r) => r.fftiers).length}`);
+// unmatched fftiers players in the ADP<=120 range = likely name-normalization misses worth checking
+const boardNorms = new Set(rows.map((r) => normName(r.name)));
+const unmatched = [...fftMap.entries()].filter(([n, v]) => v.rank <= 130 && !boardNorms.has(n)).map(([, v]) => v).slice(0, 15);
+if (unmatched.length) console.log(`fftiers top-130 NOT matched to board (${unmatched.length}+):`, unmatched.map((v) => `${v.rank}:${v.pos}`).join(" "));
