@@ -13,6 +13,7 @@ Fantasy football decision support for the 2026 season of The HBGBs (10-team Slee
 | `briefs/` | Dated /brief outputs; each new brief diffs against the previous one. |
 | `.claude/commands/` | The four commands below. |
 | `site/` | **HBGBs HQ dashboard** — static, zero-cost, read-only. Live standings + season state straight from Sleeper's public API (client-side), an NFL-updates panel fed by the daily `nfl-events` routine, plus waiver-board and latest-brief panels fed by `data/site/*.json` (published by /waivers and /brief). Standings show the playoff cut line (top 6) and inline points-for bars; a header refresh button re-pulls live data. Start: `python scripts/serve.py 8642` from the project root (or the `hbgbs-hq` launch config — it runs the no-cache server), open `http://localhost:8642/site/`. Update `site/config.js` with the new league ID at renewal. **After editing `site/style.css` or `site/app.js`, bump the `?v=N` query on their `<link>`/`<script>` tags in `site/index.html`** so browsers fetch the change. |
+| `plans/` | Design docs — **confirmed, pre-build**. [valuation-and-scouting.md](plans/valuation-and-scouting.md): the VORP/replacement + ceiling valuation fixes and the `scouting_brief` commentary layer that feeds a capped `situation.modifier`. |
 
 ## Commands
 
