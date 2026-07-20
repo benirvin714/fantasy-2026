@@ -14,7 +14,7 @@
   const saveTaken = () => localStorage.setItem(LS_KEY, JSON.stringify([...taken]));
 
   let board = null, rows = [];
-  let pos = "ALL", view = "board", hideDrafted = false, hideFlagged = false;
+  let pos = "ALL", view = "board", sort = "value", hideDrafted = false, hideFlagged = false;
   const expanded = new Set();
 
   /* ---------- value math (transparent, in one place) ----------
@@ -83,6 +83,7 @@
     const isTaken = taken.has(p.id);
     const isOpen = expanded.has(p.id);
     const gapCls = p.gap == null ? "" : p.gap >= 5 ? "gap-value" : p.gap <= -5 ? "gap-reach" : "gap-fair";
+    const nameCls = p.gap == null ? "" : p.gap >= 5 ? "name-value" : p.gap <= -5 ? "name-reach" : "";
     const gapTxt = p.gap == null ? "–" : (p.gap > 0 ? "+" : "") + Math.round(p.gap);
     const badges = [
       ...p.flagged.map((f) => badge(f.slice(0, 3).toUpperCase(), "rbadge-risk", `${f} risk — see detail`)),
@@ -94,7 +95,7 @@
       <button class="take" data-act="take" aria-pressed="${isTaken}" title="${isTaken ? "Mark available" : "Mark drafted"}">${isTaken ? "✓" : ""}</button>
       <button class="dmain" data-act="expand" aria-expanded="${isOpen}">
         <span class="dr">${rankLabel}</span>
-        <span class="dname">${esc(p.name)}</span>
+        <span class="dname ${nameCls}">${esc(p.name)}</span>
         <span class="dpos">${esc(p.pos)}${p.posRank ? p.posRank : ""} · ${esc(p.team)}</span>
         ${badges}
         <span class="dval mono">${p.value ?? "–"}</span>
@@ -165,11 +166,13 @@
   function paint() {
     const list = visible();
     if (view === "board") {
-      $("#board-title").textContent = pos === "ALL" ? "Value board" : `Value board — ${pos}`;
-      const sorted = [...list].sort((a, b) => (b.value ?? -1) - (a.value ?? -1));
+      $("#board-title").textContent = (pos === "ALL" ? "Value board" : `Value board — ${pos}`) + (sort === "adp" ? " · by ADP" : " · by value");
+      const sorted = [...list].sort((a, b) => sort === "adp"
+        ? (a.adp?.half_ppr ?? Infinity) - (b.adp?.half_ppr ?? Infinity)
+        : (b.value ?? -1) - (a.value ?? -1));
       $("#board-body").innerHTML = headerHTML +
         sorted.map((p) => rowHTML(p, p.valueRank ?? "–")).join("") +
-        `<div class="boardfoot">gap = ADP − value rank · <span class="gap-value">+green</span> = market prices them later than their value (bargain) · <span class="gap-reach">−red</span> = priced above value (reach)</div>`;
+        `<div class="boardfoot">gap = ADP − value rank · name in <span class="name-value">light&nbsp;blue</span> = market prices them later than their value (bargain, +gap) · <span class="name-reach">red</span> = priced above value (reach, −gap). # column is value rank in both sorts.</div>`;
     } else {
       $("#board-title").textContent = "Tiers — cliff edges";
       const posList = pos === "ALL" ? ["RB", "WR", "QB", "TE", "K", "DEF"] : [pos];
@@ -206,6 +209,10 @@
   document.querySelectorAll("#toolbar [data-view]").forEach((b) => b.addEventListener("click", () => {
     document.querySelectorAll("#toolbar [data-view]").forEach((x) => x.setAttribute("aria-pressed", "false"));
     b.setAttribute("aria-pressed", "true"); view = b.dataset.view; paint();
+  }));
+  document.querySelectorAll("#toolbar [data-sort]").forEach((b) => b.addEventListener("click", () => {
+    document.querySelectorAll("#toolbar [data-sort]").forEach((x) => x.setAttribute("aria-pressed", "false"));
+    b.setAttribute("aria-pressed", "true"); sort = b.dataset.sort; paint();
   }));
   $("#hide-drafted").addEventListener("click", (e) => {
     hideDrafted = !hideDrafted; e.target.setAttribute("aria-pressed", String(hideDrafted)); paint();

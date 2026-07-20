@@ -14,6 +14,7 @@
   --moss: #8fae6d;
   --neg: #d06a5c;
   --warn: #c9b458;
+  --blue: #6cb6f2;   /* value-vs-ADP bargain highlight (added for draft board name coloring) */
   --radius: 6px;   /* softened from 2px to sit better under shadows (in-chat override of the sharp-edge foundation) */
   --font-data: "Fira Code", ui-monospace, SFMono-Regular, Consolas, monospace; /* numerals & tags only */
   --font-body: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -318,6 +319,8 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
 .gap-value { color: var(--accent); }
 .gap-reach { color: var(--neg); }
 .gap-fair { color: var(--faint); }
+.name-value { color: var(--blue); }
+.name-reach { color: var(--neg); }
 .drow.taken .dmain { opacity: 0.38; }
 .drow.taken .dname { text-decoration: line-through; }
 

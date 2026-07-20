@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap">
-  <link rel="stylesheet" href="style.css?v=8">
+  <link rel="stylesheet" href="style.css?v=9">
 </head>
 <body>
   <header>
@@ -37,6 +37,10 @@
         <button data-view="board" aria-pressed="true">value board</button>
         <button data-view="tiers" aria-pressed="false">tiers</button>
       </div>
+      <div class="filters" role="group" aria-label="Sort board by">
+        <button data-sort="value" aria-pressed="true">sort: value</button>
+        <button data-sort="adp" aria-pressed="false">sort: ADP</button>
+      </div>
       <div class="filters" role="group" aria-label="Toggles">
         <button id="hide-drafted" aria-pressed="false">hide drafted</button>
         <button id="hide-flagged" aria-pressed="false">hide risk-flagged</button>
@@ -60,6 +64,6 @@
   </footer>
 
   <script src="config.js?v=6"></script>
-  <script src="draft.js?v=8"></script>
+  <script src="draft.js?v=9"></script>
 </body>
 </html>
