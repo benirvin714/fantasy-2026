@@ -15,7 +15,7 @@
 
   let board = null, rows = [];
   let pos = "ALL", view = "board", sort = "value", hideDrafted = false, hideFlagged = false;
-  const expanded = new Set();
+  let expandedId = null; // single-row accordion: only one detail open at a time
 
   /* ---------- value math (transparent, in one place) ----------
      Cross-positional value MUST be VORP, not raw points: in this league QB13-16,
@@ -81,7 +81,7 @@
 
   function rowHTML(p, rankLabel) {
     const isTaken = taken.has(p.id);
-    const isOpen = expanded.has(p.id);
+    const isOpen = expandedId === p.id;
     const gapCls = p.gap == null ? "" : p.gap >= 5 ? "gap-value" : p.gap <= -5 ? "gap-reach" : "gap-fair";
     const nameCls = p.gap == null ? "" : p.gap >= 5 ? "name-value" : p.gap <= -5 ? "name-reach" : "";
     const gapTxt = p.gap == null ? "–" : (p.gap > 0 ? "+" : "") + Math.round(p.gap);
@@ -138,8 +138,6 @@
     const a = p.availability ?? {};
     const gp = a.games_played ?? {};
     const facts = p.situation?.facts ?? [];
-    const ctx = p.context ?? {};
-    const ctxRow = (label, v, fmt) => `<div><b>${label}:</b> ${v == null ? noData : esc(fmt ? fmt(v) : v)}</div>`;
     const notes = p.risk_flags?.notes ?? [];
     return `<div class="ddetail">
       ${p.adp_commentary ? `<div class="dcommentary"><b>Why here at ${esc(p.pos)}:</b> ${esc(p.adp_commentary)}</div>` : ""}
@@ -167,11 +165,6 @@
         <div>${p.risk_flags.researched === false ? `${noData} — not yet researched (null ≠ clean)` :
           p.flagged.length ? `<b class="flagged-txt">${p.flagged.map(esc).join(", ")}</b>` : "researched: clean"}</div>
         ${notes.map((n) => `<div class="fact faint">• ${esc(n)}</div>`).join("")}
-        <h4>Context</h4>
-        ${ctxRow("contract year", ctx.contract_year)}
-        ${ctxRow("rookie capital", ctx.rookie_capital)}
-        ${ctxRow("team win total", ctx.team_win_total)}
-        ${ctxRow("playoff SOS (wks 15-17)", ctx.playoff_sos)}
       </div>
     </div>`;
   }
@@ -226,7 +219,7 @@
       taken.has(id) ? taken.delete(id) : taken.add(id);
       saveTaken();
     } else if (act.dataset.act === "expand") {
-      expanded.has(id) ? expanded.delete(id) : expanded.add(id);
+      expandedId = expandedId === id ? null : id; // open this row, closing any other
     }
     paint();
   });
