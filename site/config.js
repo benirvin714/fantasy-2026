@@ -11,4 +11,5 @@ window.HQ_CONFIG = {
   WAIVERS_JSON: "/data/site/waivers.json",
   BRIEF_JSON: "/data/site/latest-brief.json",
   EVENTS_JSON: "/data/site/nfl-events.json",
+  DRAFT_BOARD_JSON: "/data/site/draft-board.json",
 };

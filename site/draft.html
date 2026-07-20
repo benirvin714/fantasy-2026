@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HBGBs Draft Day</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230b0f0c'/%3E%3Crect x='6' y='6' width='20' height='20' fill='%2363bf5a'/%3E%3Crect x='12' y='12' width='8' height='8' fill='%230b0f0c'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap">
+  <link rel="stylesheet" href="style.css?v=7">
+</head>
+<body>
+  <header>
+    <h1>THE HBGBS <span class="hq">/ DRAFT DAY</span></h1>
+    <nav class="chips" aria-label="Pages">
+      <a class="chip navlink" href="index.html">in-season HQ</a>
+      <span class="chip navlink active" aria-current="page">draft day</span>
+    </nav>
+    <div class="spacer"></div>
+    <span class="chip" id="board-meta">loading…</span>
+    <span class="readonly-note">pre-season value board · one-time draft knowledge, no in-season content</span>
+  </header>
+
+  <main class="draft-main">
+    <div class="draft-toolbar" id="toolbar">
+      <div class="filters" role="group" aria-label="Position filter">
+        <button data-pos="ALL" aria-pressed="true">all</button>
+        <button data-pos="QB" aria-pressed="false">QB</button>
+        <button data-pos="RB" aria-pressed="false">RB</button>
+        <button data-pos="WR" aria-pressed="false">WR</button>
+        <button data-pos="TE" aria-pressed="false">TE</button>
+        <button data-pos="K" aria-pressed="false">K</button>
+        <button data-pos="DEF" aria-pressed="false">DEF</button>
+      </div>
+      <div class="filters" role="group" aria-label="View">
+        <button data-view="board" aria-pressed="true">value board</button>
+        <button data-view="tiers" aria-pressed="false">tiers</button>
+      </div>
+      <div class="filters" role="group" aria-label="Toggles">
+        <button id="hide-drafted" aria-pressed="false">hide drafted</button>
+        <button id="hide-flagged" aria-pressed="false">hide risk-flagged</button>
+        <button id="reset-draft" title="Clear all drafted marks">reset draft</button>
+      </div>
+    </div>
+
+    <section class="panel" id="board-panel">
+      <div class="panel-head">
+        <h2 id="board-title">Value board</h2>
+        <span class="meta" id="board-sub">value = VORP (league pts over free replacement) × availability × situation, vs ADP</span>
+      </div>
+      <div class="panel-body" id="board-body"><div class="loading">Loading draft board…</div></div>
+    </section>
+  </main>
+
+  <footer>
+    Data: <span class="mono">data/site/draft-board.json</span> (Sleeper projections re-scored to HBGBs scoring;
+    availability from 3-yr games + age + status). Fields without data say so — nothing is fabricated.
+    Drafted marks persist in this browser only (localStorage) and survive reloads.
+  </footer>
+
+  <script src="config.js?v=6"></script>
+  <script src="draft.js?v=7"></script>
+</body>
+</html>
