@@ -144,17 +144,27 @@ const precededByOtherName = (text, last, first) => {
   return false;
 };
 function situationFacts(name, pos) {
-  const parts = name.split(" "), last = parts[parts.length - 1], first = parts[0];
+  const inText = (e) => `${e.headline}\n${e.detail}`;
+  const fact = (e) => ({ date: e.date, type: e.type, fact: e.headline, source: e.source?.url ?? null });
+  // DEF: the entity is a team; players[] tags cover skill players, so match the team nickname.
+  if (pos === "DEF") {
+    const nick = name.split(" ").slice(-1)[0];
+    return events.filter((e) => new RegExp(`\\b${reEsc(nick)}\\b`).test(inText(e))).map(fact);
+  }
+  const nn = normName(name), parts = name.split(" "), last = parts[parts.length - 1], first = parts[0];
   return events.filter((e) => {
-    const text = `${e.headline}\n${e.detail}`;
-    if (text.includes(name)) return true;                                   // unambiguous full-name hit
-    if (pos === "DEF") return new RegExp(`\\b${reEsc(last)}\\b`).test(text); // team nickname
-    if (last.length <= 4) return false;                                     // short surnames: too collision-prone
-    if (sharedSurnames.has(last) || teamNicknames.has(last)) return false;  // ambiguous -> require full name
+    // Explicit players[] tag is authoritative for skill players — set by the nfl-daily-events
+    // routine, so matching is exact (no surname collisions, no coach/team false positives).
+    if (Array.isArray(e.players)) return e.players.some((pn) => normName(pn) === nn);
+    // Fallback for untagged events only: full name, then a safe bare-surname heuristic.
+    const text = inText(e);
+    if (text.includes(name)) return true;
+    if (last.length <= 4) return false;
+    if (sharedSurnames.has(last) || teamNicknames.has(last)) return false;
     if (!new RegExp(`\\b${reEsc(last)}\\b`).test(text)) return false;
-    if (precededByOtherName(text, last, first)) return false;               // "Zac Robinson" / "Sanders/Watson"
+    if (precededByOtherName(text, last, first)) return false;
     return true;
-  }).map((e) => ({ date: e.date, type: e.type, fact: e.headline, source: e.source?.url ?? null }));
+  }).map(fact);
 }
 
 // ---- ceiling / spike-week metric (weekly variance) --------------------------
