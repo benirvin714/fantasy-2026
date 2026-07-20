@@ -134,6 +134,70 @@ function situationFacts(name) {
     .map((e) => ({ date: e.date, type: e.type, fact: e.headline, source: e.source?.url ?? null }));
 }
 
+// ---- ceiling / spike-week metric (weekly variance) --------------------------
+// Mean-VORP is variance-blind, but this league pays for ceiling ("draft for spike
+// weeks", league-profile.md §10). Re-score every player-week 2023-25 in league
+// format; a "spike week" = finishing at/above the position's top-SPIKE_RANK weekly
+// line. spike_week_rate = share of a player's weeks that spiked. Feeds the draft
+// board's ceiling column + the ceiling-tilt knob. Degrades to null (with reason)
+// on fetch failure or thin sample (rookies) — never fabricated.
+const SPIKE_RANK = 5;        // a spike week ~ a top-5 weekly finish at the position
+const MIN_CEIL_WEEKS = 10;   // fewer real games than this -> null (no stable estimate)
+const CEIL_POS = ["QB", "RB", "WR", "TE"];
+let ceilingById = new Map(), ceilingPosAvg = {}, ceilingStatus = "ok", ceilingBoomLine = {};
+try {
+  const t0 = Date.now();
+  const YEARS = ["2023", "2024", "2025"], WEEKS = Array.from({ length: 18 }, (_, i) => i + 1);
+  const weekly = await Promise.all(
+    YEARS.flatMap((y) => WEEKS.map((w) =>
+      get(`https://api.sleeper.app/v1/stats/nfl/regular/${y}/${w}`).catch(() => ({}))))
+  );
+  const posOf = (id) => players[id]?.position ?? null;
+  const perPlayer = new Map();   // id -> [weekly league pts]
+  const perPosWeek = new Map();  // `${pos}|${weekIdx}` -> [all scores that week]
+  weekly.forEach((wk, weekIdx) => {
+    for (const [id, line] of Object.entries(wk)) {
+      const pos = posOf(id);
+      if (!CEIL_POS.includes(pos) || line.gp == null || line.gp < 1) continue;
+      const pts = rescore(line, pos);
+      if (pts == null) continue;
+      if (!perPlayer.has(id)) perPlayer.set(id, []);
+      perPlayer.get(id).push(pts);
+      const k = `${pos}|${weekIdx}`;
+      if (!perPosWeek.has(k)) perPosWeek.set(k, []);
+      perPosWeek.get(k).push(pts);
+    }
+  });
+  // positional boom line = average of the SPIKE_RANK-th best score across all weeks
+  for (const pos of CEIL_POS) {
+    const nths = [];
+    for (const [k, arr] of perPosWeek) {
+      if (!k.startsWith(pos + "|") || arr.length < SPIKE_RANK) continue;
+      nths.push([...arr].sort((a, b) => b - a)[SPIKE_RANK - 1]);
+    }
+    ceilingBoomLine[pos] = nths.length ? +(nths.reduce((a, b) => a + b, 0) / nths.length).toFixed(1) : null;
+  }
+  const pct = (arr, p) => { const s = [...arr].sort((a, b) => a - b); return s[Math.min(s.length - 1, Math.floor(p * s.length))]; };
+  const posRates = Object.fromEntries(CEIL_POS.map((p) => [p, []]));
+  for (const [id, pts] of perPlayer) {
+    const pos = posOf(id), boom = ceilingBoomLine[pos];
+    if (pts.length < MIN_CEIL_WEEKS || boom == null) { ceilingById.set(id, null); continue; }
+    const rate = +(pts.filter((v) => v >= boom).length / pts.length).toFixed(3);
+    ceilingById.set(id, {
+      spike_week_rate: rate, boom_line: boom,
+      boom_pts: +pct(pts, 0.85).toFixed(1), floor_pts: +pct(pts, 0.15).toFixed(1),
+      sample_weeks: pts.length,
+      method: `share of ${pts.length} games (2023-25) at/above the ${pos} top-${SPIKE_RANK} weekly line (${boom} pts)`,
+    });
+    posRates[pos].push(rate);
+  }
+  for (const pos of CEIL_POS) {
+    const a = posRates[pos];
+    ceilingPosAvg[pos] = a.length ? +(a.reduce((x, y) => x + y, 0) / a.length).toFixed(3) : null;
+  }
+  console.log(`ceiling: ${weekly.length} weeks fetched in ${((Date.now() - t0) / 1000).toFixed(1)}s, ${ceilingById.size} players scored, boom lines ${JSON.stringify(ceilingBoomLine)}, pos avg ${JSON.stringify(ceilingPosAvg)}`);
+} catch (e) { ceilingStatus = `weekly fetch/compute failed: ${e.message}`; console.log(`ceiling: ${ceilingStatus}`); }
+
 // ---- build the pool ----------------------------------------------------------
 const ranked = (posList, n) => Object.entries(players)
   .filter(([, p]) => posList.includes(p.position) && p.team && p.search_rank && p.search_rank < 9999999)
@@ -187,6 +251,7 @@ const rows = [...skill, ...kickers, ...defs].map(([id, p]) => {
     adp: { half_ppr: adp, updated: TODAY },
     adp_commentary: rx.adp_commentary ?? null,
     fftiers: fftMap.get(normName(name)) ?? null, // Boris Chen half-PPR consensus rank+tier; null = not in his top-200
+    ceiling: ceilingById.get(id) ?? null, // weekly spike-week rate; null = thin sample (rookie) or fetch failure
     context: { contract_year: null, rookie_capital: null, team_win_total: null, playoff_sos: null },
   };
 });
@@ -196,7 +261,9 @@ const board = {
   scoring_basis: "HBGBs 2025 scoring_settings (data/raw/league-2025.json); re-verify at 2026 renewal",
   pool: `top ${POOL_SIZE} by Sleeper search_rank + 32 DEF`,
   fftiers: { source: "Boris Chen fftiers (FantasyPros consensus, GMM tiers), half-PPR draft board", status: fftStatus, updated: TODAY, matched: rows.filter((r) => r.fftiers).length },
+  ceiling: { source: "Sleeper weekly stats 2023-25 re-scored; spike week = top-5 weekly finish at position", status: ceilingStatus, pos_avg: ceilingPosAvg, boom_line: ceilingBoomLine, spike_rank: SPIKE_RANK, min_weeks: MIN_CEIL_WEEKS, scored: rows.filter((r) => r.ceiling).length, updated: TODAY },
   gaps: [
+    { field: "ceiling (rookies / thin sample)", status: "null by design", fill: `<${MIN_CEIL_WEEKS} career weeks -> no stable spike-rate; page shows no-data` },
     { field: "availability.injury_history", status: `researched for top ~35 (overlay); ${Object.keys(research).length} players in draft-research.json`, fill: "extend the web research pass deeper than ~35 as draft nears" },
     { field: "availability.score (rookies)", status: "null by design", fill: "no NFL history exists; page shows no-data" },
     { field: "situation.modifier", status: "unset", fill: "analysis pass over stored facts (facts only, no invented context)" },

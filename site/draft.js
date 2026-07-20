@@ -13,18 +13,36 @@
   const taken = new Set(JSON.parse(localStorage.getItem(LS_KEY) ?? "[]"));
   const saveTaken = () => localStorage.setItem(LS_KEY, JSON.stringify([...taken]));
 
+  const KNOB_KEY = "hq-draft-2026-knobs";
+  const savedKnobs = JSON.parse(localStorage.getItem(KNOB_KEY) ?? "{}");
+  const saveKnobs = () => localStorage.setItem(KNOB_KEY, JSON.stringify({ replBasis, ceilTilt }));
+
   let board = null, rows = [];
   let pos = "ALL", view = "board", sort = "value", hideDrafted = false, hideFlagged = false;
+  let replBasis = savedKnobs.replBasis ?? 0;  // 0 = starter basis (fixed replacement), 1 = rostered (best-FA)
+  let ceilTilt = savedKnobs.ceilTilt ?? 0;    // 0 = pure mean-VORP; >0 blends spike-week upside into value
   let expandedId = null; // single-row accordion: only one detail open at a time
 
   /* ---------- value math (transparent, in one place) ----------
      Cross-positional value MUST be VORP, not raw points: in this league QB13-16,
-     TE12-15, RB/WR ~45+, a top-12 K and streamable DEFs sit on waivers all season
-     (league-profile.md), so a player's draft value is points OVER that free
-     replacement. Raw points would rank all QBs first — exactly the trap the
-     league doctrine warns against. Replacement rank per position: */
-  const REPL_RANK = { QB: 13, RB: 46, WR: 47, TE: 13, K: 11, DEF: 11 };
-  let replPts = {}; // computed from the board itself
+     TE12-15, RB/WR streamers and streamable K/DEF sit on waivers all season
+     (league-profile.md), so draft value is points OVER that free replacement.
+     Replacement = "the streamer you'd actually start." The replacement-basis knob
+     slides each position's rank between the STARTER line (last weekly starter — the
+     fix; avoids Sleeper's backup-RB≈0 projections dragging the RB baseline down and
+     inflating RB VORP) and the ROSTERED line (last rostered / best free agent — the
+     old basis). t=0 => starters (default), t=1 => rostered. */
+  const STARTER_RANK = { QB: 11, RB: 30, WR: 32, TE: 11, K: 11, DEF: 11 };
+  const ROSTERED_RANK = { QB: 13, RB: 46, WR: 47, TE: 13, K: 11, DEF: 11 };
+  const replRankFor = (ps, t) => Math.max(1, Math.round(STARTER_RANK[ps] + (ROSTERED_RANK[ps] - STARTER_RANK[ps]) * t));
+  let replPts = {}, replRankUsed = {}, ceilAvg = {}; // all computed from the board itself
+  // ceiling-tilt factor: blends spike-week upside into value. ratio = player's spike
+  // rate vs the board's positional average, clamped [0.5, 2]; tilt 0 => factor 1.
+  const ceilFactor = (p) => {
+    if (!ceilTilt || !p.ceiling || !ceilAvg[p.pos]) return 1;
+    const ratio = Math.max(0.5, Math.min(2, p.ceiling.spike_week_rate / ceilAvg[p.pos]));
+    return 1 + ceilTilt * (ratio - 1);
+  };
 
   function compute(p) {
     const avail = p.availability?.score;   // null => neutral, flagged "no data"
@@ -36,16 +54,25 @@
   }
 
   function rank(list) {
-    // replacement level = projection of the REPL_RANK-th player at each position
-    for (const pos of Object.keys(REPL_RANK)) {
-      const posSorted = list.filter((p) => p.pos === pos && p.projection?.pts != null)
+    // replacement level = projection of the (knob-selected) replacement-rank player per position
+    for (const ps of Object.keys(STARTER_RANK)) {
+      const posSorted = list.filter((p) => p.pos === ps && p.projection?.pts != null)
         .sort((a, b) => b.projection.pts - a.projection.pts);
-      replPts[pos] = posSorted[Math.min(REPL_RANK[pos], posSorted.length) - 1]?.projection.pts ?? 0;
+      const n = replRankFor(ps, replBasis);
+      replRankUsed[ps] = n;
+      replPts[ps] = posSorted[Math.min(n, posSorted.length) - 1]?.projection.pts ?? 0;
+    }
+    // board-relative positional average spike rate = denominator for the ceiling ratio/badge
+    for (const ps of Object.keys(STARTER_RANK)) {
+      const rates = list.filter((p) => p.pos === ps && p.ceiling).map((p) => p.ceiling.spike_week_rate);
+      ceilAvg[ps] = rates.length ? +(rates.reduce((a, b) => a + b, 0) / rates.length).toFixed(3) : null;
     }
     for (const p of list) {
-      if (p.projection?.pts == null) { p.value = null; continue; }
+      if (p.projection?.pts == null) { p.value = p.valueBase = null; p.ceilRatio = null; continue; }
       const vorp = p.projection.pts - (replPts[p.pos] ?? 0);
-      p.value = +(vorp * (p.availability?.score ?? 1) * (p.situation?.modifier ?? 1)).toFixed(1);
+      p.valueBase = +(vorp * (p.availability?.score ?? 1) * (p.situation?.modifier ?? 1)).toFixed(1);
+      p.value = +(p.valueBase * ceilFactor(p)).toFixed(1);
+      p.ceilRatio = (p.ceiling && ceilAvg[p.pos]) ? +(p.ceiling.spike_week_rate / ceilAvg[p.pos]).toFixed(2) : null;
     }
     const byValue = [...list].filter((p) => p.value != null).sort((a, b) => b.value - a.value);
     byValue.forEach((p, i) => { p.valueRank = i + 1; });
@@ -88,6 +115,11 @@
     const bc = p.fftiers;
     const bcTxt = bc ? `${bc.rank}<span class="bctier">T${bc.tier}</span>` : "–";
     const bcTitle = bc ? `Boris Chen half-PPR consensus: overall #${bc.rank}, tier ${bc.tier} (avg ${bc.avg_rank}, range ${bc.best_rank}-${bc.worst_rank})` : "not in fftiers top-200";
+    const cl = p.ceiling, clr = p.ceilRatio;
+    const clCls = clr == null ? "" : clr >= 1.5 ? "ceil-boom" : clr <= 0.6 ? "ceil-steady" : "";
+    const clArrow = clr == null ? "" : clr >= 1.5 ? "▲" : clr <= 0.6 ? "▾" : "";
+    const clTxt = cl ? `${Math.round(cl.spike_week_rate * 100)}%${clArrow}` : "–";
+    const clTitle = cl ? `Spike-week rate: ${Math.round(cl.spike_week_rate * 100)}% of ${cl.sample_weeks} games (2023-25) at/above the ${p.pos} top-5 weekly line (${cl.boom_line} pts). Boom week ~${cl.boom_pts}, floor ~${cl.floor_pts}${clr != null ? `; ${clr}× the board's ${p.pos} average` : ""}.` : "no weekly ceiling data (rookie / <10 career games)";
     const badges = [
       ...p.flagged.map((f) => badge(f.slice(0, 3).toUpperCase(), "rbadge-risk", `${f} risk — see detail`)),
       p.unvetted ? badge("unvetted", "rbadge-unvetted", "Risk flags not yet researched — null, not clean") : "",
@@ -105,6 +137,7 @@
         <span class="dadp mono" title="ADP (half-PPR, ${esc(board.players ? p.adp?.updated : "")})">${p.adp?.half_ppr ?? "–"}</span>
         <span class="dgap mono ${gapCls}">${gapTxt}</span>
         <span class="dbc mono" title="${esc(bcTitle)}">${bcTxt}</span>
+        <span class="dceil mono ${clCls}" title="${esc(clTitle)}">${clTxt}</span>
       </button>
       ${isOpen ? detailHTML(p) : ""}
     </div>`;
@@ -114,7 +147,7 @@
   // Uses only numbers already in the data — consistent for all 248 players, never fabricated.
   function gapExplainer(p) {
     if (p.value == null) return `<div class="gapexp"><b>No gap:</b> no projection for this player, so no value rank (shows ${noData}).</div>`;
-    const repl = replPts[p.pos], replRank = REPL_RANK[p.pos];
+    const repl = replPts[p.pos], replRank = replRankUsed[p.pos];
     const rawVorp = +(p.projection.pts - repl).toFixed(1);
     const avail = p.availability?.score, situ = p.situation?.modifier;
     const availTxt = avail == null ? "×1 (no availability data — rookie/no history, so NO injury discount)" : `×${avail} availability`;
@@ -149,7 +182,7 @@
       <div class="dcol">
         <h4>Projection</h4>
         <div><b>league pts:</b> ${p.projection.pts ?? "–"} (${p.projection.ppg ?? "–"}/g)</div>
-        <div><b>VORP:</b> ${p.value ?? "–"} <span class="faint">(over free ${esc(p.pos)}${REPL_RANK[p.pos] ?? "?"} @ ${replPts[p.pos] ?? "?"} pts × avail × situation)</span></div>
+        <div><b>value:</b> ${p.value ?? "–"} <span class="faint">(VORP over free ${esc(p.pos)}${replRankUsed[p.pos] ?? "?"} @ ${replPts[p.pos] ?? "?"} pts × avail × situation${ceilTilt && p.valueBase != null && p.value !== p.valueBase ? ` · ceiling-tilt ${p.valueBase}→${p.value}` : ""})</span></div>
         <div><b>method:</b> ${esc(p.projection.method)}</div>
         <div><b>sleeper half-PPR anchor:</b> ${p.projection.sleeper_half_ppr ?? "–"}</div>
         <div><b>ADP:</b> ${p.adp?.half_ppr ?? "–"} <span class="faint">(as of ${esc(p.adp?.updated ?? "?")})</span></div>
@@ -158,6 +191,11 @@
         <div><b>expert avg:</b> ${p.fftiers.avg_rank} <span class="faint">(range ${p.fftiers.best_rank}–${p.fftiers.worst_rank}, std ${p.fftiers.std_dev})</span></div>
         <div class="faint">FantasyPros consensus, GMM-clustered tiers, half-PPR · as of ${esc(board.fftiers?.updated ?? "?")}</div>`
           : `<div>${noData} — not in Boris Chen's top-200 (free agent or deep)</div>`}
+        <h4>Ceiling (spike weeks)</h4>
+        ${p.ceiling ? `<div><b>spike-week rate:</b> ${Math.round(p.ceiling.spike_week_rate * 100)}% <span class="faint">of ${p.ceiling.sample_weeks} games${p.ceilRatio != null ? ` · ${p.ceilRatio}× ${esc(p.pos)} avg` : ""}</span></div>
+        <div><b>boom / floor week:</b> ${p.ceiling.boom_pts} / ${p.ceiling.floor_pts} pts <span class="faint">(${esc(p.pos)} top-5 line ${p.ceiling.boom_line})</span></div>
+        <div class="faint">${esc(p.ceiling.method)}${ceilTilt ? ` · tilt ${Math.round(ceilTilt * 100)}% applied` : " · tilt off (display only)"}</div>`
+          : `<div>${noData} — rookie / &lt;10 career games, no stable spike-rate</div>`}
       </div>
       <div class="dcol">
         <h4>Availability</h4>
@@ -175,6 +213,11 @@
           p.flagged.length ? `<b class="flagged-txt">${p.flagged.map(esc).join(", ")}</b>` : "researched: clean"}</div>
         ${notes.map((n) => `<div class="fact faint">• ${esc(n)}</div>`).join("")}
       </div>
+      <div class="dcontext">
+        <span class="ctxlabel">context <span class="faint">— display only, never affects the value number</span></span>
+        ${[["contract_year", "contract yr"], ["rookie_capital", "draft capital"], ["team_win_total", "team win total"], ["playoff_sos", "playoff SOS"]]
+          .map(([k, lab]) => `<span class="ctxitem"><b>${lab}:</b> ${p.context?.[k] == null ? '<span class="nodata">pending</span>' : esc(String(p.context[k]))}</span>`).join("")}
+      </div>
     </div>`;
   }
 
@@ -182,7 +225,7 @@
     <div class="drow dhead" aria-hidden="true">
       <span></span>
       <span class="dmain-head"><span class="dr">#</span><span class="dname">player</span><span class="dpos">pos</span>
-      <span class="dval">value</span><span class="dadp">adp</span><span class="dgap">gap</span><span class="dbc">BC</span></span>
+      <span class="dval">value</span><span class="dadp">adp</span><span class="dgap">gap</span><span class="dbc">BC</span><span class="dceil">ceil</span></span>
     </div>`;
 
   /* ---------- views ---------- */
@@ -259,6 +302,22 @@
     if (taken.size && confirm(`Clear ${taken.size} drafted marks?`)) { taken.clear(); saveTaken(); paint(); }
   });
 
+  /* ---------- value knobs (replacement basis + ceiling tilt) ---------- */
+  function updateKnobReadouts() {
+    const rb = $("#repl-basis-val"), ct = $("#ceil-tilt-val");
+    if (rb) rb.textContent = replBasis <= 0 ? `starters (RB${replRankFor("RB", 0)}·WR${replRankFor("WR", 0)})`
+      : replBasis >= 1 ? `rostered (RB${replRankFor("RB", 1)}·WR${replRankFor("WR", 1)})`
+      : `RB${replRankFor("RB", replBasis)}·WR${replRankFor("WR", replBasis)}`;
+    if (ct) ct.textContent = ceilTilt ? `${Math.round(ceilTilt * 100)}% ceiling` : "off (mean)";
+  }
+  const replInput = $("#repl-basis"), ceilInput = $("#ceil-tilt");
+  if (replInput) replInput.addEventListener("input", (e) => {
+    replBasis = +e.target.value; saveKnobs(); rank(rows); updateKnobReadouts(); paint();
+  });
+  if (ceilInput) ceilInput.addEventListener("input", (e) => {
+    ceilTilt = +e.target.value; saveKnobs(); rank(rows); updateKnobReadouts(); paint();
+  });
+
   /* ---------- boot ---------- */
   (async () => {
     try {
@@ -271,6 +330,9 @@
       return;
     }
     rows = rank(board.players.map(compute));
+    if (replInput) replInput.value = replBasis;
+    if (ceilInput) ceilInput.value = ceilTilt;
+    updateKnobReadouts();
     $("#board-meta").textContent = `board ${board.generated} · ${rows.length} players · ADP as of ${board.generated}`;
     paint();
   })();

@@ -300,6 +300,19 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
 .draft-toolbar .filters { margin-left: 0; }
 #reset-draft { color: var(--neg); }
 
+/* value knobs — replacement basis + ceiling tilt */
+.knobs { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.knob {
+  display: flex; align-items: center; gap: 8px;
+  font-family: var(--font-body); font-size: 11px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: .05em; color: var(--dim);
+  background: var(--grad-raise); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 4px 10px; min-height: 36px; cursor: pointer;
+}
+.knob .knoblab { color: var(--faint); white-space: nowrap; }
+.knob input[type="range"] { width: 88px; height: 18px; accent-color: var(--accent); cursor: pointer; }
+.knob .knobval { color: var(--accent); min-width: 118px; white-space: nowrap; font-size: 11px; text-transform: none; }
+
 .drow {
   display: grid; grid-template-columns: 40px minmax(0, 1fr);
   border-bottom: 1px solid var(--border);
@@ -328,7 +341,10 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
 .drow .dgap { font-size: 13px; min-width: 40px; text-align: right; }
 .drow .dbc { font-size: 13px; min-width: 52px; text-align: right; color: var(--dim); }
 .drow .dbc .bctier { color: var(--faint); font-size: 10px; margin-left: 3px; }
-.dhead .dval, .dhead .dadp, .dhead .dgap, .dhead .dbc { font-size: 11px; }
+.drow .dceil { font-size: 13px; min-width: 48px; text-align: right; color: var(--dim); }
+.dhead .dval, .dhead .dadp, .dhead .dgap, .dhead .dbc, .dhead .dceil { font-size: 11px; }
+.ceil-boom { color: var(--accent); }
+.ceil-steady { color: var(--faint); }
 .gap-value { color: var(--accent); }
 .gap-reach { color: var(--neg); }
 .gap-fair { color: var(--faint); }
@@ -381,6 +397,20 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
 .ddetail .fact { padding: 2px 0; }
 .ddetail .ftype { font-family: var(--font-data); font-size: 10px; color: var(--moss); }
 .faint { color: var(--faint); }
+
+/* context strip — display only, never feeds value */
+.dcontext {
+  grid-column: 1 / -1;
+  display: flex; flex-wrap: wrap; gap: 5px 16px; align-items: baseline;
+  margin-top: 6px; padding: 8px 10px;
+  background: var(--surface); border-left: 2px solid var(--border); border-radius: var(--radius);
+  font-size: 12px; color: var(--faint);
+}
+.dcontext .ctxlabel {
+  width: 100%; font-family: var(--font-data); font-size: 10px;
+  text-transform: uppercase; letter-spacing: .08em; color: var(--dim);
+}
+.dcontext .ctxitem b { color: var(--dim); font-weight: 600; }
 
 .tierhead {
   display: flex; justify-content: space-between; align-items: baseline;
