@@ -70,7 +70,7 @@
     for (const p of list) {
       if (p.projection?.pts == null) { p.value = p.valueBase = null; p.ceilRatio = null; continue; }
       const vorp = p.projection.pts - (replPts[p.pos] ?? 0);
-      p.valueBase = +(vorp * (p.availability?.score ?? 1) * (p.situation?.modifier ?? 1)).toFixed(1);
+      p.valueBase = +(vorp * (p.situation?.modifier ?? 1)).toFixed(1); // availability shown for judgment, NOT multiplied into value
       p.value = +(p.valueBase * ceilFactor(p)).toFixed(1);
       p.ceilRatio = (p.ceiling && ceilAvg[p.pos]) ? +(p.ceiling.spike_week_rate / ceilAvg[p.pos]).toFixed(2) : null;
     }
@@ -149,9 +149,9 @@
     if (p.value == null) return `<div class="gapexp"><b>No gap:</b> no projection for this player, so no value rank (shows ${noData}).</div>`;
     const repl = replPts[p.pos], replRank = replRankUsed[p.pos];
     const rawVorp = +(p.projection.pts - repl).toFixed(1);
-    const avail = p.availability?.score, situ = p.situation?.modifier;
-    const availTxt = avail == null ? "×1 (no availability data — rookie/no history, so NO injury discount)" : `×${avail} availability`;
-    const situTxt = situ == null ? "×1 (no situation modifier)" : `×${situ} situation`;
+    const situ = p.situation?.modifier;
+    const situTxt = (situ != null && situ !== 1) ? ` × ${situ} situation` : "";
+    const tiltTxt = (ceilTilt && p.valueBase != null && p.value !== p.valueBase) ? ` × ceiling-tilt (${p.valueBase}→${p.value})` : "";
     const adp = p.adp?.half_ppr;
     let verdict;
     if (p.gap == null) verdict = `<b>Gap: —</b> no ADP for this player, so nothing to compare.`;
@@ -159,13 +159,11 @@
     else if (p.gap <= -5) verdict = `<b class="name-reach">Reach (${Math.round(p.gap)}):</b> the market drafts him around pick <b>${adp}</b> — about ${Math.abs(Math.round(p.gap))} slots <b>earlier</b> than the board's value rank (<b>#${p.valueRank}</b>). Taking him at ADP means paying above the board's price.`;
     else verdict = `<b>Fair:</b> market ADP <b>${adp}</b> ≈ board value rank <b>#${p.valueRank}</b> — priced about where the board values him.`;
     const drivers = [];
-    if (avail != null && avail < 0.95) drivers.push(`his availability score (${avail}) trims the projection ~${Math.round((1 - avail) * 100)}% for injury/age history, pulling value below raw points`);
-    if (avail == null && p.projection.pts != null) drivers.push(`as a rookie he gets no availability haircut (×1), so his value is pure projection — which can rank him above veterans who are docked for injury history`);
     if (situ != null && situ !== 1) drivers.push(`a situation modifier (×${situ}) adjusts for a team/scheme change`);
     if (["QB", "TE", "K", "DEF"].includes(p.pos)) drivers.push(`at ${p.pos}, replacement is deep — the freely-available ${p.pos}${replRank} already projects ${repl} pts, so even a big raw projection leaves only modest value OVER replacement. This is why elite ${p.pos}s rank lower here than their raw points suggest, and why the market (which drafts on name/points) reaches for them`);
     const driverTxt = drivers.length ? `<div class="gapdriver">Why the gap: ${drivers.join("; ")}.</div>` : "";
     return `<div class="gapexp">
-      <b>How this value is built:</b> ${p.projection.pts} projected pts − ${repl} replacement (free ${esc(p.pos)}${replRank}) = ${rawVorp} raw VORP, then ${availTxt} ${situTxt} = <b>${p.value} value</b> → <b>#${p.valueRank}</b> overall.
+      <b>How this value is built:</b> ${p.projection.pts} projected pts − ${repl} replacement (free ${esc(p.pos)}${replRank}) = <b>${rawVorp}</b> VORP${situTxt}${tiltTxt} = <b>${p.value} value</b> → <b>#${p.valueRank}</b> overall. <span class="faint">Availability is shown below for your judgment, not baked in.</span>
       <div class="gapverdict">${verdict}</div>
       ${driverTxt}
     </div>`;
@@ -182,7 +180,7 @@
       <div class="dcol">
         <h4>Projection</h4>
         <div><b>league pts:</b> ${p.projection.pts ?? "–"} (${p.projection.ppg ?? "–"}/g)</div>
-        <div><b>value:</b> ${p.value ?? "–"} <span class="faint">(VORP over free ${esc(p.pos)}${replRankUsed[p.pos] ?? "?"} @ ${replPts[p.pos] ?? "?"} pts × avail × situation${ceilTilt && p.valueBase != null && p.value !== p.valueBase ? ` · ceiling-tilt ${p.valueBase}→${p.value}` : ""})</span></div>
+        <div><b>value:</b> ${p.value ?? "–"} <span class="faint">(VORP over free ${esc(p.pos)}${replRankUsed[p.pos] ?? "?"} @ ${replPts[p.pos] ?? "?"} pts${ceilTilt && p.valueBase != null && p.value !== p.valueBase ? ` · ceiling-tilt ${p.valueBase}→${p.value}` : ""})</span></div>
         <div><b>method:</b> ${esc(p.projection.method)}</div>
         <div><b>sleeper half-PPR anchor:</b> ${p.projection.sleeper_half_ppr ?? "–"}</div>
         <div><b>ADP:</b> ${p.adp?.half_ppr ?? "–"} <span class="faint">(as of ${esc(p.adp?.updated ?? "?")})</span></div>
@@ -198,7 +196,7 @@
           : `<div>${noData} — rookie / &lt;10 career games, no stable spike-rate</div>`}
       </div>
       <div class="dcol">
-        <h4>Availability</h4>
+        <h4>Availability <span class="faint">— not in value; your call at the draft</span></h4>
         <div><b>score:</b> ${a.score ?? noData} ${a.partial ? '<span class="faint">(injury-type component missing)</span>' : ""}</div>
         <div><b>expected games:</b> ${a.expected_games ?? noData}</div>
         <div><b>games played:</b> ${["2023", "2024", "2025"].map((y) => `${y}: ${gp[y] ?? "–"}`).join(" · ")}</div>

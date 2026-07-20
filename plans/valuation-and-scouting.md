@@ -16,13 +16,13 @@ Everything below serves that loop.
 
 ## 1. Challenge 1 — Valuation & how variables are weighted
 
-### 1.1 The engine (unchanged spine)
+### 1.1 The engine
 
 ```
-value = VORP × availability × situation
+value = VORP × situation   (× ceiling-tilt when the knob is dialed up)
 ```
 
-Multiplicative, because availability and situation are *proportional* adjustments to production-over-replacement. Validated subtlety: the haircut multiplies **VORP, not raw points** — when your player misses games you backfill from the rich RB/WR waiver wire at ~replacement, so the discount correctly applies to value *over* replacement. Current code already does this. Keep it.
+Multiplicative, because situation is a *proportional* adjustment to production-over-replacement. **Availability was removed from the value math on 2026-07-20** (user's call): the history × age-curve × status haircut was too drastic and double-counts durability/age the projection already prices — it was docking healthy-projected veterans ~30%+. Availability is still computed and shown in the detail panel as a draft-time lens, just not multiplied in. (The earlier design multiplied *VORP, not raw points*, on the sound logic that missed games backfill at replacement from the rich waiver wire — but the magnitude, not the placement, was the problem.)
 
 ### 1.2 The weighting philosophy
 
@@ -34,7 +34,7 @@ Don't hard-code false-precise weights. **Expose the two contestable weights as k
 | Market (ADP / Boris Chen) | **Zero weight in the number.** Stays a display axis; `gap = ADP − valueRank` is the actionable signal | Blending the market in shrinks the gap toward zero — deletes the edge the tool exists to find |
 | Replacement level | **Fixed** (see 1.3) + exposed as a **sensitivity knob** | Current baseline mis-measures RB; the "right" rank is a judgment call, so make it visible |
 | Ceiling / variance | **Display axis + tunable ceiling-tilt knob** (see 1.4) | League doctrine says ceiling > floor; mean-VORP is blind to it |
-| Availability | Bounded multiplier (history × age-curve × current-status), injury-type component hand-researched | Pre-existing, reasonable; unchanged |
+| Availability | **Display-only** — computed (history × age-curve × current-status) and shown in the detail panel, but removed from the value math 2026-07-20; weighed manually at the draft | The haircut was too drastic and double-counts durability/age the projection already prices |
 | Situation | Bounded multiplier ×0.90–1.10, **fed by the scouting_brief** (see 2 + M3) | Only deltas the projection missed; capped so soft narrative can't swamp hard math |
 | `context.*` (contract, rookie capital, win total, playoff SOS) | **Display-only strip.** Never silent multipliers | Already in the projection (win total, rookie capital), too noisy (contract), or uncomputable now (SOS). Reaches value only *through the human* via overrides + situation |
 
