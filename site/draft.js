@@ -111,7 +111,9 @@
     const facts = p.situation?.facts ?? [];
     const ctx = p.context ?? {};
     const ctxRow = (label, v, fmt) => `<div><b>${label}:</b> ${v == null ? noData : esc(fmt ? fmt(v) : v)}</div>`;
+    const notes = p.risk_flags?.notes ?? [];
     return `<div class="ddetail">
+      ${p.adp_commentary ? `<div class="dcommentary"><b>Why here at ${esc(p.pos)}:</b> ${esc(p.adp_commentary)}</div>` : ""}
       <div class="dcol">
         <h4>Projection</h4>
         <div><b>league pts:</b> ${p.projection.pts ?? "–"} (${p.projection.ppg ?? "–"}/g)</div>
@@ -126,14 +128,15 @@
         <div><b>expected games:</b> ${a.expected_games ?? noData}</div>
         <div><b>games played:</b> ${["2023", "2024", "2025"].map((y) => `${y}: ${gp[y] ?? "–"}`).join(" · ")}</div>
         <div><b>age:</b> ${a.age ?? "–"} (curve ×${a.age_factor ?? "–"}) · <b>status:</b> ${esc(a.current_injury_status ?? "healthy/none")}</div>
-        <div><b>injury history:</b> ${a.injury_history == null ? noData + ' <span class="faint">(research pass pending)</span>' : esc(JSON.stringify(a.injury_history))}</div>
+        <div><b>injury history:</b> ${a.injury_history == null ? noData + ' <span class="faint">(research pass pending)</span>' : esc(a.injury_history)}</div>
       </div>
       <div class="dcol">
         <h4>Situation ${p.situation?.modifier == null ? noData : `×${p.situation.modifier}`}</h4>
         ${facts.length ? facts.map((f) => `<div class="fact">${esc(f.date)} <span class="ftype">${esc(f.type)}</span> ${esc(f.fact)}${f.source ? ` <a href="${esc(f.source)}" target="_blank" rel="noopener">src</a>` : ""}</div>`).join("") : `<div>${noData} — no curated facts touch this player yet</div>`}
         <h4>Risk flags</h4>
         <div>${p.risk_flags.researched === false ? `${noData} — not yet researched (null ≠ clean)` :
-          p.flagged.length ? p.flagged.map(esc).join(", ") : "researched: clean"}</div>
+          p.flagged.length ? `<b class="flagged-txt">${p.flagged.map(esc).join(", ")}</b>` : "researched: clean"}</div>
+        ${notes.map((n) => `<div class="fact faint">• ${esc(n)}</div>`).join("")}
         <h4>Context</h4>
         ${ctxRow("contract year", ctx.contract_year)}
         ${ctxRow("rookie capital", ctx.rookie_capital)}

@@ -30,6 +30,10 @@ const [players, s23, s24, s25, proj] = await Promise.all([
 ]);
 const scoring = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "raw", "league-2025.json"), "utf8")).scoring_settings;
 const events = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "site", "nfl-events.json"), "utf8")).events;
+// Durable hand-researched overlay (risk flags, injury typing, ADP commentary). Merged in so a
+// rebuild for fresh ADP never wipes research. Missing = still null (honest "not researched").
+const researchPath = path.join(ROOT, "data", "draft-research.json");
+const research = fs.existsSync(researchPath) ? JSON.parse(fs.readFileSync(researchPath, "utf8")).players : {};
 
 // ---- projection re-scoring with THIS league's settings ----------------------
 // Skill stat keys map 1:1 onto scoring_settings keys. Kicker: projection aggregates
@@ -114,6 +118,9 @@ const rows = [...skill, ...kickers, ...defs].map(([id, p]) => {
   const name = pos === "DEF" ? `${p.first_name} ${p.last_name}` : p.full_name;
   const pts = rescore(pr, pos);
   const adp = pr?.adp_half_ppr && pr.adp_half_ppr < 900 ? pr.adp_half_ppr : null;
+  const rx = research[id] ?? {};
+  const avail = availability(id, pos, p.age, p.injury_status, p.years_exp);
+  if (rx.injury_history !== undefined) { avail.injury_history = rx.injury_history; avail.partial = rx.injury_history == null; }
   return {
     id, name, pos, team: p.team, age: p.age ?? null, years_exp: p.years_exp ?? null,
     rookie: p.years_exp === 0,
@@ -125,10 +132,11 @@ const rows = [...skill, ...kickers, ...defs].map(([id, p]) => {
       sleeper_half_ppr: pr?.pts_half_ppr ?? null, // sanity anchor, NOT the number to use
       updated: TODAY,
     },
-    availability: availability(id, pos, p.age, p.injury_status, p.years_exp),
+    availability: avail,
     situation: { modifier: null, facts: situationFacts(name) }, // modifier set by analysis pass, from facts only
-    risk_flags: { suspension: null, contract: null, legal: null, researched: false, notes: [] },
+    risk_flags: rx.risk_flags ?? { suspension: null, contract: null, legal: null, researched: false, notes: [] },
     adp: { half_ppr: adp, updated: TODAY },
+    adp_commentary: rx.adp_commentary ?? null,
     context: { contract_year: null, rookie_capital: null, team_win_total: null, playoff_sos: null },
   };
 });
@@ -138,10 +146,10 @@ const board = {
   scoring_basis: "HBGBs 2025 scoring_settings (data/raw/league-2025.json); re-verify at 2026 renewal",
   pool: `top ${POOL_SIZE} by Sleeper search_rank + 32 DEF`,
   gaps: [
-    { field: "availability.injury_history", status: "missing", fill: "web research pass (soft-tissue/recurrence typing) for top ~100" },
+    { field: "availability.injury_history", status: `researched for top ~35 (overlay); ${Object.keys(research).length} players in draft-research.json`, fill: "extend the web research pass deeper than ~35 as draft nears" },
     { field: "availability.score (rookies)", status: "null by design", fill: "no NFL history exists; page shows no-data" },
     { field: "situation.modifier", status: "unset", fill: "analysis pass over stored facts (facts only, no invented context)" },
-    { field: "risk_flags.*", status: "unresearched (null)", fill: "web pass: suspensions/holdouts/legal; small result set" },
+    { field: "risk_flags.*", status: "researched for top ~35 (overlay); rest still null", fill: "extend the overlay; re-verify suspensions/holdouts in the final 2 weeks" },
     { field: "context.contract_year", status: "missing", fill: "web (Spotrac/OTC), mostly static once pulled" },
     { field: "context.rookie_capital", status: "missing", fill: "one-time 2026 NFL draft table (web)" },
     { field: "context.team_win_total", status: "missing", fill: "Vegas win totals (web), refresh occasionally" },

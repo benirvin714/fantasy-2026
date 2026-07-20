@@ -340,6 +340,14 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
   background: var(--surface-2);
   border-top: 1px dashed var(--border);
 }
+.dcommentary {
+  grid-column: 1 / -1;
+  padding: 8px 10px; margin-bottom: 2px;
+  background: var(--surface); border-left: 2px solid var(--accent); border-radius: var(--radius);
+  font-size: 13px; color: var(--text); line-height: 1.5;
+}
+.dcommentary b { color: var(--accent); }
+.flagged-txt { color: var(--neg); text-transform: uppercase; font-size: 11px; letter-spacing: 0.05em; }
 .ddetail h4 {
   margin: 10px 0 4px; font-size: 10px; text-transform: uppercase;
   letter-spacing: 0.08em; color: var(--accent); font-weight: 700;
