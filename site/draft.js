@@ -18,7 +18,7 @@
   const saveKnobs = () => localStorage.setItem(KNOB_KEY, JSON.stringify({ replBasis, ceilTilt }));
 
   let board = null, rows = [];
-  let pos = "ALL", view = "board", sort = "value", hideDrafted = false, hideFlagged = false;
+  let pos = "ALL", view = "board", sort = "adp", hideDrafted = false, hideFlagged = false;
   let replBasis = savedKnobs.replBasis ?? 0;  // 0 = starter basis (fixed replacement), 1 = rostered (best-FA)
   let ceilTilt = savedKnobs.ceilTilt ?? 0;    // 0 = pure mean-VORP; >0 blends spike-week upside into value
   let expandedId = null; // single-row accordion: only one detail open at a time
