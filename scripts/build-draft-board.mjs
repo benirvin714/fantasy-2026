@@ -126,12 +126,35 @@ function availability(id, pos, age, injuryStatus, yearsExp) {
 }
 
 // ---- situation facts from the curated events feed ----------------------------
-function situationFacts(name) {
-  const last = name.split(" ").slice(-1)[0];
-  return events
-    .filter((e) => e.headline.includes(name) || e.detail.includes(name) ||
-      (last.length > 4 && (e.headline.includes(last) || e.detail.includes(last))))
-    .map((e) => ({ date: e.date, type: e.type, fact: e.headline, source: e.source?.url ?? null }));
+// Match events to a player by FULL NAME, never a bare surname substring — a surname
+// substring let "Zac Robinson" (a coach), "A.J. Brown", "Daniel Jones", "Sanders/Watson"
+// bleed onto the wrong player. A bare surname is allowed only when unambiguous: not
+// shared by another pooled player, not a team nickname, and not preceded by a different
+// first name. DEF matches its team nickname. Sets are filled once the pool is built.
+const reEsc = (s) => String(s).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+let sharedSurnames = new Set(), teamNicknames = new Set();
+const precededByOtherName = (text, last, first) => {
+  // A name-like token (Cap + lowercase: "Zac", "Daniel", "Sanders") right before the surname
+  // means a different person ("Zac Robinson", "Sanders/Watson"). All-caps tokens (ADP, GM, team
+  // codes) aren't names; "." is kept OUT of the separator so a sentence break ("…ADP. Kamara…")
+  // never reads as an attached first name.
+  const re = new RegExp(`([A-Z][a-z][A-Za-z.'’-]*)[\\s/-]+${reEsc(last)}\\b`, "g");
+  let m;
+  while ((m = re.exec(text))) if (m[1] !== first) return true; // "<OtherFirst> <surname>"
+  return false;
+};
+function situationFacts(name, pos) {
+  const parts = name.split(" "), last = parts[parts.length - 1], first = parts[0];
+  return events.filter((e) => {
+    const text = `${e.headline}\n${e.detail}`;
+    if (text.includes(name)) return true;                                   // unambiguous full-name hit
+    if (pos === "DEF") return new RegExp(`\\b${reEsc(last)}\\b`).test(text); // team nickname
+    if (last.length <= 4) return false;                                     // short surnames: too collision-prone
+    if (sharedSurnames.has(last) || teamNicknames.has(last)) return false;  // ambiguous -> require full name
+    if (!new RegExp(`\\b${reEsc(last)}\\b`).test(text)) return false;
+    if (precededByOtherName(text, last, first)) return false;               // "Zac Robinson" / "Sanders/Watson"
+    return true;
+  }).map((e) => ({ date: e.date, type: e.type, fact: e.headline, source: e.source?.url ?? null }));
 }
 
 // ---- ceiling / spike-week metric (weekly variance) --------------------------
@@ -214,6 +237,16 @@ const kickers = Object.entries(players)
   .map(([id, p]) => [id, p]);
 const defs = Object.entries(players).filter(([id, p]) => p.position === "DEF" && id.length <= 3);
 
+// Fill the situationFacts disambiguation sets from the pool: a surname shared by >1 pooled
+// skill player (Robinson, Brown, Taylor…) or equal to a team nickname can't match on surname
+// alone — require the full name so events never bleed across same-surname players.
+{
+  const surCount = {};
+  for (const [, p] of skill) { const ln = (p.full_name ?? "").split(" ").slice(-1)[0]; if (ln) surCount[ln] = (surCount[ln] ?? 0) + 1; }
+  sharedSurnames = new Set(Object.entries(surCount).filter(([, n]) => n > 1).map(([s]) => s));
+  teamNicknames = new Set(defs.map(([, p]) => p.last_name).filter(Boolean));
+}
+
 const rows = [...skill, ...kickers, ...defs].map(([id, p]) => {
   const pr = proj[id];
   const pos = p.position;
@@ -246,7 +279,7 @@ const rows = [...skill, ...kickers, ...defs].map(([id, p]) => {
       updated: TODAY,
     },
     availability: avail,
-    situation: { modifier: null, facts: situationFacts(name) }, // modifier set by analysis pass, from facts only
+    situation: { modifier: null, facts: situationFacts(name, pos) }, // modifier set by analysis pass, from facts only
     risk_flags: rx.risk_flags ?? { suspension: null, contract: null, legal: null, researched: false, notes: [] },
     adp: { half_ppr: adp, updated: TODAY },
     adp_commentary: rx.adp_commentary ?? null,
