@@ -33,7 +33,9 @@ const events = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "site", "nfl-e
 // Durable hand-researched overlay (risk flags, injury typing, ADP commentary). Merged in so a
 // rebuild for fresh ADP never wipes research. Missing = still null (honest "not researched").
 const researchPath = path.join(ROOT, "data", "draft-research.json");
-const research = fs.existsSync(researchPath) ? JSON.parse(fs.readFileSync(researchPath, "utf8")).players : {};
+const researchFile = fs.existsSync(researchPath) ? JSON.parse(fs.readFileSync(researchPath, "utf8")) : {};
+const research = researchFile.players ?? {};
+const cleanIds = new Set(researchFile.clean_researched?.ids ?? []);
 
 // ---- projection re-scoring with THIS league's settings ----------------------
 // Skill stat keys map 1:1 onto scoring_settings keys. Kicker: projection aggregates
@@ -118,8 +120,19 @@ const rows = [...skill, ...kickers, ...defs].map(([id, p]) => {
   const name = pos === "DEF" ? `${p.first_name} ${p.last_name}` : p.full_name;
   const pts = rescore(pr, pos);
   const adp = pr?.adp_half_ppr && pr.adp_half_ppr < 900 ? pr.adp_half_ppr : null;
-  const rx = research[id] ?? {};
   const avail = availability(id, pos, p.age, p.injury_status, p.years_exp);
+  // detailed overlay first; else expand a clean_researched id into derived-clean flags
+  let rx = research[id];
+  if (!rx && cleanIds.has(id)) {
+    const yrs = ["2023", "2024", "2025"].map((y) => avail.games_played[y]);
+    const hasHistory = yrs.some((v) => v != null);
+    rx = {
+      injury_history: hasHistory ? `No significant missed time (${yrs.map((v) => v ?? "--").join("/")}).` : null,
+      risk_flags: { suspension: false, contract: false, legal: false, researched: true, notes: ["Swept clean in the league-wide suspension/holdout pass; games-played durable (rookie = no NFL history)."] },
+      adp_commentary: null,
+    };
+  }
+  rx = rx ?? {};
   if (rx.injury_history !== undefined) { avail.injury_history = rx.injury_history; avail.partial = rx.injury_history == null; }
   return {
     id, name, pos, team: p.team, age: p.age ?? null, years_exp: p.years_exp ?? null,
