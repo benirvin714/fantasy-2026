@@ -106,6 +106,34 @@
     </div>`;
   }
 
+  // Transparent, computed decomposition of how value/placement is derived and why the ADP gap exists.
+  // Uses only numbers already in the data — consistent for all 248 players, never fabricated.
+  function gapExplainer(p) {
+    if (p.value == null) return `<div class="gapexp"><b>No gap:</b> no projection for this player, so no value rank (shows ${noData}).</div>`;
+    const repl = replPts[p.pos], replRank = REPL_RANK[p.pos];
+    const rawVorp = +(p.projection.pts - repl).toFixed(1);
+    const avail = p.availability?.score, situ = p.situation?.modifier;
+    const availTxt = avail == null ? "×1 (no availability data — rookie/no history, so NO injury discount)" : `×${avail} availability`;
+    const situTxt = situ == null ? "×1 (no situation modifier)" : `×${situ} situation`;
+    const adp = p.adp?.half_ppr;
+    let verdict;
+    if (p.gap == null) verdict = `<b>Gap: —</b> no ADP for this player, so nothing to compare.`;
+    else if (p.gap >= 5) verdict = `<b class="name-value">Bargain (+${Math.round(p.gap)}):</b> the market drafts him around pick <b>${adp}</b> — about ${Math.round(p.gap)} slots <b>later</b> than the board's value rank (<b>#${p.valueRank}</b>). He tends to be available after his value says he's worth taking.`;
+    else if (p.gap <= -5) verdict = `<b class="name-reach">Reach (${Math.round(p.gap)}):</b> the market drafts him around pick <b>${adp}</b> — about ${Math.abs(Math.round(p.gap))} slots <b>earlier</b> than the board's value rank (<b>#${p.valueRank}</b>). Taking him at ADP means paying above the board's price.`;
+    else verdict = `<b>Fair:</b> market ADP <b>${adp}</b> ≈ board value rank <b>#${p.valueRank}</b> — priced about where the board values him.`;
+    const drivers = [];
+    if (avail != null && avail < 0.95) drivers.push(`his availability score (${avail}) trims the projection ~${Math.round((1 - avail) * 100)}% for injury/age history, pulling value below raw points`);
+    if (avail == null && p.projection.pts != null) drivers.push(`as a rookie he gets no availability haircut (×1), so his value is pure projection — which can rank him above veterans who are docked for injury history`);
+    if (situ != null && situ !== 1) drivers.push(`a situation modifier (×${situ}) adjusts for a team/scheme change`);
+    if (["QB", "TE", "K", "DEF"].includes(p.pos)) drivers.push(`at ${p.pos}, replacement is deep — the freely-available ${p.pos}${replRank} already projects ${repl} pts, so even a big raw projection leaves only modest value OVER replacement. This is why elite ${p.pos}s rank lower here than their raw points suggest, and why the market (which drafts on name/points) reaches for them`);
+    const driverTxt = drivers.length ? `<div class="gapdriver">Why the gap: ${drivers.join("; ")}.</div>` : "";
+    return `<div class="gapexp">
+      <b>How this value is built:</b> ${p.projection.pts} projected pts − ${repl} replacement (free ${esc(p.pos)}${replRank}) = ${rawVorp} raw VORP, then ${availTxt} ${situTxt} = <b>${p.value} value</b> → <b>#${p.valueRank}</b> overall.
+      <div class="gapverdict">${verdict}</div>
+      ${driverTxt}
+    </div>`;
+  }
+
   function detailHTML(p) {
     const a = p.availability ?? {};
     const gp = a.games_played ?? {};
@@ -115,6 +143,7 @@
     const notes = p.risk_flags?.notes ?? [];
     return `<div class="ddetail">
       ${p.adp_commentary ? `<div class="dcommentary"><b>Why here at ${esc(p.pos)}:</b> ${esc(p.adp_commentary)}</div>` : ""}
+      ${gapExplainer(p)}
       <div class="dcol">
         <h4>Projection</h4>
         <div><b>league pts:</b> ${p.projection.pts ?? "–"} (${p.projection.ppg ?? "–"}/g)</div>
