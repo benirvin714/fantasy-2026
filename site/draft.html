@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap">
-  <link rel="stylesheet" href="style.css?v=12">
+  <link rel="stylesheet" href="style.css?v=14">
 </head>
 <body>
   <header>
@@ -38,8 +38,9 @@
         <button data-view="tiers" aria-pressed="false">tiers</button>
       </div>
       <div class="filters" role="group" aria-label="Sort board by">
-        <button data-sort="value" aria-pressed="false">sort: value</button>
-        <button data-sort="adp" aria-pressed="true">sort: ADP</button>
+        <button data-sort="draftval" aria-pressed="true">sort: $ value</button>
+        <button data-sort="edge" aria-pressed="false">sort: edge</button>
+        <button data-sort="adp" aria-pressed="false">sort: ADP</button>
         <button data-sort="bc" aria-pressed="false">sort: Boris Chen</button>
       </div>
       <div class="filters" role="group" aria-label="Toggles">
@@ -48,15 +49,10 @@
         <button id="reset-draft" title="Clear all drafted marks">reset draft</button>
       </div>
       <div class="knobs" role="group" aria-label="Value knobs">
-        <label class="knob" title="Replacement basis: 'the streamer you'd actually start' (starters) ↔ best free agent (rostered). Lower = tighter replacement; fixes Sleeper's backup-RB≈0 projections inflating RB value.">
-          <span class="knoblab">repl basis</span>
+        <label class="knob" title="Scarcity / replacement basis: 'the streamer you'd actually start' (starters) ↔ best free agent (rostered). Sets the replacement line the draft-$ is measured over.">
+          <span class="knoblab">scarcity basis</span>
           <input type="range" id="repl-basis" min="0" max="1" step="0.1" value="0" aria-label="Replacement basis: starters to rostered">
           <span class="knobval mono" id="repl-basis-val">starters</span>
-        </label>
-        <label class="knob" title="Ceiling tilt: blends spike-week upside into the value ranking. 0 = pure mean-VORP; higher rewards boom players (this league drafts for spike weeks).">
-          <span class="knoblab">ceiling tilt</span>
-          <input type="range" id="ceil-tilt" min="0" max="1" step="0.05" value="0" aria-label="Ceiling tilt: mean to ceiling">
-          <span class="knobval mono" id="ceil-tilt-val">off (mean)</span>
         </label>
       </div>
     </div>
@@ -64,7 +60,7 @@
     <section class="panel" id="board-panel">
       <div class="panel-head">
         <h2 id="board-title">Value board</h2>
-        <span class="meta" id="board-sub">value = VORP (over the streamer you'd start), ceiling-tilt optional · availability shown but not baked in · vs ADP</span>
+        <span class="meta" id="board-sub">draft-$ = asset (rate × median games) over scarcity, in auction $ · edge = your $ − market's $ at his ADP slot · TARGET/FADE</span>
       </div>
       <div class="panel-body" id="board-body"><div class="loading">Loading draft board…</div></div>
     </section>
@@ -77,6 +73,6 @@
   </footer>
 
   <script src="config.js?v=6"></script>
-  <script src="draft.js?v=15"></script>
+  <script src="draft.js?v=20"></script>
 </body>
 </html>

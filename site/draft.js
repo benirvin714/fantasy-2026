@@ -1,8 +1,13 @@
-/* HBGBs Draft Day — pre-season value board. Reads data/site/draft-board.json (shared data
-   layer). Composite value = projection.pts × availability.score × situation.modifier, with
-   null components treated as neutral 1 but ALWAYS surfaced as "no data" — never invented.
-   Risk flags are badges that cap enthusiasm; they never adjust the score.
-   Drafted/available state lives in localStorage (survives reloads; this browser only). */
+/* HBGBs Draft Day — 3-layer valuation board (Phase A: $-engine + edge).
+   ① Asset value = (Sleeper proj ÷ 17 = healthy per-game rate) × median games, floored at 0 —
+      "what he produces", position-agnostic, descriptive (not the sort).
+   Scarcity → auction draft-$: marginal over the replacement-rank player, normalized to a budget,
+      floored at $1 (no negatives). The replacement-basis knob sets the scarcity line.
+   ③ Market edge = your draft-$ − the $ of his ADP slot → TARGET / FAIR / FADE.
+   Uncertainty band + rec-confidence are Phase B (edges here are shown WITHOUT the confidence cap;
+   a board-vs-Boris-Chen divergence note is the Phase-A stopgap). Ceiling (spike weeks) is a
+   separate display attribute, never a value input. Reads data/site/draft-board.json; drafted +
+   knob state in localStorage (this browser only). */
 (() => {
   const C = window.HQ_CONFIG;
   const $ = (s) => document.querySelector(s);
@@ -15,85 +20,154 @@
 
   const KNOB_KEY = "hq-draft-2026-knobs";
   const savedKnobs = JSON.parse(localStorage.getItem(KNOB_KEY) ?? "{}");
-  const saveKnobs = () => localStorage.setItem(KNOB_KEY, JSON.stringify({ replBasis, ceilTilt }));
+  const saveKnobs = () => localStorage.setItem(KNOB_KEY, JSON.stringify({ replBasis }));
 
   let board = null, rows = [];
-  let pos = "ALL", view = "board", sort = "adp", hideDrafted = false, hideFlagged = false;
-  let replBasis = savedKnobs.replBasis ?? 0;  // 0 = starter basis (fixed replacement), 1 = rostered (best-FA)
-  let ceilTilt = savedKnobs.ceilTilt ?? 0;    // 0 = pure mean-VORP; >0 blends spike-week upside into value
-  let expandedId = null; // single-row accordion: only one detail open at a time
+  let pos = "ALL", view = "board", sort = "draftval", hideDrafted = false, hideFlagged = false;
+  let replBasis = savedKnobs.replBasis ?? 0;  // 0 = starter basis (default), 1 = rostered (best-FA)
+  let expandedId = null; // single-row accordion
 
-  /* ---------- value math (transparent, in one place) ----------
-     Cross-positional value MUST be VORP, not raw points: in this league QB13-16,
-     TE12-15, RB/WR streamers and streamable K/DEF sit on waivers all season
-     (league-profile.md), so draft value is points OVER that free replacement.
-     Replacement = "the streamer you'd actually start." The replacement-basis knob
-     slides each position's rank between the STARTER line (last weekly starter — the
-     fix; avoids Sleeper's backup-RB≈0 projections dragging the RB baseline down and
-     inflating RB VORP) and the ROSTERED line (last rostered / best free agent — the
-     old basis). t=0 => starters (default), t=1 => rostered. */
+  /* ---------- the value engine (transparent, in one place) ---------- */
+  // Replacement (scarcity) line per position; the knob slides between the STARTER line
+  // (last weekly starter — default) and the ROSTERED line (last rostered / best free agent).
   const STARTER_RANK = { QB: 11, RB: 30, WR: 32, TE: 11, K: 11, DEF: 11 };
   const ROSTERED_RANK = { QB: 13, RB: 46, WR: 47, TE: 13, K: 11, DEF: 11 };
   const replRankFor = (ps, t) => Math.max(1, Math.round(STARTER_RANK[ps] + (ROSTERED_RANK[ps] - STARTER_RANK[ps]) * t));
-  let replPts = {}, replRankUsed = {}, ceilAvg = {}; // all computed from the board itself
-  // ceiling-tilt factor: blends spike-week upside into value. ratio = player's spike
-  // rate vs the board's positional average, clamped [0.5, 2]; tilt 0 => factor 1.
-  const ceilFactor = (p) => {
-    if (!ceilTilt || !p.ceiling || !ceilAvg[p.pos]) return 1;
-    const ratio = Math.max(0.5, Math.min(2, p.ceiling.spike_week_rate / ceilAvg[p.pos]));
-    return 1 + ceilTilt * (ratio - 1);
-  };
+  // Light playing-time model (Q3): median stays near-full; only documented injury/age move it.
+  // The uncertainty BAND (Phase B) carries the risk — this is deliberately gentle.
+  const AGE_CLIFF = { RB: 28, WR: 31, TE: 31, QB: 37, K: 99, DEF: 99 };
+  const BUDGET = 200, TEAMS = 10, ROSTER_SPOTS = 15;   // auction $ scale (relative; snake uses $ as linear currency)
+  const EDGE_TARGET = 4, EDGE_FADE = -4;               // $ edge thresholds for TARGET / FADE (tunable)
+  const BC_DIVERGE = 15;                               // BC contradicts an actionable rec by ≥ this many ranks = caution note
+  let replAsset = {}, replRankUsed = {}, ceilAvg = {}, dollarAtRank = [];
+
+  function medianGames(p) {
+    if (p.pos === "K" || p.pos === "DEF") return 17;
+    const gp = p.availability?.games_played ?? {};
+    const yrs = ["2023", "2024", "2025"].map((y) => gp[y]).filter((v) => v != null);
+    let g = 17;
+    if (yrs.length) g -= (yrs.reduce((s, v) => s + Math.max(0, 17 - v), 0) / yrs.length) * 0.3; // light (old score used 0.6 as a multiplier)
+    const st = p.availability?.current_injury_status;
+    if (["Out", "IR", "PUP", "Sus", "COV"].includes(st)) g -= 3; else if (st === "Questionable") g -= 0.5;
+    const cliff = AGE_CLIFF[p.pos] ?? 99;
+    if (p.age && p.age >= cliff) g -= Math.min(2, (p.age - cliff + 1) * 0.5);
+    return Math.max(9, Math.min(17, +g.toFixed(1)));
+  }
+
+  // ---- ② uncertainty + ③ rec-confidence (Phase B) ----
+  // Asset confidence = min(playing-time risk, disagreement). Disagreement folds BOTH expert-internal
+  // spread (BC std/range) AND board-vs-consensus outlier-ness (my rank vs BC, in the rec direction).
+  // rec-confidence = min(edge strength, asset confidence) — the weaker link governs; a big edge on a
+  // shaky read is capped, never trusted. Uses dollarAtRank (set in rank()) for the expert $ band.
+  const SEV = { high: 0, some: 1, low: 2, none: 2 };
+  const CONF_LABEL = ["Low", "Med", "High"], CONF_DOTS = ["●○○", "●●○", "●●●"];
+  function confidence(p) {
+    if (p.assetPts == null) return null;
+    const mg = p.medianGames;
+    const gp = p.availability?.games_played ?? {};
+    const yrs = ["2023", "2024", "2025"].map((y) => gp[y]).filter((v) => v != null);
+    const rookie = p.rookie || yrs.length === 0;
+    const injuredNow = ["Out", "IR", "PUP", "Sus", "COV"].includes(p.availability?.current_injury_status);
+    // playing-time band + risk tier
+    let gLow = yrs.length ? Math.min(mg, Math.min(...yrs)) : mg;
+    let gHigh = Math.min(17, mg + 1);
+    if (injuredNow) gLow -= 3;
+    if (rookie) { gLow = mg - 4; gHigh = 17; }
+    gLow = Math.max(5, +gLow.toFixed(1));
+    const ptRisk = (rookie || injuredNow || mg < 14) ? "high"
+      : (mg < 16 || (yrs.length && Math.min(...yrs) < 14)) ? "some" : "none";
+    // disagreement: experts among themselves + board-vs-consensus in the rec's direction
+    const bc = p.fftiers;
+    let dis = "some";
+    if (bc) {
+      const range = bc.worst_rank - bc.best_rank;
+      let d = (bc.std_dev >= 8 || range >= 45) ? "high" : (bc.std_dev >= 4 || range >= 22) ? "some" : "low";
+      if (p.draftRank != null) {
+        const gap = bc.rank - p.draftRank; // + = board more bullish than experts
+        const contra = (p.rec === "TARGET" && gap >= BC_DIVERGE) || (p.rec === "FADE" && -gap >= BC_DIVERGE);
+        if (contra) { const o = Math.abs(gap) >= 30 ? "high" : "some"; if (SEV[o] < SEV[d]) d = o; }
+      }
+      dis = d;
+    }
+    const assetSev = Math.min(SEV[ptRisk], SEV[dis]);
+    const assetConf = assetSev <= 0 ? "Low" : assetSev === 1 ? "Med" : "High";
+    // illustrative $ band: PT swing (via games fraction) ⊕ expert-rank $ spread, in quadrature
+    const ptHalf = mg > 0 ? (p.draftDollar ?? 0) * ((gHigh - gLow) / 2) / mg : 0;
+    const bcHalf = bc ? Math.abs((dollarAtRank[Math.min(dollarAtRank.length, bc.best_rank) - 1] ?? p.draftDollar)
+      - (dollarAtRank[Math.min(dollarAtRank.length, bc.worst_rank) - 1] ?? p.draftDollar)) / 2 : 0;
+    const half = Math.round(Math.sqrt(ptHalf * ptHalf + bcHalf * bcHalf));
+    const bandLow = Math.max(1, (p.draftDollar ?? 1) - half), bandHigh = (p.draftDollar ?? 1) + half;
+    // rec-confidence (TARGET/FADE only): min(edge strength, asset confidence)
+    let recConf = null, capped = null;
+    if (p.rec === "TARGET" || p.rec === "FADE") {
+      const edgeStrength = Math.abs(p.edgeDollar) >= 10 ? 3 : 2;
+      const assetLevel = { Low: 1, Med: 2, High: 3 }[assetConf];
+      recConf = Math.min(edgeStrength, assetLevel);
+      if (assetLevel < edgeStrength) capped = assetConf === "Low"
+        ? (ptRisk === "high" ? "playing-time / role risk" : "you're the outlier vs consensus")
+        : "moderate asset uncertainty";
+    }
+    return { assetConf, ptRisk, dis, gLow, gHigh, bandLow, bandHigh, recConf, capped, rookie, injuredNow };
+  }
 
   function compute(p) {
-    const avail = p.availability?.score;   // null => neutral, flagged "no data"
-    const situ = p.situation?.modifier;    // null => neutral, flagged "no data"
     const flags = p.risk_flags ?? {};
     const flagged = ["suspension", "contract", "legal"].filter((k) => flags[k] === true);
     const unvetted = flags.researched === false;
-    return { ...p, availMissing: avail == null, situMissing: situ == null, flagged, unvetted };
+    const mg = medianGames(p);
+    const rate = p.projection?.pts != null ? +(p.projection.pts / 17).toFixed(2) : null;   // healthy per-game rate
+    const assetPts = rate != null ? Math.max(0, +(rate * mg).toFixed(1)) : null;            // ① asset value, floored at 0
+    return { ...p, flagged, unvetted, medianGames: mg, rate, assetPts };
   }
 
   function rank(list) {
-    // replacement level = projection of the (knob-selected) replacement-rank player per position
+    // ② scarcity: replacement level in ASSET points at the knob-selected rank, per position
     for (const ps of Object.keys(STARTER_RANK)) {
-      const posSorted = list.filter((p) => p.pos === ps && p.projection?.pts != null)
-        .sort((a, b) => b.projection.pts - a.projection.pts);
+      const s = list.filter((p) => p.pos === ps && p.assetPts != null).sort((a, b) => b.assetPts - a.assetPts);
       const n = replRankFor(ps, replBasis);
       replRankUsed[ps] = n;
-      replPts[ps] = posSorted[Math.min(n, posSorted.length) - 1]?.projection.pts ?? 0;
+      replAsset[ps] = s[Math.min(n, s.length) - 1]?.assetPts ?? 0;
     }
-    // board-relative positional average spike rate = denominator for the ceiling ratio/badge
-    for (const ps of Object.keys(STARTER_RANK)) {
-      const rates = list.filter((p) => p.pos === ps && p.ceiling).map((p) => p.ceiling.spike_week_rate);
-      ceilAvg[ps] = rates.length ? +(rates.reduce((a, b) => a + b, 0) / rates.length).toFixed(3) : null;
-    }
-    for (const p of list) {
-      if (p.projection?.pts == null) { p.value = p.valueBase = null; p.ceilRatio = null; continue; }
-      const vorp = p.projection.pts - (replPts[p.pos] ?? 0);
-      p.valueBase = +(vorp * (p.situation?.modifier ?? 1)).toFixed(1); // availability shown for judgment, NOT multiplied into value
-      p.value = +(p.valueBase * ceilFactor(p)).toFixed(1);
-      p.ceilRatio = (p.ceiling && ceilAvg[p.pos]) ? +(p.ceiling.spike_week_rate / ceilAvg[p.pos]).toFixed(2) : null;
-    }
-    const byValue = [...list].filter((p) => p.value != null).sort((a, b) => b.value - a.value);
-    byValue.forEach((p, i) => { p.valueRank = i + 1; });
+    for (const p of list) p.marginal = p.assetPts == null ? null : Math.max(0, +(p.assetPts - (replAsset[p.pos] ?? 0)).toFixed(1));
+    // auction $ normalization over the rosterable pool
+    const rosterable = TEAMS * ROSTER_SPOTS;
+    const marg = list.filter((p) => p.marginal != null).map((p) => p.marginal).sort((a, b) => b - a).slice(0, rosterable);
+    const totalMarginal = marg.reduce((a, b) => a + b, 0) || 1;
+    const dollarPerPt = (BUDGET * TEAMS - rosterable) / totalMarginal;
+    for (const p of list) p.draftDollar = p.marginal == null ? null : (p.marginal > 0 ? Math.max(1, Math.round(1 + p.marginal * dollarPerPt)) : 1);
+    // draft rank (by $) + per-position rank
+    const byDollar = list.filter((p) => p.draftDollar != null).sort((a, b) => b.draftDollar - a.draftDollar);
+    byDollar.forEach((p, i) => (p.draftRank = i + 1));
+    dollarAtRank = byDollar.map((p) => p.draftDollar);
     const posCount = {};
-    for (const p of byValue) { posCount[p.pos] = (posCount[p.pos] ?? 0) + 1; p.posRank = posCount[p.pos]; }
-    for (const p of list) p.gap = p.adp?.half_ppr != null && p.valueRank != null
-      ? +(p.adp.half_ppr - p.valueRank).toFixed(1) : null;
+    for (const p of byDollar) { posCount[p.pos] = (posCount[p.pos] ?? 0) + 1; p.posRank = posCount[p.pos]; }
+    // ③ market edge: your $ vs the $ of the player's ADP slot
+    for (const p of list) {
+      const adp = p.adp?.half_ppr;
+      p.marketDollar = adp != null ? (dollarAtRank[Math.min(dollarAtRank.length, Math.round(adp)) - 1] ?? 1) : null;
+      p.edgeDollar = p.marketDollar != null && p.draftDollar != null ? p.draftDollar - p.marketDollar : null;
+      p.edgePicks = adp != null && p.draftRank != null ? +(adp - p.draftRank).toFixed(1) : null;
+      p.rec = p.edgeDollar == null ? null : p.edgeDollar >= EDGE_TARGET ? "TARGET" : p.edgeDollar <= EDGE_FADE ? "FADE" : "FAIR";
+      p.conf = confidence(p); // ② band + tier + ③ rec-confidence (needs draftRank + dollarAtRank, both set above)
+    }
+    // ceiling badge denominator (display only — ceiling is not a value input)
+    for (const ps of Object.keys(STARTER_RANK)) {
+      const r = list.filter((p) => p.pos === ps && p.ceiling).map((p) => p.ceiling.spike_week_rate);
+      ceilAvg[ps] = r.length ? +(r.reduce((a, b) => a + b, 0) / r.length).toFixed(3) : null;
+    }
+    for (const p of list) p.ceilRatio = (p.ceiling && ceilAvg[p.pos]) ? +(p.ceiling.spike_week_rate / ceilAvg[p.pos]).toFixed(2) : null;
     return list;
   }
 
-  /* ---------- tiers: natural breaks within position by value ---------- */
+  /* ---------- tiers: natural breaks within position by draft $ ---------- */
   function tiersFor(list) {
-    const sorted = [...list].filter((p) => p.value != null).sort((a, b) => b.value - a.value);
+    const sorted = [...list].filter((p) => p.draftDollar != null).sort((a, b) => b.draftDollar - a.draftDollar);
     const tiers = [];
     let cur = [];
     for (const p of sorted) {
       if (cur.length) {
-        const drop = cur[cur.length - 1].value - p.value;
-        // threshold relative to the CURRENT tier's leader so mid-range flat zones
-        // still split; hard cap so no tier balloons past scannable size
-        const threshold = Math.max(4, Math.abs(cur[0].value) * 0.08);
+        const drop = cur[cur.length - 1].draftDollar - p.draftDollar;
+        const threshold = Math.max(3, Math.abs(cur[0].draftDollar) * 0.12);
         if (drop > threshold || cur.length >= 12) { tiers.push(cur); cur = []; }
       }
       cur.push(p);
@@ -105,13 +179,18 @@
   /* ---------- render helpers ---------- */
   const noData = '<span class="nodata">no data</span>';
   const badge = (txt, cls, title) => `<span class="rbadge ${cls}" title="${esc(title)}">${esc(txt)}</span>`;
+  const edgeStr = (e) => e == null ? "–" : e === 0 ? "$0" : (e > 0 ? "+$" : "−$") + Math.abs(e);
 
   function rowHTML(p, rankLabel) {
     const isTaken = taken.has(p.id);
     const isOpen = expandedId === p.id;
-    const gapCls = p.gap == null ? "" : p.gap >= 5 ? "gap-value" : p.gap <= -5 ? "gap-reach" : "gap-fair";
-    const nameCls = p.gap == null ? "" : p.gap >= 5 ? "name-value" : p.gap <= -5 ? "name-reach" : "";
-    const gapTxt = p.gap == null ? "–" : (p.gap > 0 ? "+" : "") + Math.round(p.gap);
+    const rec = p.rec;
+    const recCls = rec === "TARGET" ? "rec-target" : rec === "FADE" ? "rec-fade" : rec === "FAIR" ? "rec-fair" : "";
+    const nameCls = rec === "TARGET" ? "name-value" : rec === "FADE" ? "name-reach" : "";
+    const edge = p.edgeDollar, conf = p.conf;
+    const edgeCls = edge == null ? "" : edge >= EDGE_TARGET ? "gap-value" : edge <= EDGE_FADE ? "gap-reach" : "gap-fair";
+    const edgeTitle = edge == null ? "no ADP to compare" :
+      `You value him $${p.draftDollar}; the market's ADP slot (pick ${p.adp.half_ppr}) is worth $${p.marketDollar} → ${edge > 0 ? "UNDER" : edge < 0 ? "OVER" : "fairly"}valued by ${edgeStr(edge)} (${p.edgePicks > 0 ? "+" : ""}${Math.round(p.edgePicks)} picks)${conf?.recConf ? ` · rec-confidence ${CONF_LABEL[conf.recConf - 1]}${conf.capped ? ` (capped: ${conf.capped})` : ""}` : ""}`;
     const bc = p.fftiers;
     const bcTxt = bc ? `${bc.rank}<span class="bctier">T${bc.tier}</span>` : "–";
     const bcTitle = bc ? `Boris Chen half-PPR consensus: overall #${bc.rank}, tier ${bc.tier} (avg ${bc.avg_rank}, range ${bc.best_rank}-${bc.worst_rank})` : "not in fftiers top-200";
@@ -119,11 +198,11 @@
     const clCls = clr == null ? "" : clr >= 1.5 ? "ceil-boom" : clr <= 0.6 ? "ceil-steady" : "";
     const clArrow = clr == null ? "" : clr >= 1.5 ? "▲" : clr <= 0.6 ? "▾" : "";
     const clTxt = cl ? `${Math.round(cl.spike_week_rate * 100)}%${clArrow}` : "–";
-    const clTitle = cl ? `Spike-week rate: ${Math.round(cl.spike_week_rate * 100)}% of ${cl.sample_weeks} games (2023-25) at/above the ${p.pos} top-5 weekly line (${cl.boom_line} pts). Boom week ~${cl.boom_pts}, floor ~${cl.floor_pts}${clr != null ? `; ${clr}× the board's ${p.pos} average` : ""}.` : "no weekly ceiling data (rookie / <10 career games)";
+    const clTitle = cl ? `Spike-week rate: ${Math.round(cl.spike_week_rate * 100)}% of ${cl.sample_weeks} games at/above the ${p.pos} top-5 weekly line (${cl.boom_line} pts). Boom ~${cl.boom_pts}, floor ~${cl.floor_pts}${clr != null ? `; ${clr}× the board's ${p.pos} average` : ""}. Separate attribute — not in value.` : "no weekly ceiling data (rookie / <10 career games)";
     const badges = [
+      rec ? `<span class="recbadge ${recCls}" title="${esc(edgeTitle)}">${rec}${conf?.recConf ? ` <span class="confdots" title="rec-confidence ${CONF_LABEL[conf.recConf - 1]}">${CONF_DOTS[conf.recConf - 1]}</span>` : ""}</span>` : "",
       ...p.flagged.map((f) => badge(f.slice(0, 3).toUpperCase(), "rbadge-risk", `${f} risk — see detail`)),
       p.unvetted ? badge("unvetted", "rbadge-unvetted", "Risk flags not yet researched — null, not clean") : "",
-      p.availMissing ? badge("avail: no data", "rbadge-nodata", "No NFL history (rookie) or no availability inputs") : "",
     ].join("");
     return `
     <div class="drow ${isTaken ? "taken" : ""}" data-id="${p.id}">
@@ -133,9 +212,9 @@
         <span class="dname ${nameCls}">${esc(p.name)}</span>
         <span class="dpos">${esc(p.pos)}${p.posRank ? p.posRank : ""} · ${esc(p.team)}</span>
         ${badges}
-        <span class="dval mono">${p.value ?? "–"}</span>
-        <span class="dadp mono" title="ADP (half-PPR, ${esc(board.players ? p.adp?.updated : "")})">${p.adp?.half_ppr ?? "–"}</span>
-        <span class="dgap mono ${gapCls}">${gapTxt}</span>
+        <span class="dval mono" title="draft value — scarcity-aware auction $">$${p.draftDollar ?? "–"}</span>
+        <span class="dadp mono" title="ADP (half-PPR)">${p.adp?.half_ppr ?? "–"}</span>
+        <span class="dgap mono ${edgeCls}" title="${esc(edgeTitle)}">${edgeStr(edge)}</span>
         <span class="dbc mono" title="${esc(bcTitle)}">${bcTxt}</span>
         <span class="dceil mono ${clCls}" title="${esc(clTitle)}">${clTxt}</span>
       </button>
@@ -143,29 +222,31 @@
     </div>`;
   }
 
-  // Transparent, computed decomposition of how value/placement is derived and why the ADP gap exists.
-  // Uses only numbers already in the data — consistent for all 248 players, never fabricated.
-  function gapExplainer(p) {
-    if (p.value == null) return `<div class="gapexp"><b>No gap:</b> no projection for this player, so no value rank (shows ${noData}).</div>`;
-    const repl = replPts[p.pos], replRank = replRankUsed[p.pos];
-    const rawVorp = +(p.projection.pts - repl).toFixed(1);
-    const situ = p.situation?.modifier;
-    const situTxt = (situ != null && situ !== 1) ? ` × ${situ} situation` : "";
-    const tiltTxt = (ceilTilt && p.valueBase != null && p.value !== p.valueBase) ? ` × ceiling-tilt (${p.valueBase}→${p.value})` : "";
-    const adp = p.adp?.half_ppr;
+  // Full, transparent decomposition — asset → scarcity → draft-$ → market-$ → edge → rec. No black box.
+  function edgeExplainer(p) {
+    if (p.assetPts == null) return `<div class="gapexp"><b>No value:</b> no projection for this player (shows ${noData}).</div>`;
+    const replRank = replRankUsed[p.pos], repl = replAsset[p.pos], adp = p.adp?.half_ppr, rec = p.rec;
     let verdict;
-    if (p.gap == null) verdict = `<b>Gap: —</b> no ADP for this player, so nothing to compare.`;
-    else if (p.gap >= 5) verdict = `<b class="name-value">Bargain (+${Math.round(p.gap)}):</b> the market drafts him around pick <b>${adp}</b> — about ${Math.round(p.gap)} slots <b>later</b> than the board's value rank (<b>#${p.valueRank}</b>). He tends to be available after his value says he's worth taking.`;
-    else if (p.gap <= -5) verdict = `<b class="name-reach">Reach (${Math.round(p.gap)}):</b> the market drafts him around pick <b>${adp}</b> — about ${Math.abs(Math.round(p.gap))} slots <b>earlier</b> than the board's value rank (<b>#${p.valueRank}</b>). Taking him at ADP means paying above the board's price.`;
-    else verdict = `<b>Fair:</b> market ADP <b>${adp}</b> ≈ board value rank <b>#${p.valueRank}</b> — priced about where the board values him.`;
-    const drivers = [];
-    if (situ != null && situ !== 1) drivers.push(`a situation modifier (×${situ}) adjusts for a team/scheme change`);
-    if (["QB", "TE", "K", "DEF"].includes(p.pos)) drivers.push(`at ${p.pos}, replacement is deep — the freely-available ${p.pos}${replRank} already projects ${repl} pts, so even a big raw projection leaves only modest value OVER replacement. This is why elite ${p.pos}s rank lower here than their raw points suggest, and why the market (which drafts on name/points) reaches for them`);
-    const driverTxt = drivers.length ? `<div class="gapdriver">Why the gap: ${drivers.join("; ")}.</div>` : "";
+    if (p.edgeDollar == null) verdict = `<b>No market comparison:</b> no ADP for this player.`;
+    else if (rec === "TARGET") verdict = `<b class="name-value">TARGET (${edgeStr(p.edgeDollar)}):</b> you value him <b>$${p.draftDollar}</b>, but his ADP slot (pick <b>${adp}</b>) costs only <b>$${p.marketDollar}</b> — undervalued by <b>${edgeStr(p.edgeDollar)}</b> (~${Math.round(p.edgePicks)} picks late). Good value at cost.`;
+    else if (rec === "FADE") verdict = `<b class="name-reach">FADE (${edgeStr(p.edgeDollar)}):</b> the market pays <b>$${p.marketDollar}</b> at his ADP (pick <b>${adp}</b>), but you value him only <b>$${p.draftDollar}</b> — overvalued by <b>${edgeStr(Math.abs(p.edgeDollar))}</b>. Let someone else pay up.`;
+    else verdict = `<b>FAIR:</b> your value <b>$${p.draftDollar}</b> ≈ his ADP-slot cost <b>$${p.marketDollar}</b> (pick ${adp}) — priced about right.`;
+    const cf = p.conf;
+    const caution = cf?.recConf
+      ? `<div class="gapdriver"><b>Rec-confidence: ${CONF_LABEL[cf.recConf - 1]}</b> <span class="confdots">${CONF_DOTS[cf.recConf - 1]}</span> = min(edge, asset trust) — asset confidence <b>${cf.assetConf}</b>${cf.capped ? ` <b>(capped by ${cf.capped})</b>` : ""}. Value band <b>$${cf.bandLow}–$${cf.bandHigh}</b>; drivers: playing-time risk <b>${cf.ptRisk}</b> (${cf.gLow}–${cf.gHigh} games), disagreement <b>${cf.dis}</b>.</div>`
+      : cf
+        ? `<div class="gapdriver faint">FAIR — no strong action. Asset confidence ${cf.assetConf}, value band $${cf.bandLow}–$${cf.bandHigh}.</div>`
+        : "";
     return `<div class="gapexp">
-      <b>How this value is built:</b> ${p.projection.pts} projected pts − ${repl} replacement (free ${esc(p.pos)}${replRank}) = <b>${rawVorp}</b> VORP${situTxt}${tiltTxt} = <b>${p.value} value</b> → <b>#${p.valueRank}</b> overall. <span class="faint">Availability is shown below for your judgment, not baked in.</span>
+      <b>How this value is built:</b>
+      <div class="gapchain">
+        <span>rate <b>${p.rate}</b>/g × <b>${p.medianGames}</b> median games = <b>${p.assetPts}</b> asset pts <span class="faint">(what he produces, ≥ 0)</span></span>
+        <span>− free ${esc(p.pos)}${replRank} @ ${repl} asset pts = <b>${p.marginal}</b> over replacement <span class="faint">(scarcity)</span></span>
+        <span>→ <b>$${p.draftDollar}</b> draft value <span class="faint">(auction $, floored at $1)</span></span>
+        <span>vs market <b>$${p.marketDollar ?? "–"}</b> at ADP ${adp ?? "–"} → edge <b>${edgeStr(p.edgeDollar)}</b></span>
+      </div>
       <div class="gapverdict">${verdict}</div>
-      ${driverTxt}
+      ${caution}
     </div>`;
   }
 
@@ -176,32 +257,31 @@
     const notes = p.risk_flags?.notes ?? [];
     return `<div class="ddetail">
       ${p.adp_commentary ? `<div class="dcommentary"><b>Why here at ${esc(p.pos)}:</b> ${esc(p.adp_commentary)}</div>` : ""}
-      ${gapExplainer(p)}
+      ${edgeExplainer(p)}
       <div class="dcol">
-        <h4>Projection</h4>
-        <div><b>league pts:</b> ${p.projection.pts ?? "–"} (${p.projection.ppg ?? "–"}/g)</div>
-        <div><b>value:</b> ${p.value ?? "–"} <span class="faint">(VORP over free ${esc(p.pos)}${replRankUsed[p.pos] ?? "?"} @ ${replPts[p.pos] ?? "?"} pts${ceilTilt && p.valueBase != null && p.value !== p.valueBase ? ` · ceiling-tilt ${p.valueBase}→${p.value}` : ""})</span></div>
-        <div><b>method:</b> ${esc(p.projection.method)}</div>
-        <div><b>sleeper half-PPR anchor:</b> ${p.projection.sleeper_half_ppr ?? "–"}</div>
-        <div><b>ADP:</b> ${p.adp?.half_ppr ?? "–"} <span class="faint">(as of ${esc(p.adp?.updated ?? "?")})</span></div>
+        <h4>Value <span class="faint">(Phase A · $-engine)</span></h4>
+        <div><b>Sleeper proj:</b> ${p.projection?.pts ?? "–"} pts <span class="faint">(full-health season)</span></div>
+        <div><b>asset:</b> ${p.rate ?? "–"}/g rate × ${p.medianGames} median games = <b>${p.assetPts ?? "–"}</b> pts</div>
+        <div><b>draft value:</b> <b>$${p.draftDollar ?? "–"}</b> <span class="faint">(${p.marginal ?? "–"} over free ${esc(p.pos)}${replRankUsed[p.pos] ?? "?"} @ ${replAsset[p.pos] ?? "?"})</span></div>
+        <div><b>market:</b> $${p.marketDollar ?? "–"} at ADP ${p.adp?.half_ppr ?? "–"} → <b>edge ${edgeStr(p.edgeDollar)}</b> (${p.edgePicks == null ? "–" : (p.edgePicks > 0 ? "+" : "") + Math.round(p.edgePicks) + " picks"})</div>
+        <div><b>recommendation:</b> <b class="${p.rec === "TARGET" ? "name-value" : p.rec === "FADE" ? "name-reach" : ""}">${p.rec ?? "–"}</b>${p.conf?.recConf ? ` · confidence ${CONF_LABEL[p.conf.recConf - 1]} <span class="confdots">${CONF_DOTS[p.conf.recConf - 1]}</span>${p.conf.capped ? ` <span class="faint">(capped: ${p.conf.capped})</span>` : ""}` : ""}</div>
+        <div><b>asset confidence:</b> ${p.conf?.assetConf ?? "–"} <span class="faint">· band $${p.conf?.bandLow ?? "–"}–$${p.conf?.bandHigh ?? "–"} · PT ${p.conf?.gLow ?? "–"}–${p.conf?.gHigh ?? "–"} games · disagreement ${p.conf?.dis ?? "–"}</span></div>
         <h4>Boris Chen (fftiers)</h4>
         ${p.fftiers ? `<div><b>consensus rank:</b> #${p.fftiers.rank} · tier ${p.fftiers.tier}</div>
         <div><b>expert avg:</b> ${p.fftiers.avg_rank} <span class="faint">(range ${p.fftiers.best_rank}–${p.fftiers.worst_rank}, std ${p.fftiers.std_dev})</span></div>
-        <div class="faint">FantasyPros consensus, GMM-clustered tiers, half-PPR · as of ${esc(board.fftiers?.updated ?? "?")}</div>`
+        <div class="faint">FantasyPros consensus, GMM tiers, half-PPR · as of ${esc(board.fftiers?.updated ?? "?")}</div>`
           : `<div>${noData} — not in Boris Chen's top-200 (free agent or deep)</div>`}
-        <h4>Ceiling (spike weeks)</h4>
+        <h4>Ceiling (spike weeks) <span class="faint">— separate attribute, not in value</span></h4>
         ${p.ceiling ? `<div><b>spike-week rate:</b> ${Math.round(p.ceiling.spike_week_rate * 100)}% <span class="faint">of ${p.ceiling.sample_weeks} games${p.ceilRatio != null ? ` · ${p.ceilRatio}× ${esc(p.pos)} avg` : ""}</span></div>
-        <div><b>boom / floor week:</b> ${p.ceiling.boom_pts} / ${p.ceiling.floor_pts} pts <span class="faint">(${esc(p.pos)} top-5 line ${p.ceiling.boom_line})</span></div>
-        <div class="faint">${esc(p.ceiling.method)}${ceilTilt ? ` · tilt ${Math.round(ceilTilt * 100)}% applied` : " · tilt off (display only)"}</div>`
-          : `<div>${noData} — rookie / &lt;10 career games, no stable spike-rate</div>`}
+        <div><b>boom / floor week:</b> ${p.ceiling.boom_pts} / ${p.ceiling.floor_pts} pts <span class="faint">(${esc(p.pos)} top-5 line ${p.ceiling.boom_line})</span></div>`
+          : `<div>${noData} — rookie / &lt;10 career games</div>`}
       </div>
       <div class="dcol">
-        <h4>Availability <span class="faint">— not in value; your call at the draft</span></h4>
-        <div><b>score:</b> ${a.score ?? noData} ${a.partial ? '<span class="faint">(injury-type component missing)</span>' : ""}</div>
-        <div><b>expected games:</b> ${a.expected_games ?? noData}</div>
+        <h4>Availability <span class="faint">— feeds median games (lightly) + the uncertainty band</span></h4>
+        <div><b>median games used:</b> ${p.medianGames} <span class="faint">of 17</span></div>
         <div><b>games played:</b> ${["2023", "2024", "2025"].map((y) => `${y}: ${gp[y] ?? "–"}`).join(" · ")}</div>
-        <div><b>age:</b> ${a.age ?? "–"} (curve ×${a.age_factor ?? "–"}) · <b>status:</b> ${esc(a.current_injury_status ?? "healthy/none")}</div>
-        <div><b>injury history:</b> ${a.injury_history == null ? noData + ' <span class="faint">(research pass pending)</span>' : esc(a.injury_history)}</div>
+        <div><b>age:</b> ${a.age ?? p.age ?? "–"} · <b>status:</b> ${esc(a.current_injury_status ?? "healthy/none")}</div>
+        <div><b>injury history:</b> ${a.injury_history == null ? noData + ' <span class="faint">(research pending)</span>' : esc(a.injury_history)}</div>
       </div>
       <div class="dcol">
         <h4>Situation ${p.situation?.modifier == null ? noData : `×${p.situation.modifier}`}</h4>
@@ -223,7 +303,7 @@
     <div class="drow dhead" aria-hidden="true">
       <span></span>
       <span class="dmain-head"><span class="dr">#</span><span class="dname">player</span><span class="dpos">pos</span>
-      <span class="dval">value</span><span class="dadp">adp</span><span class="dgap">gap</span><span class="dbc">BC</span><span class="dceil">ceil</span></span>
+      <span class="dval">$val</span><span class="dadp">adp</span><span class="dgap">edge</span><span class="dbc">BC</span><span class="dceil">ceil</span></span>
     </div>`;
 
   /* ---------- views ---------- */
@@ -238,19 +318,20 @@
   function paint() {
     const list = visible();
     if (view === "board") {
-      const sortLabel = { value: "by value", adp: "by ADP", bc: "by Boris Chen rank" }[sort] ?? "by value";
+      const sortLabel = { draftval: "by draft $", edge: "by edge", adp: "by ADP", bc: "by Boris Chen" }[sort] ?? "by draft $";
       $("#board-title").textContent = (pos === "ALL" ? "Value board" : `Value board — ${pos}`) + " · " + sortLabel;
       const sortFns = {
         adp: (a, b) => (a.adp?.half_ppr ?? Infinity) - (b.adp?.half_ppr ?? Infinity),
         bc: (a, b) => (a.fftiers?.rank ?? Infinity) - (b.fftiers?.rank ?? Infinity),
-        value: (a, b) => (b.value ?? -1) - (a.value ?? -1),
+        draftval: (a, b) => (b.draftDollar ?? -1) - (a.draftDollar ?? -1),
+        edge: (a, b) => (b.edgeDollar ?? -Infinity) - (a.edgeDollar ?? -Infinity),
       };
-      const sorted = [...list].sort(sortFns[sort] ?? sortFns.value);
+      const sorted = [...list].sort(sortFns[sort] ?? sortFns.draftval);
       $("#board-body").innerHTML = headerHTML +
-        sorted.map((p) => rowHTML(p, p.valueRank ?? "–")).join("") +
-        `<div class="boardfoot">gap = ADP − value rank · name in <span class="name-value">light&nbsp;blue</span> = market prices them later than their value (bargain, +gap) · <span class="name-reach">red</span> = priced above value (reach, −gap). # column is value rank in both sorts.</div>`;
+        sorted.map((p) => rowHTML(p, p.draftRank ?? "–")).join("") +
+        `<div class="boardfoot">$val = draft value (scarcity-aware auction $) · edge = your $ − the market's $ at his ADP slot · <span class="name-value">TARGET</span> / <span class="name-reach">FADE</span> with rec-confidence dots ●●● = min(edge size, asset trust). # = draft-value rank.</div>`;
     } else {
-      $("#board-title").textContent = "Tiers — cliff edges";
+      $("#board-title").textContent = "Tiers — cliff edges (by draft $)";
       const posList = pos === "ALL" ? ["RB", "WR", "QB", "TE", "K", "DEF"] : [pos];
       $("#board-body").innerHTML = posList.map((ps) => {
         const tiers = tiersFor(list.filter((p) => p.pos === ps));
@@ -263,7 +344,7 @@
     }
   }
 
-  /* ---------- events (delegated; state never lost to reloads) ---------- */
+  /* ---------- events (delegated; state survives reloads) ---------- */
   $("#board-body").addEventListener("click", (e) => {
     const act = e.target.closest("[data-act]");
     if (!act) return;
@@ -273,7 +354,7 @@
       taken.has(id) ? taken.delete(id) : taken.add(id);
       saveTaken();
     } else if (act.dataset.act === "expand") {
-      expandedId = expandedId === id ? null : id; // open this row, closing any other
+      expandedId = expandedId === id ? null : id;
     }
     paint();
   });
@@ -300,20 +381,16 @@
     if (taken.size && confirm(`Clear ${taken.size} drafted marks?`)) { taken.clear(); saveTaken(); paint(); }
   });
 
-  /* ---------- value knobs (replacement basis + ceiling tilt) ---------- */
+  /* ---------- replacement (scarcity) knob ---------- */
   function updateKnobReadouts() {
-    const rb = $("#repl-basis-val"), ct = $("#ceil-tilt-val");
+    const rb = $("#repl-basis-val");
     if (rb) rb.textContent = replBasis <= 0 ? `starters (RB${replRankFor("RB", 0)}·WR${replRankFor("WR", 0)})`
       : replBasis >= 1 ? `rostered (RB${replRankFor("RB", 1)}·WR${replRankFor("WR", 1)})`
       : `RB${replRankFor("RB", replBasis)}·WR${replRankFor("WR", replBasis)}`;
-    if (ct) ct.textContent = ceilTilt ? `${Math.round(ceilTilt * 100)}% ceiling` : "off (mean)";
   }
-  const replInput = $("#repl-basis"), ceilInput = $("#ceil-tilt");
+  const replInput = $("#repl-basis");
   if (replInput) replInput.addEventListener("input", (e) => {
     replBasis = +e.target.value; saveKnobs(); rank(rows); updateKnobReadouts(); paint();
-  });
-  if (ceilInput) ceilInput.addEventListener("input", (e) => {
-    ceilTilt = +e.target.value; saveKnobs(); rank(rows); updateKnobReadouts(); paint();
   });
 
   /* ---------- boot ---------- */
@@ -329,7 +406,6 @@
     }
     rows = rank(board.players.map(compute));
     if (replInput) replInput.value = replBasis;
-    if (ceilInput) ceilInput.value = ceilTilt;
     updateKnobReadouts();
     $("#board-meta").textContent = `board ${board.generated} · ${rows.length} players · ADP as of ${board.generated}`;
     paint();

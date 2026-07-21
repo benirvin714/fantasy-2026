@@ -1,14 +1,15 @@
 # Plan — Player Valuation & Scouting Briefs
 
 > Design doc for two dashboard upgrades, settled via a full grilling pass on 2026-07-20.
-> Status: **Phase 1 (valuation fixes) shipped 2026-07-20; Phases 2–4 (scouting) not yet built.** Build sequence in §6.
+> Status: **Valuation REDESIGNED 2026-07-20 (§1, 3-layer model). Phases A ($-engine + edge) and B (uncertainty band + rec-confidence) both shipped. Scouting (§2) not yet built.** Build sequence in §6.
+> The original VORP-as-value design (Phase 1, shipped then superseded) is preserved in git history; §1 below is the current algorithm.
 > Scope note: neither of these is a from-scratch build — both finish and integrate machinery that already exists but is stubbed to `null`.
 
 ## 0. The one idea that unifies both
 
 Valuation and commentary are **one loop, not two features**:
 
-> Independent VORP surfaces a **gap** (your value rank vs the market's ADP) → a big gap is not a buy signal, it's a **question: why do I disagree with the market?** → the `scouting_brief` (Challenge 2) has to answer it → if the answer is a role/scheme delta the projection missed, it sets a capped `situation.modifier` and the gap closes on its own; if the answer is "no reason," the gap is either **real alpha** (act on it) or a **projection error** (fix it with an override). Nothing moves value silently, and every disagreement with the market is explained before it's trusted.
+> **Asset value** (what a player produces) → **scarcity** → **draft-$** (auction dollars) → compared to the **market's $** at his ADP slot → **edge** (over/undervalued, and by how much) → **recommendation** (TARGET/FAIR/FADE), gated by **confidence** = `min(edge size, how much you trust the asset read)`. A big edge you can't trust (rookie, injury, experts split) is *capped, not acted on*. The `scouting_brief` (Challenge 2) feeds the trust side — role/scheme stability tightens or widens the uncertainty band — and annotates the recommendation. Nothing moves value silently; every edge is decomposed, and every low-confidence call is flagged.
 
 Everything below serves that loop.
 
@@ -16,40 +17,61 @@ Everything below serves that loop.
 
 ## 1. Challenge 1 — Valuation & how variables are weighted
 
-### 1.1 The engine
+### 1.1 The three layers (per player, never fused into one opaque number)
+
+1. **Asset value** — *what he produces.* `rate` (Sleeper proj ÷ 17 = healthy per-game) × **median games** (light PT model, §1.3), **floored at 0**. Position-agnostic, descriptive — *not* the draft sort.
+2. **Uncertainty** — *how wrong the median could be.* A $ band (low–median–high) + High/Med/Low tier + drivers, from the PT band + Boris Chen expert disagreement + rookie/role flags. Weekly boom/bust is a **separate** ceiling attribute, not confidence. *(Phase B.)*
+3. **Recommendation** — *mispriced, and by how much.* The pipeline below → TARGET/FAIR/FADE, gated by rec-confidence = `min(edge size, asset confidence)`.
+
+### 1.2 The pipeline (asset → edge)
 
 ```
-value = VORP × situation   (× ceiling-tilt when the knob is dialed up)
+ rate × median games   →  asset value (≥ 0)            ① what he produces
+ − replacement (scarcity line, knob)  →  marginal (≥0) ② positional scarcity
+ → auction draft-$  (normalized, $1 floor)             your price
+ vs market-$  (the $ of his ADP slot)                  market price
+ → edge = draft-$ − market-$  →  TARGET / FAIR / FADE   ③ over/undervalued + degree
 ```
 
-Multiplicative, because situation is a *proportional* adjustment to production-over-replacement. **Availability was removed from the value math on 2026-07-20** (user's call): the history × age-curve × status haircut was too drastic and double-counts durability/age the projection already prices — it was docking healthy-projected veterans ~30%+. Availability is still computed and shown in the detail panel as a draft-time lens, just not multiplied in. (The earlier design multiplied *VORP, not raw points*, on the sound logic that missed games backfill at replacement from the rich waiver wire — but the magnitude, not the placement, was the problem.)
+- **One currency — $.** Draft edges *and* FAAB waiver bids are both dollars → same engine, both contexts.
+- **No negatives.** Asset ≥ 0, marginal ≥ 0, draft-$ ≥ $1. Kills the old "141 players below replacement, Kamara 240th" pile-up that drove the VORP-vs-ADP divergence.
+- **Scarcity is visible *and* separable** — its own step, shown as a distinct layer, then folded into the $.
+- **Edge in $ (honest magnitude) + picks (draft intuition).** Late-round $1 players correctly compress to ~$0 edge; the pick-gap still shows their divergence.
+- **Phase-A stopgap for confidence:** on a TARGET/FADE where Boris Chen *contradicts* the call by ≥15 ranks, a ⚠ flags "you're the outlier" until the real Phase-B cap lands (e.g. Josh Allen $46/rank-10 vs ADP+BC ~24).
 
-### 1.2 The weighting philosophy
+### 1.3 Playing-time model (rate vs games, availability as a light band)
 
-Don't hard-code false-precise weights. **Expose the two contestable weights as knobs, bound the soft ones, and zero-weight anything that would double-count.**
+Sleeper's projection is `rate × 17` (full health) — `gp` reads 18 for everyone, a placeholder. So: **`rate` = proj ÷ 17**, and **games are modeled here**:
+- **Median games stays near-full (~16–17)** — moved down only for *documented* reasons: current injury/PUP status, a chronic multi-year games-missed pattern (regressed at 0.3, vs the old score's 0.6 multiplier), or an age cliff. Deliberately gentle — the old availability multiplier was too drastic.
+- **The injury signal lives in the band width** (Phase B), not the median: durable → tight, chronic/PUP → wide, rookie → wide (job not locked). Two players with the same median can have very different bands → the wide-band one gets its rec-confidence capped.
 
-| Variable | Treatment | Rationale |
-|---|---|---|
-| Projection (base) | Sleeper stat line re-scored to league format; **calibrate** against Boris Chen consensus (big divergence → hand-review); per-player **overrides** in the overlay for the top ~30 | Free base kept; sharper signal used as a sanity flag, not an auto-blend |
-| Market (ADP / Boris Chen) | **Zero weight in the number.** Stays a display axis; `gap = ADP − valueRank` is the actionable signal | Blending the market in shrinks the gap toward zero — deletes the edge the tool exists to find |
-| Replacement level | **Fixed** (see 1.3) + exposed as a **sensitivity knob** | Current baseline mis-measures RB; the "right" rank is a judgment call, so make it visible |
-| Ceiling / variance | **Display axis + tunable ceiling-tilt knob** (see 1.4) | League doctrine says ceiling > floor; mean-VORP is blind to it |
-| Availability | **Display-only** — computed (history × age-curve × current-status) and shown in the detail panel, but removed from the value math 2026-07-20; weighed manually at the draft | The haircut was too drastic and double-counts durability/age the projection already prices |
-| Situation | Bounded multiplier ×0.90–1.10, **fed by the scouting_brief** (see 2 + M3) | Only deltas the projection missed; capped so soft narrative can't swamp hard math |
-| `context.*` (contract, rookie capital, win total, playoff SOS) | **Display-only strip.** Never silent multipliers | Already in the projection (win total, rookie capital), too noisy (contract), or uncomputable now (SOS). Reaches value only *through the human* via overrides + situation |
+### 1.4 Uncertainty & recommendation-confidence (Phase B)
 
-### 1.3 The replacement fix (the load-bearing change)
+- **Asset-confidence band** = the Q3 PT band + Boris Chen `best/worst/std_dev` (expert disagreement) + rookie/new-team/committee flags → a $ band (low–median–high) + H/M/L tier + visible drivers.
+- **Recommendation** = TARGET/FAIR/FADE (draft) / BID-PASS (waiver) / BUY-HOLD-SELL (trade) from the edge sign + threshold.
+- **Rec-confidence = `min(edge strength, asset confidence)`** — the weaker link governs. Big edge + tight band = high-confidence TARGET; big edge + wide band = capped ("edge huge, but role/health unresolved").
+- **Single-source noise → uncertainty, not a regressed number.** When Sleeper and Boris Chen disagree, that widens the band and caps confidence — the edge stays visible but honestly flagged. (Phase A previews this with the ⚠.)
+- **League-mates** = a separate *actionability* note from `league-tendencies.md` (a rival will snipe this value / FAAB pressure) — annotates the rec, never moves the edge.
 
-**Problem found in the live board:** replacement is computed as the Nth-best *preseason* projection per position. Sleeper projects backup RBs at ~0 (they only play on injury), so RB replacement collapses (#46 RB ≈ 74 pts) while WR replacement is a real floor (#47 WR ≈ 135 pts). Result: **RB VORP is systematically inflated** relative to WR — the top-RB-vs-top-WR value gap on the board is partly a projection artifact, not real scarcity.
+### 1.5 Build status & calibration defaults
 
-**Fix:** redefine replacement as *"the streamer you'd actually start"* — a backup who has *become* a starter, not a backup projected as a backup — applied **consistently across positions** so RB and WR measure the same real-world thing. Candidate approaches (calibrate at build): a starter-adjusted rank (~RB30 rather than RB46), or a floor on the projection pool so near-zero backup projections can't set the baseline. Then **expose the replacement rank N as a knob** so sensitivity is visible rather than a hidden hard-coded guess.
+**Phase A shipped** (`site/draft.js`, client-side — no rebuild; reuses existing board fields): the full pipeline (1.2), the light median-games model (1.3), TARGET/FAIR/FADE + the ⚠ stopgap, default sort = draft-$ (toggles: edge / ADP / BC), and the replacement (scarcity) knob. The ceiling-tilt knob was **retired** (ceiling is now a pure display attribute).
 
-### 1.4 The ceiling axis (biggest doctrine-vs-formula gap closed)
+Tunable calibration defaults (all constants at the top of `draft.js`): auction budget $200 × 10 teams; edge thresholds **TARGET ≥ +$4 / FADE ≤ −$4** (from the observed edge distribution: median 0, p90 +6, p10 −5); median-games regression 0.3; ⚠ when BC contradicts a rec by ≥15 ranks. Replacement line = starter-basis default (RB30/WR32/QB11/TE11), knob-adjustable to rostered.
 
-`league-profile.md` §10: *"floor matters less, ceiling matters more — draft for spike weeks."* The mean-VORP formula can't see variance. Fix, in two visible pieces:
+**Phase B shipped:** asset-confidence tier = `min(playing-time risk, disagreement)`, where disagreement folds *both* Boris Chen internal spread (std/range) *and* board-vs-consensus outlier-ness in the rec's direction. Rec-confidence = `min(edge strength, asset confidence)` → ●○○/●●○/●●● dots on the badge, with the cap reason and a $ band shown on expand. Calibrated to a sensible spread (of 53 TARGET/FADE calls: ~2 High, ~16 Med, ~35 Low — honestly humble for a single-source board; Cook #4-vs-BC-#35 reads Low, Bijan reads High). Thresholds are all tunable constants.
 
-1. **Spike-week rate** — build from free Sleeper *weekly* stats 2023–25: per player, how often they post a top-N positional week. This is the signal that actually wins H2H matchups here.
-2. **Render + control** — a display column + boom/bust badge (like the gap column), **plus a tunable ceiling-tilt knob** that blends `ceiling-VORP` into the ranking. Default = pure mean-VORP (clean, defensible); dial up to weight spike-week upside.
+### 1.6 Migration & how the old pieces map in
+
+- **Replacement model (old §1.3 fix)** → now sets the **scarcity line** in the pipeline (measured on *asset points*, not raw projection). Same starter-basis default + knob.
+- **Ceiling / spike-week rate (old §1.4)** → stays as a **separate display attribute** (column + boom/bust badge). The ceiling-*tilt* knob is **retired** — ceiling no longer moves value (it's the "weekly boom/bust" that 1.4 explicitly keeps out of confidence).
+- **Availability** → repurposed into the **light median-games model + Phase-B band** (1.3), instead of the removed value multiplier.
+- **Situation modifier / `scouting_brief`** → no longer a value multiplier. The `scouting_brief` (§2) feeds the **Phase-B role-stability band** and the **recommendation's actionability note**, not the number.
+- **`context.*`** → unchanged: display-only strip.
+
+### 1.7 Draft vs in-season waivers
+
+One engine, two contexts. **Draft (built):** market = ADP/BC, rate = Sleeper season projection. **Waivers (in-season):** market = FAAB prices + rival pressure, rate = recent snap/route/target trend (last 3–4 wks) — *doesn't exist until Week 1* — layered onto the existing `/waivers` FAAB model, action label BID (+$)/PASS.
 
 ---
 
