@@ -71,7 +71,9 @@ Tunable calibration defaults (all constants at the top of `draft.js`): auction b
 
 ### 1.7 Draft vs in-season waivers
 
-One engine, two contexts. **Draft (built):** market = ADP/BC, rate = Sleeper season projection. **Waivers (in-season):** market = FAAB prices + rival pressure, rate = recent snap/route/target trend (last 3–4 wks) — *doesn't exist until Week 1* — layered onto the existing `/waivers` FAAB model, action label BID (+$)/PASS.
+One engine, two contexts. **Draft (built):** market = ADP/BC, rate = Sleeper season projection.
+
+**Waivers — scaffolding built 2026-07-21, live once the season starts:** `/waivers` now applies the same **asset → worth → edge → verdict + rec-confidence** model against the **FAAB market** (`faab-market.json` bands + rival `price_to_beat` + pressure). `waivers.json` schema + the dashboard render carry `asset` / `rate_basis` / `worth` / `edge` / `confidence` / `confidence_why`; the render degrades gracefully on old data. Action = PURSUE(bid)/WATCH/AVOID(pass); **rec-confidence = min(edge, asset confidence)** where asset confidence = role stability (sustained role vs one-week blip) + sample size. The **one piece that waits for Week 1 is the rate signal**: in-season it reads off the last 3–4 weeks' snap/route/target trend; pre-season it falls back to the projection (`rate_basis` states which). The preseason `waivers.json` was migrated to the schema as a worked example.
 
 ---
 

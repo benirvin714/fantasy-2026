@@ -123,6 +123,8 @@
     $("#waivers-meta").textContent = `generated ${d.generated} · ${d.mode}`;
     const age = (Date.now() - new Date(d.generated).getTime()) / 864e5;
     const stale = age > 7 ? `<div class="stale-warn">This board is ${Math.floor(age)} days old — re-run /waivers for current suggestions.</div>` : "";
+    const confDots = { high: "●●●", med: "●●○", low: "●○○" };
+    const edgeCls = (e) => e === "value" ? "edge-value" : e === "overpay" ? "edge-over" : "edge-fair";
     $("#waivers-body").innerHTML = stale + d.targets.map((t) => `
       <div class="wtarget">
         <div class="row1">
@@ -130,9 +132,11 @@
           <span class="name">${esc(t.player)}</span>
           <span class="pos">${esc(t.pos)} · ${esc(t.team)}</span>
           ${t.verdict ? `<span class="verdict verdict-${esc(t.verdict)}">${esc(t.verdict)}</span>` : ""}
+          ${t.confidence ? `<span class="wconf conf-${esc(t.confidence)}" title="rec-confidence: ${esc(t.confidence)}${t.confidence_why ? " — " + esc(t.confidence_why) : ""}">${confDots[t.confidence] ?? ""}</span>` : ""}
           <span class="bid">${esc(t.bid)}</span>
         </div>
         <div class="why">${esc(t.why)}</div>
+        ${t.asset ? `<div class="wasset"><b>asset:</b> ${esc(t.asset)}${t.rate_basis ? ` <span class="faint">(${esc(t.rate_basis)})</span>` : ""}${t.edge ? ` · <b class="${edgeCls(t.edge)}">${esc(t.edge)}</b>` : ""}${t.worth ? ` · worth <b>${esc(t.worth)}</b>` : ""}</div>` : ""}
         ${t.my_team_impact ? `<div class="impact">↳ ${esc(t.my_team_impact)}</div>` : ""}
         <div class="sub"><b>competition:</b> ${t.pressure ? `<span class="pressure pressure-${esc(t.pressure)}">${esc(t.pressure).toUpperCase()}</span> — ` : ""}${esc(t.competition)} &nbsp;·&nbsp; <b>drop:</b> ${esc(t.drop)}</div>
       </div>`).join("") + (d.note ? `<p class="sub" style="color:var(--faint);font-size:12px;margin:10px 0 0">${esc(d.note)}</p>` : "");
