@@ -1,8 +1,9 @@
 # Fork prompt — Scouting workstream (paste into a fresh session)
 
-You own the **scouting + information-gathering workstream** for the HBGBs fantasy-football
-dashboard. A parallel session owns **valuation** (the draft/waiver boards). Build the
-`scouting_brief` feature end-to-end. Stay in your lane (constraints at the bottom).
+You are the **"Player Data" session** — you own the **scouting + information-gathering workstream** for
+the HBGBs fantasy-football dashboard. Build the `scouting_brief` feature. A parallel **historical-stats /
+valuation session** owns `confidence()` and the value math and reads the `role_stability` you produce
+(see coordination below) — stay in your lane.
 
 ## Orient first
 - Project: `C:\Users\ben-i\OneDrive\Documents\AI\Fantasy 2026`. **Read `CLAUDE.md`** (hard rules:
@@ -13,8 +14,9 @@ dashboard. A parallel session owns **valuation** (the draft/waiver boards). Buil
   deleted. The reconciled design below is authoritative. **Update §2 to match** as part of your work.
 - What already exists: valuation is a 3-layer model (asset → scarcity → auction **draft-$** → market
   **edge** → recommendation + **rec-confidence**), all in `site/draft.js`. Its `confidence()` builds
-  an uncertainty band from playing-time risk + expert/consensus disagreement — that's your one
-  integration socket. `data/draft-research.json` already holds `adp_commentary` per player id (your
+  an uncertainty band from playing-time risk + expert/consensus disagreement; **the historical-stats
+  session owns `confidence()`** and will read the `role_stability` you produce — you don't edit it.
+  `data/draft-research.json` already holds `adp_commentary` per player id (your
   sibling field; follow its overlay pattern). `data/site/nfl-events.json` is a curated, `players[]`-tagged
   news feed (produced by the `nfl-daily-events` scheduled task).
 
@@ -52,11 +54,11 @@ For each, produce a brief: **what analysts, coaches, and players are saying + sc
 **4. Wire it in (additive + minimal — see constraints):**
 - `scripts/build-draft-board.mjs`: merge `scouting_brief` through to `draft-board.json` exactly like
   the existing research overlay merges `adp_commentary`/`risk_flags`.
-- `site/draft.js` → `confidence()`: add `role_stability` as an input to the **playing-time/role-risk**
-  component, **worst-of** with the existing injury/rookie risk. Map `locked → none` (can *upgrade* a
-  crude `rookie` penalty), `committee → some`, `in_flux → high`. If `scouting_brief` is absent/null,
-  behavior is **unchanged** (today's rookie/injury fallback). **`scheme_fit` does NOT enter
-  `confidence()`.**
+- **Do NOT edit `confidence()`.** The parallel **historical-stats session owns it** and reads your
+  `scouting_brief.role_stability` (combining it *worst-of* with its own quantitative usage-stability read,
+  falling back gracefully when yours is absent). Your job is to **produce an accurate `role_stability`**
+  (locked / committee / in_flux) in the data — the valuation side consumes it. `scheme_fit` never enters
+  confidence; it's descriptive + the override trigger only.
 - `site/draft.js` render: show the **prose** (detail block + hover-tooltip first sentence), the
   **sources + `as_of`**, a "⚠ fresh news since brief" flag when `nfl-events` postdates `as_of`, and a
   **⚑ override flag** ("scouting: role/scheme delta — revisit projection") when `override_flag`. Honest
@@ -69,13 +71,15 @@ For each, produce a brief: **what analysts, coaches, and players are saying + sc
 - **Value independence (load-bearing)**: scouting **NEVER** moves the asset value or the edge. It only
   (a) informs the confidence *band* via `role_stability`, (b) sets `override_flag` for the human, (c)
   renders as descriptive prose. Do not resurrect a value multiplier.
-- **Stay in your lane**: you may ADD the `scouting_brief` field, the *minimal* `role_stability` hook in
-  `confidence()`, and its render. Do **NOT** restructure the valuation engine ($-pipeline, edge/rec
-  math) — the other session owns it and is actively editing `draft.js` / `build-draft-board.mjs`. Keep
-  edits small and localized; `git pull --rebase` before pushing and expect to replay onto their commits.
-- **Verify** in-browser (serve on :8642, open `/site/draft.html`): briefs render, sources link,
-  confidence shifts sensibly for a scouted `in_flux` vs `locked` player, honest nulls, no console
-  errors. Then **publish**: commit + push to `main` (Cloudflare auto-deploys). Commit trailer:
+- **Stay in your lane**: you ADD the `scouting_brief` field (data + build-merge + prose render). Do
+  **NOT** touch `confidence()`, the $-pipeline, or the edge/rec math — the historical-stats / valuation
+  session owns those and is actively editing `draft.js` / `build-draft-board.mjs` (it's also adding a
+  stats panel to `detailHTML`, which you both touch). Keep edits small and localized; `git pull --rebase`
+  before pushing, expect to replay onto their commits, and ideally don't edit the same file at the same time.
+- **Verify** in-browser (serve on :8642, open `/site/draft.html`): briefs render (detail block + hover
+  tooltip), sources link, the ⚑ override flag shows when set, honest `null` below the top ~50, no console
+  errors; and confirm `role_stability` is populated in `data/draft-research.json` for the valuation side
+  to consume. Then **publish**: commit + push to `main` (Cloudflare auto-deploys). Commit trailer:
   `Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>`.
 
 ## Deferred (NOT this session)
