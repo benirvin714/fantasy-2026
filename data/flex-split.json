@@ -1,0 +1,84 @@
+{
+  "_meta": {
+    "purpose": "Measured FLEX usage across HBGBs seasons; supplies the replacement level that league-profile.md line 60's value ladder assumes structurally.",
+    "generated": "2026-07-22",
+    "source": "Sleeper public REST /league/{id}/matchups/{week}, regular-season weeks only",
+    "caveat": "Split is behavioural, not structural: it reflects what THIS room started, including weeks a manager had no good alternative. It is the right input for replacement level (realized league-wide demand) but is not evidence about which position is better.",
+    "observations": 1640,
+    "filled": 1640,
+    "gaps": null
+  },
+  "seasons": {
+    "2020": {
+      "n": 260,
+      "share": {
+        "RB": 0.36538461538461536,
+        "WR": 0.6192307692307693,
+        "TE": 0.015384615384615385
+      },
+      "lastRegularWeek": 13
+    },
+    "2021": {
+      "n": 260,
+      "share": {
+        "RB": 0.40384615384615385,
+        "WR": 0.5807692307692308,
+        "TE": 0.015384615384615385
+      },
+      "lastRegularWeek": 13
+    },
+    "2022": {
+      "n": 280,
+      "share": {
+        "RB": 0.4107142857142857,
+        "WR": 0.5642857142857143,
+        "TE": 0.025
+      },
+      "lastRegularWeek": 14
+    },
+    "2023": {
+      "n": 280,
+      "share": {
+        "RB": 0.40714285714285714,
+        "WR": 0.575,
+        "TE": 0.017857142857142856
+      },
+      "lastRegularWeek": 14
+    },
+    "2024": {
+      "n": 280,
+      "share": {
+        "RB": 0.4142857142857143,
+        "WR": 0.5678571428571428,
+        "TE": 0.017857142857142856
+      },
+      "lastRegularWeek": 14
+    },
+    "2025": {
+      "n": 280,
+      "share": {
+        "RB": 0.4035714285714286,
+        "WR": 0.5571428571428572,
+        "TE": 0.039285714285714285
+      },
+      "lastRegularWeek": 14
+    }
+  },
+  "pooled_share": {
+    "RB": 0.401219512195122,
+    "WR": 0.5768292682926829,
+    "TE": 0.02195121951219512
+  },
+  "effective_starters_per_team": {
+    "QB": 1,
+    "RB": 2.802439024390244,
+    "WR": 3.1536585365853655,
+    "TE": 1.0439024390243903
+  },
+  "replacement_rank": {
+    "QB": 10,
+    "RB": 28,
+    "WR": 32,
+    "TE": 10
+  }
+}
