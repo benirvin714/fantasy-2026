@@ -168,8 +168,16 @@ function situationFacts(name, pos) {
 }
 
 // ---- ceiling / spike-week metric (weekly variance) --------------------------
-// Mean-VORP is variance-blind, but this league pays for ceiling ("draft for spike
-// weeks", league-profile.md §10). Re-score every player-week 2023-25 in league
+// PREMISE RETRACTED — READ BEFORE RELYING ON THIS COLUMN. This metric was built on
+// league-profile.md §10 ("draft for spike weeks"), which has since been tested and
+// retracted: across 60 team-seasons, week-to-week variance does not predict wins
+// (t = -0.85) or playoff qualification (t = +0.26) once scoring level is controlled
+// (data/ceiling-vs-floor.json). The column is left in place and unchanged — it is a
+// fair description of a player's weekly distribution — but the ARGUMENT that ceiling
+// should tilt draft value no longer has support. Treat ceiling_tilt as unjustified
+// until someone re-establishes a reason for it. Note the retraction covers making the
+// 6-team field; variance inside the weeks 15-17 tournament is untested (n=6).
+// Re-score every player-week 2023-25 in league
 // format; a "spike week" = finishing at/above the position's top-SPIKE_RANK weekly
 // line. spike_week_rate = share of a player's weeks that spiked. Feeds the draft
 // board's ceiling column + the ceiling-tilt knob. Degrades to null (with reason)
