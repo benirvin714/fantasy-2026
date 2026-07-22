@@ -168,20 +168,20 @@ function situationFacts(name, pos) {
 }
 
 // ---- ceiling / spike-week metric (weekly variance) --------------------------
-// PREMISE RETRACTED — READ BEFORE RELYING ON THIS COLUMN. This metric was built on
-// league-profile.md §10 ("draft for spike weeks"), which has since been tested and
-// retracted: across 60 team-seasons, week-to-week variance does not predict wins
-// (t = -0.85) or playoff qualification (t = +0.26) once scoring level is controlled
-// (data/ceiling-vs-floor.json). The column is left in place and unchanged — it is a
-// fair description of a player's weekly distribution — but the ARGUMENT that ceiling
-// should tilt draft value no longer has support. Treat ceiling_tilt as unjustified
-// until someone re-establishes a reason for it. Note the retraction covers making the
-// 6-team field; variance inside the weeks 15-17 tournament is untested (n=6).
-// Re-score every player-week 2023-25 in league
-// format; a "spike week" = finishing at/above the position's top-SPIKE_RANK weekly
-// line. spike_week_rate = share of a player's weeks that spiked. Feeds the draft
-// board's ceiling column + the ceiling-tilt knob. Degrades to null (with reason)
-// on fetch failure or thin sample (rookies) — never fabricated.
+// Re-score every player-week 2023-25 in league format; a "spike week" = finishing
+// at/above the position's top-SPIKE_RANK weekly line. spike_week_rate = share of a
+// player's weeks that spiked. DISPLAY ONLY — ceiling is not an input to value, the
+// edge, or the ranking (site/draft.js keeps it strictly descriptive). Degrades to
+// null (with reason) on fetch failure or thin sample (rookies) — never fabricated.
+//
+// This metric was originally justified by league-profile.md §10 ("draft for spike
+// weeks"). §10 has since been TESTED AND RETRACTED: across 60 team-seasons, weekly
+// variance predicts neither wins (t = -0.85) nor playoff qualification (t = +0.26)
+// once scoring level is controlled (data/ceiling-vs-floor.json). Nothing changed here
+// because nothing needed to — the column never fed value. Two things the retraction
+// does NOT cover: variance inside the weeks 15-17 tournament (untested, n=6), and the
+// bench-tier "upside among near-replacement darts" case, which is about option value
+// under weekly waivers rather than held variance and was not measured.
 const SPIKE_RANK = 5;        // a spike week ~ a top-5 weekly finish at the position
 const MIN_CEIL_WEEKS = 10;   // fewer real games than this -> null (no stable estimate)
 const CEIL_POS = ["QB", "RB", "WR", "TE"];
