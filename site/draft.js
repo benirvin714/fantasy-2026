@@ -38,6 +38,7 @@
   const AGE_CLIFF = { RB: 28, WR: 31, TE: 31, QB: 37, K: 99, DEF: 99 };
   const BUDGET = 200, TEAMS = 10, ROSTER_SPOTS = 15;   // auction $ scale (relative; snake uses $ as linear currency)
   const EDGE_TARGET = 4, EDGE_FADE = -4;               // $ edge thresholds for TARGET / FADE (tunable)
+  const FADE_ADP = 110, PICK_FADE = -25;               // sub-$1 FADE: market drafts a below-replacement player inside pick ~110 AND ≥25 picks earlier than the board ranks him
   const BC_DIVERGE = 15;                               // BC contradicts an actionable rec by ≥ this many ranks = caution note
   let replAsset = {}, replRankUsed = {}, ceilAvg = {}, dollarAtRank = [];
 
@@ -96,11 +97,12 @@
     const bcHalf = bc ? Math.abs((dollarAtRank[Math.min(dollarAtRank.length, bc.best_rank) - 1] ?? p.draftDollar)
       - (dollarAtRank[Math.min(dollarAtRank.length, bc.worst_rank) - 1] ?? p.draftDollar)) / 2 : 0;
     const half = Math.round(Math.sqrt(ptHalf * ptHalf + bcHalf * bcHalf));
-    const bandLow = Math.max(1, (p.draftDollar ?? 1) - half), bandHigh = (p.draftDollar ?? 1) + half;
+    const bandLow = Math.max(0.05, (p.draftDollar ?? 1) - half), bandHigh = (p.draftDollar ?? 1) + half;
     // rec-confidence (TARGET/FADE only): min(edge strength, asset confidence)
     let recConf = null, capped = null;
     if (p.rec === "TARGET" || p.rec === "FADE") {
-      const edgeStrength = Math.abs(p.edgeDollar) >= 10 ? 3 : 2;
+      const edgeStrength = p.draftDollar >= 1 ? (Math.abs(p.edgeDollar) >= 10 ? 3 : 2)
+        : (Math.abs(p.edgePicks ?? 0) >= 60 ? 3 : 2); // sub-$1 FADE strength from the pick-gap overpay
       const assetLevel = { Low: 1, Med: 2, High: 3 }[assetConf];
       recConf = Math.min(edgeStrength, assetLevel);
       if (assetLevel < edgeStrength) capped = assetConf === "Low"
@@ -134,7 +136,15 @@
     const marg = list.filter((p) => p.marginal != null).map((p) => p.marginal).sort((a, b) => b - a).slice(0, rosterable);
     const totalMarginal = marg.reduce((a, b) => a + b, 0) || 1;
     const dollarPerPt = (BUDGET * TEAMS - rosterable) / totalMarginal;
-    for (const p of list) p.draftDollar = p.marginal == null ? null : (p.marginal > 0 ? Math.max(1, Math.round(1 + p.marginal * dollarPerPt)) : 1);
+    // draft-$: integer auction PRICE ≥ $1 at/above replacement; a fractional PROXIMITY score
+    // (asset ÷ position-replacement, $0.05–0.99) below — differentiates the bench, no $1 wall.
+    for (const p of list) {
+      if (p.assetPts == null) { p.draftDollar = null; continue; }
+      const r = replAsset[p.pos] ?? 0;
+      p.draftDollar = p.assetPts >= r
+        ? Math.max(1, Math.round(1 + Math.max(0, p.assetPts - r) * dollarPerPt))
+        : Math.max(0.05, r > 0 ? +(p.assetPts / r).toFixed(3) : 0.05);
+    }
     // draft rank (by $) + per-position rank
     const byDollar = list.filter((p) => p.draftDollar != null).sort((a, b) => b.draftDollar - a.draftDollar);
     byDollar.forEach((p, i) => (p.draftRank = i + 1));
@@ -147,7 +157,12 @@
       p.marketDollar = adp != null ? (dollarAtRank[Math.min(dollarAtRank.length, Math.round(adp)) - 1] ?? 1) : null;
       p.edgeDollar = p.marketDollar != null && p.draftDollar != null ? p.draftDollar - p.marketDollar : null;
       p.edgePicks = adp != null && p.draftRank != null ? +(adp - p.draftRank).toFixed(1) : null;
-      p.rec = p.edgeDollar == null ? null : p.edgeDollar >= EDGE_TARGET ? "TARGET" : p.edgeDollar <= EDGE_FADE ? "FADE" : "FAIR";
+      // rec driver switches at the $1 line. Above: $-edge (TARGET/FAIR/FADE). Below: the board is
+      // structurally conservative on late-round upside, so NO TARGET — only FADE the real overpays
+      // (a below-replacement projection the market spends an early pick on). Ceiling is the late lens.
+      p.rec = p.draftDollar == null ? null
+        : p.draftDollar >= 1 ? (p.edgeDollar == null ? null : p.edgeDollar >= EDGE_TARGET ? "TARGET" : p.edgeDollar <= EDGE_FADE ? "FADE" : "FAIR")
+        : (adp != null && adp <= FADE_ADP && p.edgePicks != null && p.edgePicks <= PICK_FADE ? "FADE" : "FAIR");
       p.conf = confidence(p); // ② band + tier + ③ rec-confidence (needs draftRank + dollarAtRank, both set above)
     }
     // ceiling badge denominator (display only — ceiling is not a value input)
@@ -180,17 +195,22 @@
   const noData = '<span class="nodata">no data</span>';
   const badge = (txt, cls, title) => `<span class="rbadge ${cls}" title="${esc(title)}">${esc(txt)}</span>`;
   const edgeStr = (e) => e == null ? "–" : e === 0 ? "$0" : (e > 0 ? "+$" : "−$") + Math.abs(e);
+  const fmtD = (d) => d == null ? "–" : d >= 1 ? `$${d}` : `$${d.toFixed(2)}`;   // ≥$1 = integer price; <$1 = proximity score
 
   function rowHTML(p, rankLabel) {
     const isTaken = taken.has(p.id);
     const isOpen = expandedId === p.id;
-    const rec = p.rec;
+    const rec = p.rec, conf = p.conf, adp = p.adp?.half_ppr;
+    const sub = p.draftDollar != null && p.draftDollar < 1;          // below the $1 line = proximity/bench tier
     const recCls = rec === "TARGET" ? "rec-target" : rec === "FADE" ? "rec-fade" : rec === "FAIR" ? "rec-fair" : "";
     const nameCls = rec === "TARGET" ? "name-value" : rec === "FADE" ? "name-reach" : "";
-    const edge = p.edgeDollar, conf = p.conf;
-    const edgeCls = edge == null ? "" : edge >= EDGE_TARGET ? "gap-value" : edge <= EDGE_FADE ? "gap-reach" : "gap-fair";
-    const edgeTitle = edge == null ? "no ADP to compare" :
-      `You value him $${p.draftDollar}; the market's ADP slot (pick ${p.adp.half_ppr}) is worth $${p.marketDollar} → ${edge > 0 ? "UNDER" : edge < 0 ? "OVER" : "fairly"}valued by ${edgeStr(edge)} (${p.edgePicks > 0 ? "+" : ""}${Math.round(p.edgePicks)} picks)${conf?.recConf ? ` · rec-confidence ${CONF_LABEL[conf.recConf - 1]}${conf.capped ? ` (capped: ${conf.capped})` : ""}` : ""}`;
+    const showRec = rec === "TARGET" || rec === "FADE" || (rec === "FAIR" && !sub); // suppress the FAIR badge in the bench tier
+    const edgeCls = rec === "TARGET" ? "gap-value" : rec === "FADE" ? "gap-reach" : "gap-fair";
+    // edge column: $-edge above $1; the board-vs-ADP pick-gap (disparity) below
+    const edgeTxt = sub ? (p.edgePicks == null ? "–" : `${p.edgePicks > 0 ? "+" : ""}${Math.round(p.edgePicks)}p`) : edgeStr(p.edgeDollar);
+    const edgeTitle = p.edgeDollar == null ? "no ADP to compare"
+      : sub ? `Board ranks him #${p.draftRank}; market ADP ${adp} → the market is ${Math.abs(Math.round(p.edgePicks))} picks ${p.edgePicks < 0 ? "HIGHER" : "lower"} on him. A projection-based board is conservative on late-round upside — check ceiling before acting.${rec === "FADE" ? ` FADE: the market spends an early pick (≤${FADE_ADP}) on a below-replacement projection.` : ""}`
+      : `You value him ${fmtD(p.draftDollar)}; the market's ADP slot (pick ${adp}) is worth ${fmtD(p.marketDollar)} → ${p.edgeDollar > 0 ? "UNDER" : p.edgeDollar < 0 ? "OVER" : "fairly"}valued by ${edgeStr(p.edgeDollar)} (${p.edgePicks > 0 ? "+" : ""}${Math.round(p.edgePicks)} picks)${conf?.recConf ? ` · rec-confidence ${CONF_LABEL[conf.recConf - 1]}${conf.capped ? ` (capped: ${conf.capped})` : ""}` : ""}`;
     const bc = p.fftiers;
     const bcTxt = bc ? `${bc.rank}<span class="bctier">T${bc.tier}</span>` : "–";
     const bcTitle = bc ? `Boris Chen half-PPR consensus: overall #${bc.rank}, tier ${bc.tier} (avg ${bc.avg_rank}, range ${bc.best_rank}-${bc.worst_rank})` : "not in fftiers top-200";
@@ -200,7 +220,7 @@
     const clTxt = cl ? `${Math.round(cl.spike_week_rate * 100)}%${clArrow}` : "–";
     const clTitle = cl ? `Spike-week rate: ${Math.round(cl.spike_week_rate * 100)}% of ${cl.sample_weeks} games at/above the ${p.pos} top-5 weekly line (${cl.boom_line} pts). Boom ~${cl.boom_pts}, floor ~${cl.floor_pts}${clr != null ? `; ${clr}× the board's ${p.pos} average` : ""}. Separate attribute — not in value.` : "no weekly ceiling data (rookie / <10 career games)";
     const badges = [
-      rec ? `<span class="recbadge ${recCls}" title="${esc(edgeTitle)}">${rec}${conf?.recConf ? ` <span class="confdots" title="rec-confidence ${CONF_LABEL[conf.recConf - 1]}">${CONF_DOTS[conf.recConf - 1]}</span>` : ""}</span>` : "",
+      showRec ? `<span class="recbadge ${recCls}" title="${esc(edgeTitle)}">${rec}${conf?.recConf ? ` <span class="confdots" title="rec-confidence ${CONF_LABEL[conf.recConf - 1]}">${CONF_DOTS[conf.recConf - 1]}</span>` : ""}</span>` : "",
       ...p.flagged.map((f) => badge(f.slice(0, 3).toUpperCase(), "rbadge-risk", `${f} risk — see detail`)),
       p.unvetted ? badge("unvetted", "rbadge-unvetted", "Risk flags not yet researched — null, not clean") : "",
     ].join("");
@@ -212,9 +232,9 @@
         <span class="dname ${nameCls}">${esc(p.name)}</span>
         <span class="dpos">${esc(p.pos)}${p.posRank ? p.posRank : ""} · ${esc(p.team)}</span>
         ${badges}
-        <span class="dval mono" title="draft value — scarcity-aware auction $">$${p.draftDollar ?? "–"}</span>
+        <span class="dval mono" title="${sub ? "proximity-to-rosterable score (below the $1 startable line — a differentiation score, not a price)" : "draft value — scarcity-aware auction $"}">${fmtD(p.draftDollar)}</span>
         <span class="dadp mono" title="ADP (half-PPR)">${p.adp?.half_ppr ?? "–"}</span>
-        <span class="dgap mono ${edgeCls}" title="${esc(edgeTitle)}">${edgeStr(edge)}</span>
+        <span class="dgap mono ${edgeCls}" title="${esc(edgeTitle)}">${edgeTxt}</span>
         <span class="dbc mono" title="${esc(bcTitle)}">${bcTxt}</span>
         <span class="dceil mono ${clCls}" title="${esc(clTitle)}">${clTxt}</span>
       </button>
@@ -225,26 +245,38 @@
   // Full, transparent decomposition — asset → scarcity → draft-$ → market-$ → edge → rec. No black box.
   function edgeExplainer(p) {
     if (p.assetPts == null) return `<div class="gapexp"><b>No value:</b> no projection for this player (shows ${noData}).</div>`;
-    const replRank = replRankUsed[p.pos], repl = replAsset[p.pos], adp = p.adp?.half_ppr, rec = p.rec;
-    let verdict;
-    if (p.edgeDollar == null) verdict = `<b>No market comparison:</b> no ADP for this player.`;
-    else if (rec === "TARGET") verdict = `<b class="name-value">TARGET (${edgeStr(p.edgeDollar)}):</b> you value him <b>$${p.draftDollar}</b>, but his ADP slot (pick <b>${adp}</b>) costs only <b>$${p.marketDollar}</b> — undervalued by <b>${edgeStr(p.edgeDollar)}</b> (~${Math.round(p.edgePicks)} picks late). Good value at cost.`;
-    else if (rec === "FADE") verdict = `<b class="name-reach">FADE (${edgeStr(p.edgeDollar)}):</b> the market pays <b>$${p.marketDollar}</b> at his ADP (pick <b>${adp}</b>), but you value him only <b>$${p.draftDollar}</b> — overvalued by <b>${edgeStr(Math.abs(p.edgeDollar))}</b>. Let someone else pay up.`;
-    else verdict = `<b>FAIR:</b> your value <b>$${p.draftDollar}</b> ≈ his ADP-slot cost <b>$${p.marketDollar}</b> (pick ${adp}) — priced about right.`;
-    const cf = p.conf;
-    const caution = cf?.recConf
-      ? `<div class="gapdriver"><b>Rec-confidence: ${CONF_LABEL[cf.recConf - 1]}</b> <span class="confdots">${CONF_DOTS[cf.recConf - 1]}</span> = min(edge, asset trust) — asset confidence <b>${cf.assetConf}</b>${cf.capped ? ` <b>(capped by ${cf.capped})</b>` : ""}. Value band <b>$${cf.bandLow}–$${cf.bandHigh}</b>; drivers: playing-time risk <b>${cf.ptRisk}</b> (${cf.gLow}–${cf.gHigh} games), disagreement <b>${cf.dis}</b>.</div>`
-      : cf
-        ? `<div class="gapdriver faint">FAIR — no strong action. Asset confidence ${cf.assetConf}, value band $${cf.bandLow}–$${cf.bandHigh}.</div>`
-        : "";
-    return `<div class="gapexp">
-      <b>How this value is built:</b>
-      <div class="gapchain">
+    const replRank = replRankUsed[p.pos], repl = replAsset[p.pos], adp = p.adp?.half_ppr, rec = p.rec, cf = p.conf;
+    const sub = p.draftDollar != null && p.draftDollar < 1;
+    const ceilTxt = p.ceiling ? `${Math.round(p.ceiling.spike_week_rate * 100)}% spike rate` : "no ceiling data";
+    let verdict, chain;
+    if (sub) {
+      // below the $1 line: proximity score + the board-vs-ADP disparity as info; ceiling is the lens.
+      chain = `<div class="gapchain">
+        <span>rate <b>${p.rate}</b>/g × <b>${p.medianGames}</b> median games = <b>${p.assetPts}</b> asset pts</span>
+        <span>÷ free ${esc(p.pos)}${replRank} @ ${repl} = <b>${fmtD(p.draftDollar)}</b> <span class="faint">(proximity to the startable line — a differentiation score below $1, not a price)</span></span>
+        <span>disparity: <b>board #${p.draftRank}</b> vs <b>ADP ${adp ?? "–"}</b>${p.edgePicks != null ? ` → market ${Math.abs(Math.round(p.edgePicks))} picks ${p.edgePicks < 0 ? "higher" : "lower"}` : ""}</span>
+      </div>`;
+      if (adp == null) verdict = `<b>Undrafted flier:</b> no ADP — a pure dart. Lean on ceiling (<b>${ceilTxt}</b>) for the upside read.`;
+      else if (rec === "FADE") verdict = `<b class="name-reach">FADE:</b> the market spends an early pick (ADP ${adp}, ≤${FADE_ADP}) on a player your projection has below replacement. Unless you're buying upside the projection can't see (ceiling <b>${ceilTxt}</b>), let it go.`;
+      else verdict = `<b>Bench tier:</b> a differentiated late dart. A projection-based board is conservative on late-round upside, so there's no "TARGET" here — <b>ceiling is your lens</b> (${ceilTxt}).`;
+    } else {
+      chain = `<div class="gapchain">
         <span>rate <b>${p.rate}</b>/g × <b>${p.medianGames}</b> median games = <b>${p.assetPts}</b> asset pts <span class="faint">(what he produces, ≥ 0)</span></span>
         <span>− free ${esc(p.pos)}${replRank} @ ${repl} asset pts = <b>${p.marginal}</b> over replacement <span class="faint">(scarcity)</span></span>
-        <span>→ <b>$${p.draftDollar}</b> draft value <span class="faint">(auction $, floored at $1)</span></span>
-        <span>vs market <b>$${p.marketDollar ?? "–"}</b> at ADP ${adp ?? "–"} → edge <b>${edgeStr(p.edgeDollar)}</b></span>
-      </div>
+        <span>→ <b>${fmtD(p.draftDollar)}</b> draft value <span class="faint">(auction $)</span></span>
+        <span>vs market <b>${fmtD(p.marketDollar)}</b> at ADP ${adp ?? "–"} → edge <b>${edgeStr(p.edgeDollar)}</b></span>
+      </div>`;
+      if (p.edgeDollar == null) verdict = `<b>No market comparison:</b> no ADP for this player.`;
+      else if (rec === "TARGET") verdict = `<b class="name-value">TARGET (${edgeStr(p.edgeDollar)}):</b> you value him <b>${fmtD(p.draftDollar)}</b>, but his ADP slot (pick <b>${adp}</b>) costs only <b>${fmtD(p.marketDollar)}</b> — undervalued by <b>${edgeStr(p.edgeDollar)}</b> (~${Math.round(p.edgePicks)} picks late). Good value at cost.`;
+      else if (rec === "FADE") verdict = `<b class="name-reach">FADE (${edgeStr(p.edgeDollar)}):</b> the market pays <b>${fmtD(p.marketDollar)}</b> at his ADP (pick <b>${adp}</b>), but you value him only <b>${fmtD(p.draftDollar)}</b> — overvalued. Let someone else pay up.`;
+      else verdict = `<b>FAIR:</b> your value <b>${fmtD(p.draftDollar)}</b> ≈ his ADP-slot cost <b>${fmtD(p.marketDollar)}</b> (pick ${adp}) — priced about right.`;
+    }
+    const caution = cf?.recConf
+      ? `<div class="gapdriver"><b>Rec-confidence: ${CONF_LABEL[cf.recConf - 1]}</b> <span class="confdots">${CONF_DOTS[cf.recConf - 1]}</span> = min(edge, asset trust) — asset confidence <b>${cf.assetConf}</b>${cf.capped ? ` <b>(capped by ${cf.capped})</b>` : ""}. Value band <b>${fmtD(cf.bandLow)}–${fmtD(cf.bandHigh)}</b>; drivers: playing-time risk <b>${cf.ptRisk}</b> (${cf.gLow}–${cf.gHigh} games), disagreement <b>${cf.dis}</b>.</div>`
+      : cf ? `<div class="gapdriver faint">${sub ? "Bench dart" : "FAIR"} — asset confidence ${cf.assetConf}, band ${fmtD(cf.bandLow)}–${fmtD(cf.bandHigh)}.</div>` : "";
+    return `<div class="gapexp">
+      <b>How this value is built:</b>
+      ${chain}
       <div class="gapverdict">${verdict}</div>
       ${caution}
     </div>`;
@@ -262,10 +294,10 @@
         <h4>Value <span class="faint">(Phase A · $-engine)</span></h4>
         <div><b>Sleeper proj:</b> ${p.projection?.pts ?? "–"} pts <span class="faint">(full-health season)</span></div>
         <div><b>asset:</b> ${p.rate ?? "–"}/g rate × ${p.medianGames} median games = <b>${p.assetPts ?? "–"}</b> pts</div>
-        <div><b>draft value:</b> <b>$${p.draftDollar ?? "–"}</b> <span class="faint">(${p.marginal ?? "–"} over free ${esc(p.pos)}${replRankUsed[p.pos] ?? "?"} @ ${replAsset[p.pos] ?? "?"})</span></div>
-        <div><b>market:</b> $${p.marketDollar ?? "–"} at ADP ${p.adp?.half_ppr ?? "–"} → <b>edge ${edgeStr(p.edgeDollar)}</b> (${p.edgePicks == null ? "–" : (p.edgePicks > 0 ? "+" : "") + Math.round(p.edgePicks) + " picks"})</div>
+        <div><b>draft value:</b> <b>${fmtD(p.draftDollar)}</b> <span class="faint">${p.draftDollar != null && p.draftDollar < 1 ? "(proximity score — below the $1 startable line)" : `(${p.marginal ?? "–"} over free ${esc(p.pos)}${replRankUsed[p.pos] ?? "?"} @ ${replAsset[p.pos] ?? "?"})`}</span></div>
+        <div><b>market:</b> ${fmtD(p.marketDollar)} at ADP ${p.adp?.half_ppr ?? "–"} → <b>edge ${p.draftDollar != null && p.draftDollar < 1 ? (p.edgePicks == null ? "–" : (p.edgePicks > 0 ? "+" : "") + Math.round(p.edgePicks) + "p") : edgeStr(p.edgeDollar)}</b> (${p.edgePicks == null ? "–" : (p.edgePicks > 0 ? "+" : "") + Math.round(p.edgePicks) + " picks"})</div>
         <div><b>recommendation:</b> <b class="${p.rec === "TARGET" ? "name-value" : p.rec === "FADE" ? "name-reach" : ""}">${p.rec ?? "–"}</b>${p.conf?.recConf ? ` · confidence ${CONF_LABEL[p.conf.recConf - 1]} <span class="confdots">${CONF_DOTS[p.conf.recConf - 1]}</span>${p.conf.capped ? ` <span class="faint">(capped: ${p.conf.capped})</span>` : ""}` : ""}</div>
-        <div><b>asset confidence:</b> ${p.conf?.assetConf ?? "–"} <span class="faint">· band $${p.conf?.bandLow ?? "–"}–$${p.conf?.bandHigh ?? "–"} · PT ${p.conf?.gLow ?? "–"}–${p.conf?.gHigh ?? "–"} games · disagreement ${p.conf?.dis ?? "–"}</span></div>
+        <div><b>asset confidence:</b> ${p.conf?.assetConf ?? "–"} <span class="faint">· band ${fmtD(p.conf?.bandLow)}–${fmtD(p.conf?.bandHigh)} · PT ${p.conf?.gLow ?? "–"}–${p.conf?.gHigh ?? "–"} games · disagreement ${p.conf?.dis ?? "–"}</span></div>
         <h4>Boris Chen (fftiers)</h4>
         ${p.fftiers ? `<div><b>consensus rank:</b> #${p.fftiers.rank} · tier ${p.fftiers.tier}</div>
         <div><b>expert avg:</b> ${p.fftiers.avg_rank} <span class="faint">(range ${p.fftiers.best_rank}–${p.fftiers.worst_rank}, std ${p.fftiers.std_dev})</span></div>
@@ -329,7 +361,7 @@
       const sorted = [...list].sort(sortFns[sort] ?? sortFns.draftval);
       $("#board-body").innerHTML = headerHTML +
         sorted.map((p) => rowHTML(p, p.draftRank ?? "–")).join("") +
-        `<div class="boardfoot">$val = draft value (scarcity-aware auction $) · edge = your $ − the market's $ at his ADP slot · <span class="name-value">TARGET</span> / <span class="name-reach">FADE</span> with rec-confidence dots ●●● = min(edge size, asset trust). # = draft-value rank.</div>`;
+        `<div class="boardfoot">$val: <b>≥$1</b> = auction price · <b>&lt;$1</b> = proximity-to-rosterable score (differentiates the bench) · edge: $-gap above $1, board-vs-ADP pick-gap (<b>Np</b>) below · <span class="name-value">TARGET</span>/<span class="name-reach">FADE</span> + confidence dots ●●●. Bench tier gets no TARGET — lean on the <b>ceil</b> column for upside. # = draft-value rank.</div>`;
     } else {
       $("#board-title").textContent = "Tiers — cliff edges (by draft $)";
       const posList = pos === "ALL" ? ["RB", "WR", "QB", "TE", "K", "DEF"] : [pos];

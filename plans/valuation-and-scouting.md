@@ -75,7 +75,11 @@ One engine, two contexts. **Draft (built):** market = ADP/BC, rate = Sleeper sea
 
 **Waivers — scaffolding built 2026-07-21, live once the season starts:** `/waivers` now applies the same **asset → worth → edge → verdict + rec-confidence** model against the **FAAB market** (`faab-market.json` bands + rival `price_to_beat` + pressure). `waivers.json` schema + the dashboard render carry `asset` / `rate_basis` / `worth` / `edge` / `confidence` / `confidence_why`; the render degrades gracefully on old data. Action = PURSUE(bid)/WATCH/AVOID(pass); **rec-confidence = min(edge, asset confidence)** where asset confidence = role stability (sustained role vs one-week blip) + sample size. The **one piece that waits for Week 1 is the rate signal**: in-season it reads off the last 3–4 weeks' snap/route/target trend; pre-season it falls back to the projection (`rate_basis` states which). The preseason `waivers.json` was migrated to the schema as a worked example.
 
----
+### 1.8 Low-tier differentiation (sub-$1 scale) — shipped 2026-07-21
+
+The `$1` floor clipped ~60% of the board to an identical value (below replacement → marginal 0 → $1), leaving the bench undifferentiated and the edge flat. Fix: one **continuous position-relative scale** — integer auction **price ≥ $1**, and below the line a **proximity score = `asset ÷ position-replacement`** ($0.05–0.99). This differentiates the bench without resurrecting the old cross-positional pile-up (it's each player's ratio to *his own* replacement) and fully orders `draftRank` board-wide.
+
+Recommendation driver switches at $1: **`$`-edge above** (TARGET/FAIR/FADE), **pick-gap below**. A key calibration finding: a projection-based board is *structurally conservative on late-round upside* (the market drafts bench players on upside the projection can't see), so the sub-$1 pick-gap is one-directional — **no TARGET below $1**, only **FADE on real overpays** (a below-replacement projection the market spends a pick ≤110 on, ≥25 picks earlier than the board), and **ceiling is the late-round lens**. The FAIR badge is suppressed in the bench tier; the drop-down shows the proximity chain + the board-vs-ADP disparity + ceiling. Tunables: `FADE_ADP=110`, `PICK_FADE=−25`.
 
 ## 2. Challenge 2 — `scouting_brief` (public commentary)
 
