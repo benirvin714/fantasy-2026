@@ -2,71 +2,1015 @@
   "_meta": {
     "purpose": "Durable hand-researched overlay merged into draft-board.json by build-draft-board.mjs. Survives ADP rebuilds. Web-sourced 2026-07-20; re-verify injury/flag status in the final 2 weeks before draft.",
     "risk_flags_semantics": "true = documented exposure; false = researched, no current exposure; researched:true means it was checked. Clean designation = not surfaced in the league-wide suspension/holdout sweep AND clean games-played — a reasonable confidence level, not a per-player deep dive.",
-    "injury_history_null": "rookies / <1 NFL season — no history exists; page shows 'no data' rather than a guess"
+    "injury_history_null": "rookies / <1 NFL season — no history exists; page shows 'no data' rather than a guess",
+    "scouting_seed": "Top-tier scouting_brief seed (13 players by ADP), web-sourced 2026-07-21. Scheme-fit-first prose + role_stability/scheme_fit/override_flag. Retrieval-grounded; extend deeper as the draft nears. null below = not scouted yet."
   },
   "players": {
-    "9509": { "injury_history": "No significant missed time 2023-25 (17/17/17).", "risk_flags": { "suspension": false, "contract": false, "legal": false, "researched": true, "notes": ["Extension-leverage chatter (agent pushing for highest-paid RB) but participating; no holdout."] }, "adp_commentary": "RB1 off the board at ~1.5. In a 2-RB/2-FLEX half-PPR league the elite bell-cow RB is the scarcest resource (top VORP tier), and Bijan's clean availability + workhorse role justify 1.01 cost despite Atlanta's stated wide-zone usage-cap talk." },
-    "9221": { "injury_history": "Minor 2023 (15 games), 17/17 since — no chronic pattern.", "risk_flags": { "suspension": false, "contract": false, "legal": false, "researched": true, "notes": [] }, "adp_commentary": "RB2 at ~2.9. Campbell's 'bell cow now' comments consolidate his touches — the single most valuable RB signal in this format — so a top-3 price is correct." },
-    "4034": { "injury_history": "2024 lost 13 games to bilateral Achilles tendinitis (soft-tissue, both legs) + late PCL sprain; answered with a 17-game RB1 season in 2025. Age 30 + Achilles history is the recurrence/decline risk, not a current injury.", "risk_flags": { "suspension": false, "contract": false, "legal": false, "researched": true, "notes": [] }, "adp_commentary": "Market drafts him ~RB5 (ADP 5.7) while the board values him ~RB9 — you're paying up for ceiling against an age-30, Achilles-history availability cap. A slight reach at cost in a format where RB-adjacent value is available later." },
-    "6813": { "injury_history": "Recurring high-ankle sprains (2022 surgery, 2024 re-injury) — a documented re-injury pattern; played 17 in 2025, currently healthy.", "risk_flags": { "suspension": false, "contract": false, "legal": false, "researched": true, "notes": [] }, "adp_commentary": "RB at ~6.4. Led the NFL in carries in 2025 — bell-cow volume is elite here — with the high-ankle recurrence history as the cap rather than a live concern." },
-    "8138": { "injury_history": "No significant missed time (17/16/17).", "risk_flags": { "suspension": false, "contract": false, "legal": false, "researched": true, "notes": [] }, "adp_commentary": "RB at ~8.2. Went RB6→RB-adjacent on Brady's continuity in Buffalo; TD-dependent but the board rates him a clear value vs ADP." },
-    "9226": { "injury_history": "2023 rookie knee (11 games); 17 then 16 since. A 'Questionable' tag is carrying in Sleeper's DB — verify at camp, likely stale.", "risk_flags": { "suspension": false, "contract": false, "legal": false, "researched": true, "notes": [] }, "adp_commentary": "RB at ~13.6. Receiving-back volume plays slightly down in half-PPR vs full-PPR ADP, but Miami's lead role keeps him a low-end RB1." },
-    "4866": { "injury_history": "Durable recently (14/16/16), no chronic pattern; the flag is age (29) not health.", "risk_flags": { "suspension": false, "contract": false, "legal": false, "researched": true, "notes": [] }, "adp_commentary": "RB at ~15.4. Age-29 RBs are the classic cliff risk, but the PHI O-line + recent workload keep him a fringe RB1 — fair, not a bargain." },
-    "8151": { "injury_history": "Lower-body/abdomen injuries missed time 2022-24; first fully clean 17-game season in 2025. Signed with KC (new scheme) in 2026.", "risk_flags": { "suspension": false, "contract": false, "legal": false, "researched": true, "notes": [] }, "adp_commentary": "RB at ~16.8. Three straight partial seasons before 2025 plus a KC scheme change cap him; the ADP fairly bakes in the durability question." },
-    "9224": { "injury_history": "2023 rookie limited (12 games); 16/17 since — trending durable.", "risk_flags": { "suspension": false, "contract": false, "legal": false, "researched": true, "notes": [] }, "adp_commentary": "RB at ~19.1 — one of the board's biggest RB values vs ADP. CIN volume + a clean recent workload make him a target a full round after his value rank." },
-    "7564": { "injury_history": "Durable (16/17/16), no chronic pattern.", "risk_flags": { "suspension": false, "contract": false, "legal": false, "researched": true, "notes": [] }, "adp_commentary": "WR1 at ~3.7. Elite target share; in half-PPR his yardage/TD profile survives the reception haircut — correctly priced top-4 overall." },
-    "9493": { "injury_history": "2024 PCL sprain (knee), re-aggravated from a joint practice, missed 6+; played 16 in 2025. Re-aggravation pattern is the watch.", "risk_flags": { "suspension": false, "contract": false, "legal": false, "researched": true, "notes": [] }, "adp_commentary": "WR at ~4.8. Elite when healthy; the PCL re-aggravation history plus Rams target competition cap an otherwise top-3 WR profile." },
-    "9488": { "injury_history": "Clean 17/17/17.", "risk_flags": { "suspension": false, "contract": false, "legal": false, "researched": true, "notes": [] }, "adp_commentary": "WR2 at ~7.3. Led the NFL with ~44% of Seattle's air yards in 2025 — format-correct here (yardage-driven, survives half-PPR). The pick your team name already endorses." },
-    "7547": { "injury_history": "Durable (16/17/17).", "risk_flags": { "suspension": false, "contract": false, "legal": false, "researched": true, "notes": [] }, "adp_commentary": "WR at ~8.6. Volume + TD equity in a high-scoring Detroit offense; only mild target competition caps him." },
-    "6786": { "injury_history": "High-ankle/shoulder issues cost games in 2025 (14); not a chronic pattern.", "risk_flags": { "suspension": false, "contract": false, "legal": false, "researched": true, "notes": [] }, "adp_commentary": "WR at ~10.3. Target hog; Pickens opposite him (now on the franchise tag, participating) is only mild competition." },
-    "6794": { "injury_history": "2023 hamstring (IR, soft-tissue — reinjury-prone class); durable since (17/17). Annual hamstring-flare watch.", "risk_flags": { "suspension": false, "contract": false, "legal": false, "researched": true, "notes": [] }, "adp_commentary": "WR at ~12.4. Top-3 talent; the MIN QB question (Murray/McCarthy) and the hamstring history are the only caps on an otherwise top-5 profile." },
-    "8112": { "injury_history": "Missed games in 2025 (12); a 'Questionable' tag is carrying in Sleeper's DB — verify at camp.", "risk_flags": { "suspension": false, "contract": false, "legal": false, "researched": true, "notes": [] }, "adp_commentary": "WR at ~17.6. Ascending target share in ATL; the Penix/Tua QB battle is the swing factor on his ceiling." },
-    "7569": { "injury_history": "MISSED TIME IN ALL FIVE NFL SEASONS — chronic soft-tissue availability concern. Ceiling is a Tier-1 WR if he ever plays 17.", "risk_flags": { "suspension": false, "contract": false, "legal": false, "researched": true, "notes": [] }, "adp_commentary": "WR at ~23.7. The talent says top-10 WR; the availability record says round 3. The highest injury-bust risk in the WR2 tier — a boom-or-miss-weeks pick this format's ceiling-hunting rewards, but eyes open." },
-    "5859": { "injury_history": "Missed some time 2024-25 (13/15) — minor hamstring/knee, not chronic.", "risk_flags": { "suspension": false, "contract": false, "legal": false, "researched": true, "notes": [] }, "adp_commentary": "WR at ~24.4. Now in New England with Drake Maye (traded from PHI); target dominance intact but the offense downgrade caps the ceiling — a mild reach at ADP 16-range boards, fairer here at 24." },
-    "11632": { "injury_history": "2025 ACL + meniscus (October) plus a spring scar-tissue cleanup; camp status uncertain (Questionable). Structural — real Week-1 risk.", "risk_flags": { "suspension": false, "contract": false, "legal": false, "researched": true, "notes": [] }, "adp_commentary": "WR at ~24.6. Elite talent at a discount IF healthy — but the ACL recovery is the entire bet. This format overpays for uninjured elite WRs, and he isn't one yet; draft the discount only if you can carry the IR stash." },
-    "8137": { "injury_history": "Durable (17/14/17).", "risk_flags": { "suspension": false, "contract": false, "legal": false, "researched": true, "notes": ["On the fully-guaranteed $27.3M franchise tag; attended minicamp, no holdout — resolved."] }, "adp_commentary": "WR at ~27.1. Contract-year motivation as the WR2 opposite CeeDee in Dallas; his TD-lean profile plays up in half-PPR." },
-    "8144": { "injury_history": "MAJOR RED FLAG: 4-5 diagnosed concussions (2022-2024; missed 9 games in 2024) PLUS a January-2026 blood clot in the lung, limited in offseason work. Concussion recurrence + clot is the board's most serious availability profile.", "risk_flags": { "suspension": false, "contract": false, "legal": false, "researched": true, "notes": ["Contract year in NO; hold-in chatter given health, but speculative."] }, "adp_commentary": "WR at ~31.8. Pure talent is a top-15 WR, but a 4-5 concussion history plus an offseason pulmonary blood clot make this arguably the riskiest availability profile on the board — the ADP does NOT fully price the medical risk. Let someone else chase the upside." },
-    "10229": { "injury_history": "2024 knee (LCL, 4 games) then a 2026 offseason knee clean-up (~2 months, debris removal). Verify the knee clears camp.", "risk_flags": { "suspension": false, "contract": false, "legal": false, "researched": true, "notes": ["Served a 6-game conduct suspension in 2025 (2024 Dallas crash); NOT expected to be suspended again.", "Completed a 30-day jail term (May 2026, probation violation) and was released; legal matter resolved."] }, "adp_commentary": "WR at ~34.8 (~WR12). The ADP has already absorbed the jail stint and the knee — he's elite on the field, and the price IS the discount. A calculated-risk value if the knee clears camp; the conduct/legal history is documented but currently resolved." },
-    "8146": { "injury_history": "2025 hyperextended knee (November), shut down/IR — only 7 games. One-off structural, targeting full health for 2026; not a chronic pattern.", "risk_flags": { "suspension": false, "contract": false, "legal": false, "researched": true, "notes": [] }, "adp_commentary": "WR at ~40.5. Bounce-back candidate — the knee cost 2025 but isn't chronic; the NYJ QB situation is the real cap on his rebound." },
-    "8148": { "injury_history": "Durable (12/15/17).", "risk_flags": { "suspension": true, "contract": false, "legal": false, "researched": true, "notes": ["Repeat offender: 4-game gambling suspension (2023) + 2-game PED suspension (2024). A PED repeat escalates to a 17-game ban — genuine week-loss exposure. No confirmed 2026 suspension, but documented exposure per the user's 'suspension exposure' flag."] }, "adp_commentary": "WR at ~52.2. Legitimate big-play, per-game upside — but the two-suspension history (especially PED, where a second strike is a full-season ban) is real exposure the ADP treats lightly. Flagged, not disqualified." },
-    "5927": { "injury_history": "2025 missed time (10 games).", "risk_flags": { "suspension": false, "contract": true, "legal": false, "researched": true, "notes": ["Live training-camp holdout for a new deal (unresolved as of this research). Fined per day; missed-camp/games risk until settled."] }, "adp_commentary": "WR at ~58.8. A live holdout depresses the ADP: upside is a solid WR2 if the deal gets done and he reports on time, downside is missed camp and early games. Do not draft until the holdout resolves." },
-    "2133": { "injury_history": "Missed time 2024-25 (14/14); age 33 — decline + durability is the compound risk.", "risk_flags": { "suspension": false, "contract": false, "legal": false, "researched": true, "notes": [] }, "adp_commentary": "WR at ~55. Name value; an age-33 WR is a steep redraft bet and the board rates him below ADP — a fade in this ceiling-over-name format." },
-    "8130": { "injury_history": "Durable (17/16/17).", "risk_flags": { "suspension": false, "contract": false, "legal": false, "researched": true, "notes": [] }, "adp_commentary": "TE at ~20.3. Elite target share; in a 1-TE league an every-week TE1 is worth round-2 capital given the replacement cliff — but the ARI QB uncertainty is a caveat, and rival Stipe now chases early TEs." },
-    "11604": { "injury_history": "2025 knee (IR late, 12 games); says he's '100%' and practicing full speed at 2026 OTAs — recovery on track.", "risk_flags": { "suspension": false, "contract": false, "legal": false, "researched": true, "notes": [] }, "adp_commentary": "TE at ~20.6 — the positional-scarcity TE1. A healthy Bowers is arguably the top TE and the injury discount has largely closed; bwalsh89/Stipe and your own TE-hunter history all compete here." },
-    "4984": { "injury_history": "Iron-man durable (17/17/17).", "risk_flags": { "suspension": false, "contract": false, "legal": false, "researched": true, "notes": [] }, "adp_commentary": "QB1 at ~24.2 — but in a 1-QB, 10-team league QB13-16 stream free all year. The board's VORP likes the player, not the pick: only worth it if you value his konami-rushing floor over the RB/WR you'd pass at that slot." },
-    "4881": { "injury_history": "2025 missed 4 (13 games); minor, not chronic.", "risk_flags": { "suspension": false, "contract": false, "legal": false, "researched": true, "notes": [] }, "adp_commentary": "QB at ~39.6 — the format's premium QB archetype (rushing floor immune to the 4-pt passing-TD cap). Same 1-QB caveat: the streamer band is free, so pay only for the ceiling." },
-    "11564": { "injury_history": "Durable in a short career (13/17).", "risk_flags": { "suspension": false, "contract": false, "legal": false, "researched": true, "notes": [] }, "adp_commentary": "QB at ~54 — a konami-code riser now throwing to A.J. Brown; the exact profile this format prizes, and ENOTS (his 2025 owner and a QB-punter) won't chase him. A live mid-round target if you want a rushing QB." },
-    "12527": { "injury_history": null, "risk_flags": { "suspension": false, "contract": false, "legal": false, "researched": true, "notes": ["Rookie — no NFL availability history."] }, "adp_commentary": "RB at ~11.9 — projected rookie workhorse in LV. No availability history to lean on, so the projection carries all the weight; rookie variance applies." },
-    "13287": { "injury_history": null, "risk_flags": { "suspension": null, "contract": null, "legal": null, "researched": false, "notes": ["Rookie — not individually vetted; low draft-decision priority."] }, "adp_commentary": "Projected ~RB7 at ADP ~17.1, but a rookie with no NFL availability data (shows 'no data'). Value is projection-only — treat with full rookie variance." },
-    "12512": { "injury_history": "2025 leg fracture/dislocation (structural); healed on the 4-6 month timeline, expected Week 1. A 'Questionable' tag is carrying — verify.", "risk_flags": { "suspension": false, "contract": false, "legal": false, "researched": true, "notes": ["Rookie."] }, "adp_commentary": "RB at ~49.6 — CLE rookie in Monken's run-heavy scheme (the cycle's best RB ecosystem transplant). The healing leg is the uncertainty the ADP reflects; bwalsh89 (his 2025 stash) competes." },
-    "12481": { "injury_history": "2025 ankle (8 games); expected full participation early in camp.", "risk_flags": { "suspension": false, "contract": false, "legal": false, "researched": true, "notes": ["Rookie."] }, "adp_commentary": "RB at ~44.4 — NYG rookie in a possible committee under the new Harbaugh regime; ankle recovery and role split are the caps." },
-
-    "5850": { "injury_history": "2025 knee (missed Weeks 11-12; noticeably less effective after — 14.6 touches/11.3 pts vs 21.1/19.6 before).", "risk_flags": { "suspension": true, "contract": false, "legal": true, "researched": true, "notes": ["Arrested May 27 2026, five charges incl. felony strangulation (alleged domestic, Brown County WI); released same day. DA has NOT decided on charges — investigation ongoing.", "Commissioner-Exempt-list / suspension exposure while unresolved; if charges are declined he'll likely avoid suspension, but this is a live, unresolved legal + availability risk."] }, "adp_commentary": "RB at ~25.2 — top-12 RB talent, but a pending domestic-violence case (felony charge, undecided) plus a 2025 knee that sapped his second half make this a genuine avoid-until-clarity at cost. The ADP has not fully absorbed the legal risk." },
-    "6801": { "injury_history": "Recurring soft-tissue history — hamstring (missed 2 to start a season) and a high-ankle sprain (3 games); expected 100% for Week 1. Perennial 'needs better injury luck' profile.", "risk_flags": { "suspension": false, "contract": false, "legal": false, "researched": true, "notes": [] }, "adp_commentary": "WR at ~37.8 — elite TD source (career-high 11 TDs even with Burrow hurt in 2025); the recurring soft-tissue history is the cap on an otherwise back-end-WR1 ceiling." },
-    "7526": { "injury_history": "Frequent nagging (soft-tissue) injuries throughout his Miami tenure; no single structural event, but a chronic availability drag. Now in Denver.", "risk_flags": { "suspension": false, "contract": false, "legal": false, "researched": true, "notes": [] }, "adp_commentary": "WR at ~45.5 — a featured role in an ascending Denver pass game is the breakout case; the chronic nagging-injury pattern is the reason he keeps hovering on the WR1 fringe rather than breaking through." },
-    "2216": { "injury_history": "Age-33 season coming off injuries and his worst fantasy year (10.6 PPG, WR41); 1.62 YPRR is a separate red flag. Durability plus age-decline is the compound risk.", "risk_flags": { "suspension": false, "contract": false, "legal": false, "researched": true, "notes": [] }, "adp_commentary": "WR at ~57 — name value on an age-33 receiver coming off his worst season and now in a new SF role; the board likely rates him below ADP. A fade in this ceiling-over-name format." },
-    "6770": { "injury_history": "2025 limited to 8 games (turf-toe surgery). When healthy a top-5 fantasy QB — but that version has shown up once in three seasons; the injury history is the story.", "risk_flags": { "suspension": false, "contract": false, "legal": false, "researched": true, "notes": [] }, "adp_commentary": "QB at ~58 — elite ceiling with Chase + Higgins, but in this 1-QB streaming league you pay only for the healthy-Burrow ceiling, and the availability track record makes that a real gamble." },
-    "8167": { "injury_history": "20 games missed over 4 seasons — but the recurring hamstrings were tied to a biomechanical asymmetry reportedly corrected ~2 years ago, and his ACL was a 'clean' tear. Enters 2026 fully healthy for the first time in a while.", "risk_flags": { "suspension": false, "contract": false, "legal": false, "researched": true, "notes": [] }, "adp_commentary": "WR at ~63 — a real breakout dart if the corrected biomechanics hold; the injury history says buyer-beware, but the cause (not just the symptom) was addressed, which is more encouraging than the raw games-missed suggests." },
-    "10859": { "injury_history": "Herniated disc in the back worsened in Nov 2025 → IR (9 games). Aiming to be fully cleared by camp; present read is Week 1, but back injuries can be tricky/recurrent.", "risk_flags": { "suspension": false, "contract": false, "legal": false, "researched": true, "notes": [] }, "adp_commentary": "TE at ~78 — a healthy LaPorta is a top-5 TE, but a herniated disc is the kind of injury that lingers; the ADP is a fair midpoint between his ceiling and the back risk." },
-    "6806": { "injury_history": "Chronically injury-prone — long Achilles history plus a Nov 2025 foot injury that required a second opinion. gp 1/13/10 over three years. Now in a crowded Denver backfield.", "risk_flags": { "suspension": false, "contract": false, "legal": false, "researched": true, "notes": [] }, "adp_commentary": "RB at ~90.6 — talent flashes, but the availability record is among the worst on the board and the backfield is crowded (Harvey, rookie Coleman). A late-round dart, not a plan." },
-    "4037": { "injury_history": "2024 season-ending dislocated/fractured ankle that also delayed and wrecked 2025 (9 PPG over injury-hit games). ~30 games missed across 9 seasons. Reportedly enters 2026 healthy.", "risk_flags": { "suspension": false, "contract": false, "legal": false, "researched": true, "notes": [] }, "adp_commentary": "WR at ~93 — was a 19.7-PPG player before the ankle; if fully healthy that's a massive value at WR36 ADP, but the ankle wrecked a year-plus and the durability history is long. A high-variance value pick." },
-    "7523": { "injury_history": "2024 shoulder issues (10 games); healthy 17 in 2025 under Liam Coen. No lingering concern reported.", "risk_flags": { "suspension": false, "contract": false, "legal": false, "researched": true, "notes": [] }, "adp_commentary": "QB at ~93.8 — top-10 QB upside in Year 2 of the Coen offense; the 2024 shoulder is behind him. Standard 1-QB-league caveat: streamer band is free, so pay only for the ceiling." },
-    "10236": { "injury_history": "Missed time in 2024-25 (13/12 games) — nagging soft-tissue/lower-body issues, no single structural event.", "risk_flags": { "suspension": false, "contract": false, "legal": false, "researched": true, "notes": [] }, "adp_commentary": "TE at ~97.5 — talent for a top-8 TE, but the availability and a crowded BUF target tree cap him; fine as a mid-round TE swing." },
-    "3294": { "injury_history": "2024 catastrophic hamstring (torn off the bone, Week 8, season-ending surgery — 8 games). Returned fully in 2025 (17 games, Comeback Player of the Year finalist).", "risk_flags": { "suspension": false, "contract": false, "legal": false, "researched": true, "notes": [] }, "adp_commentary": "QB at ~97.8 — the 2024 injury is fully behind him (a healthy 17-game 2025 proves it); with the offense intact he's a solid streaming-plus QB, though the 1-QB caveat applies." },
-    "4217": { "injury_history": "MAJOR: ruptured his Achilles on Jan 11 2026. Likely opens on Reserve/PUP and misses ~the first month; turns 33 in October. A fringe-TE1 finish would be 'borderline miraculous' per analysts.", "risk_flags": { "suspension": false, "contract": false, "legal": false, "researched": true, "notes": [] }, "adp_commentary": "TE at ~99 — do not draft as a starter. A ruptured Achilles at 33 with real PUP/first-month risk makes him a late-round stash for the playoff run at best, not the every-week TE1 his name implies. You (ThatWasButtery) rostered him in 2025 — this is a clear sell/avoid at cost." },
-    "4046": { "injury_history": "2025 torn ACL + LCL (Week 15). Throwing this offseason and targeting Week 1, but KC has stopped short of guaranteeing that date — real Week-1 risk on a structural knee.", "risk_flags": { "suspension": false, "contract": false, "legal": false, "researched": true, "notes": [] }, "adp_commentary": "QB at ~101 — name-brand QB coming off a torn ACL+LCL with an uncertain Week 1; in a 1-QB streaming league there is no reason to pay QB1-name prices for that risk. Let someone else." },
-    "6797": { "injury_history": "Durable-ish (13/17/16); no chronic pattern. New Mike McDaniel run-first scheme (quicker release, ~2.4s time-to-throw) trims pass volume.", "risk_flags": { "suspension": false, "contract": false, "legal": false, "researched": true, "notes": [] }, "adp_commentary": "QB at ~85.7 — the scheme change compresses his passing volume in a format that already caps pocket QBs (4-pt TD, 1/25 yds); a streamer-band QB here unless his mobility becomes a designed-run element." },
-    "4199": { "injury_history": "2025 limited to 12 games (combination of injuries incl. a Week 18 hip); age 31. Age + accumulating soft-tissue is the profile.", "risk_flags": { "suspension": false, "contract": false, "legal": false, "researched": true, "notes": ["Restructured to stay in MIN for 2026."] }, "adp_commentary": "RB at ~107 — an aging back in a timeshare with Jordan Mason; little upside unless injury clears the way. Depth/bye filler at cost." },
-    "9756": { "injury_history": "Durable on the field (17/15/14); the 2025 dip was a suspension, not injury.", "risk_flags": { "suspension": false, "contract": false, "legal": false, "researched": true, "notes": ["Served a 3-game suspension to open 2025 (Substances-of-Abuse policy, from a 2024 DUI resolved as a 'wet reckless' misdemeanor). Eligible with no remaining 2026 ban — but a second policy violation would escalate. Documented, currently resolved (like Rice)."] }, "adp_commentary": "WR at ~98.4 — the WR2 in a strong MIN passing game; the suspension is served and behind him. A steady value at cost, with the substance-policy history as a background note, not a live flag." },
-    "11584": { "injury_history": "2025 foot + shoulder injuries wrecked the year (10 games, 588 yds); listed 1A with Gainwell 1B. Camp health is the swing variable.", "risk_flags": { "suspension": false, "contract": false, "legal": false, "researched": true, "notes": [] }, "adp_commentary": "RB at ~37.6 — bounce-back lead-back if the foot/shoulder are clean; the 2025 injuries plus Gainwell's presence are the caps. Buy the recovery, but the availability is a real question." },
-    "3198": { "injury_history": "Remarkably durable (17/17/17); the flag is age (32), not health.", "risk_flags": { "suspension": false, "contract": false, "legal": false, "researched": true, "notes": [] }, "adp_commentary": "RB at ~22 — an age-32 RB is the archetypal cliff bet, but his workload and BAL offense have shown no decline; the board rates him a clear RB1 and the durability is a genuine plus." },
-    "11566": { "injury_history": "2025 missed significant time (7 games); cause not separately verified this pass — flagged for the final-weeks re-check.", "risk_flags": { "suspension": false, "contract": false, "legal": false, "researched": true, "notes": [] }, "adp_commentary": "QB at ~64 — a premium rushing-QB profile (the format's actual QB edge), but the 2025 games-missed needs verification before the draft; if healthy, a strong konami-code target that this league's QB-punters won't chase." },
-    "8183": { "injury_history": "2025 missed time (9 games); cause not separately verified this pass. SF left-guard turnover (protection) is a separate 2026 risk.", "risk_flags": { "suspension": false, "contract": false, "legal": false, "researched": true, "notes": [] }, "adp_commentary": "QB at ~105.8 — a pocket QB in a strong scheme, but the 2025 availability and O-line questions cap him; standard 1-QB streamer here." },
-    "9484": { "injury_history": "2025 missed time (8 games); cause not separately verified this pass — flagged for re-check.", "risk_flags": { "suspension": false, "contract": false, "legal": false, "researched": true, "notes": [] }, "adp_commentary": "TE at ~68 — an ascending GB TE; the 2025 games-missed is the availability question. A mid-round TE dart with real upside if healthy." },
-    "10222": { "injury_history": "2025 missed time (7 games); cause not separately verified this pass — flagged for re-check.", "risk_flags": { "suspension": false, "contract": false, "legal": false, "researched": true, "notes": [] }, "adp_commentary": "WR at ~110.5 — big-play GB slot; the 2025 availability plus a crowded target tree cap him. Late-round upside dart." }
+    "2133": {
+      "injury_history": "Missed time 2024-25 (14/14); age 33 — decline + durability is the compound risk.",
+      "risk_flags": {
+        "suspension": false,
+        "contract": false,
+        "legal": false,
+        "researched": true,
+        "notes": []
+      },
+      "adp_commentary": "WR at ~55. Name value; an age-33 WR is a steep redraft bet and the board rates him below ADP — a fade in this ceiling-over-name format."
+    },
+    "2216": {
+      "injury_history": "Age-33 season coming off injuries and his worst fantasy year (10.6 PPG, WR41); 1.62 YPRR is a separate red flag. Durability plus age-decline is the compound risk.",
+      "risk_flags": {
+        "suspension": false,
+        "contract": false,
+        "legal": false,
+        "researched": true,
+        "notes": []
+      },
+      "adp_commentary": "WR at ~57 — name value on an age-33 receiver coming off his worst season and now in a new SF role; the board likely rates him below ADP. A fade in this ceiling-over-name format."
+    },
+    "3198": {
+      "injury_history": "Remarkably durable (17/17/17); the flag is age (32), not health.",
+      "risk_flags": {
+        "suspension": false,
+        "contract": false,
+        "legal": false,
+        "researched": true,
+        "notes": []
+      },
+      "adp_commentary": "RB at ~22 — an age-32 RB is the archetypal cliff bet, but his workload and BAL offense have shown no decline; the board rates him a clear RB1 and the durability is a genuine plus."
+    },
+    "3294": {
+      "injury_history": "2024 catastrophic hamstring (torn off the bone, Week 8, season-ending surgery — 8 games). Returned fully in 2025 (17 games, Comeback Player of the Year finalist).",
+      "risk_flags": {
+        "suspension": false,
+        "contract": false,
+        "legal": false,
+        "researched": true,
+        "notes": []
+      },
+      "adp_commentary": "QB at ~97.8 — the 2024 injury is fully behind him (a healthy 17-game 2025 proves it); with the offense intact he's a solid streaming-plus QB, though the 1-QB caveat applies."
+    },
+    "4034": {
+      "injury_history": "2024 lost 13 games to bilateral Achilles tendinitis (soft-tissue, both legs) + late PCL sprain; answered with a 17-game RB1 season in 2025. Age 30 + Achilles history is the recurrence/decline risk, not a current injury.",
+      "risk_flags": {
+        "suspension": false,
+        "contract": false,
+        "legal": false,
+        "researched": true,
+        "notes": []
+      },
+      "adp_commentary": "Market drafts him ~RB5 (ADP 5.7) while the board values him ~RB9 — you're paying up for ceiling against an age-30, Achilles-history availability cap. A slight reach at cost in a format where RB-adjacent value is available later.",
+      "scouting_brief": {
+        "prose": "When healthy he's a full-usage centerpiece in Shanahan's offense — 2025's No. 1 non-QB at 24.5 PPG on ~450 total touches. The scouting story is risk, not role: an age-30 season, extensive injury history, and a workload history says regresses (~48% avg decline after 370+ touches). SF plans to be 'cautious' through camp; analysts near-unanimously recommend handcuffing his backup.",
+        "role_stability": "locked",
+        "scheme_fit": "plus",
+        "override_flag": false,
+        "rationale": "Role/scheme elite; the flag is age-30 + workload + injury history (uncertainty, not role).",
+        "sources": [
+          {
+            "label": "CBS Sports (2026 outlook)",
+            "url": "https://www.cbssports.com/fantasy/football/news/2026-outlook-christian-mccaffrey/",
+            "date": "2026-07-21",
+            "type": "analyst"
+          },
+          {
+            "label": "FantasyLife",
+            "url": "https://www.fantasylife.com/articles/fantasy/christian-mccaffrey-fantasy-football-outlook-can-you-trust-him",
+            "date": "2026-07-21",
+            "type": "analyst"
+          }
+        ],
+        "as_of": "2026-07-21"
+      }
+    },
+    "4037": {
+      "injury_history": "2024 season-ending dislocated/fractured ankle that also delayed and wrecked 2025 (9 PPG over injury-hit games). ~30 games missed across 9 seasons. Reportedly enters 2026 healthy.",
+      "risk_flags": {
+        "suspension": false,
+        "contract": false,
+        "legal": false,
+        "researched": true,
+        "notes": []
+      },
+      "adp_commentary": "WR at ~93 — was a 19.7-PPG player before the ankle; if fully healthy that's a massive value at WR36 ADP, but the ankle wrecked a year-plus and the durability history is long. A high-variance value pick."
+    },
+    "4046": {
+      "injury_history": "2025 torn ACL + LCL (Week 15). Throwing this offseason and targeting Week 1, but KC has stopped short of guaranteeing that date — real Week-1 risk on a structural knee.",
+      "risk_flags": {
+        "suspension": false,
+        "contract": false,
+        "legal": false,
+        "researched": true,
+        "notes": []
+      },
+      "adp_commentary": "QB at ~101 — name-brand QB coming off a torn ACL+LCL with an uncertain Week 1; in a 1-QB streaming league there is no reason to pay QB1-name prices for that risk. Let someone else."
+    },
+    "4199": {
+      "injury_history": "2025 limited to 12 games (combination of injuries incl. a Week 18 hip); age 31. Age + accumulating soft-tissue is the profile.",
+      "risk_flags": {
+        "suspension": false,
+        "contract": false,
+        "legal": false,
+        "researched": true,
+        "notes": [
+          "Restructured to stay in MIN for 2026."
+        ]
+      },
+      "adp_commentary": "RB at ~107 — an aging back in a timeshare with Jordan Mason; little upside unless injury clears the way. Depth/bye filler at cost."
+    },
+    "4217": {
+      "injury_history": "MAJOR: ruptured his Achilles on Jan 11 2026. Likely opens on Reserve/PUP and misses ~the first month; turns 33 in October. A fringe-TE1 finish would be 'borderline miraculous' per analysts.",
+      "risk_flags": {
+        "suspension": false,
+        "contract": false,
+        "legal": false,
+        "researched": true,
+        "notes": []
+      },
+      "adp_commentary": "TE at ~99 — do not draft as a starter. A ruptured Achilles at 33 with real PUP/first-month risk makes him a late-round stash for the playoff run at best, not the every-week TE1 his name implies. You (ThatWasButtery) rostered him in 2025 — this is a clear sell/avoid at cost."
+    },
+    "4866": {
+      "injury_history": "Durable recently (14/16/16), no chronic pattern; the flag is age (29) not health.",
+      "risk_flags": {
+        "suspension": false,
+        "contract": false,
+        "legal": false,
+        "researched": true,
+        "notes": []
+      },
+      "adp_commentary": "RB at ~15.4. Age-29 RBs are the classic cliff risk, but the PHI O-line + recent workload keep him a fringe RB1 — fair, not a bargain."
+    },
+    "4881": {
+      "injury_history": "2025 missed 4 (13 games); minor, not chronic.",
+      "risk_flags": {
+        "suspension": false,
+        "contract": false,
+        "legal": false,
+        "researched": true,
+        "notes": []
+      },
+      "adp_commentary": "QB at ~39.6 — the format's premium QB archetype (rushing floor immune to the 4-pt passing-TD cap). Same 1-QB caveat: the streamer band is free, so pay only for the ceiling."
+    },
+    "4984": {
+      "injury_history": "Iron-man durable (17/17/17).",
+      "risk_flags": {
+        "suspension": false,
+        "contract": false,
+        "legal": false,
+        "researched": true,
+        "notes": []
+      },
+      "adp_commentary": "QB1 at ~24.2 — but in a 1-QB, 10-team league QB13-16 stream free all year. The board's VORP likes the player, not the pick: only worth it if you value his konami-rushing floor over the RB/WR you'd pass at that slot."
+    },
+    "5850": {
+      "injury_history": "2025 knee (missed Weeks 11-12; noticeably less effective after — 14.6 touches/11.3 pts vs 21.1/19.6 before).",
+      "risk_flags": {
+        "suspension": true,
+        "contract": false,
+        "legal": true,
+        "researched": true,
+        "notes": [
+          "Arrested May 27 2026, five charges incl. felony strangulation (alleged domestic, Brown County WI); released same day. DA has NOT decided on charges — investigation ongoing.",
+          "Commissioner-Exempt-list / suspension exposure while unresolved; if charges are declined he'll likely avoid suspension, but this is a live, unresolved legal + availability risk."
+        ]
+      },
+      "adp_commentary": "RB at ~25.2 — top-12 RB talent, but a pending domestic-violence case (felony charge, undecided) plus a 2025 knee that sapped his second half make this a genuine avoid-until-clarity at cost. The ADP has not fully absorbed the legal risk."
+    },
+    "5859": {
+      "injury_history": "Missed some time 2024-25 (13/15) — minor hamstring/knee, not chronic.",
+      "risk_flags": {
+        "suspension": false,
+        "contract": false,
+        "legal": false,
+        "researched": true,
+        "notes": []
+      },
+      "adp_commentary": "WR at ~24.4. Now in New England with Drake Maye (traded from PHI); target dominance intact but the offense downgrade caps the ceiling — a mild reach at ADP 16-range boards, fairer here at 24."
+    },
+    "5927": {
+      "injury_history": "2025 missed time (10 games).",
+      "risk_flags": {
+        "suspension": false,
+        "contract": true,
+        "legal": false,
+        "researched": true,
+        "notes": [
+          "Live training-camp holdout for a new deal (unresolved as of this research). Fined per day; missed-camp/games risk until settled."
+        ]
+      },
+      "adp_commentary": "WR at ~58.8. A live holdout depresses the ADP: upside is a solid WR2 if the deal gets done and he reports on time, downside is missed camp and early games. Do not draft until the holdout resolves."
+    },
+    "6770": {
+      "injury_history": "2025 limited to 8 games (turf-toe surgery). When healthy a top-5 fantasy QB — but that version has shown up once in three seasons; the injury history is the story.",
+      "risk_flags": {
+        "suspension": false,
+        "contract": false,
+        "legal": false,
+        "researched": true,
+        "notes": []
+      },
+      "adp_commentary": "QB at ~58 — elite ceiling with Chase + Higgins, but in this 1-QB streaming league you pay only for the healthy-Burrow ceiling, and the availability track record makes that a real gamble."
+    },
+    "6786": {
+      "injury_history": "High-ankle/shoulder issues cost games in 2025 (14); not a chronic pattern.",
+      "risk_flags": {
+        "suspension": false,
+        "contract": false,
+        "legal": false,
+        "researched": true,
+        "notes": []
+      },
+      "adp_commentary": "WR at ~10.3. Target hog; Pickens opposite him (now on the franchise tag, participating) is only mild competition.",
+      "scouting_brief": {
+        "prose": "Still the most talented WR in a pass-heavy Dallas offense (2nd in NFL passing) with Dak Prescott healthy and full scheme continuity under Schottenheimer — the setup to reclaim his 17+ PPG form after an injury-and-Pickens-hit 2025. The cap is real target competition: George Pickens drew 137 targets last year, so both can eat but Lamb's ceiling isn't the uncontested 2023 version. Locked-in Round-1 WR1.",
+        "role_stability": "locked",
+        "scheme_fit": "neutral",
+        "override_flag": false,
+        "rationale": "Locked WR1 with Dak + continuity; Pickens target competition caps the ceiling.",
+        "sources": [
+          {
+            "label": "FantasyLife (DAL cheat sheet)",
+            "url": "https://www.fantasylife.com/articles/fantasy/dallas-cowboys-2026-fantasy-football-cheat-sheet-ceedee-lamb-geo",
+            "date": "2026-07-21",
+            "type": "analyst"
+          },
+          {
+            "label": "Forbes",
+            "url": "https://www.forbes.com/sites/stevebradshaw/2026/06/13/should-you-draft-ceedee-lamb-in-2026-fantasy-football/",
+            "date": "2026-07-21",
+            "type": "analyst"
+          }
+        ],
+        "as_of": "2026-07-21"
+      }
+    },
+    "6794": {
+      "injury_history": "2023 hamstring (IR, soft-tissue — reinjury-prone class); durable since (17/17). Annual hamstring-flare watch.",
+      "risk_flags": {
+        "suspension": false,
+        "contract": false,
+        "legal": false,
+        "researched": true,
+        "notes": []
+      },
+      "adp_commentary": "WR at ~12.4. Top-3 talent; the MIN QB question (Murray/McCarthy) and the hamstring history are the only caps on an otherwise top-5 profile."
+    },
+    "6797": {
+      "injury_history": "Durable-ish (13/17/16); no chronic pattern. New Mike McDaniel run-first scheme (quicker release, ~2.4s time-to-throw) trims pass volume.",
+      "risk_flags": {
+        "suspension": false,
+        "contract": false,
+        "legal": false,
+        "researched": true,
+        "notes": []
+      },
+      "adp_commentary": "QB at ~85.7 — the scheme change compresses his passing volume in a format that already caps pocket QBs (4-pt TD, 1/25 yds); a streamer-band QB here unless his mobility becomes a designed-run element."
+    },
+    "6801": {
+      "injury_history": "Recurring soft-tissue history — hamstring (missed 2 to start a season) and a high-ankle sprain (3 games); expected 100% for Week 1. Perennial 'needs better injury luck' profile.",
+      "risk_flags": {
+        "suspension": false,
+        "contract": false,
+        "legal": false,
+        "researched": true,
+        "notes": []
+      },
+      "adp_commentary": "WR at ~37.8 — elite TD source (career-high 11 TDs even with Burrow hurt in 2025); the recurring soft-tissue history is the cap on an otherwise back-end-WR1 ceiling."
+    },
+    "6806": {
+      "injury_history": "Chronically injury-prone — long Achilles history plus a Nov 2025 foot injury that required a second opinion. gp 1/13/10 over three years. Now in a crowded Denver backfield.",
+      "risk_flags": {
+        "suspension": false,
+        "contract": false,
+        "legal": false,
+        "researched": true,
+        "notes": []
+      },
+      "adp_commentary": "RB at ~90.6 — talent flashes, but the availability record is among the worst on the board and the backfield is crowded (Harvey, rookie Coleman). A late-round dart, not a plan."
+    },
+    "6813": {
+      "injury_history": "Recurring high-ankle sprains (2022 surgery, 2024 re-injury) — a documented re-injury pattern; played 17 in 2025, currently healthy.",
+      "risk_flags": {
+        "suspension": false,
+        "contract": false,
+        "legal": false,
+        "researched": true,
+        "notes": []
+      },
+      "adp_commentary": "RB at ~6.4. Led the NFL in carries in 2025 — bell-cow volume is elite here — with the high-ankle recurrence history as the cap rather than a live concern.",
+      "scouting_brief": {
+        "prose": "Still the focal point of the Colts' run game (league-high 323 carries, all 17 games in 2025), with Daniel Jones back from an Achilles tear to stabilize the offense. The live watch is a public staff split: RB coach DeAndre Smith says they 'need to find ways to take some of that workload off,' while HC Steichen resists — unresolved. If a committee forms it dents the projection; for now he's the overwhelming touch leader.",
+        "role_stability": "locked",
+        "scheme_fit": "neutral",
+        "override_flag": false,
+        "rationale": "Workhorse role intact but a public workload-reduction push is unresolved — monitor.",
+        "sources": [
+          {
+            "label": "CBS Sports (coaches)",
+            "url": "https://www.cbssports.com/fantasy/football/news/colts-jonathan-taylor-coaching-staff-split-on-workload/",
+            "date": "2026-07-21",
+            "type": "coach"
+          },
+          {
+            "label": "NFL.com",
+            "url": "https://www.nfl.com/news/colts-aiming-to-take-some-of-that-workload-off-rb-jonathan-taylor-in-2026",
+            "date": "2026-07-21",
+            "type": "beat"
+          }
+        ],
+        "as_of": "2026-07-21"
+      }
+    },
+    "7523": {
+      "injury_history": "2024 shoulder issues (10 games); healthy 17 in 2025 under Liam Coen. No lingering concern reported.",
+      "risk_flags": {
+        "suspension": false,
+        "contract": false,
+        "legal": false,
+        "researched": true,
+        "notes": []
+      },
+      "adp_commentary": "QB at ~93.8 — top-10 QB upside in Year 2 of the Coen offense; the 2024 shoulder is behind him. Standard 1-QB-league caveat: streamer band is free, so pay only for the ceiling."
+    },
+    "7526": {
+      "injury_history": "Frequent nagging (soft-tissue) injuries throughout his Miami tenure; no single structural event, but a chronic availability drag. Now in Denver.",
+      "risk_flags": {
+        "suspension": false,
+        "contract": false,
+        "legal": false,
+        "researched": true,
+        "notes": []
+      },
+      "adp_commentary": "WR at ~45.5 — a featured role in an ascending Denver pass game is the breakout case; the chronic nagging-injury pattern is the reason he keeps hovering on the WR1 fringe rather than breaking through."
+    },
+    "7547": {
+      "injury_history": "Durable (16/17/17).",
+      "risk_flags": {
+        "suspension": false,
+        "contract": false,
+        "legal": false,
+        "researched": true,
+        "notes": []
+      },
+      "adp_commentary": "WR at ~8.6. Volume + TD equity in a high-scoring Detroit offense; only mild target competition caps him.",
+      "scouting_brief": {
+        "prose": "Detroit's locked-in target hog — four straight 1,100-yard seasons and 10+ TDs in three straight — with Jared Goff still throwing. The watch is scheme continuity: John Morton was dismissed and Drew Petzing is his new (and fifth career) play-caller; St. Brown himself cautioned the offense 'won't click right away.' Talent and volume float the floor, but early-season timing is a mild question.",
+        "role_stability": "locked",
+        "scheme_fit": "neutral",
+        "override_flag": false,
+        "rationale": "Elite role secure; new OC Petzing + 'won't click right away' is the only drag.",
+        "sources": [
+          {
+            "label": "SI (Lions, player)",
+            "url": "https://www.si.com/nfl/lions/onsi/news/detroit-lions-wr-says-offense-will-not-click-right-away-2026",
+            "date": "2026-07-21",
+            "type": "player"
+          },
+          {
+            "label": "Yardbarker (player)",
+            "url": "https://www.yardbarker.com/nfl/articles/lions_oc_has_great_control_over_jared_goff_led_lions_offense_amon_ra_st_brown/s1_17791_44064626",
+            "date": "2026-07-21",
+            "type": "player"
+          }
+        ],
+        "as_of": "2026-07-21"
+      }
+    },
+    "7564": {
+      "injury_history": "Durable (16/17/16), no chronic pattern.",
+      "risk_flags": {
+        "suspension": false,
+        "contract": false,
+        "legal": false,
+        "researched": true,
+        "notes": []
+      },
+      "adp_commentary": "WR1 at ~3.7. Elite target share; in half-PPR his yardage/TD profile survives the reception haircut — correctly priced top-4 overall.",
+      "scouting_brief": {
+        "prose": "Scheme-proof WR1 in one of the NFL's premier passing offenses: 30%+ target share and an NFL-high 185 targets even through 2025's QB instability. Burrow projects back to full strength and Tee Higgins re-signed (4yr/$115M), keeping the offense's shape intact — analysts call him one of the safest, highest ceilings at the position. Only watch is Burrow's health (turf toe cost most of 2025).",
+        "role_stability": "locked",
+        "scheme_fit": "plus",
+        "override_flag": false,
+        "rationale": "Locked target hog; offense intact with Burrow healthy + Higgins retained.",
+        "sources": [
+          {
+            "label": "FantasyPros",
+            "url": "https://www.fantasypros.com/nfl/notes/418951/jamarr-chase-2026-outlook.php",
+            "date": "2026-07-21",
+            "type": "analyst"
+          },
+          {
+            "label": "FantasyLife (CIN cheat sheet)",
+            "url": "https://www.fantasylife.com/articles/fantasy/cincinnati-bengals-fantasy-football-cheat-sheet-for-2026-joe-burrow-jamarr-chase-and-more",
+            "date": "2026-07-21",
+            "type": "analyst"
+          }
+        ],
+        "as_of": "2026-07-21"
+      }
+    },
+    "7569": {
+      "injury_history": "MISSED TIME IN ALL FIVE NFL SEASONS — chronic soft-tissue availability concern. Ceiling is a Tier-1 WR if he ever plays 17.",
+      "risk_flags": {
+        "suspension": false,
+        "contract": false,
+        "legal": false,
+        "researched": true,
+        "notes": []
+      },
+      "adp_commentary": "WR at ~23.7. The talent says top-10 WR; the availability record says round 3. The highest injury-bust risk in the WR2 tier — a boom-or-miss-weeks pick this format's ceiling-hunting rewards, but eyes open."
+    },
+    "8112": {
+      "injury_history": "Missed games in 2025 (12); a 'Questionable' tag is carrying in Sleeper's DB — verify at camp.",
+      "risk_flags": {
+        "suspension": false,
+        "contract": false,
+        "legal": false,
+        "researched": true,
+        "notes": []
+      },
+      "adp_commentary": "WR at ~17.6. Ascending target share in ATL; the Penix/Tua QB battle is the swing factor on his ceiling."
+    },
+    "8130": {
+      "injury_history": "Durable (17/16/17).",
+      "risk_flags": {
+        "suspension": false,
+        "contract": false,
+        "legal": false,
+        "researched": true,
+        "notes": []
+      },
+      "adp_commentary": "TE at ~20.3. Elite target share; in a 1-TE league an every-week TE1 is worth round-2 capital given the replacement cliff — but the ARI QB uncertainty is a caveat, and rival Stipe now chases early TEs."
+    },
+    "8137": {
+      "injury_history": "Durable (17/14/17).",
+      "risk_flags": {
+        "suspension": false,
+        "contract": false,
+        "legal": false,
+        "researched": true,
+        "notes": [
+          "On the fully-guaranteed $27.3M franchise tag; attended minicamp, no holdout — resolved."
+        ]
+      },
+      "adp_commentary": "WR at ~27.1. Contract-year motivation as the WR2 opposite CeeDee in Dallas; his TD-lean profile plays up in half-PPR."
+    },
+    "8138": {
+      "injury_history": "No significant missed time (17/16/17).",
+      "risk_flags": {
+        "suspension": false,
+        "contract": false,
+        "legal": false,
+        "researched": true,
+        "notes": []
+      },
+      "adp_commentary": "RB at ~8.2. Went RB6→RB-adjacent on Brady's continuity in Buffalo; TD-dependent but the board rates him a clear value vs ADP.",
+      "scouting_brief": {
+        "prose": "Contract secure (4yr/$48M) as Buffalo's lead back, with Joe Brady — now HC — running the run-friendly, free-flowing style that fueled Cook's TD spike. But regression signals stack up: 16 rush TDs is unsustainable, lead blocker Reggie Gilliam left, the O-line has left-guard/tackle turnover, and DJ Moore was traded in for more target competition. Role is safe; the efficiency/TD profile is the risk the projection may carry too high.",
+        "role_stability": "locked",
+        "scheme_fit": "neutral",
+        "override_flag": false,
+        "rationale": "Lead-back role locked; TD regression + lost blocker + new mouths cap the upside.",
+        "sources": [
+          {
+            "label": "SI (Bills, regression)",
+            "url": "https://www.si.com/nfl/bills/onsi/many-signs-indicate-regression-coming-for-bills-james-cook-his-fantasy-football-owners-in-2026",
+            "date": "2026-07-21",
+            "type": "analyst"
+          },
+          {
+            "label": "ESPN (extension)",
+            "url": "https://www.espn.com/nfl/story/_/id/45963843/james-cook-bills-reach-4-year-48m-extension-rb-hold-in",
+            "date": "2026-07-21",
+            "type": "beat"
+          }
+        ],
+        "as_of": "2026-07-21"
+      }
+    },
+    "8144": {
+      "injury_history": "MAJOR RED FLAG: 4-5 diagnosed concussions (2022-2024; missed 9 games in 2024) PLUS a January-2026 blood clot in the lung, limited in offseason work. Concussion recurrence + clot is the board's most serious availability profile.",
+      "risk_flags": {
+        "suspension": false,
+        "contract": false,
+        "legal": false,
+        "researched": true,
+        "notes": [
+          "Contract year in NO; hold-in chatter given health, but speculative."
+        ]
+      },
+      "adp_commentary": "WR at ~31.8. Pure talent is a top-15 WR, but a 4-5 concussion history plus an offseason pulmonary blood clot make this arguably the riskiest availability profile on the board — the ADP does NOT fully price the medical risk. Let someone else chase the upside."
+    },
+    "8146": {
+      "injury_history": "2025 hyperextended knee (November), shut down/IR — only 7 games. One-off structural, targeting full health for 2026; not a chronic pattern.",
+      "risk_flags": {
+        "suspension": false,
+        "contract": false,
+        "legal": false,
+        "researched": true,
+        "notes": []
+      },
+      "adp_commentary": "WR at ~40.5. Bounce-back candidate — the knee cost 2025 but isn't chronic; the NYJ QB situation is the real cap on his rebound."
+    },
+    "8148": {
+      "injury_history": "Durable (12/15/17).",
+      "risk_flags": {
+        "suspension": true,
+        "contract": false,
+        "legal": false,
+        "researched": true,
+        "notes": [
+          "Repeat offender: 4-game gambling suspension (2023) + 2-game PED suspension (2024). A PED repeat escalates to a 17-game ban — genuine week-loss exposure. No confirmed 2026 suspension, but documented exposure per the user's 'suspension exposure' flag."
+        ]
+      },
+      "adp_commentary": "WR at ~52.2. Legitimate big-play, per-game upside — but the two-suspension history (especially PED, where a second strike is a full-season ban) is real exposure the ADP treats lightly. Flagged, not disqualified."
+    },
+    "8151": {
+      "injury_history": "Lower-body/abdomen injuries missed time 2022-24; first fully clean 17-game season in 2025. Signed with KC (new scheme) in 2026.",
+      "risk_flags": {
+        "suspension": false,
+        "contract": false,
+        "legal": false,
+        "researched": true,
+        "notes": []
+      },
+      "adp_commentary": "RB at ~16.8. Three straight partial seasons before 2025 plus a KC scheme change cap him; the ADP fairly bakes in the durability question.",
+      "scouting_brief": {
+        "prose": "Fresh three-year deal to be Kansas City's bell-cow, and Andy Reid — historically a lean-on-one-back coach (Charles, McCoy, early Hunt) — appears set to hand him 15-18 carries plus goal-line work with Hunt and Pacheco gone. Clear runway in a strong RB scheme; Mahomes's presence (back from a torn ACL) keeps defenses honest. Watches: the Mahomes health question, a brand-new system, and Walker's spotty durability; one analyst calls the early 2nd-round ADP a touch rich.",
+        "role_stability": "locked",
+        "scheme_fit": "plus",
+        "override_flag": false,
+        "rationale": "Bell-cow role in a back-friendly Reid scheme; Mahomes health + new system the caveats.",
+        "sources": [
+          {
+            "label": "Establish The Run",
+            "url": "https://establishtherun.com/fantasy-fallout-kenneth-walker-iii-joins-chiefs/",
+            "date": "2026-07-21",
+            "type": "analyst"
+          },
+          {
+            "label": "AOL (Reid)",
+            "url": "https://www.aol.com/articles/andy-reid-reveals-kenneth-walker-160109158.html",
+            "date": "2026-07-21",
+            "type": "coach"
+          }
+        ],
+        "as_of": "2026-07-21"
+      }
+    },
+    "8167": {
+      "injury_history": "20 games missed over 4 seasons — but the recurring hamstrings were tied to a biomechanical asymmetry reportedly corrected ~2 years ago, and his ACL was a 'clean' tear. Enters 2026 fully healthy for the first time in a while.",
+      "risk_flags": {
+        "suspension": false,
+        "contract": false,
+        "legal": false,
+        "researched": true,
+        "notes": []
+      },
+      "adp_commentary": "WR at ~63 — a real breakout dart if the corrected biomechanics hold; the injury history says buyer-beware, but the cause (not just the symptom) was addressed, which is more encouraging than the raw games-missed suggests."
+    },
+    "8183": {
+      "injury_history": "2025 missed time (9 games); cause not separately verified this pass. SF left-guard turnover (protection) is a separate 2026 risk.",
+      "risk_flags": {
+        "suspension": false,
+        "contract": false,
+        "legal": false,
+        "researched": true,
+        "notes": []
+      },
+      "adp_commentary": "QB at ~105.8 — a pocket QB in a strong scheme, but the 2025 availability and O-line questions cap him; standard 1-QB streamer here."
+    },
+    "9221": {
+      "injury_history": "Minor 2023 (15 games), 17/17 since — no chronic pattern.",
+      "risk_flags": {
+        "suspension": false,
+        "contract": false,
+        "legal": false,
+        "researched": true,
+        "notes": []
+      },
+      "adp_commentary": "RB2 at ~2.9. Campbell's 'bell cow now' comments consolidate his touches — the single most valuable RB signal in this format — so a top-3 price is correct.",
+      "scouting_brief": {
+        "prose": "HC Dan Campbell has publicly named him 'our bell cow now,' and David Montgomery's departure clears the backfield — genuine touch consolidation, the top value signal in this format. Consensus RB1-overall candidate. Watch: Detroit signed Isiah Pacheco, who could absorb some early-down/goal-line work, and there's OC turnover (Morton out, Petzing in) as a mild scheme unknown.",
+        "role_stability": "locked",
+        "scheme_fit": "plus",
+        "override_flag": false,
+        "rationale": "Bell-cow per HC + Montgomery gone; Pacheco a minor goal-line hedge.",
+        "sources": [
+          {
+            "label": "CBS Sports (Campbell)",
+            "url": "https://www.cbssports.com/fantasy/football/news/lions-jahmyr-gibbs-gets-bell-cow-label-from-campbell/",
+            "date": "2026-07-21",
+            "type": "coach"
+          },
+          {
+            "label": "NBC Sports (DET preview)",
+            "url": "https://www.nbcsports.com/fantasy/football/news/2026-detroit-lions-fantasy-preview-should-jahmyr-gibbs-be-first-player-picked-in-drafts",
+            "date": "2026-07-21",
+            "type": "analyst"
+          }
+        ],
+        "as_of": "2026-07-21"
+      }
+    },
+    "9224": {
+      "injury_history": "2023 rookie limited (12 games); 16/17 since — trending durable.",
+      "risk_flags": {
+        "suspension": false,
+        "contract": false,
+        "legal": false,
+        "researched": true,
+        "notes": []
+      },
+      "adp_commentary": "RB at ~19.1 — one of the board's biggest RB values vs ADP. CIN volume + a clean recent workload make him a target a full round after his value rank."
+    },
+    "9226": {
+      "injury_history": "2023 rookie knee (11 games); 17 then 16 since. A 'Questionable' tag is carrying in Sleeper's DB — verify at camp, likely stale.",
+      "risk_flags": {
+        "suspension": false,
+        "contract": false,
+        "legal": false,
+        "researched": true,
+        "notes": []
+      },
+      "adp_commentary": "RB at ~13.6. Receiving-back volume plays slightly down in half-PPR vs full-PPR ADP, but Miami's lead role keeps him a low-end RB1.",
+      "scouting_brief": {
+        "prose": "Role is secure — he's the clear lead back (neither Jaylen Wright nor rookie Ollie Gordon threatened him), and OC Slowik may lean on him even harder. But the scheme signals are negative: Mike McDaniel, who built his pass-game role, is gone, and QB Malik Willis is a runner whose scrambles replace RB checkdowns and whose goal-line rushing eats Achane's TDs — analysts already tag him a 2026 'faller.' A real receiving/TD downgrade the projection may not fully reflect.",
+        "role_stability": "locked",
+        "scheme_fit": "minus",
+        "override_flag": true,
+        "rationale": "QB/scheme downgrade (Tua→Willis, McDaniel gone) likely trims his receiving + goal-line role below the projection — revisit.",
+        "sources": [
+          {
+            "label": "NBC Sports (MIA preview)",
+            "url": "https://www.nbcsports.com/fantasy/football/news/2026-miami-dolphins-fantasy-preview-can-devon-achane-avoid-fantasy-disaster",
+            "date": "2026-07-21",
+            "type": "analyst"
+          },
+          {
+            "label": "Yahoo Sports (fallers)",
+            "url": "https://sports.yahoo.com/fantasy/article/2026-nfl-free-agency-fantasy-football-fallers-dolphins-duo-of-devon-achane-jaylen-waddle-among-those-impacted-170443036.html",
+            "date": "2026-07-21",
+            "type": "analyst"
+          }
+        ],
+        "as_of": "2026-07-21"
+      }
+    },
+    "9484": {
+      "injury_history": "2025 missed time (8 games); cause not separately verified this pass — flagged for re-check.",
+      "risk_flags": {
+        "suspension": false,
+        "contract": false,
+        "legal": false,
+        "researched": true,
+        "notes": []
+      },
+      "adp_commentary": "TE at ~68 — an ascending GB TE; the 2025 games-missed is the availability question. A mid-round TE dart with real upside if healthy."
+    },
+    "9488": {
+      "injury_history": "Clean 17/17/17.",
+      "risk_flags": {
+        "suspension": false,
+        "contract": false,
+        "legal": false,
+        "researched": true,
+        "notes": []
+      },
+      "adp_commentary": "WR2 at ~7.3. Led the NFL with ~44% of Seattle's air yards in 2025 — format-correct here (yardage-driven, survives half-PPR). The pick your team name already endorses.",
+      "scouting_brief": {
+        "prose": "Unquestioned Seattle WR1 off a historic 2025 (WR2, NFL-high 36% target share, 1,793 yds), with Sam Darnold back and no new pass-catchers added to threaten his usage. The one wrinkle is scheme: OC Klint Kubiak left for Las Vegas, replaced by Brian Fleury (ex-49ers TE coach) — analysts don't expect it to tank him but flag the play-caller change. Floor is high given his first-read target dominance.",
+        "role_stability": "locked",
+        "scheme_fit": "neutral",
+        "override_flag": false,
+        "rationale": "Locked WR1, no new target competition; the OC change (Kubiak out) is the only unknown.",
+        "sources": [
+          {
+            "label": "FantasyLife (SEA cheat sheet)",
+            "url": "https://www.fantasylife.com/articles/fantasy/seattle-seahawks-2026-fantasy-football-cheat-sheet-jaxon-smith-njigba-jadarian-price-and-more",
+            "date": "2026-07-21",
+            "type": "analyst"
+          },
+          {
+            "label": "Seahawks.com (top 25)",
+            "url": "https://www.seahawks.com/news/top-25-fantasy-football-players-for-2026-jaxon-smith-njigba-third-in-early-ranks-after-historic-season",
+            "date": "2026-07-21",
+            "type": "beat"
+          }
+        ],
+        "as_of": "2026-07-21"
+      }
+    },
+    "9493": {
+      "injury_history": "2024 PCL sprain (knee), re-aggravated from a joint practice, missed 6+; played 16 in 2025. Re-aggravation pattern is the watch.",
+      "risk_flags": {
+        "suspension": false,
+        "contract": false,
+        "legal": false,
+        "researched": true,
+        "notes": []
+      },
+      "adp_commentary": "WR at ~4.8. Elite when healthy; the PCL re-aggravation history plus Rams target competition cap an otherwise top-3 WR profile.",
+      "scouting_brief": {
+        "prose": "Stafford's clear #1 (Kupp gone) in McVay's elite offense, coming off a league-leading 23.4 PPG. Scheme fit isn't a clean plus, though: Davante Adams is a goal-line savant (14 TDs in 2025) who caps Nacua's TD ceiling, and one analyst framed the new-look offense as a mild drag on his outlook. Off-field note: an offseason rehab stint, but no on-field concern reported.",
+        "role_stability": "locked",
+        "scheme_fit": "neutral",
+        "override_flag": false,
+        "rationale": "Locked target leader; Adams's goal-line role is the TD-ceiling cap.",
+        "sources": [
+          {
+            "label": "FantasyLife (LAR cheat sheet)",
+            "url": "https://www.fantasylife.com/articles/fantasy/los-angeles-rams-fantasy-football-cheat-sheet-2026-puka-nacua",
+            "date": "2026-07-21",
+            "type": "analyst"
+          },
+          {
+            "label": "Yahoo Sports",
+            "url": "https://sports.yahoo.com/fantasy/article/heres-how-the-rams-offense-has-changed--and-how-its-hurt-puka-nacuas-fantasy-football-outlook-215141356.html",
+            "date": "2026-07-21",
+            "type": "analyst"
+          }
+        ],
+        "as_of": "2026-07-21"
+      }
+    },
+    "9509": {
+      "injury_history": "No significant missed time 2023-25 (17/17/17).",
+      "risk_flags": {
+        "suspension": false,
+        "contract": false,
+        "legal": false,
+        "researched": true,
+        "notes": [
+          "Extension-leverage chatter (agent pushing for highest-paid RB) but participating; no holdout."
+        ]
+      },
+      "adp_commentary": "RB1 off the board at ~1.5. In a 2-RB/2-FLEX half-PPR league the elite bell-cow RB is the scarcest resource (top VORP tier), and Bijan's clean availability + workhorse role justify 1.01 cost despite Atlanta's stated wide-zone usage-cap talk.",
+      "scouting_brief": {
+        "prose": "Stefanski's wide-zone/gap scheme and 12-personnel sets suit him, and Tyler Allgeier's departure opens goal-line carries — analysts see a possible TD bump, with CBS calling the outlook 'complicated' only re: a lighter touch-share, not his standing. Consensus locked-in RB1 who can win a week by himself. Lone watch: Stefanski trimming his 35%+ usage share, but the projection already assumes elite volume.",
+        "role_stability": "locked",
+        "scheme_fit": "plus",
+        "override_flag": false,
+        "rationale": "Centerpiece role secure; scheme + Allgeier's exit are mild positives already largely priced.",
+        "sources": [
+          {
+            "label": "CBS Sports",
+            "url": "https://www.cbssports.com/fantasy/football/news/bijan-robinsons-case-to-be-the-first-player-drafted-in-2026-fantasy-football-leagues-just-got-complicated/",
+            "date": "2026-07-21",
+            "type": "analyst"
+          },
+          {
+            "label": "FantasySixPack (ATL preview)",
+            "url": "https://fantasysixpack.net/2026-atlanta-falcons-fantasy-outlook/",
+            "date": "2026-07-21",
+            "type": "analyst"
+          }
+        ],
+        "as_of": "2026-07-21"
+      }
+    },
+    "9756": {
+      "injury_history": "Durable on the field (17/15/14); the 2025 dip was a suspension, not injury.",
+      "risk_flags": {
+        "suspension": false,
+        "contract": false,
+        "legal": false,
+        "researched": true,
+        "notes": [
+          "Served a 3-game suspension to open 2025 (Substances-of-Abuse policy, from a 2024 DUI resolved as a 'wet reckless' misdemeanor). Eligible with no remaining 2026 ban — but a second policy violation would escalate. Documented, currently resolved (like Rice)."
+        ]
+      },
+      "adp_commentary": "WR at ~98.4 — the WR2 in a strong MIN passing game; the suspension is served and behind him. A steady value at cost, with the substance-policy history as a background note, not a live flag."
+    },
+    "10222": {
+      "injury_history": "2025 missed time (7 games); cause not separately verified this pass — flagged for re-check.",
+      "risk_flags": {
+        "suspension": false,
+        "contract": false,
+        "legal": false,
+        "researched": true,
+        "notes": []
+      },
+      "adp_commentary": "WR at ~110.5 — big-play GB slot; the 2025 availability plus a crowded target tree cap him. Late-round upside dart."
+    },
+    "10229": {
+      "injury_history": "2024 knee (LCL, 4 games) then a 2026 offseason knee clean-up (~2 months, debris removal). Verify the knee clears camp.",
+      "risk_flags": {
+        "suspension": false,
+        "contract": false,
+        "legal": false,
+        "researched": true,
+        "notes": [
+          "Served a 6-game conduct suspension in 2025 (2024 Dallas crash); NOT expected to be suspended again.",
+          "Completed a 30-day jail term (May 2026, probation violation) and was released; legal matter resolved."
+        ]
+      },
+      "adp_commentary": "WR at ~34.8 (~WR12). The ADP has already absorbed the jail stint and the knee — he's elite on the field, and the price IS the discount. A calculated-risk value if the knee clears camp; the conduct/legal history is documented but currently resolved."
+    },
+    "10236": {
+      "injury_history": "Missed time in 2024-25 (13/12 games) — nagging soft-tissue/lower-body issues, no single structural event.",
+      "risk_flags": {
+        "suspension": false,
+        "contract": false,
+        "legal": false,
+        "researched": true,
+        "notes": []
+      },
+      "adp_commentary": "TE at ~97.5 — talent for a top-8 TE, but the availability and a crowded BUF target tree cap him; fine as a mid-round TE swing."
+    },
+    "10859": {
+      "injury_history": "Herniated disc in the back worsened in Nov 2025 → IR (9 games). Aiming to be fully cleared by camp; present read is Week 1, but back injuries can be tricky/recurrent.",
+      "risk_flags": {
+        "suspension": false,
+        "contract": false,
+        "legal": false,
+        "researched": true,
+        "notes": []
+      },
+      "adp_commentary": "TE at ~78 — a healthy LaPorta is a top-5 TE, but a herniated disc is the kind of injury that lingers; the ADP is a fair midpoint between his ceiling and the back risk."
+    },
+    "11564": {
+      "injury_history": "Durable in a short career (13/17).",
+      "risk_flags": {
+        "suspension": false,
+        "contract": false,
+        "legal": false,
+        "researched": true,
+        "notes": []
+      },
+      "adp_commentary": "QB at ~54 — a konami-code riser now throwing to A.J. Brown; the exact profile this format prizes, and ENOTS (his 2025 owner and a QB-punter) won't chase him. A live mid-round target if you want a rushing QB."
+    },
+    "11566": {
+      "injury_history": "2025 missed significant time (7 games); cause not separately verified this pass — flagged for the final-weeks re-check.",
+      "risk_flags": {
+        "suspension": false,
+        "contract": false,
+        "legal": false,
+        "researched": true,
+        "notes": []
+      },
+      "adp_commentary": "QB at ~64 — a premium rushing-QB profile (the format's actual QB edge), but the 2025 games-missed needs verification before the draft; if healthy, a strong konami-code target that this league's QB-punters won't chase."
+    },
+    "11584": {
+      "injury_history": "2025 foot + shoulder injuries wrecked the year (10 games, 588 yds); listed 1A with Gainwell 1B. Camp health is the swing variable.",
+      "risk_flags": {
+        "suspension": false,
+        "contract": false,
+        "legal": false,
+        "researched": true,
+        "notes": []
+      },
+      "adp_commentary": "RB at ~37.6 — bounce-back lead-back if the foot/shoulder are clean; the 2025 injuries plus Gainwell's presence are the caps. Buy the recovery, but the availability is a real question."
+    },
+    "11604": {
+      "injury_history": "2025 knee (IR late, 12 games); says he's '100%' and practicing full speed at 2026 OTAs — recovery on track.",
+      "risk_flags": {
+        "suspension": false,
+        "contract": false,
+        "legal": false,
+        "researched": true,
+        "notes": []
+      },
+      "adp_commentary": "TE at ~20.6 — the positional-scarcity TE1. A healthy Bowers is arguably the top TE and the injury discount has largely closed; bwalsh89/Stipe and your own TE-hunter history all compete here."
+    },
+    "11632": {
+      "injury_history": "2025 ACL + meniscus (October) plus a spring scar-tissue cleanup; camp status uncertain (Questionable). Structural — real Week-1 risk.",
+      "risk_flags": {
+        "suspension": false,
+        "contract": false,
+        "legal": false,
+        "researched": true,
+        "notes": []
+      },
+      "adp_commentary": "WR at ~24.6. Elite talent at a discount IF healthy — but the ACL recovery is the entire bet. This format overpays for uninjured elite WRs, and he isn't one yet; draft the discount only if you can carry the IR stash."
+    },
+    "12481": {
+      "injury_history": "2025 ankle (8 games); expected full participation early in camp.",
+      "risk_flags": {
+        "suspension": false,
+        "contract": false,
+        "legal": false,
+        "researched": true,
+        "notes": [
+          "Rookie."
+        ]
+      },
+      "adp_commentary": "RB at ~44.4 — NYG rookie in a possible committee under the new Harbaugh regime; ankle recovery and role split are the caps."
+    },
+    "12512": {
+      "injury_history": "2025 leg fracture/dislocation (structural); healed on the 4-6 month timeline, expected Week 1. A 'Questionable' tag is carrying — verify.",
+      "risk_flags": {
+        "suspension": false,
+        "contract": false,
+        "legal": false,
+        "researched": true,
+        "notes": [
+          "Rookie."
+        ]
+      },
+      "adp_commentary": "RB at ~49.6 — CLE rookie in Monken's run-heavy scheme (the cycle's best RB ecosystem transplant). The healing leg is the uncertainty the ADP reflects; bwalsh89 (his 2025 stash) competes."
+    },
+    "12527": {
+      "injury_history": null,
+      "risk_flags": {
+        "suspension": false,
+        "contract": false,
+        "legal": false,
+        "researched": true,
+        "notes": [
+          "Rookie — no NFL availability history."
+        ]
+      },
+      "adp_commentary": "RB at ~11.9 — projected rookie workhorse in LV. No availability history to lean on, so the projection carries all the weight; rookie variance applies.",
+      "scouting_brief": {
+        "prose": "Clear scheme upgrade: Chip Kelly is out as OC, and Klint Kubiak's system (81+ backfield receptions/yr since 2021) plus a rebuilt line (added C Tyler Linderbaum) point to three-down workhorse usage. RB coach says he's 'doing all the right things' for a full workhorse role; 4th-round rookie Mike Washington is only a pusher. Consensus bounce-back from a disappointing RB16 rookie year to top-10 upside.",
+        "role_stability": "locked",
+        "scheme_fit": "plus",
+        "override_flag": false,
+        "rationale": "Workhorse + Kubiak pass-game usage + better scheme/OL; only a late-round pusher behind him.",
+        "sources": [
+          {
+            "label": "SI (Raiders)",
+            "url": "https://www.si.com/nfl/raiders/onsi/las-vegas-how-new-staff-fueling-ashton-jeanty-breakout",
+            "date": "2026-07-21",
+            "type": "beat"
+          },
+          {
+            "label": "FantasyLife (LV cheat sheet)",
+            "url": "https://www.fantasylife.com/articles/fantasy/las-vegas-raiders-fantasy-football-cheat-sheet-for-2026-ashton-j",
+            "date": "2026-07-21",
+            "type": "analyst"
+          }
+        ],
+        "as_of": "2026-07-21"
+      }
+    },
+    "13287": {
+      "injury_history": null,
+      "risk_flags": {
+        "suspension": null,
+        "contract": null,
+        "legal": null,
+        "researched": false,
+        "notes": [
+          "Rookie — not individually vetted; low draft-decision priority."
+        ]
+      },
+      "adp_commentary": "Projected ~RB7 at ADP ~17.1, but a rookie with no NFL availability data (shows 'no data'). Value is projection-only — treat with full rookie variance."
+    }
   },
   "clean_researched": {
     "note": "Swept in the league-wide suspension/holdout pass (nothing found) AND games-played durable. The build script sets researched-clean flags and derives injury_history from games-played (rookies -> null, since no NFL history exists). This is a reasonable confidence level, NOT a per-player medical deep dive.",
-    "ids": ["8155", "7543", "7588", "9997", "4983", "6790", "8228", "7594", "7553", "5967", "5045", "7021", "5947", "6819", "8126", "7567", "8142", "5846", "6904", "11560", "11563", "11635", "11620", "11631", "11628", "11586", "11638", "12507", "12526", "12529", "12517", "12519", "12514", "12518", "12490", "12506", "12489", "12534", "12508", "12493", "12533", "13279", "13286", "13281", "13294", "1466", "5892", "7611", "8121"]
+    "ids": [
+      "8155",
+      "7543",
+      "7588",
+      "9997",
+      "4983",
+      "6790",
+      "8228",
+      "7594",
+      "7553",
+      "5967",
+      "5045",
+      "7021",
+      "5947",
+      "6819",
+      "8126",
+      "7567",
+      "8142",
+      "5846",
+      "6904",
+      "11560",
+      "11563",
+      "11635",
+      "11620",
+      "11631",
+      "11628",
+      "11586",
+      "11638",
+      "12507",
+      "12526",
+      "12529",
+      "12517",
+      "12519",
+      "12514",
+      "12518",
+      "12490",
+      "12506",
+      "12489",
+      "12534",
+      "12508",
+      "12493",
+      "12533",
+      "13279",
+      "13286",
+      "13281",
+      "13294",
+      "1466",
+      "5892",
+      "7611",
+      "8121"
+    ]
   }
 }
