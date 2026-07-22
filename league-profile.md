@@ -77,7 +77,29 @@ K and DEF are not measured: Sleeper's DEF touchdown keys don't map cleanly onto 
 
 **Streaming gain by position** (weekly replacement minus draft replacement): RB **+2**, WR +18, TE +32, QB **+50**. Streaming is worth nothing at RB and a great deal at QB — the quantitative case for the no-backup-QB/TE rule below, and for RB being the one position where a bench spot earns its keep.
 
-*Caveat on the whole table: "elite" is the ex-post #1 finisher, whom nobody can draft. These measure the prize, not the expected return on taking the consensus RB1.*
+**The table above is the PRIZE, not the return. You capture about a third of it.** "Elite" is the ex-post #1 finisher, whom nobody can draft. Measured against this league's own 900 picks (`data/pick-expectation.json`), a top-10 pick spent on the position actually returned:
+
+| | prize (ex-post #1) | **E[VOR] of a top-10 pick** | capture rate |
+|---|---|---|---|
+| RB | +168 | **+62** (n=41) | 37% |
+| WR | +139 | **+49** (n=18) | 35% |
+
+The two-thirds shortfall is the cost of not knowing in advance which player becomes the #1. Use the +62 / +49 figures for pick decisions and the ladder above only for *relative* positional weight. **RB still leads WR early, ex-ante as well as ex-post.**
+
+**Expected value by round** (VOR over the measured replacement line, 14-week terms, 6 drafts):
+
+| round | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11–15 |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| mean VOR | +58 | +56 | +12 | +12 | +2 | +1 | −4 | −17 | −18 | −25 | −33 to −50 |
+| bust % | 15 | 10 | 40 | 32 | 50 | 45 | 48 | 65 | 65 | 69 | 71–87 |
+
+**Rounds 1 and 2 are indistinguishable (+58 vs +56 — round 2 actually busts less, 10% vs 15%), then round 3 falls off a cliff to +12.** Essentially all the draft's surplus sits in the first two rounds. Rounds 3–7 hover around zero; from round 8 the average pick returns *less than the free replacement*.
+
+Two things that number does **not** mean. Late-round VOR is negative by arithmetic — you are drafting the 100th-best player and measuring him against the 28th — so it is not an argument against drafting. And a bench pick is an **option you can drop**, so its mean understates it; what matters there is the tail, and the tail is real (Mostert +106 from round 12, Josh Allen +71 from round 11). Difference-maker rate by bucket: rounds 1–2 **34%**, 3–4 11%, 5–7 11%, 8–10 4%, 11–15 2%.
+
+**Ex-ante by round × position** — the actionable version of the ladder. RB leads early (+60 rounds 1–2) and is the *worst* thing to hold late (−29 in rounds 8–10, −52 in 11–15, the weakest cells in the table). QB has been the best rounds 3–4 bet (+26) and the only positive late cell (+5 in 8–10) — both thin (n≈12), consistent with the "QB rounds 8–12" plan below, not strong enough to lean on alone.
+
+*Confound, stated: these are this room's picks, so the curve reflects pick position AND this room's drafting. It answers "what has a pick here been worth to us", not "what is a pick here worth in the abstract".*
 
 - **Rounds 1–3: elite RB/WR only** (RB lean vs full-PPR boards — measurement supports a *clearer* lean than "modest": +168 vs +139, and RB is the position where replacement is genuinely unavailable, streaming gain +2 vs WR's +18), or an elite TE falling to value — though the TE1 was a ~+55 season in three of the last six, so treat that branch as a lottery ticket, not a plan.
 - **Rounds 4–7: RB/WR volume.** You need 4–5 weekly startables; FLEX demand keeps the scarcity curve as steep as a 12-team league. The WR25–45 band is flat — don't pay round-4 prices for WRs separated by ~1 ppg from round-7 WRs.
