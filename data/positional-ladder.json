@@ -1,0 +1,261 @@
+{
+  "_meta": {
+    "purpose": "Measured positional value ladder in HBGBs scoring, testing the structural estimates at league-profile.md line 60.",
+    "generated": "2026-07-22",
+    "method": "Sleeper weekly stats 2020-2025 re-scored with league-2025 scoring_settings; regular-season weeks only; scaled to a 14-week season.",
+    "replacement_ranks": {
+      "QB": 10,
+      "RB": 28,
+      "WR": 32,
+      "TE": 10
+    },
+    "replacement_ranks_source": "data/flex-split.json (measured, 1640 FLEX slot-weeks)",
+    "rushing_qb_cut_yd": 350,
+    "gaps": [
+      "K and DEF not measured. DEF touchdown stat keys (td, misc_td, def_st_td) do not map cleanly onto the scoring_settings DEF keys, so a DEF total would silently undercount. league-profile.md line 60's 'best DEF ~+28, best K ~+21' remains unvalidated.",
+      "Elite = positional #1 each season. A top-3 mean is also stored per position but the headline verdicts use #1, matching the wording 'elite RB' rather than 'elite RB tier'."
+    ]
+  },
+  "ladder": {
+    "RB": {
+      "measured_season_repl": 168.1,
+      "measured_weekly_repl": 166.4,
+      "structural": 154,
+      "verdict": "UNDERSTATED",
+      "per_season_season_repl": [
+        168.3,
+        195.4,
+        147,
+        164.6,
+        157,
+        176.5
+      ]
+    },
+    "WR": {
+      "measured_season_repl": 139.4,
+      "measured_weekly_repl": 122.2,
+      "structural": 133,
+      "verdict": "inside bracket",
+      "per_season_season_repl": [
+        126.5,
+        150.2,
+        132.3,
+        148.1,
+        150.8,
+        128.4
+      ]
+    },
+    "TE": {
+      "measured_season_repl": 81.9,
+      "measured_weekly_repl": 50.6,
+      "structural": 98,
+      "verdict": "OVERSTATED",
+      "per_season_season_repl": [
+        112,
+        56.9,
+        125.4,
+        52.2,
+        58.1,
+        86.8
+      ]
+    },
+    "QB_rush": {
+      "measured_season_repl": 88.3,
+      "measured_weekly_repl": 38.6,
+      "structural": 98,
+      "verdict": "OVERSTATED",
+      "per_season_season_repl": [
+        94.6,
+        63.5,
+        111.7,
+        80.6,
+        93.5,
+        85.6
+      ]
+    },
+    "QB_pocket": {
+      "measured_season_repl": 65.5,
+      "measured_weekly_repl": 15.9,
+      "structural": 56,
+      "verdict": "inside bracket",
+      "per_season_season_repl": [
+        89,
+        66.9,
+        105.2,
+        38,
+        59.2,
+        34.8
+      ]
+    }
+  },
+  "replacement_by_season": [
+    {
+      "season": 2020,
+      "pos": "QB",
+      "replSeason": 247.79999999999998,
+      "replWeekly": 306.9015384615384,
+      "replRank": 10
+    },
+    {
+      "season": 2020,
+      "pos": "RB",
+      "replSeason": 109.41538461538461,
+      "replWeekly": 120.18461538461537,
+      "replRank": 28
+    },
+    {
+      "season": 2020,
+      "pos": "WR",
+      "replSeason": 129.66153846153847,
+      "replWeekly": 152.81538461538466,
+      "replRank": 32
+    },
+    {
+      "season": 2020,
+      "pos": "TE",
+      "replSeason": 101.87692307692306,
+      "replWeekly": 141.72307692307692,
+      "replRank": 10
+    },
+    {
+      "season": 2021,
+      "pos": "QB",
+      "replSeason": 238.96923076923076,
+      "replWeekly": 291.9969230769231,
+      "replRank": 10
+    },
+    {
+      "season": 2021,
+      "pos": "RB",
+      "replSeason": 117.38461538461537,
+      "replWeekly": 124.59999999999998,
+      "replRank": 28
+    },
+    {
+      "season": 2021,
+      "pos": "WR",
+      "replSeason": 123.43692307692308,
+      "replWeekly": 141.61538461538458,
+      "replRank": 32
+    },
+    {
+      "season": 2021,
+      "pos": "TE",
+      "replSeason": 109.19999999999999,
+      "replWeekly": 137.52307692307693,
+      "replRank": 10
+    },
+    {
+      "season": 2022,
+      "pos": "QB",
+      "replSeason": 226.16000000000003,
+      "replWeekly": 269.82000000000005,
+      "replRank": 10
+    },
+    {
+      "season": 2022,
+      "pos": "RB",
+      "replSeason": 113.80000000000001,
+      "replWeekly": 121.10000000000001,
+      "replRank": 28
+    },
+    {
+      "season": 2022,
+      "pos": "WR",
+      "replSeason": 114.92,
+      "replWeekly": 137.9,
+      "replRank": 32
+    },
+    {
+      "season": 2022,
+      "pos": "TE",
+      "replSeason": 91.5,
+      "replWeekly": 125.60000000000001,
+      "replRank": 10
+    },
+    {
+      "season": 2023,
+      "pos": "QB",
+      "replSeason": 240.66000000000003,
+      "replWeekly": 276.4,
+      "replRank": 10
+    },
+    {
+      "season": 2023,
+      "pos": "RB",
+      "replSeason": 120.79999999999998,
+      "replWeekly": 108.6,
+      "replRank": 28
+    },
+    {
+      "season": 2023,
+      "pos": "WR",
+      "replSeason": 126.10000000000002,
+      "replWeekly": 137.29999999999998,
+      "replRank": 32
+    },
+    {
+      "season": 2023,
+      "pos": "TE",
+      "replSeason": 105.38,
+      "replWeekly": 126.20000000000002,
+      "replRank": 10
+    },
+    {
+      "season": 2024,
+      "pos": "QB",
+      "replSeason": 230.88000000000002,
+      "replWeekly": 281.40000000000003,
+      "replRank": 10
+    },
+    {
+      "season": 2024,
+      "pos": "RB",
+      "replSeason": 128.50000000000003,
+      "replWeekly": 121.70000000000002,
+      "replRank": 28
+    },
+    {
+      "season": 2024,
+      "pos": "WR",
+      "replSeason": 120.10000000000001,
+      "replWeekly": 135.1,
+      "replRank": 32
+    },
+    {
+      "season": 2024,
+      "pos": "TE",
+      "replSeason": 104.1,
+      "replWeekly": 130.79999999999998,
+      "replRank": 10
+    },
+    {
+      "season": 2025,
+      "pos": "QB",
+      "replSeason": 234.44,
+      "replWeekly": 290.20000000000005,
+      "replRank": 10
+    },
+    {
+      "season": 2025,
+      "pos": "RB",
+      "replSeason": 115,
+      "replWeekly": 118.80000000000001,
+      "replRank": 28
+    },
+    {
+      "season": 2025,
+      "pos": "WR",
+      "replSeason": 114.49999999999999,
+      "replWeekly": 127.2,
+      "replRank": 32
+    },
+    {
+      "season": 2025,
+      "pos": "TE",
+      "replSeason": 101.4,
+      "replWeekly": 139.6,
+      "replRank": 10
+    }
+  ]
+}
