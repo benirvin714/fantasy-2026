@@ -194,7 +194,7 @@
   /* ---------- render helpers ---------- */
   const noData = '<span class="nodata">no data</span>';
   const badge = (txt, cls, title) => `<span class="rbadge ${cls}" title="${esc(title)}">${esc(txt)}</span>`;
-  const edgeStr = (e) => e == null ? "–" : e === 0 ? "$0" : (e > 0 ? "+$" : "−$") + Math.abs(e);
+  const edgeStr = (e) => { if (e == null) return "–"; const r = Math.round(e); return r === 0 ? "$0" : (r > 0 ? "+$" : "−$") + Math.abs(r); }; // round: a boundary player's sub-dollar market gap reads $0 (fair), not "+$0.04"
   const fmtD = (d) => d == null ? "–" : d >= 1 ? `$${d}` : `$${d.toFixed(2)}`;   // ≥$1 = integer price; <$1 = proximity score
 
   function rowHTML(p, rankLabel) {
