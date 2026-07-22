@@ -20,7 +20,7 @@
 
 ## How this format distorts standard player value
 
-Public rankings mostly assume 12 teams, 1 FLEX, full or half PPR, deeper benches. This league breaks those assumptions in specific, exploitable ways. (The numbers below are structural math from the scoring rules — replacement-level estimates, not player projections.)
+Public rankings mostly assume 12 teams, 1 FLEX, full or half PPR, deeper benches. This league breaks those assumptions in specific, exploitable ways. (The numbers below are replacement-level values, not player projections. Where marked **measured**, they come from six seasons of actual production re-scored in this format — see `data/positional-ladder.json` and `data/flex-split.json`; anything still labelled an estimate is structural math from the scoring rules and has not been validated.)
 
 ### 1. It's a normal-depth league at RB/WR and a very shallow league everywhere else
 
@@ -43,13 +43,17 @@ A reception = 0.5 pt = exactly 5 yards. Full-PPR boards price it at 10. An 85-ca
 
 ### 4. TE: elite at a discount, or punt — never the middle
 
-Half PPR compresses TE scoring, and streaming replacement (~TE12) is higher than 12-team boards assume. An elite TE still delivers ~+6–7 ppg in a onesie slot — a real weapon, but only at value (round 3-ish, never a round-1–2 reach; see the self-scout in [league-tendencies.md](league-tendencies.md)). **The TE5–9 band is the format's clearest trap**: a round 5–9 pick to beat the free streamer by 1–2 ppg. Punting costs almost nothing.
+Half PPR compresses TE scoring, and streaming replacement is higher than 12-team boards assume — **measured at TE10, not ~TE12** (`data/flex-split.json`: TE fills just 2.2% of FLEX slots, so barely more than ten TEs start league-wide in any week). Better replacement shrinks the elite premium: an elite TE delivers a **measured +3.6 to +5.9 ppg** in the onesie slot (`data/positional-ladder.json`), not the ~+6–7 previously estimated. A real weapon, but only at value (round 3-ish, never a round-1–2 reach; see the self-scout in [league-tendencies.md](league-tendencies.md)). **The TE5–9 band is the format's clearest trap**: a round 5–9 pick to beat the free streamer by 1–2 ppg. Punting costs almost nothing.
+
+**And elite TE is a coin flip, not an asset.** Measured season-by-season, the best TE in football was worth +112, +57, +125, +52, +58, +87 over replacement (2020–25) — a 2.4× spread against elite RB's 1.33×. In three of six seasons the TE1 returned ~+55. Note this **cuts against §10's draft-for-ceiling logic**, which would treat that volatility as upside; the two rules genuinely conflict at this position and the conflict is unresolved.
 
 ### 5. Kickers: the scoring inverts football logic
 
-Expected value per attempt at typical NFL make rates: FG 0–39 ≈ 2.76, FG 40–49 ≈ 3.00, **FG 50–59 ≈ 3.25 (highest band — and a free roll, since 50+ misses cost 0)**, XP ≈ 0.92 (barely anything, with downside). A 52-yard attempt is worth more than a chip shot; five XPs are worth less than two mid-range FGs.
+**The scoring changed in 2024**: through 2023 every miss cost −1 flat; from 2024 the miss penalty is banded and `fgmiss_50_59 = −1`. Only **60+** misses are free, not 50+. (Verify at renewal — this changed once already.)
 
-**Winning profile: big leg + coach who attempts long FGs + offense that stalls between the 25 and 40. Trap profile: XP-machine on an elite TD offense.** Short-range accuracy is the floor (only sub-50 misses hurt); long-attempt volume is the ceiling.
+Expected value per attempt, **measured** over 2024–25 (all NFL kickers, current settings): FG 20–29 ≈ 2.92, FG 30–39 ≈ 2.75, FG 40–49 ≈ 2.92, **FG 50–59 ≈ 3.26 (highest band)**, FG 60+ ≈ 2.79, XP ≈ 0.92 (barely anything, with downside). A 52-yard attempt is worth more than a chip shot; five XPs are worth less than two mid-range FGs.
+
+**Winning profile: big leg + coach who attempts long FGs + offense that stalls between the 25 and 40. Trap profile: XP-machine on an elite TD offense.** But the big-leg edge is **thin, not free**: 50–59 beats the short bands by ~0.35–0.5 per attempt, not by a free roll. And 60+ is *not* the jackpot the free miss suggests — at a measured 46.4% make rate it returns 2.79, no better than a 30-yarder. The band to want is 50–59, not "as long as possible".
 
 ### 6. DEF: stream by opponent, don't pay for a name
 
@@ -57,9 +61,25 @@ The points-allowed table spans 14 points with 3-point cliffs (13 vs 14 allowed, 
 
 ### 7. Draft capital, in order
 
-Season-long value over replacement (14-week regular season, structural estimates): elite RB ~+154, elite WR ~+133, elite TE ~+98, elite rushing QB ~+98, elite pocket QB ~+56, best DEF ~+28, best K ~+21.
+Season-long value over replacement (14-week regular season). **Measured** from six seasons re-scored in this format (`data/positional-ladder.json`), against replacement ranks measured from actual FLEX usage (QB10 / RB28 / WR32 / TE10). Two figures per position: value over a replacement you draft and start all year, and over perfect-hindsight weekly streaming. **True value sits between them** — a single number here would be a choice disguised as a measurement.
 
-- **Rounds 1–3: elite RB/WR only** (modest RB lean vs full-PPR boards), or an elite TE falling to value.
+| | measured (draft repl.) | measured (stream repl.) | old structural est. | |
+|---|---|---|---|---|
+| elite RB | **+168** | +166 | +154 | understated |
+| elite WR | **+139** | +122 | +133 | held up |
+| elite TE | **+82** | +51 | +98 | overstated |
+| elite rushing QB | **+88** | +39 | +98 | overstated |
+| elite pocket QB | **+66** | +16 | +56 | held up |
+| best DEF | — | — | ~+28 | **unvalidated** |
+| best K | — | — | ~+21 | **unvalidated** |
+
+K and DEF are not measured: Sleeper's DEF touchdown keys don't map cleanly onto the scoring settings, so a total would silently undercount. Left as estimates rather than guessed.
+
+**Streaming gain by position** (weekly replacement minus draft replacement): RB **+2**, WR +18, TE +32, QB **+50**. Streaming is worth nothing at RB and a great deal at QB — the quantitative case for the no-backup-QB/TE rule below, and for RB being the one position where a bench spot earns its keep.
+
+*Caveat on the whole table: "elite" is the ex-post #1 finisher, whom nobody can draft. These measure the prize, not the expected return on taking the consensus RB1.*
+
+- **Rounds 1–3: elite RB/WR only** (RB lean vs full-PPR boards — measurement supports a *clearer* lean than "modest": +168 vs +139, and RB is the position where replacement is genuinely unavailable, streaming gain +2 vs WR's +18), or an elite TE falling to value — though the TE1 was a ~+55 season in three of the last six, so treat that branch as a lottery ticket, not a plan.
 - **Rounds 4–7: RB/WR volume.** You need 4–5 weekly startables; FLEX demand keeps the scarcity curve as steep as a 12-team league. The WR25–45 band is flat — don't pay round-4 prices for WRs separated by ~1 ppg from round-7 WRs.
 - **Rounds 8–12: QB (if not a faller earlier), upside bench.** Bench spots are for ceiling lottery tickets and at most one handcuff (to *your own* elite RB). No backup QB/TE, ever.
 - **Last two rounds: K and DEF. Always.** (Six years of league data confirm nobody follows an early K/DEF pick — see tendencies doc.)
