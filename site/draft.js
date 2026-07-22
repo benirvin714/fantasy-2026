@@ -62,6 +62,78 @@
   // shaky read is capped, never trusted. Uses dollarAtRank (set in rank()) for the expert $ band.
   const SEV = { high: 0, some: 1, low: 2, none: 2 };
   const CONF_LABEL = ["Low", "Med", "High"], CONF_DOTS = ["●○○", "●●○", "●●●"];
+
+  /* ---- role stability: the ONE place historical usage touches the model ----
+     Usage is EVIDENCE, not value. Sleeper's projection already prices raw target share and age,
+     so folding share back into the number would double-count it. What usage legitimately informs
+     is how much to TRUST that number: a sustained, established, multi-year role is a safer read
+     than a committee body or an unproven one. So it enters confidence() as a third severity
+     beside playing-time risk and expert disagreement, folded worst-of — it can widen the band and
+     cap a recommendation, but it can never move the asset value or the edge.
+     Combined worst-of with the scouting session's qualitative role_stability when that exists;
+     falls back to the usage read alone when it doesn't.
+     Bars are calibrated to the board's own 2025 distribution (≈median share for WR/TE, ≈p60 touch
+     share for RB) so they separate settled roles from unsettled ones instead of capping everyone.
+     QB deliberately uses SNAP share, not pass attempts — the question is "is he the starter",
+     and an attempts bar would wrongly flag run-first starters like Lamar Jackson (23.2 att/g). */
+  const ESTABLISHED = { WR: ["target_share", 0.20, 0.65], TE: ["target_share", 0.17, 0.62], RB: ["touch_share", 0.28, 0.45], QB: [null, null, 0.80] };
+  const SCOUT_ROLE = { locked: "none", committee: "some", in_flux: "high" };
+  function roleStability(p) {
+    const bar = ESTABLISHED[p.pos];
+    const scoutRaw = p.scouting_brief?.role_stability;
+    const scout = SCOUT_ROLE[scoutRaw] ?? null;
+    if (!bar) return scout ? { sev: scout, why: `scouting: role ${scoutRaw}`, source: "scouting" } : null; // K/DEF: no usage, no role read
+    const seasons = p.usage?.seasons ?? {};
+    const qual = ["2023", "2024", "2025"].filter((y) => seasons[y] && seasons[y].g >= 8);
+    let sev, why;
+    if (!qual.length) {
+      sev = "high"; why = p.rookie ? "no NFL usage yet (rookie) — role unproven" : "no season with 8+ games of usage — role unproven";
+    } else {
+      const y = qual[qual.length - 1], s = seasons[y];
+      const [mk, mmin, smin] = bar;
+      const mv = mk ? s[mk] : null, sv = s.snap_share;
+      const metOk = mk ? mv != null && mv >= mmin : true;
+      const snapOk = sv != null && sv >= smin;
+      const fringe = (mk && mv != null && mv < mmin * 0.5) || (sv != null && sv < smin * 0.5);
+      const label = mk ? `${mk.replace("_", " ")} ${(mv * 100).toFixed(0)}%` : `snap share ${(sv * 100).toFixed(0)}%`;
+      const down = p.usage?.direction?.direction === "down" || p.usage?.trend?.direction === "down";
+      if (fringe) { sev = "high"; why = `${y} ${label} — rotational/fringe usage, so the projected role is the shakiest part of the read`; }
+      else if (y !== "2025") { sev = "some"; why = `most recent usage is ${y} (no 2025 sample) — role read is stale`; }
+      else if (metOk && snapOk && !down) { sev = "none"; why = `established 2025 role (${label}, ${(sv * 100).toFixed(0)}% snaps), trending steady or up`; }
+      else if (metOk && snapOk) { sev = "some"; why = `established 2025 role (${label}) but usage is trending DOWN`; }
+      else { sev = "some"; why = `2025 ${label}, ${sv == null ? "no snap data" : (sv * 100).toFixed(0) + "% snaps"} — below the settled-role bar (committee / rotational)`; }
+    }
+    // worst-of with the scouting brief's qualitative read, when it exists
+    if (scout && SEV[scout] < SEV[sev]) return { sev: scout, why: `scouting: role ${scoutRaw} (worse than the usage read: ${why})`, source: "scouting" };
+    return { sev, why, source: "usage" };
+  }
+
+  /* ---- override hook: "revisit his number" ----
+     A display flag, never an adjustment. Raised when the context-appropriate trend clearly
+     contradicts the projection: this is the DRAFT view, so the multi-year direction leads and
+     the within-season trajectory is the secondary lens. Compares the projection's per-game rate
+     against last season's ACTUAL per-game production.
+
+     Deliberately ONE-DIRECTIONAL, calibrated against this board (2026-07-22). Falling usage +
+     a projection asking for MORE is rare (6 of 248) and genuinely contradictory — the projection
+     makes a claim the recent evidence doesn't support. The mirror case (rising usage + a lower
+     projection) fired on 35 players — McCaffrey 0.70x, Gibbs 0.84x, Taylor 0.75x, Achane 0.72x,
+     McBride 0.76x all at once — because projections regress EVERY career year; that's not a
+     contradiction, it's how projections work. Worse, its most extreme hits were backups
+     (Charbonnet 0.34x) where the projection correctly prices a bench role and the raw usage read
+     is the naive one. A flag that fires on a sixth of the board is wallpaper, so that side is
+     off: the markdown usually encodes information the usage history lacks. */
+  const REVISIT_UP = 1.15;
+  function revisitFlag(p) {
+    const ls = p.usage?.last_season, projPpg = p.projection?.ppg;
+    if (!ls || ls.g < 8 || !projPpg || !(ls.ppg > 0)) return null;
+    const ratio = +(projPpg / ls.ppg).toFixed(2);
+    const dir = p.usage?.direction?.direction, tr = p.usage?.trend?.direction;
+    if (!(dir === "down" || tr === "down") || ratio < REVISIT_UP) return null;
+    const which = dir === "down" ? "multi-year DOWN" : `within-season DOWN (late ${ls.year})`;
+    return { ratio, why: `usage is ${which}, yet the 2026 projection asks for ${Math.round((ratio - 1) * 100)}% MORE per game than he actually scored in ${ls.year} (${projPpg}/g projected vs ${ls.ppg}/g actual)` };
+  }
+
   function confidence(p) {
     if (p.assetPts == null) return null;
     const mg = p.medianGames;
@@ -90,7 +162,9 @@
       }
       dis = d;
     }
-    const assetSev = Math.min(SEV[ptRisk], SEV[dis]);
+    // role stability from historical usage (worst-of with the scouting brief) — the third leg
+    const role = roleStability(p);
+    const assetSev = Math.min(SEV[ptRisk], SEV[dis], role ? SEV[role.sev] : 2);
     const assetConf = assetSev <= 0 ? "Low" : assetSev === 1 ? "Med" : "High";
     // illustrative $ band: PT swing (via games fraction) ⊕ expert-rank $ spread, in quadrature
     const ptHalf = mg > 0 ? (p.draftDollar ?? 0) * ((gHigh - gLow) / 2) / mg : 0;
@@ -105,11 +179,15 @@
         : (Math.abs(p.edgePicks ?? 0) >= 60 ? 3 : 2); // sub-$1 FADE strength from the pick-gap overpay
       const assetLevel = { Low: 1, Med: 2, High: 3 }[assetConf];
       recConf = Math.min(edgeStrength, assetLevel);
-      if (assetLevel < edgeStrength) capped = assetConf === "Low"
-        ? (ptRisk === "high" ? "playing-time / role risk" : "you're the outlier vs consensus")
-        : "moderate asset uncertainty";
+      // name the binding constraint — whichever leg actually set assetSev
+      if (assetLevel < edgeStrength) {
+        const worst = Math.min(SEV[ptRisk], SEV[dis], role ? SEV[role.sev] : 2);
+        capped = SEV[ptRisk] === worst ? "playing-time / injury risk"
+          : (role && SEV[role.sev] === worst) ? "role stability (usage)"
+          : "you're the outlier vs consensus";
+      }
     }
-    return { assetConf, ptRisk, dis, gLow, gHigh, bandLow, bandHigh, recConf, capped, rookie, injuredNow };
+    return { assetConf, ptRisk, dis, role, gLow, gHigh, bandLow, bandHigh, recConf, capped, rookie, injuredNow };
   }
 
   function compute(p) {
@@ -223,6 +301,7 @@
       showRec ? `<span class="recbadge ${recCls}" title="${esc(edgeTitle)}">${rec}${conf?.recConf ? ` <span class="confdots" title="rec-confidence ${CONF_LABEL[conf.recConf - 1]}">${CONF_DOTS[conf.recConf - 1]}</span>` : ""}</span>` : "",
       ...p.flagged.map((f) => badge(f.slice(0, 3).toUpperCase(), "rbadge-risk", `${f} risk — see detail`)),
       p.unvetted ? badge("unvetted", "rbadge-unvetted", "Risk flags not yet researched — null, not clean") : "",
+      p.scouting_brief?.prose ? `<span class="rbadge rbadge-scout${p.scouting_brief.override_flag ? " scout-override" : ""}" title="${esc((p.scouting_brief.override_flag ? "⚑ role/scheme delta — revisit projection. " : "") + firstSentence(p.scouting_brief.prose))}">${p.scouting_brief.override_flag ? "⚑ scout" : "scout"}</span>` : "",
     ].join("");
     return `
     <div class="drow ${isTaken ? "taken" : ""}" data-id="${p.id}">
@@ -282,6 +361,95 @@
     </div>`;
   }
 
+  // Scouting brief (evidence layer): what the world says + scheme fit. Descriptive only — NEVER
+  // moves value/edge. role_stability feeds the valuation side's confidence band (via the data);
+  // scheme_fit + override_flag are the human "revisit his number" trigger.
+  const firstSentence = (s) => String(s ?? "").split(/(?<=[.!?])\s/)[0];
+  function scoutHTML(p) {
+    const s = p.scouting_brief;
+    if (!s || !s.prose) return `<div class="dscout dscout-null"><b>Scouting</b> <span class="nodata">not scouted yet</span> <span class="faint">— evidence layer (analyst/coach/player sentiment + scheme fit) pending</span></div>`;
+    const stale = s.as_of && (p.situation?.facts ?? []).some((f) => f.date > s.as_of);
+    const fitCls = s.scheme_fit === "plus" ? "fit-plus" : s.scheme_fit === "minus" ? "fit-minus" : "";
+    const chips = [
+      s.role_stability ? `<span class="scout-chip role-${esc(s.role_stability)}">role: ${esc(s.role_stability.replace("_", " "))}</span>` : "",
+      s.scheme_fit ? `<span class="scout-chip ${fitCls}">scheme fit: ${esc(s.scheme_fit)}</span>` : "",
+    ].join(" ");
+    const flags = [
+      s.override_flag ? `<span class="scout-flag override" title="Scouting flags a role/scheme delta the projection likely hasn't caught — revisit his number">⚑ revisit projection</span>` : "",
+      stale ? `<span class="scout-flag stale" title="nfl-events carries news dated after this brief — re-scout">⚠ fresh news since brief</span>` : "",
+    ].join("");
+    const srcs = (s.sources ?? []).map((src) => `<a href="${esc(src.url)}" target="_blank" rel="noopener" title="${esc([src.type, src.date].filter(Boolean).join(" · "))}">${esc(src.label)}</a>`).join(" · ");
+    return `<div class="dscout">
+      <div class="scout-head"><b>Scouting</b> <span class="faint">— what the world says · as of ${esc(s.as_of ?? "?")}</span> ${flags}</div>
+      <div class="scout-prose">${esc(s.prose)}</div>
+      <div class="scout-meta">${chips}${srcs ? ` · <span class="faint">sources:</span> ${srcs}` : ""}</div>
+    </div>`;
+  }
+
+  /* ---- historical usage panel (replaces the old placeholder context strip) ----
+     Three time-scales, per the design: the recent season's share/efficiency, the multi-year
+     DIRECTION, and last season's within-season trajectory. The draft view leads with the
+     multi-year read (you're betting a whole season); the within-season lens sits below it
+     (a strong finish is the sophomore-breakout signal). Waivers invert that in-season.
+     Every arrow is sample-gated upstream — where a trend isn't earned, the build emits a
+     reason and this renders "steady" or an honest no-data, never a fabricated arrow. */
+  const ARROW = { up: "▲", down: "▾", steady: "→" };
+  const pctS = (v) => v == null ? "–" : `${(v * 100).toFixed(0)}%`;
+  const dirClass = (d) => d === "up" ? "trend-up" : d === "down" ? "trend-down" : "trend-flat";
+  const STAT_ROWS = {
+    WR: [["target_share", "target share", pctS], ["snap_share", "snap share", pctS], ["catch_rate", "catch rate", pctS],
+         ["rz_tgt_share", "RZ tgt share", pctS], ["adot", "aDOT", (v) => v == null ? "–" : `${v} yd`], ["tgt_pg", "targets/g", (v) => v ?? "–"]],
+    RB: [["touch_share", "touch share", pctS], ["snap_share", "snap share", pctS], ["touch_pg", "touches/g", (v) => v ?? "–"],
+         ["rush_att_pg", "rush att/g", (v) => v ?? "–"], ["tgt_pg", "targets/g", (v) => v ?? "–"], ["rush_rz_att", "RZ carries", (v) => v ?? "–"]],
+    QB: [["snap_share", "snap share", pctS], ["pass_att_pg", "pass att/g", (v) => v ?? "–"],
+         ["rush_att_pg", "rush att/g", (v) => v ?? "–"], ["rush_yd", "rush yds", (v) => v ?? "–"]],
+  };
+  STAT_ROWS.TE = STAT_ROWS.WR;
+
+  function statsHTML(p) {
+    const u = p.usage;
+    if (!STAT_ROWS[p.pos]) return `<div class="dstats"><span class="ctxlabel">Historical usage</span>
+      <div class="statnone">${noData} — ${esc(p.pos)} has no usage profile (this position is scored on team/kicking events, not snaps or targets).</div></div>`;
+    if (!u || !Object.keys(u.seasons ?? {}).length) return `<div class="dstats"><span class="ctxlabel">Historical usage</span>
+      <div class="statnone">${noData} — ${p.rookie ? "rookie: no NFL usage history exists yet" : "no NFL usage on file for 2023–25"}. Role stability is treated as <b>unproven</b>, which widens the confidence band.</div></div>`;
+    const yrs = ["2023", "2024", "2025"].filter((y) => u.seasons[y]);
+    const rows = STAT_ROWS[p.pos];
+    const head = `<tr><th>metric</th>${yrs.map((y) => `<th>${y}</th>`).join("")}</tr>`;
+    const body = rows.map(([k, lab, fmt]) => {
+      if (yrs.every((y) => u.seasons[y][k] == null)) return "";
+      return `<tr><td class="statlab">${lab}</td>${yrs.map((y) => `<td class="mono">${u.seasons[y][k] == null ? '<span class="nodata">–</span>' : fmt(u.seasons[y][k])}</td>`).join("")}</tr>`;
+    }).join("");
+    const sample = `<tr class="statsample"><td class="statlab">games <span class="faint">(share sample)</span></td>${yrs.map((y) => `<td class="mono">${u.seasons[y].g}${u.seasons[y].share_g !== u.seasons[y].g ? ` <span class="faint">(${u.seasons[y].share_g})</span>` : ""}</td>`).join("")}</tr>`;
+
+    const d = u.direction;
+    const dirTxt = !d ? `<span class="nodata">no direction metric for this position</span>`
+      : d.direction == null ? `<span class="nodata">not claimed</span> <span class="faint">— ${esc(d.reason ?? "")}</span>`
+      : `<span class="${dirClass(d.direction)}">${ARROW[d.direction]} ${d.direction}</span> <span class="faint">— ${esc(d.metric.replace("_", " "))} ${d.metric.includes("share") ? pctS(d.from.value) + " → " + pctS(d.to.value) : d.from.value + " → " + d.to.value} (${d.from.year} → ${d.to.year}, ${d.from.g}/${d.to.g} games)${p.age ? `, age ${p.age}` : ""}</span>`;
+
+    const t = u.trend;
+    const trTxt = !t ? `<span class="nodata">no trend metric for this position</span>`
+      : t.direction == null ? `<span class="nodata">not claimed</span> <span class="faint">— ${esc(t.reason ?? "")}</span>`
+      : `<span class="${dirClass(t.direction)}">${ARROW[t.direction]} ${t.direction}</span> <span class="faint">— ${esc(t.metric.replace("_pg", "/g").replace("_", " "))} ${t.first.per_game} (wks ${esc(t.first.weeks)}) → ${t.last.per_game} (wks ${esc(t.last.weeks)}), Δ${t.delta > 0 ? "+" : ""}${t.delta}; gate ${esc(t.gate)}</span>`;
+    const cr = t?.catch_rate;
+    const crTxt = !cr ? "" : cr.direction == null
+      ? `<div class="statline faint">catch rate: <span class="nodata">not claimed</span> — ${esc(cr.reason ?? "")}</div>`
+      : `<div class="statline">catch rate: <span class="${dirClass(cr.direction)}">${ARROW[cr.direction]} ${cr.direction}</span> <span class="faint">${pctS(cr.first)} → ${pctS(cr.last)}</span></div>`;
+
+    const rv = revisitFlag(p);
+    const ls = u.last_season;
+    const role = p.conf?.role;
+    return `<div class="dstats">
+      <span class="ctxlabel">Historical usage <span class="faint">— evidence + a role-stability input to confidence. Never moves the value or the edge: the projection already prices raw share and age, so counting it twice would be double-dipping.</span></span>
+      ${rv ? `<div class="statrevisit" title="A flag for you, not an adjustment — nothing in the value changed">⚑ revisit his number — ${esc(rv.why)}</div>` : ""}
+      <table class="stattable">${head}${body}${sample}</table>
+      <div class="statline"><b>Multi-year direction</b> <span class="faint">(the season bet — leads on draft day)</span>: ${dirTxt}</div>
+      <div class="statline"><b>Within-season ${ls?.year ?? "2025"}</b> <span class="faint">(last 4 games vs first 4 — the finishing-form lens)</span>: ${trTxt}</div>
+      ${crTxt}
+      ${ls ? `<div class="statline faint">${ls.year} actual, this league's scoring: <b>${ls.pts}</b> pts in ${ls.g} games = <b>${ls.ppg}</b>/g · 2026 projection <b>${p.projection?.ppg ?? "–"}</b>/g</div>` : ""}
+      ${role ? `<div class="statline faint">Role stability → <b>${esc(role.sev === "none" ? "stable" : role.sev === "some" ? "some risk" : "high risk")}</b> (${esc(role.source)}): ${esc(role.why)}</div>` : ""}
+    </div>`;
+  }
+
   function detailHTML(p) {
     const a = p.availability ?? {};
     const gp = a.games_played ?? {};
@@ -289,6 +457,7 @@
     const notes = p.risk_flags?.notes ?? [];
     return `<div class="ddetail">
       ${p.adp_commentary ? `<div class="dcommentary"><b>Why here at ${esc(p.pos)}:</b> ${esc(p.adp_commentary)}</div>` : ""}
+      ${scoutHTML(p)}
       ${edgeExplainer(p)}
       <div class="dcol">
         <h4>Value <span class="faint">(Phase A · $-engine)</span></h4>
@@ -297,7 +466,7 @@
         <div><b>draft value:</b> <b>${fmtD(p.draftDollar)}</b> <span class="faint">${p.draftDollar != null && p.draftDollar < 1 ? "(proximity score — below the $1 startable line)" : `(${p.marginal ?? "–"} over free ${esc(p.pos)}${replRankUsed[p.pos] ?? "?"} @ ${replAsset[p.pos] ?? "?"})`}</span></div>
         <div><b>market:</b> ${fmtD(p.marketDollar)} at ADP ${p.adp?.half_ppr ?? "–"} → <b>edge ${p.draftDollar != null && p.draftDollar < 1 ? (p.edgePicks == null ? "–" : (p.edgePicks > 0 ? "+" : "") + Math.round(p.edgePicks) + "p") : edgeStr(p.edgeDollar)}</b> (${p.edgePicks == null ? "–" : (p.edgePicks > 0 ? "+" : "") + Math.round(p.edgePicks) + " picks"})</div>
         <div><b>recommendation:</b> <b class="${p.rec === "TARGET" ? "name-value" : p.rec === "FADE" ? "name-reach" : ""}">${p.rec ?? "–"}</b>${p.conf?.recConf ? ` · confidence ${CONF_LABEL[p.conf.recConf - 1]} <span class="confdots">${CONF_DOTS[p.conf.recConf - 1]}</span>${p.conf.capped ? ` <span class="faint">(capped: ${p.conf.capped})</span>` : ""}` : ""}</div>
-        <div><b>asset confidence:</b> ${p.conf?.assetConf ?? "–"} <span class="faint">· band ${fmtD(p.conf?.bandLow)}–${fmtD(p.conf?.bandHigh)} · PT ${p.conf?.gLow ?? "–"}–${p.conf?.gHigh ?? "–"} games · disagreement ${p.conf?.dis ?? "–"}</span></div>
+        <div><b>asset confidence:</b> ${p.conf?.assetConf ?? "–"} <span class="faint">= worst of three legs · playing-time risk <b>${p.conf?.ptRisk ?? "–"}</b> (${p.conf?.gLow ?? "–"}–${p.conf?.gHigh ?? "–"} games) · disagreement <b>${p.conf?.dis ?? "–"}</b> · role stability <b>${p.conf?.role?.sev ?? "n/a"}</b> · band ${fmtD(p.conf?.bandLow)}–${fmtD(p.conf?.bandHigh)}</span></div>
         <h4>Boris Chen (fftiers)</h4>
         ${p.fftiers ? `<div><b>consensus rank:</b> #${p.fftiers.rank} · tier ${p.fftiers.tier}</div>
         <div><b>expert avg:</b> ${p.fftiers.avg_rank} <span class="faint">(range ${p.fftiers.best_rank}–${p.fftiers.worst_rank}, std ${p.fftiers.std_dev})</span></div>
@@ -323,11 +492,7 @@
           p.flagged.length ? `<b class="flagged-txt">${p.flagged.map(esc).join(", ")}</b>` : "researched: clean"}</div>
         ${notes.map((n) => `<div class="fact faint">• ${esc(n)}</div>`).join("")}
       </div>
-      <div class="dcontext">
-        <span class="ctxlabel">context <span class="faint">— display only, never affects the value number</span></span>
-        ${[["contract_year", "contract yr"], ["rookie_capital", "draft capital"], ["team_win_total", "team win total"], ["playoff_sos", "playoff SOS"]]
-          .map(([k, lab]) => `<span class="ctxitem"><b>${lab}:</b> ${p.context?.[k] == null ? '<span class="nodata">pending</span>' : esc(String(p.context[k]))}</span>`).join("")}
-      </div>
+      ${statsHTML(p)}
     </div>`;
   }
 

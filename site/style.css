@@ -320,6 +320,12 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
 .knob .knoblab { color: var(--faint); white-space: nowrap; }
 .knob input[type="range"] { width: 88px; height: 18px; accent-color: var(--accent); cursor: pointer; }
 .knob .knobval { color: var(--accent); min-width: 118px; white-space: nowrap; font-size: 11px; text-transform: none; }
+/* at 375px the label + 88px slider + 118px readout overran the viewport by 2px; let the row wrap
+   and the readout give up its min-width rather than push the page into a horizontal scroll. */
+@media (max-width: 420px) {
+  .knob { flex-wrap: wrap; max-width: 100%; }
+  .knob .knobval { min-width: 0; }
+}
 
 .drow {
   display: grid; grid-template-columns: 40px minmax(0, 1fr);
@@ -370,6 +376,8 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
 .rbadge-risk { color: var(--neg); border-color: var(--neg); }
 .rbadge-unvetted { color: var(--faint); border-color: var(--border); }
 .rbadge-nodata { color: var(--warn); border-color: var(--border); }
+.rbadge-scout { color: var(--moss); border-color: var(--moss); }
+.rbadge-scout.scout-override { color: var(--warn); border-color: var(--warn); }
 .nodata { color: var(--warn); font-style: italic; }
 
 /* recommendation badge — the primary at-a-glance signal */
@@ -403,6 +411,32 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
   font-size: 13px; color: var(--text); line-height: 1.5;
 }
 .dcommentary b { color: var(--accent); }
+/* scouting brief — evidence layer (what the world says + scheme fit); descriptive, never moves value */
+.dscout {
+  grid-column: 1 / -1;
+  padding: 8px 10px; margin-bottom: 2px;
+  background: var(--surface); border-left: 2px solid var(--moss); border-radius: var(--radius);
+  font-size: 13px; color: var(--text); line-height: 1.5;
+}
+.dscout.dscout-null { color: var(--faint); border-left-color: var(--border); font-size: 12.5px; }
+.dscout .scout-head { font-size: 12px; }
+.dscout .scout-head b { color: var(--moss); }
+.dscout .scout-prose { margin: 4px 0; }
+.dscout .scout-meta { font-size: 11.5px; color: var(--faint); display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.dscout .scout-meta a { padding: 1px 0; }
+.scout-chip {
+  font-family: var(--font-data); font-size: 10px; text-transform: uppercase; letter-spacing: 0.04em;
+  border: 1px solid var(--border); border-radius: var(--radius); padding: 1px 6px; color: var(--dim);
+}
+.scout-chip.role-locked, .scout-chip.fit-plus { color: var(--accent); border-color: var(--accent); }
+.scout-chip.role-committee { color: var(--warn); border-color: var(--warn); }
+.scout-chip.role-in_flux, .scout-chip.fit-minus { color: var(--neg); border-color: var(--neg); }
+.scout-flag {
+  font-family: var(--font-data); font-size: 10px; font-weight: 600; margin-left: 6px;
+  padding: 1px 6px; border: 1px solid; border-radius: var(--radius); white-space: nowrap;
+}
+.scout-flag.override { color: var(--warn); border-color: var(--warn); }
+.scout-flag.stale { color: var(--faint); border-color: var(--border); }
 .gapexp {
   grid-column: 1 / -1;
   padding: 8px 10px; margin-bottom: 2px;
@@ -422,19 +456,39 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
 .ddetail .ftype { font-family: var(--font-data); font-size: 10px; color: var(--moss); }
 .faint { color: var(--faint); }
 
-/* context strip — display only, never feeds value */
-.dcontext {
+/* historical-usage panel — evidence + a role-stability input to confidence; never feeds value.
+   (Replaced the old placeholder context strip, which rendered "pending" for every player.) */
+.dstats {
   grid-column: 1 / -1;
-  display: flex; flex-wrap: wrap; gap: 5px 16px; align-items: baseline;
   margin-top: 6px; padding: 8px 10px;
   background: var(--surface); border-left: 2px solid var(--border); border-radius: var(--radius);
   font-size: 12px; color: var(--faint);
 }
-.dcontext .ctxlabel {
-  width: 100%; font-family: var(--font-data); font-size: 10px;
+.ctxlabel {
+  display: block; margin-bottom: 6px;
+  font-family: var(--font-data); font-size: 10px;
   text-transform: uppercase; letter-spacing: .08em; color: var(--dim);
 }
-.dcontext .ctxitem b { color: var(--dim); font-weight: 600; }
+.ctxlabel .faint { text-transform: none; letter-spacing: 0; font-family: var(--font-body); font-size: 11.5px; }
+.dstats .statnone { padding: 2px 0; color: var(--faint); }
+.stattable { border-collapse: collapse; margin: 2px 0 8px; width: 100%; max-width: 460px; }
+.stattable th, .stattable td { text-align: right; padding: 2px 8px 2px 0; font-size: 12px; }
+.stattable th {
+  font-family: var(--font-data); font-size: 10px; font-weight: 600; color: var(--moss);
+  text-transform: uppercase; letter-spacing: .06em; border-bottom: 1px solid var(--border);
+}
+.stattable th:first-child, .stattable td.statlab { text-align: left; color: var(--dim); }
+.stattable tr.statsample td { border-top: 1px solid var(--border); color: var(--faint); }
+.dstats .statline { padding: 2px 0; line-height: 1.5; }
+.dstats .statline b { color: var(--text); font-weight: 600; }
+.trend-up { color: var(--accent); font-weight: 600; }
+.trend-down { color: var(--neg); font-weight: 600; }
+.trend-flat { color: var(--dim); font-weight: 600; }
+.statrevisit {
+  margin: 2px 0 8px; padding: 5px 8px;
+  border: 1px solid var(--warn); border-radius: var(--radius);
+  color: var(--warn); font-size: 11.5px; line-height: 1.45;
+}
 
 .tierhead {
   display: flex; justify-content: space-between; align-items: baseline;

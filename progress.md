@@ -5,7 +5,7 @@ _Design of record: [`plans/valuation-and-scouting.md`](plans/valuation-and-scout
 
 ## TL;DR — current state
 
-The draft board runs a **3-layer valuation model** (asset → scarcity → auction-$ → market edge → recommendation + confidence), differentiated cleanly from the top of the board to the deepest bench dart. The `/waivers` command speaks the same language against the FAAB market (live once the season starts). Two pieces are **designed and confirmed but not yet built**: the historical-stats panel and the scouting-brief workstream (the latter forked to its own session).
+The draft board runs a **3-layer valuation model** (asset → scarcity → auction-$ → market edge → recommendation + confidence), differentiated cleanly from the top of the board to the deepest bench dart. The **historical-usage panel** now backs every drop-down with real share/efficiency evidence, gated trends, and a role-stability input to confidence. The `/waivers` command speaks the same language against the FAAB market (live once the season starts). The **scouting-brief workstream** is forked to its own session and in flight.
 
 ## What's built & live
 
@@ -17,6 +17,11 @@ The draft board runs a **3-layer valuation model** (asset → scarcity → aucti
 - **Ceiling** (spike-week rate, from Sleeper weekly 2023–25) is a **separate display attribute**, never a value input. **Availability** is a light median-games input + the Phase-B uncertainty band (no longer a value multiplier). A **scarcity (replacement-basis) knob** slides starters↔rostered.
 - Default sort = draft-$ (toggles: edge / ADP / BC). Every player's drop-down shows the full decomposition + justification — no black box.
 
+### Historical-usage panel (shipped 2026-07-22)
+- Replaced the placeholder `context` strip (it read "pending" for every player) with a real per-position usage panel: **recent-season shares/efficiency + a multi-year direction + a within-season trajectory**, all sample-gated. Full spec + calibration: [`plans/valuation-and-scouting.md`](plans/valuation-and-scouting.md) §1.9.
+- **Stats inform, they never move value** — the projection already prices raw share and age, so usage feeds only (a) evidence, (b) the **role-stability** leg of `confidence()` (worst-of with the scouting brief's `role_stability`), (c) a one-directional **"⚑ revisit his number"** override flag. Asset value and the edge are untouched.
+- Team-level denominators come from a **per-week team fingerprint** (`tm_off_snp|tm_def_snp|tm_st_snp` is identical across a team's players), so no historical roster data is needed and mid-season trades stay correct. Collided clusters and 2025-wk18's missing snap data are detected and excluded, which is why each season stamps both `g` and `share_g`.
+
 ### Data integrity
 - **`situation.facts` now match players by explicit `players[]` tags** on each `nfl-events.json` item (not surname substrings). Fixed the "Bijan showing Egbuka/Zac-Robinson news" class of bug across the whole board. The `nfl-daily-events` scheduled routine emits the tag going forward; existing events were backfilled.
 
@@ -25,20 +30,19 @@ The draft board runs a **3-layer valuation model** (asset → scarcity → aucti
 
 ## Designed & confirmed, NOT yet built
 
-- **Historical-stats panel** (replaces the placeholder `context` strip in the drop-down): target/snap/touch share, catch rate, aDOT, red-zone usage + a **multi-year direction** and a **within-season trajectory**, all sample-gated (default "steady," no fake trends). Role: **evidence + confidence + trajectory/override — never moves value** (the projection already prices raw share/age). Feeds confidence via the shared "role-stability" slot + an override hook. **Draft leans multi-year, waivers lean the recent trend.** Build touches `build-draft-board.mjs` (new stat computation — needs team-level totals) + `draft.js`. Full spec: `plans/valuation-and-scouting.md` (added during the grill) — implement next.
 - **Scouting-brief workstream** — forked to its own session via [`plans/scouting-fork-prompt.md`](plans/scouting-fork-prompt.md). `scouting_brief` = prose (analyst/coach/player sentiment + scheme fit) + `{role_stability, scheme_fit, override_flag}`. `role_stability` feeds confidence (worst-of with the historical-stats read); scheme_fit is descriptive + override-trigger. Never moves value. Deep-research seed over the top ~50, retrieval-grounded-or-null.
 
 ## Next steps (rough priority)
 
-1. **Build the historical-stats panel (B)** — the confirmed, self-contained next build.
-2. **Run the scouting fork** — hand `plans/scouting-fork-prompt.md` to a fresh session (coordinate: both it and the valuation session edit `draft.js`/`build-draft-board.mjs`).
-3. **In-season (Week 1+)**: wire the waiver **recent-snap-trend rate** into `/waivers`, and fold event-driven scouting synthesis into the `nfl-daily-events` routine.
-4. **At 2026 league renewal** (not created as of last check): run `get_user_leagues` (ThatWasButtery, 2026), update the league ID in **`CLAUDE.md`** and **`site/config.js`**, re-verify settings, and update `$leagueId` in `scripts/fetch-league-data.ps1`.
+1. **Finish the scouting fork** — in flight in its own session (`plans/scouting-fork-prompt.md`). It produces `scouting_brief.role_stability`, which `confidence()` **already consumes** (worst-of with the usage read) and degrades gracefully while it's absent — no further valuation-side work needed when it lands.
+2. **Waiver-side usage lens (in-season, Week 1+)**: the same usage pipeline exists at build time; `/waivers` should read the **recent** weeks (waivers lead with the current trend, the inverse of the draft view's multi-year lead) — plus fold event-driven scouting synthesis into `nfl-daily-events`.
+3. **At 2026 league renewal** — **re-checked 2026-07-22: still not created** (`get_user_leagues` returned empty). When it exists: update the league ID in **`CLAUDE.md`** and **`site/config.js`**, re-verify settings, update `$leagueId` in `scripts/fetch-league-data.ps1`, and refresh `data/raw/`.
+4. **Optional**: `context.*` (contract year, draft capital, win total, playoff SOS) is still `null` in the board and **no longer rendered anywhere** — the usage panel replaced the strip that displayed it. Either fill it or drop the field.
 
 ## Key files & tunables
 
 - **`site/draft.js`** — the whole client-side valuation engine (asset/scarcity/$/edge/confidence + rendering). Tunable constants at top: `EDGE_TARGET/FADE=±4`, `FADE_ADP=110`, `PICK_FADE=−25`, `BC_DIVERGE=15`, auction `BUDGET`, `STARTER_RANK`/`ROSTERED_RANK`.
-- **`scripts/build-draft-board.mjs`** — build-time data layer (projections re-scored to league format, ceiling metric, availability, `players[]`-tag matching). Regenerate: `node scripts/build-draft-board.mjs`.
+- **`scripts/build-draft-board.mjs`** — build-time data layer (projections re-scored to league format, ceiling metric, **historical usage + gated trends**, availability, `players[]`-tag matching). Regenerate: `node scripts/build-draft-board.mjs`. Usage gates are constants near the usage block: `MIN_SEASON_G`, `TREND_BLOCK`, `DIR_METRIC`, `TREND_METRIC`, `CR_MIN_TGT`, `MERGED_CLUSTER`.
 - **`.claude/commands/waivers.md`** — the in-season waiver command.
 - **`plans/valuation-and-scouting.md`** — design of record (§1 valuation is current; §2 scouting; §1.8 low-tier).
 - **`~/.claude/scheduled-tasks/nfl-daily-events/SKILL.md`** — the daily news routine (outside the repo).

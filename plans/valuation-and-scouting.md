@@ -81,35 +81,78 @@ The `$1` floor clipped ~60% of the board to an identical value (below replacemen
 
 Recommendation driver switches at $1: **`$`-edge above** (TARGET/FAIR/FADE), **pick-gap below**. A key calibration finding: a projection-based board is *structurally conservative on late-round upside* (the market drafts bench players on upside the projection can't see), so the sub-$1 pick-gap is one-directional — **no TARGET below $1**, only **FADE on real overpays** (a below-replacement projection the market spends a pick ≤110 on, ≥25 picks earlier than the board), and **ceiling is the late-round lens**. The FAIR badge is suppressed in the bench tier; the drop-down shows the proximity chain + the board-vs-ADP disparity + ceiling. Tunables: `FADE_ADP=110`, `PICK_FADE=−25`.
 
+### 1.9 Historical-usage panel — shipped 2026-07-22
+
+Replaced the placeholder `context` strip (which read "pending" for every player) in the drop-down.
+
+**Role — load-bearing: stats INFORM, they never MOVE value.** Sleeper's projection already prices raw
+target share and age, so feeding usage back in as a value multiplier would double-count it. Usage is
+therefore (a) transparent evidence, (b) a **role-stability** input to `confidence()`, (c) a
+trajectory/**override** signal. It never touches asset value or the edge.
+
+**Three time-scales**, per position — WR/TE: target share, snap share, catch rate, RZ target share, aDOT,
+targets/g · RB: touch share, snap share, touches/g, rush att/g, targets/g, RZ carries · QB: snap share,
+pass att/g, rush att/g, rush yds · K/DEF: honest "no usage profile". Plus a **multi-year direction**
+('23→'25, paired with age — leads on draft day) and a **within-season trajectory** (last 4 games vs
+first 4 of '25). Waivers invert the emphasis in-season.
+
+**Team denominators** (target/touch share) come from a **per-week team fingerprint**: every player on a
+team shares an identical `(tm_off_snp, tm_def_snp, tm_st_snp)` triple in a given week, so grouping by it
+yields team totals with no roster history and stays correct through mid-season trades. Two source
+defects are handled explicitly, not absorbed: **fingerprint collisions** (2 teams posting an identical
+triple merge into one ~96-player cluster — detected by size, dropped from share denominators) and
+**missing snap data** (2025 wk18 carries `tm_off_snp` for only 4 teams). Hence every season stamps both
+`g` (games played, the per-game basis) and `share_g` (share-valid weeks). Validated independently:
+Chase 2025 target share = 33.8% reproduced by a separate code path, and a clean cluster is
+unambiguously one team.
+
+**Everything is sample-gated** — direction needs 2+ seasons at 8+ games and a delta past a per-position
+threshold; the within-season split needs 8+ games; the catch-rate arrow needs 16+ targets in each
+block. Under-sampled ⇒ an explicit reason, never a fabricated arrow. (Working as intended: Josh Allen's
+−1.5 rush att/g is suppressed to "steady" at 19% relative, under the 25% gate.)
+
+**Confidence integration** — `assetConf = min(playing-time risk, disagreement, role stability)`, where
+role stability is the usage read folded **worst-of** with the scouting brief's qualitative
+`role_stability` (`locked/committee/in_flux`), degrading gracefully when that's absent. Bars are
+calibrated to the board's own 2025 distribution; **QB uses snap share, not pass attempts** (an attempts
+bar would wrongly flag run-first starters like Lamar Jackson at 23.2 att/g). Result: 63 stable / 100
+some-risk / 37 high-risk / 48 n/a, strictly binding for 7 players (e.g. CeeDee Lamb → Med on a
+30→27→23% target-share slide). Rec-confidence spread is unchanged (2 High / 16 Med / 30 Low) — it
+informs, it doesn't dominate.
+
+**Override hook** ("⚑ revisit his number") is **deliberately one-directional**: falling usage + a
+projection asking ≥15% MORE per game than last season's actual (6 of 248 — e.g. Montgomery, touch share
+28→19%, projection +16%). The mirror case was measured and **dropped**: it fired on 35 players
+(McCaffrey 0.70×, Gibbs 0.84×, Taylor 0.75×) because projections regress *every* career year, and its
+most extreme hits were backups where the projection is right and the raw usage read is naive.
+
 ## 2. Challenge 2 — `scouting_brief` (public commentary)
 
 ### 2.1 What it is
 
 A new, **distinct per-player field** — *not* merged into `adp_commentary`. It is the **evidence layer** (what the world says) that sits beside the **verdict layer** (`adp_commentary` = what you concluded). Keeping them separate preserves "the market thinks X, but I think Y" — the disagreement the gap system exploits.
 
-Content: 1–5 sentences on external sentiment + scheme fit, **sourced + dated**. Doubles as the **audit trail** for any `situation.modifier` nudge.
+Content: 1–5 sentences on external sentiment + scheme fit, **sourced + dated** (scheme-fit first, then sentiment, then watch/risk). It **never moves value or the edge** — it feeds the *confidence band* (via `role_stability`) and flags a human revisit (via `override_flag`). See §2.5.
 
-### 2.2 Shape (M2): prose + signal sidecar
+### 2.2 Shape (reconciled — shipped 2026-07-21)
 
-Generated together, from the same sources, in one synthesis pass:
+Generated together, from the same sources, in one pass. The signal fields are **evidence about trust and fit**, not a value multiplier:
 
 ```json
 "scouting_brief": {
   "prose": "Scheme-fit first, then sentiment, then watch/risk. 1–5 sentences.",
-  "signal": {
-    "direction": "positive | neutral | negative",
-    "magnitude": "none | slight | moderate",
-    "rationale": "one line: the delta vs what the projection already assumes"
-  },
-  "sources": [
-    { "label": "The Athletic", "url": "…", "date": "YYYY-MM-DD", "type": "coach | beat | analyst | player" }
-  ],
+  "role_stability": "locked | committee | in_flux",   // will he hold the job/role
+  "scheme_fit": "plus | neutral | minus",             // does the scheme suit him
+  "override_flag": false,                              // true = a ROLE/SCHEME DELTA the projection likely hasn't caught → a human revisits his number
+  "rationale": "one line: the delta, or why null",
+  "sources": [{ "label": "The Athletic", "url": "…", "date": "YYYY-MM-DD", "type": "coach|beat|analyst|player" }],
   "as_of": "YYYY-MM-DD"
 }
 ```
 
-- **prose** renders to the user (detail block + hover tooltip). Coverage enforced by content rules (must address scheme fit + sentiment when sources exist), not visible sub-headers — readable, not robotic.
-- **signal** is machine-read by the build script to set `situation.modifier` (M3). Born with the prose, so the two can never disagree.
+- **prose** renders to the user (detail block + hover-tooltip first sentence), scheme-fit first. Sourced + dated, or `null` — never synthesized from memory.
+- **role_stability** is the one signal that touches the model: the valuation side's `roleStability()`/`confidence()` folds it **worst-of** with its own quantitative usage read, so a `committee`/`in_flux` role can *widen the band and cap a recommendation* — but it can **never** move the asset value or the edge.
+- **scheme_fit** + **override_flag** are descriptive + the human revisit trigger; they do not enter confidence.
 
 ### 2.3 Scope (tiered) + sources
 
@@ -125,21 +168,15 @@ Generated together, from the same sources, in one synthesis pass:
 - **Seed (one-time, pre-draft):** a bulk pass with the existing **`deep-research` skill** (fan-out searches → fetch → *adversarially verify* → cited synthesis) over the top ~50, establishing every baseline brief. The adversarial-verify step *is* the sourcing guarantee. Timing floats with the draft date (2026 league not yet renewed) — target ~2–3 weeks out, once ADP stabilizes.
 - **Maintain (ongoing):** folded into the daily `nfl-daily-events` routine. **Retrieval-grounded-or-null** is forced (ground rule #2): synthesis happens *only* from sources fetched/harvested at that moment, cited + dated; **no synthesis from model memory**; no usable sources → `null`. Trigger = **event-driven** (re-synthesize when the harvest flags fresh news — the event *is* the citation) **+ a staggered ~7-of-50/day backstop** for standing scheme-fit drift. Cost is bounded (~7–15 grounded syntheses/day, not 50).
 
-### 2.5 The bridge (M3): sidecar → `situation.modifier`
+### 2.5 How it feeds the model (reconciled — replaces the old `situation.modifier` bridge)
 
-**Discrete lookup table** (deterministic + auditable, not a free-floating LLM number):
+The valuation redesign **deleted the `situation.modifier` value-multiplier**, so scouting no longer moves the number. The old direction/magnitude → ×-table below is retired. Instead:
 
-| direction \ magnitude | slight | moderate |
-|---|---|---|
-| positive | ×1.03 | ×1.07 |
-| neutral | ×1.00 | ×1.00 |
-| negative | ×0.97 | ×0.93 |
+- **`role_stability` → confidence band.** The valuation side's `roleStability()` maps `locked→none / committee→some / in_flux→high` severity and folds it **worst-of** with its quantitative usage-stability read (falling back to usage alone when the brief is absent). This can widen the uncertainty band and cap rec-confidence — **never** the asset value or edge.
+- **`override_flag` → human revisit.** When scouting sees a genuine role/scheme delta the projection likely hasn't caught (e.g. Achane: McDaniel gone + a rushing QB eating checkdowns/goal-line), a **⚑ "revisit projection"** flags it. A human acts; the board never auto-adjusts.
+- **`scheme_fit`** is descriptive prose colour only.
 
-Hard clamp **[0.90, 1.10]** (safety net the table never reaches). `null` brief → `null` modifier → ×1.
-
-**The double-count guard (the #1 correctness rule):** the sidecar rates `direction/magnitude` as the **delta vs what the projection already assumes**, *not* the raw goodness of the news. "Coach confirms he's the workhorse" when Sleeper already projects him the workhorse = `neutral`, not positive. The synthesis step is fed the projection's implied role as an explicit baseline and rates the gap against it. Getting this wrong would silently re-count role expectations already in the projection and destroy value independence — so it's the thing to test hardest.
-
-**Governance:** automated (table lookup off the sidecar), bounded by the clamp, fully transparent — `rationale + sources + as_of` always render beside any non-1.0 modifier. Seed pass gets adversarial verification; ongoing updates lean on clamp + transparency. No mandatory human gate. Stale brief → modifier *holds* until re-synthesized (staleness flag prompts refresh); no time-decay.
+**Value independence (load-bearing):** scouting is the *evidence* layer — it informs *trust* (confidence via `role_stability`), prompts *human* revisits (`override_flag`), and *reads* as prose. It is never a value multiplier. That firewall is what the whole 3-layer model's honesty depends on; the old double-count guard is subsumed by simply not letting scouting touch the number at all.
 
 ### 2.6 Render + storage
 

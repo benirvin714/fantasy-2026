@@ -177,14 +177,28 @@ function situationFacts(name, pos) {
 const SPIKE_RANK = 5;        // a spike week ~ a top-5 weekly finish at the position
 const MIN_CEIL_WEEKS = 10;   // fewer real games than this -> null (no stable estimate)
 const CEIL_POS = ["QB", "RB", "WR", "TE"];
-let ceilingById = new Map(), ceilingPosAvg = {}, ceilingStatus = "ok", ceilingBoomLine = {};
-try {
+
+// ---- shared weekly pull (2023-25) --------------------------------------------
+// One fetch, two consumers: the ceiling metric below and the historical-usage panel
+// further down. 54 week-files; each is a { player_id: statline } map.
+const YEARS = ["2023", "2024", "2025"], WEEKS = Array.from({ length: 18 }, (_, i) => i + 1);
+let weeklyByYear = null, weeklyStatus = "ok";
+{
   const t0 = Date.now();
-  const YEARS = ["2023", "2024", "2025"], WEEKS = Array.from({ length: 18 }, (_, i) => i + 1);
-  const weekly = await Promise.all(
-    YEARS.flatMap((y) => WEEKS.map((w) =>
-      get(`https://api.sleeper.app/v1/stats/nfl/regular/${y}/${w}`).catch(() => ({}))))
-  );
+  try {
+    const flat = await Promise.all(
+      YEARS.flatMap((y) => WEEKS.map((w) =>
+        get(`https://api.sleeper.app/v1/stats/nfl/regular/${y}/${w}`).catch(() => ({}))))
+    );
+    weeklyByYear = Object.fromEntries(YEARS.map((y, i) => [y, flat.slice(i * WEEKS.length, (i + 1) * WEEKS.length)]));
+    console.log(`weekly: ${flat.length} week-files fetched in ${((Date.now() - t0) / 1000).toFixed(1)}s`);
+  } catch (e) { weeklyStatus = `weekly fetch failed: ${e.message}`; console.log(`weekly: ${weeklyStatus}`); }
+}
+
+let ceilingById = new Map(), ceilingPosAvg = {}, ceilingBoomLine = {}, ceilingStatus = weeklyStatus === "ok" ? "ok" : weeklyStatus;
+try {
+  if (!weeklyByYear) throw new Error(weeklyStatus);
+  const weekly = YEARS.flatMap((y) => weeklyByYear[y]);
   const posOf = (id) => players[id]?.position ?? null;
   const perPlayer = new Map();   // id -> [weekly league pts]
   const perPosWeek = new Map();  // `${pos}|${weekIdx}` -> [all scores that week]
@@ -228,8 +242,165 @@ try {
     const a = posRates[pos];
     ceilingPosAvg[pos] = a.length ? +(a.reduce((x, y) => x + y, 0) / a.length).toFixed(3) : null;
   }
-  console.log(`ceiling: ${weekly.length} weeks fetched in ${((Date.now() - t0) / 1000).toFixed(1)}s, ${ceilingById.size} players scored, boom lines ${JSON.stringify(ceilingBoomLine)}, pos avg ${JSON.stringify(ceilingPosAvg)}`);
-} catch (e) { ceilingStatus = `weekly fetch/compute failed: ${e.message}`; console.log(`ceiling: ${ceilingStatus}`); }
+  console.log(`ceiling: ${weekly.length} weeks scored, ${ceilingById.size} players, boom lines ${JSON.stringify(ceilingBoomLine)}, pos avg ${JSON.stringify(ceilingPosAvg)}`);
+} catch (e) { ceilingStatus = `weekly compute failed: ${e.message}`; console.log(`ceiling: ${ceilingStatus}`); }
+
+// ---- historical usage: evidence + confidence input, NEVER a value input ------
+// Role of this block (design of record, plans/handoff-stats-and-renewal.md): Sleeper's
+// projection ALREADY prices raw target share and age, so feeding usage back in as a value
+// multiplier would double-count. Usage is therefore (a) transparent evidence in the panel,
+// (b) a role-stability input to the client's confidence band, (c) a trajectory/override
+// signal. It never touches asset value or the edge.
+//
+// Team denominators (target share, touch share) need per-season team totals, which Sleeper
+// does not expose and the players endpoint can't supply (its `team` is the CURRENT team, so
+// it misattributes past seasons for anyone who moved). Solution: within a single week every
+// player on a team carries an IDENTICAL (tm_off_snp, tm_def_snp, tm_st_snp) triple, so that
+// triple is a per-week team fingerprint. Grouping by it yields team totals without any roster
+// history and stays correct through mid-season trades.
+//
+// Two source defects this handles explicitly rather than absorbing:
+//   1. Fingerprint collisions. Twice in 54 weeks (2023 wk13, 2024 wk14) two teams posted an
+//      identical snap triple, merging into one ~96-player cluster (a real one is ~46-50). Left
+//      alone that halves those teams' shares for the week, so oversized clusters are detected
+//      and those weeks are dropped from the SHARE denominators.
+//   2. Missing snap data. 2025 wk18 carries tm_off_snp for only 4 teams. So a game is counted
+//      from any line with gp>=1, and only the share/snap components require a valid fingerprint.
+// Per-game rates therefore run over games played, while shares run over share-valid weeks —
+// which is why every season carries both `g` and `share_g`.
+const MERGED_CLUSTER = 70;   // a real team-week cluster is ~46-50 lines; >= this means two merged
+const USAGE_POS = ["QB", "RB", "WR", "TE"];
+const MIN_SEASON_G = 8;   // a season counts toward the multi-year direction only at/above this
+const TREND_BLOCK = 4;    // within-season = last 4 games played vs first 4
+// multi-year direction: [metric, threshold to call a direction at all]
+const DIR_METRIC = { WR: ["target_share", 0.030], TE: ["target_share", 0.030], RB: ["touch_share", 0.040], QB: ["rush_att_pg", 1.5] };
+// within-season trend: [metric, min absolute per-game delta, min relative delta]
+const TREND_METRIC = { WR: ["tgt_pg", 1.5, 0.20], TE: ["tgt_pg", 1.5, 0.20], RB: ["touch_pg", 2.0, 0.20], QB: ["rush_att_pg", 1.5, 0.25] };
+const CR_MIN_TGT = 16;    // catch-rate arrow only when EACH half clears this target volume
+const CR_DELTA = 0.07;
+let usageById = new Map(), usageStatus = weeklyStatus === "ok" ? "ok" : weeklyStatus, clusterWarn = [];
+try {
+  if (!weeklyByYear) throw new Error(weeklyStatus);
+  const acc = new Map();   // id -> { year -> season aggregate }
+  const wk25 = new Map();  // id -> [{ w, tgt, rec, touch, ru }] for the within-season trend
+  for (const y of YEARS) {
+    weeklyByYear[y].forEach((wk, wi) => {
+      const fp = (l) => `${l.tm_off_snp}|${l.tm_def_snp}|${l.tm_st_snp}`;
+      const teams = new Map();
+      for (const l of Object.values(wk)) {
+        if (l.tm_off_snp == null) continue;
+        const t = teams.get(fp(l)) ?? { tgt: 0, rz: 0, ru: 0, n: 0 };
+        t.tgt += l.rec_tgt ?? 0; t.rz += l.rec_rz_tgt ?? 0; t.ru += l.rush_att ?? 0; t.n++;
+        teams.set(fp(l), t);
+      }
+      const merged = [...teams.values()].filter((t) => t.n >= MERGED_CLUSTER).length;
+      if (merged) clusterWarn.push(`${y} wk${wi + 1}: ${merged} collided cluster(s) dropped from share denominators`);
+      for (const [id, l] of Object.entries(wk)) {
+        if (!(l.gp >= 1)) continue;
+        if (!USAGE_POS.includes(players[id]?.position)) continue;
+        const t0 = l.tm_off_snp != null ? teams.get(fp(l)) : null;
+        const t = t0 && t0.n < MERGED_CLUSTER ? t0 : null;   // null = no trustworthy team denominator this week
+        let byYear = acc.get(id); if (!byYear) { byYear = {}; acc.set(id, byYear); }
+        const a = byYear[y] ?? (byYear[y] = { g: 0, shareG: 0, snp: 0, tm_snp: 0, tgt: 0, rec: 0, air: 0, rz: 0, ru: 0, ruz: 0, ruyd: 0, pa: 0, s_tgt: 0, s_rz: 0, s_touch: 0, t_tgt: 0, t_rz: 0, t_touch: 0 });
+        a.g++;
+        a.tgt += l.rec_tgt ?? 0; a.rec += l.rec ?? 0; a.air += l.rec_air_yd ?? 0; a.rz += l.rec_rz_tgt ?? 0;
+        a.ru += l.rush_att ?? 0; a.ruz += l.rush_rz_att ?? 0; a.ruyd += l.rush_yd ?? 0; a.pa += l.pass_att ?? 0;
+        if (t) {
+          a.shareG++; a.snp += l.off_snp ?? 0; a.tm_snp += l.tm_off_snp ?? 0;
+          a.s_tgt += l.rec_tgt ?? 0; a.s_rz += l.rec_rz_tgt ?? 0; a.s_touch += (l.rush_att ?? 0) + (l.rec_tgt ?? 0);
+          a.t_tgt += t.tgt; a.t_rz += t.rz; a.t_touch += t.tgt + t.ru;
+        }
+        if (y === "2025") {
+          const arr = wk25.get(id) ?? [];
+          arr.push({ w: wi + 1, tgt: l.rec_tgt ?? 0, rec: l.rec ?? 0, touch: (l.rush_att ?? 0) + (l.rec_tgt ?? 0), ru: l.rush_att ?? 0 });
+          wk25.set(id, arr);
+        }
+      }
+    });
+  }
+  const MIN_SHARE_G = 4;    // fewer share-valid weeks than this -> no share claimed
+  const sh = (a, n, d) => (a.shareG >= MIN_SHARE_G && d ? +(n / d).toFixed(3) : null);
+  const pg = (n, g) => (g ? +(n / g).toFixed(1) : null);
+  const metrics = (a, pos) => {
+    const m = { g: a.g, share_g: a.shareG, snap_share: sh(a, a.snp, a.tm_snp) };
+    if (pos === "WR" || pos === "TE") Object.assign(m, {
+      target_share: sh(a, a.s_tgt, a.t_tgt), tgt_pg: pg(a.tgt, a.g),
+      catch_rate: a.tgt ? +(a.rec / a.tgt).toFixed(3) : null,
+      adot: a.tgt ? +(a.air / a.tgt).toFixed(1) : null,
+      rz_tgt: a.rz, rz_tgt_share: sh(a, a.s_rz, a.t_rz),
+    });
+    if (pos === "RB") Object.assign(m, {
+      touch_share: sh(a, a.s_touch, a.t_touch), touch_pg: pg(a.ru + a.tgt, a.g),
+      rush_att_pg: pg(a.ru, a.g), tgt_pg: pg(a.tgt, a.g),
+      rush_rz_att: a.ruz, target_share: sh(a, a.s_tgt, a.t_tgt),
+    });
+    if (pos === "QB") Object.assign(m, {
+      pass_att_pg: pg(a.pa, a.g), rush_att_pg: pg(a.ru, a.g), rush_yd: a.ruyd,
+    });
+    return m;
+  };
+  for (const [id, byYear] of acc) {
+    const pos = players[id]?.position;
+    const seasons = {};
+    for (const y of YEARS) if (byYear[y]) seasons[y] = metrics(byYear[y], pos);
+    // --- multi-year direction: GATED. Needs >= 2 seasons at >= MIN_SEASON_G games, and a
+    // delta past the threshold; otherwise "steady" or an honest null — never a fake arrow.
+    const [dm, dthr] = DIR_METRIC[pos] ?? [];
+    const qual = YEARS.filter((y) => seasons[y] && seasons[y].g >= MIN_SEASON_G && seasons[y][dm] != null);
+    let direction = null;
+    if (dm && qual.length >= 2) {
+      const from = qual[0], to = qual[qual.length - 1];
+      const d = +(seasons[to][dm] - seasons[from][dm]).toFixed(3);
+      direction = {
+        metric: dm, from: { year: from, value: seasons[from][dm], g: seasons[from].g },
+        to: { year: to, value: seasons[to][dm], g: seasons[to].g },
+        delta: d, direction: d >= dthr ? "up" : d <= -dthr ? "down" : "steady", threshold: dthr,
+      };
+    } else if (dm) {
+      direction = { metric: dm, direction: null, reason: `only ${qual.length} season(s) with ${MIN_SEASON_G}+ games — no direction claimed` };
+    }
+    // --- within-season trend (2025): last 4 games played vs first 4. Needs 2*TREND_BLOCK
+    // games so the halves never overlap. Catch rate gets an arrow only at real target volume.
+    const [tm, tabs, trel] = TREND_METRIC[pos] ?? [];
+    const lines = (wk25.get(id) ?? []).sort((a, b) => a.w - b.w);
+    let trend = null;
+    if (tm && lines.length >= TREND_BLOCK * 2) {
+      const first = lines.slice(0, TREND_BLOCK), last = lines.slice(-TREND_BLOCK);
+      const key = tm === "tgt_pg" ? "tgt" : tm === "touch_pg" ? "touch" : "ru";
+      const avg = (arr) => +(arr.reduce((s, l) => s + l[key], 0) / arr.length).toFixed(1);
+      const fv = avg(first), lv = avg(last), d = +(lv - fv).toFixed(1);
+      const rel = fv > 0 ? Math.abs(d) / fv : 1;
+      let cr = null;
+      if ((pos === "WR" || pos === "TE")) {
+        const ft = first.reduce((s, l) => s + l.tgt, 0), lt = last.reduce((s, l) => s + l.tgt, 0);
+        if (ft >= CR_MIN_TGT && lt >= CR_MIN_TGT) {
+          const fc = first.reduce((s, l) => s + l.rec, 0) / ft, lc = last.reduce((s, l) => s + l.rec, 0) / lt;
+          const cd = +(lc - fc).toFixed(3);
+          cr = { first: +fc.toFixed(3), last: +lc.toFixed(3), delta: cd, direction: cd >= CR_DELTA ? "up" : cd <= -CR_DELTA ? "down" : "steady" };
+        } else cr = { direction: null, reason: `under ${CR_MIN_TGT} targets in a 4-game block — catch-rate trend not claimed` };
+      }
+      trend = {
+        season: "2025", metric: tm, games: lines.length,
+        first: { games: TREND_BLOCK, per_game: fv, weeks: `${first[0].w}-${first[TREND_BLOCK - 1].w}` },
+        last: { games: TREND_BLOCK, per_game: lv, weeks: `${last[0].w}-${last[TREND_BLOCK - 1].w}` },
+        delta: d, direction: (Math.abs(d) >= tabs && rel >= trel) ? (d > 0 ? "up" : "down") : "steady",
+        gate: `|Δ| >= ${tabs}/g and >= ${Math.round(trel * 100)}% relative`,
+        catch_rate: cr,
+      };
+    } else if (tm) {
+      trend = { season: "2025", metric: tm, direction: null, games: lines.length, reason: `${lines.length} games played — needs ${TREND_BLOCK * 2} for a first-4 vs last-4 split` };
+    }
+    // last season's ACTUAL league-scored production — the baseline the projection is checked against
+    const act = s25[id];
+    const actPts = act ? rescore(act, pos) : null;
+    usageById.set(id, {
+      seasons, direction, trend,
+      last_season: actPts != null && act.gp ? { year: 2025, pts: actPts, g: act.gp, ppg: +(actPts / act.gp).toFixed(1) } : null,
+      method: "weekly stats 2023-25; team totals from the per-week (tm_off_snp,tm_def_snp,tm_st_snp) fingerprint; shares measured over games played",
+    });
+  }
+  console.log(`usage: ${usageById.size} players, ${clusterWarn.length} weeks with a possible team-fingerprint collision${clusterWarn.length ? ` (${clusterWarn.slice(0, 5).join("; ")})` : ""}`);
+} catch (e) { usageStatus = `usage compute failed: ${e.message}`; console.log(`usage: ${usageStatus}`); }
 
 // ---- build the pool ----------------------------------------------------------
 const ranked = (posList, n) => Object.entries(players)
@@ -293,8 +464,10 @@ const rows = [...skill, ...kickers, ...defs].map(([id, p]) => {
     risk_flags: rx.risk_flags ?? { suspension: null, contract: null, legal: null, researched: false, notes: [] },
     adp: { half_ppr: adp, updated: TODAY },
     adp_commentary: rx.adp_commentary ?? null,
+    scouting_brief: rx.scouting_brief ?? null, // evidence layer: what analysts/coaches/players say + scheme fit; null = not scouted (overlay-merged, survives rebuilds)
     fftiers: fftMap.get(normName(name)) ?? null, // Boris Chen half-PPR consensus rank+tier; null = not in his top-200
     ceiling: ceilingById.get(id) ?? null, // weekly spike-week rate; null = thin sample (rookie) or fetch failure
+    usage: usageById.get(id) ?? null, // historical share/efficiency + gated trends; null = rookie/K/DEF (no NFL usage) — EVIDENCE + confidence only, never a value input
     context: { contract_year: null, rookie_capital: null, team_win_total: null, playoff_sos: null },
   };
 });
@@ -305,7 +478,16 @@ const board = {
   pool: `top ${POOL_SIZE} by Sleeper search_rank + 32 DEF`,
   fftiers: { source: "Boris Chen fftiers (FantasyPros consensus, GMM tiers), half-PPR draft board", status: fftStatus, updated: TODAY, matched: rows.filter((r) => r.fftiers).length },
   ceiling: { source: "Sleeper weekly stats 2023-25 re-scored; spike week = top-5 weekly finish at position", status: ceilingStatus, pos_avg: ceilingPosAvg, boom_line: ceilingBoomLine, spike_rank: SPIKE_RANK, min_weeks: MIN_CEIL_WEEKS, scored: rows.filter((r) => r.ceiling).length, updated: TODAY },
+  usage: {
+    source: "Sleeper weekly stats 2023-25; team totals via the per-week (tm_off_snp,tm_def_snp,tm_st_snp) team fingerprint",
+    role: "EVIDENCE + confidence (role-stability) + trajectory/override only — never an input to asset value or the edge (the projection already prices raw share and age)",
+    status: usageStatus, players: usageById.size, updated: TODAY,
+    gates: { min_season_games: MIN_SEASON_G, trend_block: TREND_BLOCK, direction_thresholds: DIR_METRIC, trend_thresholds: TREND_METRIC, catch_rate_min_targets: CR_MIN_TGT },
+    cluster_warnings: clusterWarn,
+  },
   gaps: [
+    { field: "usage (rookies / K / DEF)", status: "null by design", fill: "no NFL usage history exists (or the position has none); page shows no-data" },
+    { field: "usage.direction / usage.trend", status: "null when under-sampled", fill: `direction needs 2+ seasons at ${MIN_SEASON_G}+ games; trend needs ${TREND_BLOCK * 2}+ games in 2025 — no arrow is claimed below that` },
     { field: "ceiling (rookies / thin sample)", status: "null by design", fill: `<${MIN_CEIL_WEEKS} career weeks -> no stable spike-rate; page shows no-data` },
     { field: "availability.injury_history", status: `researched for top ~35 (overlay); ${Object.keys(research).length} players in draft-research.json`, fill: "extend the web research pass deeper than ~35 as draft nears" },
     { field: "availability.score (rookies)", status: "null by design", fill: "no NFL history exists; page shows no-data" },
@@ -327,6 +509,13 @@ const sanity = rows.filter((r) => r.projection.pts != null && r.projection.sleep
   .map((r) => Math.abs(r.projection.pts - r.projection.sleeper_half_ppr));
 console.log(`skill re-score vs sleeper_half_ppr: max diff ${Math.max(...sanity).toFixed(1)}, mean ${(sanity.reduce((a, b) => a + b, 0) / sanity.length).toFixed(2)}`);
 console.log(`fftiers: status=${fftStatus}, csv-rows=${fftMap.size}, matched to board=${rows.filter((r) => r.fftiers).length}`);
+// usage sanity: team-fingerprint shares must reproduce known 2025 anchors (Chase target share ~32.6%).
+for (const nm of ["Ja'Marr Chase", "Bijan Robinson", "Josh Allen"]) {
+  const r = rows.find((x) => x.name === nm), s = r?.usage?.seasons?.["2025"];
+  if (!s) { console.log(`usage anchor ${nm}: no 2025 usage`); continue; }
+  console.log(`usage anchor ${nm}: g=${s.g} snap=${s.snap_share} tgt_share=${s.target_share ?? "-"} touch_share=${s.touch_share ?? "-"} dir=${r.usage.direction?.direction ?? "null"} trend=${r.usage.trend?.direction ?? "null"}`);
+}
+console.log(`usage: ${rows.filter((r) => r.usage).length}/${rows.length} board players have usage; direction claimed for ${rows.filter((r) => r.usage?.direction?.direction).length}, trend claimed for ${rows.filter((r) => r.usage?.trend?.direction).length}`);
 // unmatched fftiers players in the ADP<=120 range = likely name-normalization misses worth checking
 const boardNorms = new Set(rows.map((r) => normName(r.name)));
 const unmatched = [...fftMap.entries()].filter(([n, v]) => v.rank <= 130 && !boardNorms.has(n)).map(([, v]) => v).slice(0, 15);
