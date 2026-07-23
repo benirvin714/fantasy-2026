@@ -30,7 +30,14 @@
   /* ---------- the value engine (transparent, in one place) ---------- */
   // Replacement (scarcity) line per position; the knob slides between the STARTER line
   // (last weekly starter — default) and the ROSTERED line (last rostered / best free agent).
-  const STARTER_RANK = { QB: 11, RB: 30, WR: 32, TE: 11, K: 11, DEF: 11 };
+  // STARTER_RANK is MEASURED, not assumed: data/flex-split.json counts every FLEX slot this
+  // league has ever started (1,640 slot-weeks, 2020-25) -> RB 40.1% / WR 57.7% / TE 2.2%,
+  // giving effective starters per team of QB 1.00, RB 2.80, WR 3.15, TE 1.04.
+  // Rank = round(effective_starters x 10 teams) + 1, the +1 being "the streamer you'd
+  // actually start" — the first player past the weekly starter pool. Re-derive with
+  // node scripts/measure-flex-split.mjs if the league size or FLEX count ever changes.
+  // QB/TE/K/DEF were already correct at 11 (10 starters + 1); RB was 30 and WR 32.
+  const STARTER_RANK = { QB: 11, RB: 29, WR: 33, TE: 11, K: 11, DEF: 11 };
   const ROSTERED_RANK = { QB: 13, RB: 46, WR: 47, TE: 13, K: 11, DEF: 11 };
   const replRankFor = (ps, t) => Math.max(1, Math.round(STARTER_RANK[ps] + (ROSTERED_RANK[ps] - STARTER_RANK[ps]) * t));
   // Light playing-time model (Q3): median stays near-full; only documented injury/age move it.
