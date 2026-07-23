@@ -332,7 +332,15 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
   border-bottom: 1px solid var(--border);
 }
 .drow:last-child { border-bottom: none; }
-.drow.dhead { border-bottom: 1px solid var(--border); }
+/* column header locks to the top on scroll. The toolbar above is already sticky at top:0
+   (z-index 10), so this parks just beneath it at the JS-measured toolbar height (--toolbar-h,
+   kept current on resize) and sits at a lower z-index so the toolbar always wins where they meet.
+   Opaque background so list rows scroll invisibly underneath. */
+.drow.dhead {
+  position: sticky; top: var(--toolbar-h, 0); z-index: 6;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
 .drow .take {
   width: 28px; height: 28px; margin: auto 6px;
   background: var(--surface-2); color: var(--accent);
@@ -350,13 +358,22 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
 .drow .dr { font-family: var(--font-data); font-size: 12px; color: var(--faint); min-width: 34px; font-variant-numeric: tabular-nums; }
 .drow .dname { font-weight: 600; font-size: 15px; }
 .drow .dpos { font-family: var(--font-data); font-size: 11px; color: var(--moss); }
-.drow .dval { margin-left: auto; font-size: 13px; color: var(--text); min-width: 48px; text-align: right; }
+/* metric cluster, right-aligned. BC is the primary board (its own line), so it anchors the cluster
+   (margin-left:auto) and is rendered prominently; the rest are supporting reads. Order left→right:
+   BC · BC−adp · adp · $val · edge · ceil. */
+.drow .dbc { margin-left: auto; font-size: 14px; font-weight: 700; color: var(--text); min-width: 52px; text-align: right; }
+.drow .dbc .bctier { color: var(--faint); font-size: 10px; font-weight: 400; margin-left: 3px; }
+.drow .dbcdiff { font-size: 13px; min-width: 50px; text-align: right; color: var(--faint); }
+/* value/reach tint must out-specify the .drow .dbcdiff base color (both 0,2,0) — the same
+   two-class specificity trap the featured-panel border hit; scope them to the cell. */
+.drow .dbcdiff.name-value { color: var(--blue); }
+.drow .dbcdiff.name-reach { color: var(--neg); }
 .drow .dadp { font-size: 13px; color: var(--faint); min-width: 44px; text-align: right; }
+.drow .dval { font-size: 13px; color: var(--dim); min-width: 48px; text-align: right; }
 .drow .dgap { font-size: 13px; min-width: 40px; text-align: right; }
-.drow .dbc { font-size: 13px; min-width: 52px; text-align: right; color: var(--dim); }
-.drow .dbc .bctier { color: var(--faint); font-size: 10px; margin-left: 3px; }
 .drow .dceil { font-size: 13px; min-width: 48px; text-align: right; color: var(--dim); }
-.dhead .dval, .dhead .dadp, .dhead .dgap, .dhead .dbc, .dhead .dceil { font-size: 11px; }
+.dhead .dbc { font-weight: 600; }
+.dhead .dbc, .dhead .dbcdiff, .dhead .dadp, .dhead .dval, .dhead .dgap, .dhead .dceil { font-size: 11px; }
 .ceil-boom { color: var(--accent); }
 .ceil-steady { color: var(--faint); }
 .gap-value { color: var(--accent); }
@@ -457,21 +474,22 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
 .faint { color: var(--faint); }
 
 /* historical-usage panel — evidence + a role-stability input to confidence; never feeds value.
-   (Replaced the old placeholder context strip, which rendered "pending" for every player.) */
+   (Replaced the old placeholder context strip, which rendered "pending" for every player.)
+   Now its OWN 3rd column in the expanded detail (a plain .dcol) rather than a full-width strip. */
 .dstats {
-  grid-column: 1 / -1;
-  margin-top: 6px; padding: 8px 10px;
-  background: var(--surface); border-left: 2px solid var(--border); border-radius: var(--radius);
+  padding: 0;
   font-size: 12px; color: var(--faint);
+  min-width: 0;   /* let the year table shrink/scroll inside a narrow column instead of overflowing */
 }
+/* usage-column header — matches the sibling <h4> columns (accent, uppercase) for visual parity */
 .ctxlabel {
-  display: block; margin-bottom: 6px;
-  font-family: var(--font-data); font-size: 10px;
-  text-transform: uppercase; letter-spacing: .08em; color: var(--dim);
+  display: block; margin: 10px 0 4px;
+  font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .08em; color: var(--accent);
 }
-.ctxlabel .faint { text-transform: none; letter-spacing: 0; font-family: var(--font-body); font-size: 11.5px; }
+.ctxlabel .faint { text-transform: none; letter-spacing: 0; font-weight: 400; font-family: var(--font-body); font-size: 11.5px; color: var(--faint); }
 .dstats .statnone { padding: 2px 0; color: var(--faint); }
-.stattable { border-collapse: collapse; margin: 2px 0 8px; width: 100%; max-width: 460px; }
+.stattable { border-collapse: collapse; margin: 2px 0 8px; width: 100%; max-width: 460px; display: block; overflow-x: auto; }
 .stattable th, .stattable td { text-align: right; padding: 2px 8px 2px 0; font-size: 12px; }
 .stattable th {
   font-family: var(--font-data); font-size: 10px; font-weight: 600; color: var(--moss);

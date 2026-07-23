@@ -23,7 +23,7 @@
   const saveKnobs = () => localStorage.setItem(KNOB_KEY, JSON.stringify({ replBasis }));
 
   let board = null, rows = [];
-  let pos = "ALL", view = "board", sort = "draftval", hideDrafted = false, hideFlagged = false;
+  let pos = "ALL", view = "board", sort = "bc", hideDrafted = false, hideFlagged = false;
   let replBasis = savedKnobs.replBasis ?? 0;  // 0 = starter basis (default), 1 = rostered (best-FA)
   let expandedId = null; // single-row accordion
 
@@ -242,6 +242,10 @@
       p.marketDollar = adp != null ? (dollarAtRank[Math.min(dollarAtRank.length, Math.round(adp)) - 1] ?? 1) : null;
       p.edgeDollar = p.marketDollar != null && p.draftDollar != null ? p.draftDollar - p.marketDollar : null;
       p.edgePicks = adp != null && p.draftRank != null ? +(adp - p.draftRank).toFixed(1) : null;
+      // BC−ADP: how far the market lets an expert-ranked player fall. +ve = ADP later than BC rank
+      // (the market is passing on him relative to the expert consensus → value); −ve = drafted ahead
+      // of consensus (a reach). Needs both a BC rank and an ADP; null otherwise.
+      p.bcDiff = (p.fftiers?.rank != null && adp != null) ? Math.round(adp - p.fftiers.rank) : null;
       // rec driver switches at the $1 line. Above: $-edge (TARGET/FAIR/FADE). Below: the board is
       // structurally conservative on late-round upside, so NO TARGET — only FADE the real overpays
       // (a below-replacement projection the market spends an early pick on). Ceiling is the late lens.
@@ -298,7 +302,13 @@
       : `You value him ${fmtD(p.draftDollar)}; the market's ADP slot (pick ${adp}) is worth ${fmtD(p.marketDollar)} → ${p.edgeDollar > 0 ? "UNDER" : p.edgeDollar < 0 ? "OVER" : "fairly"}valued by ${edgeStr(p.edgeDollar)} (${p.edgePicks > 0 ? "+" : ""}${Math.round(p.edgePicks)} picks)${conf?.recConf ? ` · rec-confidence ${CONF_LABEL[conf.recConf - 1]}${conf.capped ? ` (capped: ${conf.capped})` : ""}` : ""}`;
     const bc = p.fftiers;
     const bcTxt = bc ? `${bc.rank}<span class="bctier">T${bc.tier}</span>` : "–";
-    const bcTitle = bc ? `Boris Chen half-PPR consensus: overall #${bc.rank}, tier ${bc.tier} (avg ${bc.avg_rank}, range ${bc.best_rank}-${bc.worst_rank})` : "not in fftiers top-200";
+    const bcTitle = bc ? `Boris Chen half-PPR consensus (your primary board): overall #${bc.rank}, tier ${bc.tier} (avg ${bc.avg_rank}, range ${bc.best_rank}-${bc.worst_rank})` : "not in fftiers top-200";
+    // BC vs ADP: where the experts rank him vs where the market drafts him
+    const bcd = p.bcDiff;
+    const bcdCls = bcd == null ? "" : bcd > 0 ? "name-value" : bcd < 0 ? "name-reach" : "gap-fair";
+    const bcdTxt = bcd == null ? "–" : bcd > 0 ? `+${bcd}` : bcd < 0 ? `−${Math.abs(bcd)}` : "0";
+    const bcdTitle = bcd == null ? "needs both a Boris Chen rank and an ADP"
+      : `Experts (BC) rank him #${bc.rank}; the market drafts him at ADP ${adp}. ${bcd > 0 ? `The market lets him fall ${bcd} spots past the expert consensus — a value.` : bcd < 0 ? `He goes ${Math.abs(bcd)} picks ahead of where experts rank him — a reach vs consensus.` : "Right where experts rank him."}`;
     const cl = p.ceiling, clr = p.ceilRatio;
     const clCls = clr == null ? "" : clr >= 1.5 ? "ceil-boom" : clr <= 0.6 ? "ceil-steady" : "";
     const clArrow = clr == null ? "" : clr >= 1.5 ? "▲" : clr <= 0.6 ? "▾" : "";
@@ -318,10 +328,11 @@
         <span class="dname ${nameCls}">${esc(p.name)}</span>
         <span class="dpos">${esc(p.pos)}${p.posRank ? p.posRank : ""} · ${esc(p.team)}</span>
         ${badges}
-        <span class="dval mono" title="${sub ? "proximity-to-rosterable score (below the $1 startable line — a differentiation score, not a price)" : "draft value — scarcity-aware auction $"}">${fmtD(p.draftDollar)}</span>
-        <span class="dadp mono" title="ADP (half-PPR)">${p.adp?.half_ppr ?? "–"}</span>
-        <span class="dgap mono ${edgeCls}" title="${esc(edgeTitle)}">${edgeTxt}</span>
         <span class="dbc mono" title="${esc(bcTitle)}">${bcTxt}</span>
+        <span class="dbcdiff mono ${bcdCls}" title="${esc(bcdTitle)}">${bcdTxt}</span>
+        <span class="dadp mono" title="ADP (half-PPR)">${p.adp?.half_ppr ?? "–"}</span>
+        <span class="dval mono" title="${sub ? "proximity-to-rosterable score (below the $1 startable line — a differentiation score, not a price)" : "league-contextualized draft value — scarcity-aware auction $ in this league's format"}">${fmtD(p.draftDollar)}</span>
+        <span class="dgap mono ${edgeCls}" title="${esc(edgeTitle)}">${edgeTxt}</span>
         <span class="dceil mono ${clCls}" title="${esc(clTitle)}">${clTxt}</span>
       </button>
       ${isOpen ? detailHTML(p) : ""}
@@ -415,9 +426,9 @@
 
   function statsHTML(p) {
     const u = p.usage;
-    if (!STAT_ROWS[p.pos]) return `<div class="dstats"><span class="ctxlabel">Historical usage</span>
+    if (!STAT_ROWS[p.pos]) return `<div class="dcol dstats"><span class="ctxlabel">Historical usage</span>
       <div class="statnone">${noData} — ${esc(p.pos)} has no usage profile (this position is scored on team/kicking events, not snaps or targets).</div></div>`;
-    if (!u || !Object.keys(u.seasons ?? {}).length) return `<div class="dstats"><span class="ctxlabel">Historical usage</span>
+    if (!u || !Object.keys(u.seasons ?? {}).length) return `<div class="dcol dstats"><span class="ctxlabel">Historical usage</span>
       <div class="statnone">${noData} — ${p.rookie ? "rookie: no NFL usage history exists yet" : "no NFL usage on file for 2023–25"}. Role stability is treated as <b>unproven</b>, which widens the confidence band.</div></div>`;
     const yrs = ["2023", "2024", "2025"].filter((y) => u.seasons[y]);
     const rows = STAT_ROWS[p.pos];
@@ -445,7 +456,7 @@
     const rv = revisitFlag(p);
     const ls = u.last_season;
     const role = p.conf?.role;
-    return `<div class="dstats">
+    return `<div class="dcol dstats">
       <span class="ctxlabel">Historical usage <span class="faint">— evidence + a role-stability input to confidence. Never moves the value or the edge: the projection already prices raw share and age, so counting it twice would be double-dipping.</span></span>
       ${rv ? `<div class="statrevisit" title="A flag for you, not an adjustment — nothing in the value changed">⚑ revisit his number — ${esc(rv.why)}</div>` : ""}
       <table class="stattable">${head}${body}${sample}</table>
@@ -465,7 +476,6 @@
     return `<div class="ddetail">
       ${p.adp_commentary ? `<div class="dcommentary"><b>Why here at ${esc(p.pos)}:</b> ${esc(p.adp_commentary)}</div>` : ""}
       ${scoutHTML(p)}
-      ${edgeExplainer(p)}
       <div class="dcol">
         <h4>Value <span class="faint">(Phase A · $-engine)</span></h4>
         <div><b>Sleeper proj:</b> ${p.projection?.pts ?? "–"} pts <span class="faint">(full-health season)</span></div>
@@ -490,8 +500,6 @@
         <div><b>games played:</b> ${["2023", "2024", "2025"].map((y) => `${y}: ${gp[y] ?? "–"}`).join(" · ")}</div>
         <div><b>age:</b> ${a.age ?? p.age ?? "–"} · <b>status:</b> ${esc(a.current_injury_status ?? "healthy/none")}</div>
         <div><b>injury history:</b> ${a.injury_history == null ? noData + ' <span class="faint">(research pending)</span>' : esc(a.injury_history)}</div>
-      </div>
-      <div class="dcol">
         <h4>Situation ${p.situation?.modifier == null ? noData : `×${p.situation.modifier}`}</h4>
         ${facts.length ? facts.map((f) => `<div class="fact">${esc(f.date)} <span class="ftype">${esc(f.type)}</span> ${esc(f.fact)}${f.source ? ` <a href="${esc(f.source)}" target="_blank" rel="noopener">src</a>` : ""}</div>`).join("") : `<div>${noData} — no curated facts touch this player yet</div>`}
         <h4>Risk flags</h4>
@@ -500,6 +508,7 @@
         ${notes.map((n) => `<div class="fact faint">• ${esc(n)}</div>`).join("")}
       </div>
       ${statsHTML(p)}
+      ${edgeExplainer(p)}
     </div>`;
   }
 
@@ -507,7 +516,7 @@
     <div class="drow dhead" aria-hidden="true">
       <span></span>
       <span class="dmain-head"><span class="dr">#</span><span class="dname">player</span><span class="dpos">pos</span>
-      <span class="dval">$val</span><span class="dadp">adp</span><span class="dgap">edge</span><span class="dbc">BC</span><span class="dceil">ceil</span></span>
+      <span class="dbc">BC</span><span class="dbcdiff">BC−adp</span><span class="dadp">adp</span><span class="dval">$val</span><span class="dgap">edge</span><span class="dceil">ceil</span></span>
     </div>`;
 
   /* ---------- views ---------- */
@@ -522,18 +531,19 @@
   function paint() {
     const list = visible();
     if (view === "board") {
-      const sortLabel = { draftval: "by draft $", edge: "by edge", adp: "by ADP", bc: "by Boris Chen" }[sort] ?? "by draft $";
+      const sortLabel = { bc: "by Boris Chen", bcdiff: "by BC−ADP value", adp: "by ADP", draftval: "by draft $", edge: "by edge" }[sort] ?? "by Boris Chen";
       $("#board-title").textContent = (pos === "ALL" ? "Value board" : `Value board — ${pos}`) + " · " + sortLabel;
       const sortFns = {
-        adp: (a, b) => (a.adp?.half_ppr ?? Infinity) - (b.adp?.half_ppr ?? Infinity),
         bc: (a, b) => (a.fftiers?.rank ?? Infinity) - (b.fftiers?.rank ?? Infinity),
+        bcdiff: (a, b) => (b.bcDiff ?? -Infinity) - (a.bcDiff ?? -Infinity),   // biggest value (falls furthest past consensus) first
+        adp: (a, b) => (a.adp?.half_ppr ?? Infinity) - (b.adp?.half_ppr ?? Infinity),
         draftval: (a, b) => (b.draftDollar ?? -1) - (a.draftDollar ?? -1),
         edge: (a, b) => (b.edgeDollar ?? -Infinity) - (a.edgeDollar ?? -Infinity),
       };
-      const sorted = [...list].sort(sortFns[sort] ?? sortFns.draftval);
+      const sorted = [...list].sort(sortFns[sort] ?? sortFns.bc);
       $("#board-body").innerHTML = headerHTML +
         sorted.map((p) => rowHTML(p, p.draftRank ?? "–")).join("") +
-        `<div class="boardfoot">$val: <b>≥$1</b> = auction price · <b>&lt;$1</b> = proximity-to-rosterable score (differentiates the bench) · edge: $-gap above $1, board-vs-ADP pick-gap (<b>Np</b>) below · <span class="name-value">TARGET</span>/<span class="name-reach">FADE</span> + confidence dots ●●●. Bench tier gets no TARGET — lean on the <b>ceil</b> column for upside. # = draft-value rank.</div>`;
+        `<div class="boardfoot"><b>BC</b> = Boris Chen consensus rank (your primary board) · <b>BC−adp</b> = spots the market lets him fall past that consensus (<span class="name-value">+ = value</span> / <span class="name-reach">− = reach</span>) · <b>$val</b>: ≥$1 = auction price, &lt;$1 = proximity-to-rosterable score · <b>edge</b>: $-gap above $1, board-vs-ADP pick-gap (Np) below · <span class="name-value">TARGET</span>/<span class="name-reach">FADE</span> + confidence dots ●●●. Bench tier gets no TARGET — lean on <b>ceil</b> for upside. # = draft-value rank.</div>`;
     } else {
       $("#board-title").textContent = "Tiers — cliff edges (by draft $)";
       const posList = pos === "ALL" ? ["RB", "WR", "QB", "TE", "K", "DEF"] : [pos];
@@ -597,6 +607,24 @@
     replBasis = +e.target.value; saveKnobs(); rank(rows); updateKnobReadouts(); paint();
   });
 
+  /* ---------- sticky column header offset ----------
+     The toolbar above is sticky at top:0 with a wrapping (variable-height) row of controls, so the
+     locked column header must park at exactly the toolbar's current height. Measure it and expose it
+     as --toolbar-h; keep it live on resize (ResizeObserver catches wrap-height changes too). */
+  const toolbarEl = document.getElementById("toolbar");
+  const syncToolbarH = () => {
+    // Skip measuring in a degenerate 0-width layout (e.g. a not-yet-displayed / non-composited pane):
+    // the toolbar wraps every control onto its own line and reports a garbage height that would push
+    // the sticky header off-screen. Keep the last good value; a real display always has width > 0.
+    if (!toolbarEl || document.documentElement.clientWidth === 0) return;
+    document.documentElement.style.setProperty("--toolbar-h", `${toolbarEl.offsetHeight}px`);
+  };
+  syncToolbarH();
+  if (toolbarEl && "ResizeObserver" in window) new ResizeObserver(syncToolbarH).observe(toolbarEl);
+  window.addEventListener("resize", syncToolbarH);
+  // fonts settle after first paint (the toolbar reflows taller), so re-measure on load too
+  window.addEventListener("load", syncToolbarH);
+
   /* ---------- boot ---------- */
   (async () => {
     try {
@@ -613,5 +641,6 @@
     updateKnobReadouts();
     $("#board-meta").textContent = `board ${board.generated} · ${rows.length} players · ADP as of ${board.generated}`;
     paint();
+    syncToolbarH(); // board is now in flow; lock the header offset to the settled toolbar height
   })();
 })();

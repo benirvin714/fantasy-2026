@@ -55,7 +55,7 @@ Sleeper's projection is `rate × 17` (full health) — `gp` reads 18 for everyon
 
 ### 1.5 Build status & calibration defaults
 
-**Phase A shipped** (`site/draft.js`, client-side — no rebuild; reuses existing board fields): the full pipeline (1.2), the light median-games model (1.3), TARGET/FAIR/FADE + the ⚠ stopgap, default sort = draft-$ (toggles: edge / ADP / BC), and the replacement (scarcity) knob. The ceiling-tilt knob was **retired** (ceiling is now a pure display attribute).
+**Phase A shipped** (`site/draft.js`, client-side — no rebuild; reuses existing board fields): the full pipeline (1.2), the light median-games model (1.3), TARGET/FAIR/FADE + the ⚠ stopgap, and the replacement (scarcity) knob. (Board sort/column layout was later reworked to lead with Boris Chen — see §1.10.) The ceiling-tilt knob was **retired** (ceiling is now a pure display attribute).
 
 Tunable calibration defaults (all constants at the top of `draft.js`): auction budget $200 × 10 teams; edge thresholds **TARGET ≥ +$4 / FADE ≤ −$4** (from the observed edge distribution: median 0, p90 +6, p10 −5); median-games regression 0.3; ⚠ when BC contradicts a rec by ≥15 ranks. Replacement line = starter-basis default (RB30/WR32/QB11/TE11), knob-adjustable to rostered.
 
@@ -125,6 +125,29 @@ projection asking ≥15% MORE per game than last season's actual (6 of 248 — e
 28→19%, projection +16%). The mirror case was measured and **dropped**: it fired on 35 players
 (McCaffrey 0.70×, Gibbs 0.84×, Taylor 0.75×) because projections regress *every* career year, and its
 most extreme hits were backups where the projection is right and the raw usage read is naive.
+
+### 1.10 Board layout reworked to lead with Boris Chen — 2026-07-23
+
+Per a shift in draft approach, the board is now organized around the **Boris Chen consensus rank as the
+primary source** ("if I had nothing else I could draft off this alone"), with the league's own value math
+as the supporting read rather than the headline.
+
+- **Default sort = BC rank.** The metric row reads, left→right: **BC · BC−ADP · ADP · $val · edge · ceil.**
+  BC anchors the right-aligned cluster and is rendered prominently; the rest support it.
+- **BC−ADP** is a new column: `ADP − BC rank` = how many spots the market lets an expert-ranked player
+  fall past the consensus. **+ (blue) = value** (falls to you), **− (red) = reach** (goes ahead of
+  consensus). Sortable (biggest value first), null when either input is missing.
+- **Sticky column headers.** The header row locks to the top on scroll. The toolbar above is already
+  sticky at `top:0`, so the header parks at a **JS-measured `--toolbar-h`** (kept live via
+  ResizeObserver + resize/load), guarded to ignore a degenerate 0-width layout that would otherwise
+  write a garbage offset.
+- **Expanded detail** reorganized into three columns — **Value/BC/Ceiling · Availability+Situation+Risk ·
+  Historical usage** — with the "How this value is built" decomposition moved to a **full-width block at
+  the bottom** (it's the deep-dive, not the first thing you scan).
+
+The underlying valuation math is unchanged; this is presentation only. Sort toggles: BC / BC−ADP / ADP /
+$val / edge. Tunables/labels live in `site/draft.js` (`sortFns`, `headerHTML`, `rowHTML`) and
+`site/style.css` (`.dhead` sticky, `.dbcdiff`).
 
 ## 2. Challenge 2 — `scouting_brief` (public commentary)
 
