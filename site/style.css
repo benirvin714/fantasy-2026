@@ -371,9 +371,13 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
 .drow .dadp { font-size: 13px; color: var(--faint); min-width: 44px; text-align: right; }
 .drow .dval { font-size: 13px; color: var(--dim); min-width: 48px; text-align: right; }
 .drow .dgap { font-size: 13px; min-width: 40px; text-align: right; }
+.drow .dbcgap { font-size: 13px; min-width: 46px; text-align: right; color: var(--faint); }
+/* us-vs-consensus divergence: amber when we're a notable outlier vs Boris Chen, bold when strong */
+.drow .dbcgap.bc-out, .drow .dbcgap.bc-out-strong, .ddetail .bc-out { color: var(--warn); }
+.drow .dbcgap.bc-out-strong { font-weight: 700; }
 .drow .dceil { font-size: 13px; min-width: 48px; text-align: right; color: var(--dim); }
 .dhead .dbc { font-weight: 600; }
-.dhead .dbc, .dhead .dbcdiff, .dhead .dadp, .dhead .dval, .dhead .dgap, .dhead .dceil { font-size: 11px; }
+.dhead .dbc, .dhead .dbcdiff, .dhead .dadp, .dhead .dval, .dhead .dgap, .dhead .dbcgap, .dhead .dceil { font-size: 11px; }
 .ceil-boom { color: var(--accent); }
 .ceil-steady { color: var(--faint); }
 .gap-value { color: var(--accent); }

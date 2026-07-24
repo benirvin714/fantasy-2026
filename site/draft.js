@@ -46,7 +46,7 @@
   const BUDGET = 200, TEAMS = 10, ROSTER_SPOTS = 15;   // auction $ scale (relative; snake uses $ as linear currency)
   const EDGE_TARGET = 4, EDGE_FADE = -4;               // $ edge thresholds for TARGET / FADE (tunable)
   const FADE_ADP = 110, PICK_FADE = -25;               // sub-$1 FADE: market drafts a below-replacement player inside pick ~110 AND ≥25 picks earlier than the board ranks him
-  const BC_DIVERGE = 15;                               // BC contradicts an actionable rec by ≥ this many ranks = caution note
+  const BC_OUT_SOME = 10, BC_OUT_STRONG = 18;          // us-vs-BC POSITIONAL divergence (calibrated to this board: median gap 7, p85≈18) — notable vs strong outlier
   let replAsset = {}, replRankUsed = {}, ceilAvg = {}, dollarAtRank = [];
 
   function medianGames(p) {
@@ -162,10 +162,10 @@
     if (bc) {
       const range = bc.worst_rank - bc.best_rank;
       let d = (bc.std_dev >= 8 || range >= 45) ? "high" : (bc.std_dev >= 4 || range >= 22) ? "some" : "low";
-      if (p.draftRank != null) {
-        const gap = bc.rank - p.draftRank; // + = board more bullish than experts
-        const contra = (p.rec === "TARGET" && gap >= BC_DIVERGE) || (p.rec === "FADE" && -gap >= BC_DIVERGE);
-        if (contra) { const o = Math.abs(gap) >= 30 ? "high" : "some"; if (SEV[o] < SEV[d]) d = o; }
+      const g = p.bcGap; // + = we're MORE BEARISH than the experts (POSITIONAL), − = more bullish
+      if (g != null) {
+        const contra = (p.rec === "FADE" && g >= BC_OUT_SOME) || (p.rec === "TARGET" && -g >= BC_OUT_SOME);
+        if (contra) { const o = Math.abs(g) >= BC_OUT_STRONG ? "high" : "some"; if (SEV[o] < SEV[d]) d = o; }
       }
       dis = d;
     }
@@ -236,6 +236,17 @@
     dollarAtRank = byDollar.map((p) => p.draftDollar);
     const posCount = {};
     for (const p of byDollar) { posCount[p.pos] = (posCount[p.pos] ?? 0) + 1; p.posRank = posCount[p.pos]; }
+    // us-vs-BC divergence on a like-for-like POSITIONAL scale. fftiers.rank is an OVERALL
+    // cross-positional rank, so ranking WR38-vs-#36-overall is apples-to-oranges; instead compare
+    // our $-rank among a position against BC's rank among the SAME position. bcGap = our posRank −
+    // BC posRank: + = we're MORE BEARISH than the experts (rank him lower than they do), − = more
+    // bullish. This is the "is our number corroborated by consensus, or are we the lone outlier" read.
+    for (const ps of Object.keys(STARTER_RANK)) {
+      list.filter((p) => p.pos === ps && p.fftiers?.rank != null)
+        .sort((a, b) => a.fftiers.rank - b.fftiers.rank)
+        .forEach((p, i) => (p.bcPosRank = i + 1));
+    }
+    for (const p of list) p.bcGap = (p.posRank != null && p.bcPosRank != null) ? p.posRank - p.bcPosRank : null;
     // ③ market edge: your $ vs the $ of the player's ADP slot
     for (const p of list) {
       const adp = p.adp?.half_ppr;
@@ -309,6 +320,12 @@
     const bcdTxt = bcd == null ? "–" : bcd > 0 ? `+${bcd}` : bcd < 0 ? `−${Math.abs(bcd)}` : "0";
     const bcdTitle = bcd == null ? "needs both a Boris Chen rank and an ADP"
       : `Experts (BC) rank him #${bc.rank}; the market drafts him at ADP ${adp}. ${bcd > 0 ? `The market lets him fall ${bcd} spots past the expert consensus — a value.` : bcd < 0 ? `He goes ${Math.abs(bcd)} picks ahead of where experts rank him — a reach vs consensus.` : "Right where experts rank him."}`;
+    // us vs experts (BC), positional — corroborated or lone outlier
+    const g = p.bcGap, ga = g == null ? null : Math.abs(g);
+    const gCls = ga == null || ga < BC_OUT_SOME ? "" : ga >= BC_OUT_STRONG ? "bc-out-strong" : "bc-out";
+    const gTxt = g == null ? "–" : ga <= 7 ? "≈" : (g > 0 ? "▼" : "▲") + ga;
+    const gTitle = g == null ? "no Boris Chen rank — no consensus comparison"
+      : `You rank him ${esc(p.pos)}${p.posRank}; Boris Chen consensus ${esc(p.pos)}${p.bcPosRank} → you're ${ga} spot${ga === 1 ? "" : "s"} ${g > 0 ? "LOWER (more bearish)" : g < 0 ? "HIGHER (more bullish)" : "even"} than the experts. ${ga < BC_OUT_SOME ? "In line with consensus." : g > 0 ? (rec === "FADE" ? "CONTRARIAN fade — the crowd rates him higher than your value does; trust it only if you back the cold projection over the consensus." : "Your board sits below consensus here.") : (rec === "TARGET" ? "CONTRARIAN target — you rate him higher than the experts do." : "Your board sits above consensus here.")}`;
     const cl = p.ceiling, clr = p.ceilRatio;
     const clCls = clr == null ? "" : clr >= 1.5 ? "ceil-boom" : clr <= 0.6 ? "ceil-steady" : "";
     const clArrow = clr == null ? "" : clr >= 1.5 ? "▲" : clr <= 0.6 ? "▾" : "";
@@ -333,6 +350,7 @@
         <span class="dadp mono" title="ADP (half-PPR)">${p.adp?.half_ppr ?? "–"}</span>
         <span class="dval mono" title="${sub ? "proximity-to-rosterable score (below the $1 startable line — a differentiation score, not a price)" : "league-contextualized draft value — scarcity-aware auction $ in this league's format"}">${fmtD(p.draftDollar)}</span>
         <span class="dgap mono ${edgeCls}" title="${esc(edgeTitle)}">${edgeTxt}</span>
+        <span class="dbcgap mono ${gCls}" title="${esc(gTitle)}">${gTxt}</span>
         <span class="dceil mono ${clCls}" title="${esc(clTitle)}">${clTxt}</span>
       </button>
       ${isOpen ? detailHTML(p) : ""}
@@ -487,6 +505,7 @@
         <h4>Boris Chen (fftiers)</h4>
         ${p.fftiers ? `<div><b>consensus rank:</b> #${p.fftiers.rank} · tier ${p.fftiers.tier}</div>
         <div><b>expert avg:</b> ${p.fftiers.avg_rank} <span class="faint">(range ${p.fftiers.best_rank}–${p.fftiers.worst_rank}, std ${p.fftiers.std_dev})</span></div>
+        <div><b>vs your board:</b> experts ${esc(p.pos)}${p.bcPosRank ?? "–"} · you ${esc(p.pos)}${p.posRank ?? "–"} → ${p.bcGap == null ? "–" : p.bcGap === 0 ? "even with consensus" : `you're <b class="${Math.abs(p.bcGap) >= BC_OUT_SOME ? "bc-out" : ""}">${Math.abs(p.bcGap)} ${p.bcGap > 0 ? "LOWER (more bearish)" : "HIGHER (more bullish)"}</b>`}${p.bcGap != null && Math.abs(p.bcGap) >= BC_OUT_SOME ? ` <span class="faint">— ${p.bcGap > 0 ? (p.rec === "FADE" ? "contrarian fade, not corroborated by consensus — back it only if you trust the projection over the crowd" : "your board is below the crowd here") : (p.rec === "TARGET" ? "contrarian target — you're ahead of consensus" : "your board is above the crowd here")}</span>` : ""}</div>
         <div class="faint">FantasyPros consensus, GMM tiers, half-PPR · as of ${esc(board.fftiers?.updated ?? "?")}</div>`
           : `<div>${noData} — not in Boris Chen's top-200 (free agent or deep)</div>`}
         <h4>Ceiling (spike weeks) <span class="faint">— separate attribute, not in value</span></h4>
@@ -516,7 +535,7 @@
     <div class="drow dhead" aria-hidden="true">
       <span></span>
       <span class="dmain-head"><span class="dr">#</span><span class="dname">player</span><span class="dpos">pos</span>
-      <span class="dbc">BC</span><span class="dbcdiff">BC−adp</span><span class="dadp">adp</span><span class="dval">$val</span><span class="dgap">edge</span><span class="dceil">ceil</span></span>
+      <span class="dbc">BC</span><span class="dbcdiff">BC−adp</span><span class="dadp">adp</span><span class="dval">$val</span><span class="dgap">edge</span><span class="dbcgap">vs BC</span><span class="dceil">ceil</span></span>
     </div>`;
 
   /* ---------- views ---------- */
@@ -531,7 +550,7 @@
   function paint() {
     const list = visible();
     if (view === "board") {
-      const sortLabel = { bc: "by Boris Chen", bcdiff: "by BC−ADP value", adp: "by ADP", draftval: "by draft $", edge: "by edge" }[sort] ?? "by Boris Chen";
+      const sortLabel = { bc: "by Boris Chen", bcdiff: "by BC−ADP value", adp: "by ADP", draftval: "by draft $", edge: "by edge", bcgap: "by us-vs-consensus" }[sort] ?? "by Boris Chen";
       $("#board-title").textContent = (pos === "ALL" ? "Value board" : `Value board — ${pos}`) + " · " + sortLabel;
       const sortFns = {
         bc: (a, b) => (a.fftiers?.rank ?? Infinity) - (b.fftiers?.rank ?? Infinity),
@@ -539,6 +558,7 @@
         adp: (a, b) => (a.adp?.half_ppr ?? Infinity) - (b.adp?.half_ppr ?? Infinity),
         draftval: (a, b) => (b.draftDollar ?? -1) - (a.draftDollar ?? -1),
         edge: (a, b) => (b.edgeDollar ?? -Infinity) - (a.edgeDollar ?? -Infinity),
+        bcgap: (a, b) => (b.bcGap ?? -Infinity) - (a.bcGap ?? -Infinity),   // most bearish-vs-consensus (our value most below the crowd) first
       };
       const sorted = [...list].sort(sortFns[sort] ?? sortFns.bc);
       $("#board-body").innerHTML = headerHTML +
