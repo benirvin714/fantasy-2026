@@ -330,6 +330,9 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
 .drow {
   display: grid; grid-template-columns: 40px minmax(0, 1fr);
   border-bottom: 1px solid var(--border);
+  /* left stripe = Boris Chen tier color (set inline per row). Reserved transparent here so the
+     header and any no-tier rows keep the same 3px inset and columns stay aligned. */
+  border-left: 3px solid transparent;
 }
 .drow:last-child { border-bottom: none; }
 /* column header locks to the top on scroll. The toolbar above is already sticky at top:0
@@ -362,7 +365,9 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
    (margin-left:auto) and is rendered prominently; the rest are supporting reads. Order left→right:
    BC · BC−adp · adp · $val · edge · ceil. */
 .drow .dbc { margin-left: auto; font-size: 14px; font-weight: 700; color: var(--text); min-width: 52px; text-align: right; }
-.drow .dbc .bctier { color: var(--faint); font-size: 10px; font-weight: 400; margin-left: 3px; }
+/* tier pill — color + faint background set inline per Boris Chen tier (see tierColor() in draft.js) */
+.drow .dbc .bctier { color: var(--faint); font-size: 10px; font-weight: 500; margin-left: 4px; padding: 1px 5px; border-radius: 999px; }
+.dhead .dbc .bctier { padding: 0; background: none; }
 .drow .dbcdiff { font-size: 13px; min-width: 50px; text-align: right; color: var(--faint); }
 /* value/reach tint must out-specify the .drow .dbcdiff base color (both 0,2,0) — the same
    two-class specificity trap the featured-panel border hit; scope them to the cell. */

@@ -294,6 +294,15 @@
   /* ---------- render helpers ---------- */
   const noData = '<span class="nodata">no data</span>';
   const badge = (txt, cls, title) => `<span class="rbadge ${cls}" title="${esc(title)}">${esc(txt)}</span>`;
+  // Subtle per-tier color for Boris Chen's tiers (overall, 1..~23). Hue cycles by a fixed step so
+  // ADJACENT tiers always differ (the whole point — see the cliffs when BC-sorted); it repeats every
+  // ~8 tiers, but those share-a-hue tiers sit far apart on the board so there's no boundary ambiguity.
+  // Deliberately low saturation + a thin stripe / faint pill so it reads as a quiet band, not a rainbow.
+  // Starts on green (tier 1 = best, on-brand). Returns null-safe pieces used for the row stripe + badge.
+  const tierColor = (t) => {
+    const h = (150 + (t - 1) * 47) % 360;
+    return { stripe: `hsl(${h} 34% 55% / 0.55)`, text: `hsl(${h} 42% 72%)`, bg: `hsl(${h} 34% 55% / 0.15)` };
+  };
   const edgeStr = (e) => { if (e == null) return "–"; const r = Math.round(e); return r === 0 ? "$0" : (r > 0 ? "+$" : "−$") + Math.abs(r); }; // round: a boundary player's sub-dollar market gap reads $0 (fair), not "+$0.04"
   const fmtD = (d) => d == null ? "–" : d >= 1 ? `$${d}` : `$${d.toFixed(2)}`;   // ≥$1 = integer price; <$1 = proximity score
 
@@ -320,7 +329,8 @@
       : sub ? `Board ranks him #${p.draftRank}; market ADP ${adp} → the market is ${Math.abs(Math.round(p.edgePicks))} picks ${p.edgePicks < 0 ? "HIGHER" : "lower"} on him. A projection-based board is conservative on late-round upside — check ceiling before acting.${rec === "FADE" ? ` FADE: the market spends an early pick (≤${FADE_ADP}) on a below-replacement projection.` : ""}`
       : `You value him ${fmtD(p.draftDollar)}; the market's ADP slot (pick ${adp}) is worth ${fmtD(p.marketDollar)} → ${p.edgeDollar > 0 ? "UNDER" : p.edgeDollar < 0 ? "OVER" : "fairly"}valued by ${edgeStr(p.edgeDollar)} (${p.edgePicks > 0 ? "+" : ""}${Math.round(p.edgePicks)} picks)${conf?.recConf ? ` · rec-confidence ${CONF_LABEL[conf.recConf - 1]}${conf.capped ? ` (capped: ${conf.capped})` : ""}` : ""}`;
     const bc = p.fftiers;
-    const bcTxt = bc ? `${bc.rank}<span class="bctier">T${bc.tier}</span>` : "–";
+    const tc = bc ? tierColor(bc.tier) : null;
+    const bcTxt = bc ? `${bc.rank}<span class="bctier" style="color:${tc.text};background:${tc.bg}">T${bc.tier}</span>` : "–";
     const bcTitle = bc ? `Boris Chen half-PPR consensus (your primary board): overall #${bc.rank}, tier ${bc.tier} (avg ${bc.avg_rank}, range ${bc.best_rank}-${bc.worst_rank})` : "not in fftiers top-200";
     // BC vs ADP: where the experts rank him vs where the market drafts him
     const bcd = p.bcDiff;
@@ -346,7 +356,7 @@
       p.scouting_brief?.prose ? `<span class="rbadge rbadge-scout${p.scouting_brief.override_flag ? " scout-override" : ""}" title="${esc((p.scouting_brief.override_flag ? "⚑ role/scheme delta — revisit projection. " : "") + firstSentence(p.scouting_brief.prose))}">${p.scouting_brief.override_flag ? "⚑ scout" : "scout"}</span>` : "",
     ].join("");
     return `
-    <div class="drow ${isTaken ? "taken" : ""}" data-id="${p.id}">
+    <div class="drow ${isTaken ? "taken" : ""}" data-id="${p.id}"${tc ? ` style="border-left-color:${tc.stripe}"` : ""}>
       <button class="take" data-act="take" aria-pressed="${isTaken}" title="${isTaken ? "Mark available" : "Mark drafted"}">${isTaken ? "✓" : ""}</button>
       <button class="dmain" data-act="expand" aria-expanded="${isOpen}">
         <span class="dr">${rankLabel}</span>
