@@ -1,5 +1,9 @@
 .claude/settings.local.json
 
+# Local build cache: DynastyProcess player-ID crosswalk (2.5MB, refetched each build).
+# Not committed — the build runs locally and Cloudflare only serves the derived JSON.
+data/raw/db_playerids.csv
+
 # Throwaway prototype — lives on branch prototype/adp-mispricing, never on main.
 # Ignored here because OneDrive restores the directory after deletion, so it would
 # otherwise keep reappearing as untracked and risk being swept into a `git add .`.

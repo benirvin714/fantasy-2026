@@ -73,6 +73,45 @@ try {
   }
 } catch (e) { fftStatus = `fetch failed: ${e.message}`; }
 
+// ---- DynastyProcess player-ID crosswalk: sleeper_id -> external IDs + draft capital ----------
+// Source: github.com/DynastyProcess/data (db_playerids.csv, GPL-3.0, daily auto-pipeline). This is
+// the ENABLING layer for ID-based joins — the eventual consensus-anchor FP-ECR feed and any nflverse
+// historical-stat join key off gsis_id/pfr_id instead of fragile name matching. IDs + draft capital
+// are slow-changing, so we keep a LOCAL cache (data/raw, gitignored) and prefer it on a scrape
+// outage; total failure degrades to null IDs, never fabricated (honesty contract).
+const PIDS_URL = "https://raw.githubusercontent.com/DynastyProcess/data/master/files/db_playerids.csv";
+const PIDS_CACHE = path.join(ROOT, "data", "raw", "db_playerids.csv");
+let pidsBySleeper = new Map(), pidsStatus = "ok";
+{
+  let csv = null;
+  try {
+    csv = await (await fetch(PIDS_URL)).text();
+    if (!csv || csv.length < 100000 || !csv.includes("sleeper_id")) throw new Error("payload too small / wrong shape");
+    fs.writeFileSync(PIDS_CACHE, csv); // refresh the local cache on a good fetch
+  } catch (e) {
+    if (fs.existsSync(PIDS_CACHE)) { csv = fs.readFileSync(PIDS_CACHE, "utf8"); pidsStatus = `fetch failed, using cache: ${e.message}`; }
+    else { csv = null; pidsStatus = `unavailable (no cache): ${e.message}`; }
+  }
+  if (csv) {
+    const lines = csv.trim().split("\n");
+    const h = parseCsvLine(lines[0]).map((x) => x.replace(/"/g, ""));
+    const ci = (n) => h.indexOf(n);
+    const na = (v) => (v == null || v === "" || v === "NA") ? null : v;
+    const numOr = (v) => na(v) != null && !isNaN(+v) ? +v : null;
+    for (const line of lines.slice(1)) {
+      const c = parseCsvLine(line);
+      const sid = na(c[ci("sleeper_id")]);
+      if (!sid) continue;
+      pidsBySleeper.set(String(sid), {
+        fantasypros: na(c[ci("fantasypros_id")]), gsis: na(c[ci("gsis_id")]),
+        pfr: na(c[ci("pfr_id")]), espn: na(c[ci("espn_id")]),
+        draft_year: numOr(c[ci("draft_year")]), draft_round: numOr(c[ci("draft_round")]),
+        draft_pick: numOr(c[ci("draft_pick")]), draft_ovr: numOr(c[ci("draft_ovr")]),
+      });
+    }
+  }
+}
+
 // ---- projection re-scoring with THIS league's settings ----------------------
 // Skill stat keys map 1:1 onto scoring_settings keys. Kicker: projection aggregates
 // 50+ as fgm_50p — league pays 5 (50-59) / 6 (60+); we score fgm_50p at 5 and note
@@ -443,6 +482,12 @@ const rows = [...skill, ...kickers, ...defs].map(([id, p]) => {
   const pts = rescore(pr, pos);
   const adp = pr?.adp_half_ppr && pr.adp_half_ppr < 900 ? pr.adp_half_ppr : null;
   const avail = availability(id, pos, p.age, p.injury_status, p.years_exp);
+  // DynastyProcess ID crosswalk + draft capital (null for DEF/unmatched). ids = the clean join key
+  // for future ID-based sources; rookie_capital fills a context gap straight from the crosswalk.
+  const ext = pidsBySleeper.get(String(id)) ?? null;
+  const rookieCap = (p.years_exp === 0 && ext?.draft_ovr != null)
+    ? { year: ext.draft_year, round: ext.draft_round, pick: ext.draft_pick, overall: ext.draft_ovr, source: "DynastyProcess db_playerids" }
+    : null;
   // detailed overlay first; else expand a clean_researched id into derived-clean flags
   let rx = research[id];
   if (!rx && cleanIds.has(id)) {
@@ -459,6 +504,7 @@ const rows = [...skill, ...kickers, ...defs].map(([id, p]) => {
   return {
     id, name, pos, team: p.team, age: p.age ?? null, years_exp: p.years_exp ?? null,
     rookie: p.years_exp === 0,
+    ids: { sleeper: id, fantasypros: ext?.fantasypros ?? null, gsis: ext?.gsis ?? null, pfr: ext?.pfr ?? null, espn: ext?.espn ?? null }, // DynastyProcess crosswalk; join key for ID-based sources
     projection: {
       pts, ppg: pts != null ? +(pts / 17).toFixed(1) : null,
       method: pos === "DEF" ? "partial: only sack/int/fum/blk project; points-allowed tiers do not — low confidence"
@@ -476,7 +522,7 @@ const rows = [...skill, ...kickers, ...defs].map(([id, p]) => {
     fftiers: fftMap.get(normName(name)) ?? null, // Boris Chen half-PPR consensus rank+tier; null = not in his top-200
     ceiling: ceilingById.get(id) ?? null, // weekly spike-week rate; null = thin sample (rookie) or fetch failure
     usage: usageById.get(id) ?? null, // historical share/efficiency + gated trends; null = rookie/K/DEF (no NFL usage) — EVIDENCE + confidence only, never a value input
-    context: { contract_year: null, rookie_capital: null, team_win_total: null, playoff_sos: null },
+    context: { contract_year: null, rookie_capital: rookieCap, team_win_total: null, playoff_sos: null },
   };
 });
 
@@ -485,6 +531,7 @@ const board = {
   scoring_basis: "HBGBs 2025 scoring_settings (data/raw/league-2025.json); re-verify at 2026 renewal",
   pool: `top ${POOL_SIZE} by Sleeper search_rank + 32 DEF`,
   fftiers: { source: "Boris Chen fftiers (FantasyPros consensus, GMM tiers), half-PPR draft board", status: fftStatus, updated: TODAY, matched: rows.filter((r) => r.fftiers).length },
+  player_ids: { source: "DynastyProcess db_playerids (GPL-3.0, daily pipeline): sleeper_id crosswalk to FP/gsis/pfr/espn + NFL draft capital", status: pidsStatus, resolved_fp: rows.filter((r) => r.ids?.fantasypros).length, updated: TODAY },
   ceiling: { source: "Sleeper weekly stats 2023-25 re-scored; spike week = top-5 weekly finish at position", status: ceilingStatus, pos_avg: ceilingPosAvg, boom_line: ceilingBoomLine, spike_rank: SPIKE_RANK, min_weeks: MIN_CEIL_WEEKS, scored: rows.filter((r) => r.ceiling).length, updated: TODAY },
   usage: {
     source: "Sleeper weekly stats 2023-25; team totals via the per-week (tm_off_snp,tm_def_snp,tm_st_snp) team fingerprint",
@@ -502,7 +549,7 @@ const board = {
     { field: "situation.modifier", status: "unset", fill: "analysis pass over stored facts (facts only, no invented context)" },
     { field: "risk_flags.*", status: "researched for top ~35 (overlay); rest still null", fill: "extend the overlay; re-verify suspensions/holdouts in the final 2 weeks" },
     { field: "context.contract_year", status: "missing", fill: "web (Spotrac/OTC), mostly static once pulled" },
-    { field: "context.rookie_capital", status: "missing", fill: "one-time 2026 NFL draft table (web)" },
+    { field: "context.rookie_capital", status: "filled for rookies from DynastyProcess db_playerids (NFL draft capital); null = veteran or unmatched", fill: "auto from the ID crosswalk" },
     { field: "context.team_win_total", status: "missing", fill: "Vegas win totals (web), refresh occasionally" },
     { field: "context.playoff_sos", status: "missing", fill: "derive after 2026 schedule pull + win totals land" },
     { field: "projection (DEF)", status: "low confidence", fill: "points-allowed tiers unprojectable; DEF is a streaming position here anyway" },
@@ -517,6 +564,7 @@ const sanity = rows.filter((r) => r.projection.pts != null && r.projection.sleep
   .map((r) => Math.abs(r.projection.pts - r.projection.sleeper_half_ppr));
 console.log(`skill re-score vs sleeper_half_ppr: max diff ${Math.max(...sanity).toFixed(1)}, mean ${(sanity.reduce((a, b) => a + b, 0) / sanity.length).toFixed(2)}`);
 console.log(`fftiers: status=${fftStatus}, csv-rows=${fftMap.size}, matched to board=${rows.filter((r) => r.fftiers).length}`);
+console.log(`player-ids: status=${pidsStatus}, FP-id resolved ${rows.filter((r) => r.ids?.fantasypros).length}/${rows.length}; rookie_capital filled for ${rows.filter((r) => r.context.rookie_capital).length} rookies`);
 // usage sanity: team-fingerprint shares must reproduce known 2025 anchors (Chase target share ~32.6%).
 for (const nm of ["Ja'Marr Chase", "Bijan Robinson", "Josh Allen"]) {
   const r = rows.find((x) => x.name === nm), s = r?.usage?.seasons?.["2025"];
