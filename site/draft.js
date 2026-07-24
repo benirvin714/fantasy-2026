@@ -303,7 +303,15 @@
     const rec = p.rec, conf = p.conf, adp = p.adp?.half_ppr;
     const sub = p.draftDollar != null && p.draftDollar < 1;          // below the $1 line = proximity/bench tier
     const recCls = rec === "TARGET" ? "rec-target" : rec === "FADE" ? "rec-fade" : rec === "FAIR" ? "rec-fair" : "";
-    const nameCls = rec === "TARGET" ? "name-value" : rec === "FADE" ? "name-reach" : "";
+    // Name color = agreement between the experts (BC−ADP) and our model (edge): blue only when BOTH
+    // are positive (undervalued by the market on both reads), red only when BOTH are negative,
+    // white on any disagreement or missing value. Uses the SAME rounded signs the two columns show
+    // (edge is $-edge above $1, the pick-gap below), so the name matches what those cells display.
+    const edgeShown = sub ? (p.edgePicks == null ? null : Math.round(p.edgePicks))
+                          : (p.edgeDollar == null ? null : Math.round(p.edgeDollar));
+    const bcShown = p.bcDiff; // integer (ADP − BC rank) or null
+    const nameCls = (bcShown > 0 && edgeShown > 0) ? "name-value"
+      : (bcShown < 0 && edgeShown < 0) ? "name-reach" : "";
     const showRec = rec === "TARGET" || rec === "FADE" || (rec === "FAIR" && !sub); // suppress the FAIR badge in the bench tier
     const edgeCls = rec === "TARGET" ? "gap-value" : rec === "FADE" ? "gap-reach" : "gap-fair";
     // edge column: $-edge above $1; the board-vs-ADP pick-gap (disparity) below
