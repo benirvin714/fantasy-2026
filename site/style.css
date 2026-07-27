@@ -536,6 +536,9 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
 }
 
 .dstats .statnone { padding: 2px 0; color: var(--faint); }
+/* K/DEF/rookies render no trends column, so the usage block takes the vacated track rather than
+   leaving the row a third empty. Wide viewports only — the grid is a single column below this. */
+@media (min-width: 760px) { .dstats-wide { grid-column: span 2; } }
 .stattable { border-collapse: collapse; margin: 2px 0 8px; width: 100%; max-width: 460px; display: block; overflow-x: auto; }
 .stattable th, .stattable td { text-align: right; padding: 2px 8px 2px 0; font-size: 12px; }
 .stattable th {

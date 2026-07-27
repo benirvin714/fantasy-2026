@@ -154,9 +154,18 @@ $val / edge. Tunables/labels live in `site/draft.js` (`sortFns`, `headerHTML`, `
 The expanded row had grown to everything-at-once. Reordered around the four reads that actually drive a
 pick, with the rest one click away.
 
-- **Always visible, in priority order:** **Why here** (`adp_commentary`) → **Scouting** → **Historical
-  usage** (with its gated trends) → **Boris Chen (fftiers)**. BC moved out of the shared $-engine column
-  into its own block — it's the primary board, so it shouldn't be buried beside internals.
+- **Always visible, in priority order:** **Why here** (`adp_commentary`) and **Scouting** full-width, then
+  a three-column row: **Historical usage** (the season table) · **Trends** (multi-year direction,
+  within-season trajectory, catch-rate arrow, last-season actual vs projection, role stability) ·
+  **Boris Chen (fftiers)**. BC moved out of the shared $-engine column into its own block — it's the
+  primary board, so it shouldn't be buried beside internals. Splitting trends out of the usage block
+  reclaimed the dead space left by the ~310px-wide season table.
+- **No-trends positions stay full-bleed:** K/DEF and rookies have no trend data, so no Trends column is
+  rendered at all and the usage block spans the vacated track (`.dstats-wide`, wide viewports only)
+  rather than leaving the row a third empty.
+- The repeated "never moves value" caption moved to the column label's tooltip — identical boilerplate
+  on every player, and it cost ~5 lines of height once the column narrowed. The on-screen label still
+  says "evidence only", so the honesty contract holds.
 - **Behind disclosure buttons** (all collapsed on open): Value & $ engine · Ceiling · Availability &
   injury · Situation & risk flags · How this value is built. Closed buttons sit in one compact wrapping
   row; the opened one takes the full row and drops its body beneath, so only one block of depth is on
@@ -164,10 +173,12 @@ pick, with the rest one click away.
 - **State is per-SECTION, not per-player** (`openSect`), so a section you open follows you player to
   player and survives any repaint (take / sort / filter). It resets compact on reload — the default is
   the whole point.
-- Measured effect: a top-player drop-down is **769px collapsed vs 1577px fully expanded** (~51% shorter).
-  Nothing was removed; every field is still one click away, and the honest-`null` rendering is unchanged.
+- Measured effect: a top-player drop-down went **1577px → 769px** (disclosures) **→ 523px** (three-column
+  row) — about a third of the original height. Nothing was removed; every field is still one click away,
+  and the honest-`null` rendering is unchanged.
 
-Files: `detailHTML` / `bcHTML` / `section()` in `site/draft.js`; `.dsects` / `.dsect*` in `site/style.css`.
+Files: `statsHTML` / `detailHTML` / `bcHTML` / `section()` in `site/draft.js`; `.dsects` / `.dsect*` /
+`.dstats-wide` in `site/style.css`.
 
 ## 2. Challenge 2 — `scouting_brief` (public commentary)
 

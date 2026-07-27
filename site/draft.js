@@ -465,9 +465,11 @@
 
   function statsHTML(p) {
     const u = p.usage;
-    if (!STAT_ROWS[p.pos]) return `<div class="dcol dstats"><span class="ctxlabel">Historical usage</span>
+    // No usage → no trends column to render. The remaining block spans the vacated track so the
+    // row doesn't sit with an empty third (dstats-wide, guarded to wide viewports only).
+    if (!STAT_ROWS[p.pos]) return `<div class="dcol dstats dstats-wide"><span class="ctxlabel">Historical usage</span>
       <div class="statnone">${noData} — ${esc(p.pos)} has no usage profile (this position is scored on team/kicking events, not snaps or targets).</div></div>`;
-    if (!u || !Object.keys(u.seasons ?? {}).length) return `<div class="dcol dstats"><span class="ctxlabel">Historical usage</span>
+    if (!u || !Object.keys(u.seasons ?? {}).length) return `<div class="dcol dstats dstats-wide"><span class="ctxlabel">Historical usage</span>
       <div class="statnone">${noData} — ${p.rookie ? "rookie: no NFL usage history exists yet" : "no NFL usage on file for 2023–25"}. Role stability is treated as <b>unproven</b>, which widens the confidence band.</div></div>`;
     const yrs = ["2023", "2024", "2025"].filter((y) => u.seasons[y]);
     const rows = STAT_ROWS[p.pos];
@@ -495,12 +497,19 @@
     const rv = revisitFlag(p);
     const ls = u.last_season;
     const role = p.conf?.role;
+    // TWO sibling columns: the season table, then the trend reads beside it. The full
+    // "never moves value" reasoning moves to the label's tooltip — it's identical boilerplate on
+    // every player, and spelling it out cost ~5 lines of height in a now-narrower column.
+    const why = "Evidence + a role-stability input to confidence. Never moves the value or the edge: the projection already prices raw share and age, so counting it twice would be double-dipping.";
     return `<div class="dcol dstats">
-      <span class="ctxlabel">Historical usage <span class="faint">— evidence + a role-stability input to confidence. Never moves the value or the edge: the projection already prices raw share and age, so counting it twice would be double-dipping.</span></span>
-      ${rv ? `<div class="statrevisit" title="A flag for you, not an adjustment — nothing in the value changed">⚑ revisit his number — ${esc(rv.why)}</div>` : ""}
+      <span class="ctxlabel" title="${esc(why)}">Historical usage <span class="faint">— evidence only</span></span>
       <table class="stattable">${head}${body}${sample}</table>
-      <div class="statline"><b>Multi-year direction</b> <span class="faint">(the season bet — leads on draft day)</span>: ${dirTxt}</div>
-      <div class="statline"><b>Within-season ${ls?.year ?? "2025"}</b> <span class="faint">(last 4 games vs first 4 — the finishing-form lens)</span>: ${trTxt}</div>
+    </div>
+    <div class="dcol dstats dtrends">
+      <span class="ctxlabel" title="${esc(why)}">Trends <span class="faint">— sample-gated</span></span>
+      ${rv ? `<div class="statrevisit" title="A flag for you, not an adjustment — nothing in the value changed">⚑ revisit his number — ${esc(rv.why)}</div>` : ""}
+      <div class="statline"><b>Multi-year</b> <span class="faint">(the season bet — leads on draft day)</span>: ${dirTxt}</div>
+      <div class="statline"><b>Within-season ${ls?.year ?? "2025"}</b> <span class="faint">(last 4 games vs first 4)</span>: ${trTxt}</div>
       ${crTxt}
       ${ls ? `<div class="statline faint">${ls.year} actual, this league's scoring: <b>${ls.pts}</b> pts in ${ls.g} games = <b>${ls.ppg}</b>/g · 2026 projection <b>${p.projection?.ppg ?? "–"}</b>/g</div>` : ""}
       ${role ? `<div class="statline faint">Role stability → <b>${esc(role.sev === "none" ? "stable" : role.sev === "some" ? "some risk" : "high risk")}</b> (${esc(role.source)}): ${esc(role.why)}</div>` : ""}
