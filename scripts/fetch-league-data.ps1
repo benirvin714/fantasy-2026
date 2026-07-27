@@ -6,7 +6,7 @@ $raw = Join-Path $root "data\raw"
 New-Item -ItemType Directory -Force $raw | Out-Null
 
 $api = "https://api.sleeper.app/v1"
-$leagueId = "1257432557251731456"
+$leagueId = "1386608052991447040" # 2026 (renewed 2026-07-22); walks previous_league_id back through 2025 and earlier
 
 # Walk the previous_league_id chain to collect all seasons of this league
 $chain = @()

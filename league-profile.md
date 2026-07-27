@@ -1,8 +1,7 @@
 # League Profile — The HBGBs
 
-> Data pulled 2026-07-17 from Sleeper (league ID `1257432557251731456`, 2025 season, complete).
-> **The 2026 renewal does not exist yet** — when the commissioner renews, the new league ID must be recorded (check `get_user_leagues` for ThatWasButtery / season 2026). Settings below have been stable for years but re-verify against the 2026 league object once it exists.
-> You: **ThatWasButtery**, roster ID **10** (every season), team "Njigba, please."
+> **2026 league renewed — ID `1386608052991447040`, verified 2026-07-22 against the live Sleeper object.** All settings below re-checked and unchanged from prior years (draft_id `1386608053004017664`, pre_draft). Prior season: 2025 = `1257432557251731456`.
+> You: **ThatWasButtery**, roster ID **10** (every season, re-confirmed for 2026), team "Njigba, please."
 
 ## The rules, in plain language
 
@@ -12,7 +11,7 @@
 - **Scoring — half PPR with quirks:**
   - Receptions 0.5; rushing/receiving yards 1 pt per 10; all TDs from scrimmage 6.
   - Passing: 1 pt per 25 yards, **4-pt passing TDs**, INT only −1. Lost fumble −2.
-  - Kickers: FG 0–39 = 3, 40–49 = 4, 50–59 = 5, 60+ = 6; XP = 1; **every miss under 50 (including XPs) = −1, misses from 50+ = 0** (this structure since 2024).
+  - Kickers: FG 0–39 = 3, 40–49 = 4, 50–59 = 5, 60+ = 6; XP = 1; **every miss under 60 (including XPs) = −1, only 60+ misses are free** (`fgmiss_50_59` = −1, `fgmiss_50p` = 0; this structure since 2024).
   - DEF: sack 1, INT 2, fumble recovery 2, TD 6, safety 2, block 2; points-allowed table from **+10 for a shutout down to −4 for 35+**.
 - **Waivers: $100 FAAB**, processed Tuesdays, 1-day clear. Free agency after clears.
 - **Playoffs: 6 of 10 teams**, weeks 15–17, bracket re-seeds. 14-game regular season (weeks 1–14).

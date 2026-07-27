@@ -2,7 +2,7 @@
 
 ## Identity
 - League: **The HBGBs**, 10-team Sleeper redraft. 2025 league ID: `1257432557251731456` (season complete).
-- **2026 league ID: NOT YET CREATED — re-checked 2026-07-22** (`get_user_leagues` for `ThatWasButtery`, season 2026, returned an empty list). At the first session after renewal: run it again, update this line with the new ID, re-verify settings against it, and update the ID in `site/config.js` + `$leagueId` in `scripts/fetch-league-data.ps1`.
+- **2026 league ID: `1386608052991447040`** (renewed; verified 2026-07-22 via `get_league_info` + `get_user_leagues`). draft_id `1386608053004017664`, status pre_draft. Settings re-verified against the live object and **unchanged from prior years**: half-PPR scoring quirks (4-pt pass TD, INT −1, fum_lost −2, kicker distance bands, DEF tiers), roster QB/2RB/2WR/TE/2FLEX/K/DEF + 5 BN + 1 IR, 6 playoff teams, wk-15 playoffs, wk-12 trade deadline, $100 FAAB, max_keepers=1 (unused). `site/config.js`, `scripts/fetch-league-data.ps1`, and `league-profile.md` updated to this ID.
 - User = **ThatWasButtery** (Sleeper user_id `603035152494436352`), roster ID **10** in every season to date.
 
 ## Scoring in one paragraph (quirks bolded)

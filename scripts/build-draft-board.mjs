@@ -28,7 +28,7 @@ const [players, s23, s24, s25, proj] = await Promise.all([
   get("https://api.sleeper.app/v1/stats/nfl/regular/2025"),
   get("https://api.sleeper.app/v1/projections/nfl/regular/2026"),
 ]);
-const scoring = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "raw", "league-2025.json"), "utf8")).scoring_settings;
+const scoring = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "raw", "league-2026.json"), "utf8")).scoring_settings;
 const events = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "site", "nfl-events.json"), "utf8")).events;
 // Durable hand-researched overlay (risk flags, injury typing, ADP commentary). Merged in so a
 // rebuild for fresh ADP never wipes research. Missing = still null (honest "not researched").
@@ -528,7 +528,7 @@ const rows = [...skill, ...kickers, ...defs].map(([id, p]) => {
 
 const board = {
   generated: TODAY,
-  scoring_basis: "HBGBs 2025 scoring_settings (data/raw/league-2025.json); re-verify at 2026 renewal",
+  scoring_basis: "HBGBs 2026 scoring_settings (data/raw/league-2026.json); verified identical to 2025 at renewal 2026-07-22",
   pool: `top ${POOL_SIZE} by Sleeper search_rank + 32 DEF`,
   fftiers: { source: "Boris Chen fftiers (FantasyPros consensus, GMM tiers), half-PPR draft board", status: fftStatus, updated: TODAY, matched: rows.filter((r) => r.fftiers).length },
   player_ids: { source: "DynastyProcess db_playerids (GPL-3.0, daily pipeline): sleeper_id crosswalk to FP/gsis/pfr/espn + NFL draft capital", status: pidsStatus, resolved_fp: rows.filter((r) => r.ids?.fantasypros).length, updated: TODAY },

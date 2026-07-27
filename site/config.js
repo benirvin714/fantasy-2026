@@ -1,7 +1,7 @@
 // HBGBs HQ — dashboard config
-// UPDATE LEAGUE_ID when the 2026 league is created (see CLAUDE.md maintenance notes).
+// LEAGUE_ID is the active season; update it at each renewal (see CLAUDE.md maintenance notes).
 window.HQ_CONFIG = {
-  LEAGUE_ID: "1257432557251731456", // 2025 season (2026 not yet renewed as of 2026-07-17)
+  LEAGUE_ID: "1386608052991447040", // 2026 season (renewed; verified 2026-07-22). Prior: 2025 = 1257432557251731456
   MY_ROSTER_ID: 10,
   MY_USER_ID: "603035152494436352",
   MY_NAME: "ThatWasButtery",
