@@ -143,11 +143,31 @@ as the supporting read rather than the headline.
   write a garbage offset.
 - **Expanded detail** reorganized into three columns — **Value/BC/Ceiling · Availability+Situation+Risk ·
   Historical usage** — with the "How this value is built" decomposition moved to a **full-width block at
-  the bottom** (it's the deep-dive, not the first thing you scan).
+  the bottom** (it's the deep-dive, not the first thing you scan). *(Superseded by §1.11.)*
 
 The underlying valuation math is unchanged; this is presentation only. Sort toggles: BC / BC−ADP / ADP /
 $val / edge. Tunables/labels live in `site/draft.js` (`sortFns`, `headerHTML`, `rowHTML`) and
 `site/style.css` (`.dhead` sticky, `.dbcdiff`).
+
+### 1.11 Drop-down prioritized, depth put behind disclosures — 2026-07-27
+
+The expanded row had grown to everything-at-once. Reordered around the four reads that actually drive a
+pick, with the rest one click away.
+
+- **Always visible, in priority order:** **Why here** (`adp_commentary`) → **Scouting** → **Historical
+  usage** (with its gated trends) → **Boris Chen (fftiers)**. BC moved out of the shared $-engine column
+  into its own block — it's the primary board, so it shouldn't be buried beside internals.
+- **Behind disclosure buttons** (all collapsed on open): Value & $ engine · Ceiling · Availability &
+  injury · Situation & risk flags · How this value is built. Closed buttons sit in one compact wrapping
+  row; the opened one takes the full row and drops its body beneath, so only one block of depth is on
+  screen at a time.
+- **State is per-SECTION, not per-player** (`openSect`), so a section you open follows you player to
+  player and survives any repaint (take / sort / filter). It resets compact on reload — the default is
+  the whole point.
+- Measured effect: a top-player drop-down is **769px collapsed vs 1577px fully expanded** (~51% shorter).
+  Nothing was removed; every field is still one click away, and the honest-`null` rendering is unchanged.
+
+Files: `detailHTML` / `bcHTML` / `section()` in `site/draft.js`; `.dsects` / `.dsect*` in `site/style.css`.
 
 ## 2. Challenge 2 — `scouting_brief` (public commentary)
 

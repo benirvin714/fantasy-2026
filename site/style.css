@@ -497,6 +497,44 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
   text-transform: uppercase; letter-spacing: .08em; color: var(--accent);
 }
 .ctxlabel .faint { text-transform: none; letter-spacing: 0; font-weight: 400; font-family: var(--font-body); font-size: 11.5px; color: var(--faint); }
+/* ---------- secondary sections (collapsed by default) ----------
+   The drop-down leads with why-here / scouting / usage / Boris Chen; the rest live behind these
+   disclosure buttons. Closed buttons sit in one compact wrapping row; the open one takes the full
+   row and drops its body beneath, so only one block of depth is ever on screen at a time. */
+.dsects {
+  grid-column: 1 / -1;
+  display: flex; flex-wrap: wrap; gap: 6px;
+  margin-top: 10px; padding-top: 10px;
+  border-top: 1px dashed var(--border);
+}
+.dsect { flex: 0 0 auto; }          /* closed: hugs its label */
+.dsect.open { flex: 1 1 100%; }     /* open: owns the row */
+.dsect-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-family: var(--font-body); font-size: 11.5px; font-weight: 600;
+  background: var(--grad-raise); color: var(--faint);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 5px 10px; min-height: 32px; cursor: pointer;
+  transition: color 150ms ease-out, border-color 150ms ease-out;
+}
+.dsect-btn:hover { color: var(--text); border-color: var(--moss); }
+.dsect-btn[aria-expanded="true"] { color: var(--accent); border-color: var(--accent); }
+.dsect-caret { font-size: 9px; line-height: 1; }
+.dsect-body {
+  margin-top: 8px; padding: 10px 12px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  font-size: 12.5px; color: var(--dim);
+}
+.dsect-body > div { padding: 1px 0; }
+.dsect-sub { margin-top: 8px; }
+/* the value decomposition is already a card — flatten it inside a section body, no double frame */
+.dsect-body .gapexp { margin: 0; padding: 0; background: none; border-left: none; border-radius: 0; }
+/* mobile: full-width rows and a 44px tap target, matching the take buttons' touch standard */
+@media (max-width: 700px) {
+  .dsect { flex: 1 1 100%; }
+  .dsect-btn { width: 100%; min-height: 44px; font-size: 12.5px; }
+}
+
 .dstats .statnone { padding: 2px 0; color: var(--faint); }
 .stattable { border-collapse: collapse; margin: 2px 0 8px; width: 100%; max-width: 460px; display: block; overflow-x: auto; }
 .stattable th, .stattable td { text-align: right; padding: 2px 8px 2px 0; font-size: 12px; }

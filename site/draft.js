@@ -26,6 +26,9 @@
   let pos = "ALL", view = "board", sort = "bc", hideDrafted = false, hideFlagged = false;
   let replBasis = savedKnobs.replBasis ?? 0;  // 0 = starter basis (default), 1 = rostered (best-FA)
   let expandedId = null; // single-row accordion
+  // Which secondary sections of the drop-down are revealed. Keyed by SECTION, not by player, so the
+  // choice is a board-wide preference that follows you player to player; resets compact on reload.
+  const openSect = new Set();
 
   /* ---------- the value engine (transparent, in one place) ---------- */
   // Replacement (scarcity) line per position; the knob slides between the STARTER line
@@ -504,48 +507,78 @@
     </div>`;
   }
 
+  // Boris Chen block — a PRIORITY section (the board's primary source), so it stands on its own
+  // column rather than sharing one with the $-engine internals.
+  function bcHTML(p) {
+    if (!p.fftiers) return `<div class="dcol">
+      <h4>Boris Chen (fftiers)</h4>
+      <div>${noData} — not in Boris Chen's top-200 (free agent or deep)</div>
+    </div>`;
+    const g = p.bcGap, ga = g == null ? null : Math.abs(g);
+    const vs = g == null ? "–" : g === 0 ? "even with consensus"
+      : `you're <b class="${ga >= BC_OUT_SOME ? "bc-out" : ""}">${ga} ${g > 0 ? "LOWER (more bearish)" : "HIGHER (more bullish)"}</b>`;
+    const note = g != null && ga >= BC_OUT_SOME
+      ? ` <span class="faint">— ${g > 0 ? (p.rec === "FADE" ? "contrarian fade, not corroborated by consensus — back it only if you trust the projection over the crowd" : "your board is below the crowd here") : (p.rec === "TARGET" ? "contrarian target — you're ahead of consensus" : "your board is above the crowd here")}</span>` : "";
+    return `<div class="dcol">
+      <h4>Boris Chen (fftiers) <span class="faint">— your primary board</span></h4>
+      <div><b>consensus rank:</b> #${p.fftiers.rank} · tier ${p.fftiers.tier}</div>
+      <div><b>expert avg:</b> ${p.fftiers.avg_rank} <span class="faint">(range ${p.fftiers.best_rank}–${p.fftiers.worst_rank}, std ${p.fftiers.std_dev})</span></div>
+      <div><b>vs your board:</b> experts ${esc(p.pos)}${p.bcPosRank ?? "–"} · you ${esc(p.pos)}${p.posRank ?? "–"} → ${vs}${note}</div>
+      <div class="faint">FantasyPros consensus, GMM tiers, half-PPR · as of ${esc(board.fftiers?.updated ?? "?")}</div>
+    </div>`;
+  }
+
+  // Disclosure wrapper for the SECONDARY sections. Collapsed buttons sit in one compact row; the
+  // opened one spans full width beneath them. State lives in openSect (board-wide, see above), so a
+  // repaint — take, sort, filter — never snaps a section you opened back shut.
+  function section(key, label, bodyHTML) {
+    const isOpen = openSect.has(key);
+    return `<div class="dsect${isOpen ? " open" : ""}">
+      <button class="dsect-btn" data-act="sect" data-sect="${key}" aria-expanded="${isOpen}">
+        <span class="dsect-caret" aria-hidden="true">${isOpen ? "▾" : "▸"}</span>${esc(label)}
+      </button>
+      ${isOpen ? `<div class="dsect-body">${bodyHTML}</div>` : ""}
+    </div>`;
+  }
+
   function detailHTML(p) {
     const a = p.availability ?? {};
     const gp = a.games_played ?? {};
     const facts = p.situation?.facts ?? [];
     const notes = p.risk_flags?.notes ?? [];
+    // PRIORITY (always visible): why-here → scouting → historical usage w/ trends → Boris Chen.
+    // Everything else is one click away; the drop-down opens scannable instead of overwhelming.
     return `<div class="ddetail">
       ${p.adp_commentary ? `<div class="dcommentary"><b>Why here at ${esc(p.pos)}:</b> ${esc(p.adp_commentary)}</div>` : ""}
       ${scoutHTML(p)}
-      <div class="dcol">
-        <h4>Value <span class="faint">(Phase A · $-engine)</span></h4>
-        <div><b>Sleeper proj:</b> ${p.projection?.pts ?? "–"} pts <span class="faint">(full-health season)</span></div>
-        <div><b>asset:</b> ${p.rate ?? "–"}/g rate × ${p.medianGames} median games = <b>${p.assetPts ?? "–"}</b> pts</div>
-        <div><b>draft value:</b> <b>${fmtD(p.draftDollar)}</b> <span class="faint">${p.draftDollar != null && p.draftDollar < 1 ? "(proximity score — below the $1 startable line)" : `(${p.marginal ?? "–"} over free ${esc(p.pos)}${replRankUsed[p.pos] ?? "?"} @ ${replAsset[p.pos] ?? "?"})`}</span></div>
-        <div><b>market:</b> ${fmtD(p.marketDollar)} at ADP ${p.adp?.half_ppr ?? "–"} → <b>edge ${p.draftDollar != null && p.draftDollar < 1 ? (p.edgePicks == null ? "–" : (p.edgePicks > 0 ? "+" : "") + Math.round(p.edgePicks) + "p") : edgeStr(p.edgeDollar)}</b> (${p.edgePicks == null ? "–" : (p.edgePicks > 0 ? "+" : "") + Math.round(p.edgePicks) + " picks"})</div>
-        <div><b>recommendation:</b> <b class="${p.rec === "TARGET" ? "name-value" : p.rec === "FADE" ? "name-reach" : ""}">${p.rec ?? "–"}</b>${p.conf?.recConf ? ` · confidence ${CONF_LABEL[p.conf.recConf - 1]} <span class="confdots">${CONF_DOTS[p.conf.recConf - 1]}</span>${p.conf.capped ? ` <span class="faint">(capped: ${p.conf.capped})</span>` : ""}` : ""}</div>
-        <div><b>asset confidence:</b> ${p.conf?.assetConf ?? "–"} <span class="faint">= worst of three legs · playing-time risk <b>${p.conf?.ptRisk ?? "–"}</b> (${p.conf?.gLow ?? "–"}–${p.conf?.gHigh ?? "–"} games) · disagreement <b>${p.conf?.dis ?? "–"}</b> · role stability <b>${p.conf?.role?.sev ?? "n/a"}</b> · band ${fmtD(p.conf?.bandLow)}–${fmtD(p.conf?.bandHigh)}</span></div>
-        <h4>Boris Chen (fftiers)</h4>
-        ${p.fftiers ? `<div><b>consensus rank:</b> #${p.fftiers.rank} · tier ${p.fftiers.tier}</div>
-        <div><b>expert avg:</b> ${p.fftiers.avg_rank} <span class="faint">(range ${p.fftiers.best_rank}–${p.fftiers.worst_rank}, std ${p.fftiers.std_dev})</span></div>
-        <div><b>vs your board:</b> experts ${esc(p.pos)}${p.bcPosRank ?? "–"} · you ${esc(p.pos)}${p.posRank ?? "–"} → ${p.bcGap == null ? "–" : p.bcGap === 0 ? "even with consensus" : `you're <b class="${Math.abs(p.bcGap) >= BC_OUT_SOME ? "bc-out" : ""}">${Math.abs(p.bcGap)} ${p.bcGap > 0 ? "LOWER (more bearish)" : "HIGHER (more bullish)"}</b>`}${p.bcGap != null && Math.abs(p.bcGap) >= BC_OUT_SOME ? ` <span class="faint">— ${p.bcGap > 0 ? (p.rec === "FADE" ? "contrarian fade, not corroborated by consensus — back it only if you trust the projection over the crowd" : "your board is below the crowd here") : (p.rec === "TARGET" ? "contrarian target — you're ahead of consensus" : "your board is above the crowd here")}</span>` : ""}</div>
-        <div class="faint">FantasyPros consensus, GMM tiers, half-PPR · as of ${esc(board.fftiers?.updated ?? "?")}</div>`
-          : `<div>${noData} — not in Boris Chen's top-200 (free agent or deep)</div>`}
-        <h4>Ceiling (spike weeks) <span class="faint">— separate attribute, not in value</span></h4>
-        ${p.ceiling ? `<div><b>spike-week rate:</b> ${Math.round(p.ceiling.spike_week_rate * 100)}% <span class="faint">of ${p.ceiling.sample_weeks} games${p.ceilRatio != null ? ` · ${p.ceilRatio}× ${esc(p.pos)} avg` : ""}</span></div>
-        <div><b>boom / floor week:</b> ${p.ceiling.boom_pts} / ${p.ceiling.floor_pts} pts <span class="faint">(${esc(p.pos)} top-5 line ${p.ceiling.boom_line})</span></div>`
-          : `<div>${noData} — rookie / &lt;10 career games</div>`}
-      </div>
-      <div class="dcol">
-        <h4>Availability <span class="faint">— feeds median games (lightly) + the uncertainty band</span></h4>
-        <div><b>median games used:</b> ${p.medianGames} <span class="faint">of 17</span></div>
-        <div><b>games played:</b> ${["2023", "2024", "2025"].map((y) => `${y}: ${gp[y] ?? "–"}`).join(" · ")}</div>
-        <div><b>age:</b> ${a.age ?? p.age ?? "–"} · <b>status:</b> ${esc(a.current_injury_status ?? "healthy/none")}</div>
-        <div><b>injury history:</b> ${a.injury_history == null ? noData + ' <span class="faint">(research pending)</span>' : esc(a.injury_history)}</div>
-        <h4>Situation ${p.situation?.modifier == null ? noData : `×${p.situation.modifier}`}</h4>
-        ${facts.length ? facts.map((f) => `<div class="fact">${esc(f.date)} <span class="ftype">${esc(f.type)}</span> ${esc(f.fact)}${f.source ? ` <a href="${esc(f.source)}" target="_blank" rel="noopener">src</a>` : ""}</div>`).join("") : `<div>${noData} — no curated facts touch this player yet</div>`}
-        <h4>Risk flags</h4>
-        <div>${p.risk_flags.researched === false ? `${noData} — not yet researched (null ≠ clean)` :
-          p.flagged.length ? `<b class="flagged-txt">${p.flagged.map(esc).join(", ")}</b>` : "researched: clean"}</div>
-        ${notes.map((n) => `<div class="fact faint">• ${esc(n)}</div>`).join("")}
-      </div>
       ${statsHTML(p)}
-      ${edgeExplainer(p)}
+      ${bcHTML(p)}
+      <div class="dsects">
+        ${section("value", "Value & $ engine", `
+          <div><b>Sleeper proj:</b> ${p.projection?.pts ?? "–"} pts <span class="faint">(full-health season)</span></div>
+          <div><b>asset:</b> ${p.rate ?? "–"}/g rate × ${p.medianGames} median games = <b>${p.assetPts ?? "–"}</b> pts</div>
+          <div><b>draft value:</b> <b>${fmtD(p.draftDollar)}</b> <span class="faint">${p.draftDollar != null && p.draftDollar < 1 ? "(proximity score — below the $1 startable line)" : `(${p.marginal ?? "–"} over free ${esc(p.pos)}${replRankUsed[p.pos] ?? "?"} @ ${replAsset[p.pos] ?? "?"})`}</span></div>
+          <div><b>market:</b> ${fmtD(p.marketDollar)} at ADP ${p.adp?.half_ppr ?? "–"} → <b>edge ${p.draftDollar != null && p.draftDollar < 1 ? (p.edgePicks == null ? "–" : (p.edgePicks > 0 ? "+" : "") + Math.round(p.edgePicks) + "p") : edgeStr(p.edgeDollar)}</b> (${p.edgePicks == null ? "–" : (p.edgePicks > 0 ? "+" : "") + Math.round(p.edgePicks) + " picks"})</div>
+          <div><b>recommendation:</b> <b class="${p.rec === "TARGET" ? "name-value" : p.rec === "FADE" ? "name-reach" : ""}">${p.rec ?? "–"}</b>${p.conf?.recConf ? ` · confidence ${CONF_LABEL[p.conf.recConf - 1]} <span class="confdots">${CONF_DOTS[p.conf.recConf - 1]}</span>${p.conf.capped ? ` <span class="faint">(capped: ${p.conf.capped})</span>` : ""}` : ""}</div>
+          <div><b>asset confidence:</b> ${p.conf?.assetConf ?? "–"} <span class="faint">= worst of three legs · playing-time risk <b>${p.conf?.ptRisk ?? "–"}</b> (${p.conf?.gLow ?? "–"}–${p.conf?.gHigh ?? "–"} games) · disagreement <b>${p.conf?.dis ?? "–"}</b> · role stability <b>${p.conf?.role?.sev ?? "n/a"}</b> · band ${fmtD(p.conf?.bandLow)}–${fmtD(p.conf?.bandHigh)}</span></div>`)}
+        ${section("ceiling", "Ceiling (spike weeks)", p.ceiling
+          ? `<div><b>spike-week rate:</b> ${Math.round(p.ceiling.spike_week_rate * 100)}% <span class="faint">of ${p.ceiling.sample_weeks} games${p.ceilRatio != null ? ` · ${p.ceilRatio}× ${esc(p.pos)} avg` : ""}</span></div>
+          <div><b>boom / floor week:</b> ${p.ceiling.boom_pts} / ${p.ceiling.floor_pts} pts <span class="faint">(${esc(p.pos)} top-5 line ${p.ceiling.boom_line})</span></div>
+          <div class="faint">Separate display attribute — never an input to value.</div>`
+          : `<div>${noData} — rookie / &lt;10 career games</div>`)}
+        ${section("avail", "Availability & injury", `
+          <div><b>median games used:</b> ${p.medianGames} <span class="faint">of 17</span></div>
+          <div><b>games played:</b> ${["2023", "2024", "2025"].map((y) => `${y}: ${gp[y] ?? "–"}`).join(" · ")}</div>
+          <div><b>age:</b> ${a.age ?? p.age ?? "–"} · <b>status:</b> ${esc(a.current_injury_status ?? "healthy/none")}</div>
+          <div><b>injury history:</b> ${a.injury_history == null ? noData + ' <span class="faint">(research pending)</span>' : esc(a.injury_history)}</div>`)}
+        ${section("situation", `Situation & risk flags${p.flagged.length ? ` (${p.flagged.length})` : ""}`, `
+          <div><b>Situation</b> ${p.situation?.modifier == null ? noData : `×${p.situation.modifier}`}</div>
+          ${facts.length ? facts.map((f) => `<div class="fact">${esc(f.date)} <span class="ftype">${esc(f.type)}</span> ${esc(f.fact)}${f.source ? ` <a href="${esc(f.source)}" target="_blank" rel="noopener">src</a>` : ""}</div>`).join("") : `<div>${noData} — no curated facts touch this player yet</div>`}
+          <div class="dsect-sub"><b>Risk flags:</b> ${p.risk_flags.researched === false ? `${noData} — not yet researched (null ≠ clean)` :
+            p.flagged.length ? `<b class="flagged-txt">${p.flagged.map(esc).join(", ")}</b>` : "researched: clean"}</div>
+          ${notes.map((n) => `<div class="fact faint">• ${esc(n)}</div>`).join("")}`)}
+        ${section("build", "How this value is built", edgeExplainer(p))}
+      </div>
     </div>`;
   }
 
@@ -607,6 +640,9 @@
       saveTaken();
     } else if (act.dataset.act === "expand") {
       expandedId = expandedId === id ? null : id;
+    } else if (act.dataset.act === "sect") {
+      const k = act.dataset.sect;
+      openSect.has(k) ? openSect.delete(k) : openSect.add(k);
     }
     paint();
   });
