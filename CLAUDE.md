@@ -21,7 +21,7 @@ Half PPR (0.5/rec), 1pt/10 rush+rec yds, 6pt TDs from scrimmage; passing 1pt/25y
 - `briefs/` — dated outputs of /brief.
 - Commands: `.claude/commands/` — brief, waivers, startsit, trade. /waivers and /brief also publish JSON to `data/site/` for the dashboard.
 - `site/` — HBGBs HQ dashboard (static; serve project root on :8642, open /site/). League ID lives in `site/config.js` too — update BOTH at renewal.
-- **Live dashboard: https://hbgbs-hq.pages.dev/site/** — Cloudflare Pages, login-gated (ben.p.irvin@gmail.com email code). Auto-deploys on push to `main` of the private repo `benirvin714/fantasy-2026`; only `site/` + `data/site/` are served (build copies them to `dist/`), the rest of the repo stays unserved. Publishing = commit + push (the /brief and /waivers commands do this in their final step). Hosting details: `..\hosting-plan.md`.
+- **Live dashboard: https://hbgbs.irvinfamily.com/site/** (custom domain, added 2026-07-27; the old `https://hbgbs-hq.pages.dev/site/` still works and is still gated) — Cloudflare Pages, login-gated (ben.p.irvin@gmail.com email code). Auto-deploys on push to `main` of the private repo `benirvin714/fantasy-2026`; only `site/` + `data/site/` are served (build copies them to `dist/`), the rest of the repo stays unserved. Publishing = commit + push (the /brief and /waivers commands do this in their final step). Hosting details: `..\hosting-plan.md`.
 
 ## MCP notes
 - Sleeper MCP: 13 read-only tools. No transactions endpoint and no free-agent-pool endpoint — supplement with Sleeper public REST (`https://api.sleeper.app/v1/...`, read-only GETs).
