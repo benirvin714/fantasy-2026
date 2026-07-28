@@ -329,6 +329,11 @@
   const edgeStr = (e) => { if (e == null) return "–"; const r = Math.round(e); return r === 0 ? "$0" : (r > 0 ? "+$" : "−$") + Math.abs(r); }; // round: a boundary player's sub-dollar market gap reads $0 (fair), not "+$0.04"
   const fmtD = (d) => d == null ? "–" : d >= 1 ? `$${d}` : `$${d.toFixed(2)}`;   // ≥$1 = integer price; <$1 = proximity score
 
+  // The full-row tier wash is a GROUPING device, so it only earns its place where the tiers are
+  // contiguous: the BC sort on the value board. The tiers view groups by our own draft-$ tiers, so
+  // Boris Chen's tiers interleave inside every block there too.
+  const washOn = () => view === "board" && sort === "bc";
+
   // Which rows open a Boris Chen tier block. A capping rule only earns its keep where the tier
   // genuinely reads as a block, so a row qualifies on two local counts: it opens a run of 2+
   // consecutive rows in the same tier, AND that tier has not appeared earlier in the list.
@@ -403,7 +408,12 @@
     ].join("");
     // Tier identity rides on custom properties so the CSS owns where each one lands (row wash,
     // left band, hover, block rule) and a player with no fftiers rank simply falls back transparent.
-    const tierStyle = tc ? ` style="--tier-wash:${tc.wash};--tier-hover:${tc.hover};--tier-stripe:${tc.stripe};--tier-edge:${tc.edge}"` : "";
+    // The full-row wash is emitted ONLY where the tiers are actually contiguous — the BC sort on the
+    // value board. Everywhere else the tiers interleave, and a wash there is confetti rather than
+    // grouping; the left band and the T-pill still carry each row's tier in every sort and view.
+    const tierStyle = tc
+      ? ` style="${washOn() ? `--tier-wash:${tc.wash};--tier-hover:${tc.hover};` : ""}--tier-stripe:${tc.stripe};--tier-edge:${tc.edge}"`
+      : "";
     return `
     <div class="drow ${isTaken ? "taken" : ""}${tierStart ? " tier-start" : ""}" data-id="${p.id}"${tierStyle}>
       <button class="take" data-act="take" aria-pressed="${isTaken}" title="${isTaken ? "Mark available" : "Mark drafted"}">${isTaken ? "✓" : ""}</button>
@@ -670,7 +680,7 @@
       const starts = tierStarts(sorted);
       $("#board-body").innerHTML = headerHTML +
         sorted.map((p, i) => rowHTML(p, p.draftRank ?? "–", starts[i])).join("") +
-        `<div class="boardfoot"><b>Row color + left band</b> = Boris Chen tier (a block of one color is one tier) ·  <b>BC</b> = Boris Chen consensus rank (your primary board) · <b>BC−adp</b> = spots the market lets him fall past that consensus (<span class="name-value">+ = value</span> / <span class="name-reach">− = reach</span>) · <b>$val</b>: ≥$1 = auction price, &lt;$1 = proximity-to-rosterable score · <b>edge</b>: $-gap above $1, board-vs-ADP pick-gap (Np) below · <span class="name-value">TARGET</span>/<span class="name-reach">FADE</span> + confidence dots ●●●. Bench tier gets no TARGET — lean on <b>ceil</b> for upside. # = draft-value rank.</div>`;
+        `<div class="boardfoot">${washOn() ? "<b>Row color + left band</b> = Boris Chen tier (a block of one color is one tier)" : "<b>Left band</b> = Boris Chen tier (the full-row wash is on the BC sort only, where tiers run contiguous)"} · <b>BC</b> = Boris Chen consensus rank (your primary board) · <b>BC−adp</b> = spots the market lets him fall past that consensus (<span class="name-value">+ = value</span> / <span class="name-reach">− = reach</span>) · <b>$val</b>: ≥$1 = auction price, &lt;$1 = proximity-to-rosterable score · <b>edge</b>: $-gap above $1, board-vs-ADP pick-gap (Np) below · <span class="name-value">TARGET</span>/<span class="name-reach">FADE</span> + confidence dots ●●●. Bench tier gets no TARGET — lean on <b>ceil</b> for upside. # = draft-value rank.</div>`;
     } else {
       $("#board-title").textContent = "Tiers — cliff edges (by draft $)";
       const posList = pos === "ALL" ? ["RB", "WR", "QB", "TE", "K", "DEF"] : [pos];

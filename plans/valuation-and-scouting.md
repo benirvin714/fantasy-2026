@@ -186,10 +186,13 @@ The first pass at tier color (a 3px stripe + a faint pill, 47° hue step) was de
 as too quiet: neighbouring tiers sat a shade apart and the grouping didn't register. Rebuilt so a Boris
 Chen tier reads as a **slab**, not a hint.
 
-- **Full-row wash + a 5px left band.** Every tiered row carries its tier color as a background wash
-  (alpha 0.17) plus a near-solid band. Applies in **every sort and view** — a tier-2 player buried in an
-  ADP-sorted list still shows his color. Untiered players (outside the fftiers top-200) render
-  transparent but keep the same 5px inset so columns stay aligned with the tiered rows.
+- **Full-row wash + a 5px left band**, on two different scopes. The near-solid band (plus the T-pill)
+  carries each row's tier in **every sort and view** — a tier-2 player buried in an ADP-sorted list still
+  shows his color. The background wash (alpha 0.17) is a **grouping** device, so it only appears where
+  the tiers actually run contiguous: the **BC sort on the value board** (`washOn()`). Everywhere else the
+  tiers interleave and a wash reads as confetti, not grouping. The board footer swaps its legend line to
+  match. Untiered players (outside the fftiers top-200) render transparent but keep the same 5px inset so
+  columns stay aligned with the tiered rows.
 - **Hue steps by the golden angle (137.5°)**, not a small fixed step. Consecutive tiers land on opposite
   sides of the wheel. Measured on the composited DOM colors: adjacent tiers are **ΔE 66–167** on the band
   (ΔE ~2.3 is the just-noticeable threshold) and ΔE 11–27 on the wash. The old 47° step also wrapped to a
@@ -209,7 +212,7 @@ Chen tier reads as a **slab**, not a hint.
   signal, while the band keeps the block visually unbroken. The expanded detail sits on its own opaque
   `--surface-2`, so the wash never bleeds into a wall of text.
 
-Files: `tierColor()` / `tierStarts()` / `rowHTML` in `site/draft.js`; `.drow` custom-property block,
+Files: `tierColor()` / `tierStarts()` / `washOn()` / `rowHTML` in `site/draft.js`; `.drow` custom-property block,
 `.tier-start`, `.drow:not(.dhead):hover`, `.drow.taken` in `site/style.css`.
 
 ## 2. Challenge 2 — `scouting_brief` (public commentary)
