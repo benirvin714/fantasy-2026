@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap">
-  <link rel="stylesheet" href="style.css?v=27">
+  <link rel="stylesheet" href="style.css?v=28">
 </head>
 <body>
   <header>
@@ -73,7 +73,19 @@
           <h2>Targets <span class="tgt-count" id="tgt-count"></span></h2>
           <button id="clear-targets" class="tgt-clear" title="Remove every target">clear</button>
         </div>
-        <div class="tgt-clock" id="tgt-clock"></div>
+        <div class="tgt-clock">
+          <label class="tgt-slot" title="Your seat in the snake order. Set it and the rail works out which picks are yours and whether each target survives to them.">
+            <span>draft slot</span>
+            <select id="draft-slot">
+              <option value="">not set</option>
+              <option value="1">1</option><option value="2">2</option><option value="3">3</option>
+              <option value="4">4</option><option value="5">5</option><option value="6">6</option>
+              <option value="7">7</option><option value="8">8</option><option value="9">9</option>
+              <option value="10">10</option>
+            </select>
+          </label>
+          <div class="tgt-clockline" id="tgt-clockline"></div>
+        </div>
         <div class="panel-body tgt-body" id="targets-body"></div>
       </aside>
     </div>
@@ -87,6 +99,6 @@
   </footer>
 
   <script src="config.js?v=6"></script>
-  <script src="draft.js?v=42"></script>
+  <script src="draft.js?v=43"></script>
 </body>
 </html>

@@ -363,10 +363,38 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
 }
 .tgt-clear:hover { color: var(--neg); border-color: var(--neg); }
 .tgt-clock {
+  display: flex; align-items: center; gap: 8px;
   padding: 7px 12px; font-size: 11px; color: var(--dim);
   border-bottom: 1px solid var(--border); background: rgba(255,255,255,.015);
 }
 .tgt-clock b { color: var(--accent); }
+.tgt-clockline { line-height: 1.5; min-width: 0; }
+.tgt-slot {
+  display: flex; flex-direction: column; gap: 2px; flex: none; cursor: pointer;
+  font-size: 9px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--faint);
+}
+.tgt-slot select {
+  font-family: var(--font-data); font-size: 13px; font-weight: 600;
+  color: var(--accent); background: var(--surface-2);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 3px 4px; cursor: pointer; min-height: 28px;
+}
+.tgt-slot select:hover { border-color: var(--accent); }
+/* your own upcoming picks; flips to a loud chip on the tick where the pick is actually yours */
+.tgt-mine { color: var(--faint); font-weight: 600; }
+.tgt-mine.on-me {
+  color: var(--bg); background: var(--accent);
+  border-radius: var(--radius); padding: 0 5px; letter-spacing: .06em;
+}
+/* the snake read: does he survive to a pick I hold. Three buckets, deliberately no finer —
+   see survivalHTML() in draft.js for why the slack is a stated rule of thumb, not a probability. */
+.tgt-hold {
+  font-family: var(--font-data); font-size: 10px; font-weight: 600; white-space: nowrap;
+  border: 1px solid; border-radius: 999px; padding: 0 6px;
+}
+.tgt-hold.tgt-hold-safe { color: var(--accent); border-color: rgba(99,191,90,.45); }
+.tgt-hold.tgt-hold-flip { color: var(--warn); border-color: rgba(201,180,88,.45); }
+.tgt-hold.tgt-hold-gone { color: var(--neg); border-color: rgba(208,106,92,.5); }
 /* min-height:0 lets this flex child actually shrink so overflow-y has something to bite on */
 .panel.targets .tgt-body { padding: 6px 8px 10px; overflow-y: auto; min-height: 0; max-height: 46vh; }
 @media (min-width: 1040px) { .panel.targets .tgt-body { max-height: none; } }
@@ -382,7 +410,10 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
 .tgt:hover { background: var(--surface-2); }
 .tgt-main { min-width: 0; }
 .tgt-l1 { display: flex; align-items: baseline; gap: 6px; justify-content: space-between; }
-.tgt-l2 { display: flex; align-items: baseline; gap: 6px; justify-content: space-between; margin-top: 1px; }
+.tgt-l2, .tgt-l3 { display: flex; align-items: baseline; gap: 6px; justify-content: space-between; margin-top: 1px; }
+/* L3 holds the two time reads: when the market takes him, and whether he reaches a pick you hold.
+   With no draft slot set the right-hand chip is absent and the away figure sits alone on the left. */
+.tgt-l3 { margin-top: 2px; }
 .tgt-name { font-weight: 600; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .tgt-adp { font-size: 10px; color: var(--dim); white-space: nowrap; }
 .tgt-pos { font-size: 10px; color: var(--moss); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -685,6 +716,7 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
   .drow .star { width: 44px; height: 44px; margin: auto 0; font-size: 17px; }
   .tgt-x { width: 44px; height: 44px; }
   .tgt { grid-template-columns: minmax(0, 1fr) 44px; }
+  .tgt-slot select { min-height: 44px; min-width: 52px; }
 }
 
 /* larger touch targets on small screens */

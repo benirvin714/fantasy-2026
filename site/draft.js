@@ -28,11 +28,12 @@
 
   const KNOB_KEY = "hq-draft-2026-knobs";
   const savedKnobs = JSON.parse(localStorage.getItem(KNOB_KEY) ?? "{}");
-  const saveKnobs = () => localStorage.setItem(KNOB_KEY, JSON.stringify({ replBasis }));
+  const saveKnobs = () => localStorage.setItem(KNOB_KEY, JSON.stringify({ replBasis, draftSlot }));
 
   let board = null, rows = [];
   let pos = "ALL", view = "board", sort = "bc", hideDrafted = false, hideFlagged = false;
   let replBasis = savedKnobs.replBasis ?? 0;  // 0 = starter basis (default), 1 = rostered (best-FA)
+  let draftSlot = savedKnobs.draftSlot ?? null;   // 1..10, or null = unset (rail then hides the snake reads)
   let expandedId = null; // single-row accordion
   // Which secondary sections of the drop-down are revealed. Keyed by SECTION, not by player, so the
   // choice is a board-wide preference that follows you player to player; resets compact on reload.
@@ -59,6 +60,27 @@
   const FADE_ADP = 110, PICK_FADE = -25;               // sub-$1 FADE: market drafts a below-replacement player inside pick ~110 AND ≥25 picks earlier than the board ranks him
   const BC_OUT_SOME = 10, BC_OUT_STRONG = 18;          // us-vs-BC POSITIONAL divergence (calibrated to this board: median gap 7, p85≈18) — notable vs strong outlier
   let replAsset = {}, replRankUsed = {}, ceilAvg = {}, dollarAtRank = [];
+
+  /* ---- snake-draft geometry (for the target rail's "will he last to MY pick?" read) ----
+     MEASURED, not assumed: data/raw/draft-meta-2023..25.json are identical — 10 teams, 15 rounds,
+     type "snake", reversal_round 0 (this league does NOT run a third-round reversal). Verified
+     against data/raw/draft-picks-2025.json, where slot 3 held picks #3, #18, #23, #38, #43: odd
+     rounds run slot 1→10, even rounds run 10→1. Re-check draft-meta at renewal if the league ever
+     changes size, length, or turns reversal on — the reversal case is deliberately NOT implemented,
+     because a silently-wrong pick number here is worse than no number at all. */
+  const ROUNDS = 15;
+  const pickNoFor = (rd, slot) => (rd - 1) * TEAMS + (rd % 2 ? slot : TEAMS + 1 - slot);
+  // My remaining picks from `from` onward (inclusive), in order.
+  const myPicksFrom = (from, slot) => {
+    const out = [];
+    for (let r = 1; r <= ROUNDS; r++) { const n = pickNoFor(r, slot); if (n >= from) out.push(n); }
+    return out;
+  };
+  // How much slack to allow around a pick before calling a player gone or safe. Half a round is a
+  // stated RULE OF THUMB about how noisy ADP is in a 10-team league, not a computed probability —
+  // the board carries no ADP variance, and Boris Chen's expert rank spread is a different quantity
+  // that must not be borrowed as one. The tooltips say so rather than implying precision.
+  const ADP_SLACK = Math.round(TEAMS / 2);
 
   function medianGames(p) {
     if (p.pos === "K" || p.pos === "DEF") return 17;
@@ -674,6 +696,32 @@
     return list;
   }
 
+  /* ---- "will he last to MY pick?" — the snake read ----
+     Only rendered once you've set a draft slot; with no slot the rail makes no claim at all rather
+     than guessing a seat. The question it answers shifts by one turn when you're the one on the
+     clock: at that moment "does he survive to my next pick" is moot (you can just take him), and the
+     live decision is the WHEEL — if I spend this pick elsewhere, is he back at my following one.
+     Precision is deliberately capped at three buckets around a stated half-round of slack. The board
+     carries no ADP variance, so anything finer would be invented. */
+  function survivalHTML(adp, nextPick, myNext, mine) {
+    if (adp == null || !myNext) return "";
+    const onMe = myNext === nextPick;
+    const at = onMe ? mine[1] : myNext;
+    const chip = (cls, txt, why) => `<span class="tgt-hold ${cls}" title="${esc(why)}">${txt}</span>`;
+    if (!at) return chip("tgt-hold-flip", "your last pick", "This is the final pick you hold in the draft, so there's no later turn to wait for. It's now or not at all.");
+    const a = Math.round(adp);
+    if (a < nextPick) return chip("tgt-hold-flip", `${at - nextPick} to #${at}`,
+      `He has already outlasted his ADP of ${a}, so ADP can't price whether he survives the ${at - nextPick} picks between now and your #${at}. That one's a live judgment call, not a number.`);
+    const d = a - at;
+    const rule = `Bucketed with ${ADP_SLACK} picks of slack either side of your pick — a rule of thumb about how noisy ADP is in a ${TEAMS}-team league, not a computed probability. The board carries no ADP variance to derive one from.`;
+    if (d >= ADP_SLACK) return chip("tgt-hold-safe", `${onMe ? "back at" : "lasts to"} #${at}`,
+      `His ADP of ${a} sits ${d} picks past your #${at}${onMe ? ", the pick you come back on if you spend this one elsewhere" : ""}, so he should still be there. ${rule}`);
+    if (d > -ADP_SLACK) return chip("tgt-hold-flip", `coin flip #${at}`,
+      `His ADP of ${a} lands within ${ADP_SLACK} picks of your #${at}${onMe ? " (your next turn after this one)" : ""}. Genuinely could go either way. ${rule}`);
+    return chip("tgt-hold-gone", onMe ? "now or never" : `gone by #${at}`,
+      `His ADP of ${a} is ${-d} picks before your #${at}${onMe ? ", so passing here almost certainly costs him" : ", so waiting almost certainly costs him"}. ${rule}`);
+  }
+
   /* ---------- target list (the rail beside the board) ----------
      Answers one question on the clock: of the players I actually want, who goes next, and do I have
      time? "Away" is measured from the LIVE pick number, which is just the count of drafted marks + 1
@@ -692,9 +740,23 @@
 
     const nextPick = taken.size + 1;
     const nextRd = Math.floor((nextPick - 1) / TEAMS) + 1;
+    const over = nextPick > ROUNDS * TEAMS;
+    // your seat in the snake: the picks you still hold, soonest first. Null slot = the rail simply
+    // doesn't make the claim, rather than guessing a seat.
+    const mine = draftSlot ? myPicksFrom(nextPick, draftSlot) : [];
+    const myNext = mine[0] ?? null;
+    const onMe = myNext === nextPick;
+
     $("#tgt-count").textContent = live.length ? `${live.length}` : "";
-    $("#tgt-clock").innerHTML = `<b class="mono">pick #${nextPick}</b> <span class="faint">· round ${nextRd} · counting ${taken.size} drafted mark${taken.size === 1 ? "" : "s"}</span>`;
-    $("#tgt-clock").title = `Every "away" figure below is measured from pick #${nextPick}, derived from the ${taken.size} players you've marked drafted. Mark each pick as it happens and this stays honest; skip some and the distances read long.`;
+    const clockTxt = over ? `<b class="mono">draft complete</b> <span class="faint">· all ${ROUNDS * TEAMS} picks marked</span>`
+      : `<b class="mono">pick #${nextPick}</b> <span class="faint">· rd ${nextRd} · ${taken.size} drafted mark${taken.size === 1 ? "" : "s"}</span>`;
+    const mineTxt = !draftSlot
+      ? `<span class="faint">set your draft slot for "will he last to my pick?"</span>`
+      : mine.length
+        ? `<span class="tgt-mine${onMe ? " on-me" : ""}">${onMe ? "YOU'RE UP" : "you"}:</span> <span class="mono">${mine.slice(0, 4).map((n) => `#${n}`).join(" · ")}${mine.length > 4 ? " …" : ""}</span>`
+        : `<span class="faint">no picks left from slot ${draftSlot}</span>`;
+    $("#tgt-clockline").innerHTML = `${clockTxt}<br>${mineTxt}`;
+    $("#tgt-clockline").title = `The pick number is derived from the ${taken.size} players you've marked drafted, so mark every pick as it happens; skip some and the distances read long.${draftSlot ? ` Your picks come from slot ${draftSlot} of a ${TEAMS}-team, ${ROUNDS}-round snake with no reversal round, which is how this league has drafted every year on record.` : ""}`;
 
     if (!live.length && !gone.length) {
       body.innerHTML = `<div class="tgt-empty">No targets yet. Hit <span class="tgt-mark">☆</span> on any row to put a player here, and he'll drop off this list the moment you mark him drafted.</div>`;
@@ -724,7 +786,8 @@
       return `<div class="tgt" data-id="${p.id}"${tc ? ` style="--tier-stripe:${tc.stripe}"` : ""}>
         <div class="tgt-main">
           <div class="tgt-l1"><span class="tgt-name">${esc(p.name)}</span><span class="tgt-adp mono">${adpTxt}</span></div>
-          <div class="tgt-l2"><span class="tgt-pos mono">${esc(p.pos)}${p.posRank ?? ""} · ${esc(p.team)}${p.fftiers ? ` · BC ${p.fftiers.rank}` : ""} · ${fmtD(p.draftDollar)}</span>${rec}<span class="tgt-away mono ${awayCls}" title="${esc(awayTitle)}">${awayTxt}</span></div>
+          <div class="tgt-l2"><span class="tgt-pos mono">${esc(p.pos)}${p.posRank ?? ""} · ${esc(p.team)}${p.fftiers ? ` · BC ${p.fftiers.rank}` : ""} · ${fmtD(p.draftDollar)}</span>${rec}</div>
+          <div class="tgt-l3"><span class="tgt-away mono ${awayCls}" title="${esc(awayTitle)}">${awayTxt}</span>${survivalHTML(adp, nextPick, myNext, mine)}</div>
         </div>
         <button class="tgt-x" data-act="untarget" title="Remove ${esc(p.name)} from the target list">×</button>
       </div>`;
@@ -802,6 +865,10 @@
     if (!id) return;
     targets.delete(id); saveTargets(); paint();
   });
+  $("#draft-slot").addEventListener("change", (e) => {
+    draftSlot = e.target.value ? +e.target.value : null;
+    saveKnobs(); paintTargets();
+  });
   $("#clear-targets").addEventListener("click", () => {
     if (targets.size && confirm(`Clear all ${targets.size} targets?`)) { targets.clear(); saveTargets(); paint(); }
   });
@@ -872,6 +939,7 @@
     }
     rows = rank(board.players.map(compute));
     if (replInput) replInput.value = replBasis;
+    $("#draft-slot").value = draftSlot ?? "";
     updateKnobReadouts();
     $("#board-meta").textContent = `board ${board.generated} · ${rows.length} players · ADP as of ${board.generated}`;
     paint();

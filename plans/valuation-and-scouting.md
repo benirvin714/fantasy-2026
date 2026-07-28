@@ -237,6 +237,24 @@ a draft: **of my targets, who goes next, and do I have time?**
   the best news on the board), `on the clock` (amber), `N picks · R.R rd` inside one round (amber),
   anything further out stays quiet. No ADP renders an honest "no ADP", never a fabricated distance.
 - **Sorted by ADP ascending**, so the top of the rail is whoever the market takes first.
+- **The snake read (draft slot).** Pick your seat from the rail's `draft slot` selector and it lists
+  the picks you still hold and answers, per target, whether he reaches one. Geometry is **measured,
+  not assumed**: `draft-meta-2023..25.json` are identical (10 teams, 15 rounds, snake,
+  `reversal_round: 0`), and `pickNoFor()` is validated against `draft-picks-2025.json` — slot 3 held
+  #3, #18, #23, #38, #43, which is exactly what it emits. Reversal rounds are **deliberately not
+  implemented**; if the league ever turns one on, a silently-wrong pick number would be worse than
+  none, so re-check `draft-meta` at renewal.
+  - Three buckets against `ADP_SLACK = 5` (half a round): `lasts to #38` / `coin flip #38` /
+    `gone by #38`. The slack is a **stated rule of thumb**, and the tooltip says so. The board carries
+    no ADP variance, and Boris Chen's expert rank spread is a different quantity that must not be
+    borrowed as one, so anything finer would be invented precision.
+  - **The question shifts by one turn when the pick is yours.** At your own pick "does he survive to
+    my next pick" is moot, so the chips pivot to the wheel: `back at #43` / `coin flip #43` /
+    `now or never`. The clock line flips to a `YOU'RE UP` chip at the same moment.
+  - Two honest special cases: a player who has **already outlasted his ADP** gets `5 to #43` with a
+    tooltip saying ADP has been falsified and the wait is a judgment call, not `gone by` (he's
+    demonstrably not gone); and at your final pick the chip reads `your last pick`.
+  - With no slot set the rail **makes no claim at all** rather than guessing a seat.
 - **Independent of the board's own filters** — position filter, sort, view, and hide-drafted don't
   touch it. It's your list, not a view of the board. It does inherit each player's Boris Chen tier
   band, so a target's color matches his row.
@@ -245,7 +263,8 @@ a draft: **of my targets, who goes next, and do I have time?**
   the measured toolbar height with internal scroll. `.draft-main` widened 1100 → 1440px, which leaves
   the board column at ~1069px, so row density is unchanged.
 
-Files: `paintTargets()` / the `star` + `untarget` handlers / `TGT_KEY` in `site/draft.js`; the
+Files: `paintTargets()` / `survivalHTML()` / `pickNoFor()` / `myPicksFrom()` / `ROUNDS` / `ADP_SLACK` /
+the `star` + `untarget` + `draft-slot` handlers / `TGT_KEY` in `site/draft.js`; the
 `.draft-cols` grid, `.tgt*` block, `.drow .star`, and the widened `.drow` grid in `site/style.css`;
 the `<aside class="panel targets">` in `site/draft.html`. Note `section.panel, aside.panel` — the
 original element+class selector wouldn't have matched an `<aside>` at all.
