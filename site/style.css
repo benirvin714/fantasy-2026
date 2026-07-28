@@ -330,10 +330,19 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
 .drow {
   display: grid; grid-template-columns: 40px minmax(0, 1fr);
   border-bottom: 1px solid var(--border);
-  /* left stripe = Boris Chen tier color (set inline per row). Reserved transparent here so the
-     header and any no-tier rows keep the same 3px inset and columns stay aligned. */
-  border-left: 3px solid transparent;
+  /* Boris Chen tier identity: a bold left band plus a full-row wash, both fed by custom properties
+     set inline per row (see tierColor() in draft.js). Declared with transparent fallbacks so the
+     column header and any player outside the fftiers top-200 keep the same 5px inset and stay
+     aligned with the tiered rows. */
+  border-left: 5px solid var(--tier-stripe, transparent);
+  background: var(--tier-wash, transparent);
 }
+/* the row opening a tier block gets a rule in that tier's own color, so blocks read as slabs.
+   Only applied where the board is genuinely tier-ordered — see tierStarts() in draft.js. */
+.drow.tier-start { border-top: 1px solid var(--tier-edge, transparent); }
+/* :not(.dhead) keeps the sticky column header opaque — it has no tier vars, so a hover rule that
+   matched it would resolve to transparent and let rows scroll visibly through it. */
+.drow:not(.dhead):hover { background: var(--tier-hover, transparent); }
 .drow:last-child { border-bottom: none; }
 /* column header locks to the top on scroll. The toolbar above is already sticky at top:0
    (z-index 10), so this parks just beneath it at the JS-measured toolbar height (--toolbar-h,
@@ -390,6 +399,10 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
 .gap-fair { color: var(--faint); }
 .name-value { color: var(--blue); }
 .name-reach { color: var(--neg); }
+/* drafted: drop the wash (this row is spent, and an unwashed gap is itself a useful signal) but
+   keep the left band so the tier block still reads as one unbroken slab. Declared after the hover
+   rule — same specificity, so source order is what keeps a drafted row unwashed under the cursor. */
+.drow.taken, .drow.taken:hover { background: none; }
 .drow.taken .dmain { opacity: 0.38; }
 .drow.taken .dname { text-decoration: line-through; }
 
@@ -563,7 +576,7 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
   margin: 18px 0 2px; padding: 6px 8px;
   font-family: var(--font-data); font-size: 12px; font-weight: 600;
   letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent);
-  border-left: 2px solid var(--accent);
+  border-left: 5px solid var(--accent);   /* matches the rows' tier band so the left edge stays flush */
   background: var(--surface-2);
 }
 .cliff {

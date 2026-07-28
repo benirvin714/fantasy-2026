@@ -297,19 +297,62 @@
   /* ---------- render helpers ---------- */
   const noData = '<span class="nodata">no data</span>';
   const badge = (txt, cls, title) => `<span class="rbadge ${cls}" title="${esc(title)}">${esc(txt)}</span>`;
-  // Subtle per-tier color for Boris Chen's tiers (overall, 1..~23). Hue cycles by a fixed step so
-  // ADJACENT tiers always differ (the whole point — see the cliffs when BC-sorted); it repeats every
-  // ~8 tiers, but those share-a-hue tiers sit far apart on the board so there's no boundary ambiguity.
-  // Deliberately low saturation + a thin stripe / faint pill so it reads as a quiet band, not a rainbow.
-  // Starts on green (tier 1 = best, on-brand). Returns null-safe pieces used for the row stripe + badge.
+  // Per-tier color for Boris Chen's tiers (overall, 1..~23). It does three jobs: a full-row wash so
+  // a tier reads as one block, a bold left band, and the pill in the BC cell.
+  //
+  // Hue steps by the GOLDEN ANGLE (137.5°), not a small fixed step. Consecutive tiers land on
+  // opposite sides of the wheel, so neighbours can never be confused, and no two hues come close
+  // again for many tiers. The old 47° step was the problem: neighbours sat a shade apart and the
+  // sequence wrapped to a near-repeat every 8 tiers, which is what read as mush.
+  //
+  // Lightness does two jobs. It's compensated per hue — an HSL blue looks far darker than an HSL
+  // yellow at the same L — so blue-ish tiers get pushed up and yellow-ish ones down; without it the
+  // wash strength swings visibly tier to tier and the "same weight, different color" read breaks.
+  // Then a period-3 step rides on top: 8 golden-angle turns land only ~20° from where they started,
+  // so hue alone still near-repeats every 8 tiers, and a 3-cycle against that 8-cycle pushes a true
+  // repeat out to 24 tiers — past the end of the board. It also gives every neighbour a second axis
+  // of difference, which is what keeps the blocks apart for a red/green-colorblind reader.
+  // Starts on green (tier 1 = best, on-brand).
   const tierColor = (t) => {
-    const h = (150 + (t - 1) * 47) % 360;
-    return { stripe: `hsl(${h} 34% 55% / 0.55)`, text: `hsl(${h} 42% 72%)`, bg: `hsl(${h} 34% 55% / 0.15)` };
+    const h = (150 + (t - 1) * 137.5) % 360;
+    const l = 58 + 10 * Math.cos(((h - 240) * Math.PI) / 180)    // ~48% at yellow, ~68% at blue
+      + [0, -9, 9][t % 3];
+    return {
+      wash: `hsl(${h} 46% ${l}% / 0.17)`,                        // whole-row background
+      hover: `hsl(${h} 52% ${l}% / 0.28)`,
+      stripe: `hsl(${h} 62% ${l}% / 0.95)`,                      // 5px left band
+      edge: `hsl(${h} 62% ${l}% / 0.55)`,                        // rule capping a tier block
+      text: `hsl(${h} 60% ${Math.min(l + 16, 80)}%)`,
+      bg: `hsl(${h} 50% ${l}% / 0.26)`,                          // pill, sits on top of the wash
+    };
   };
   const edgeStr = (e) => { if (e == null) return "–"; const r = Math.round(e); return r === 0 ? "$0" : (r > 0 ? "+$" : "−$") + Math.abs(r); }; // round: a boundary player's sub-dollar market gap reads $0 (fair), not "+$0.04"
   const fmtD = (d) => d == null ? "–" : d >= 1 ? `$${d}` : `$${d.toFixed(2)}`;   // ≥$1 = integer price; <$1 = proximity score
 
-  function rowHTML(p, rankLabel) {
+  // Which rows open a Boris Chen tier block. A capping rule only earns its keep where the tier
+  // genuinely reads as a block, so a row qualifies on two local counts: it opens a run of 2+
+  // consecutive rows in the same tier, AND that tier has not appeared earlier in the list.
+  //
+  // Both tests are local, which is what makes this survive the real data. Under the BC sort tiers
+  // 1–19 come out perfectly contiguous and each gets its rule, while the tail interleaves (K and
+  // DEF carry their own tier scales and land among the deep skill players) and correctly gets none
+  // — a single global "is this list tier-ordered?" test would have thrown away all 19 clean rules
+  // to punish that tail. Under a non-tier sort almost every run is length 1, so the rules vanish.
+  function tierStarts(list) {
+    const flags = new Array(list.length).fill(false);
+    const tierOf = (p) => p?.fftiers?.tier ?? null;
+    const seen = new Set();
+    for (let i = 0; i < list.length; i++) {
+      const t = tierOf(list[i]);
+      if (t == null) continue;
+      // i > 0: the first row already sits against the column header's own border.
+      if (i > 0 && tierOf(list[i - 1]) !== t && tierOf(list[i + 1]) === t && !seen.has(t)) flags[i] = true;
+      seen.add(t);
+    }
+    return flags;
+  }
+
+  function rowHTML(p, rankLabel, tierStart) {
     const isTaken = taken.has(p.id);
     const isOpen = expandedId === p.id;
     const rec = p.rec, conf = p.conf, adp = p.adp?.half_ppr;
@@ -358,8 +401,11 @@
       p.unvetted ? badge("unvetted", "rbadge-unvetted", "Risk flags not yet researched — null, not clean") : "",
       p.scouting_brief?.prose ? `<span class="rbadge rbadge-scout${p.scouting_brief.override_flag ? " scout-override" : ""}" title="${esc((p.scouting_brief.override_flag ? "⚑ role/scheme delta — revisit projection. " : "") + firstSentence(p.scouting_brief.prose))}">${p.scouting_brief.override_flag ? "⚑ scout" : "scout"}</span>` : "",
     ].join("");
+    // Tier identity rides on custom properties so the CSS owns where each one lands (row wash,
+    // left band, hover, block rule) and a player with no fftiers rank simply falls back transparent.
+    const tierStyle = tc ? ` style="--tier-wash:${tc.wash};--tier-hover:${tc.hover};--tier-stripe:${tc.stripe};--tier-edge:${tc.edge}"` : "";
     return `
-    <div class="drow ${isTaken ? "taken" : ""}" data-id="${p.id}"${tc ? ` style="border-left-color:${tc.stripe}"` : ""}>
+    <div class="drow ${isTaken ? "taken" : ""}${tierStart ? " tier-start" : ""}" data-id="${p.id}"${tierStyle}>
       <button class="take" data-act="take" aria-pressed="${isTaken}" title="${isTaken ? "Mark available" : "Mark drafted"}">${isTaken ? "✓" : ""}</button>
       <button class="dmain" data-act="expand" aria-expanded="${isOpen}">
         <span class="dr">${rankLabel}</span>
@@ -621,19 +667,25 @@
         bcgap: (a, b) => (b.bcGap ?? -Infinity) - (a.bcGap ?? -Infinity),   // most bearish-vs-consensus (our value most below the crowd) first
       };
       const sorted = [...list].sort(sortFns[sort] ?? sortFns.bc);
+      const starts = tierStarts(sorted);
       $("#board-body").innerHTML = headerHTML +
-        sorted.map((p) => rowHTML(p, p.draftRank ?? "–")).join("") +
-        `<div class="boardfoot"><b>BC</b> = Boris Chen consensus rank (your primary board) · <b>BC−adp</b> = spots the market lets him fall past that consensus (<span class="name-value">+ = value</span> / <span class="name-reach">− = reach</span>) · <b>$val</b>: ≥$1 = auction price, &lt;$1 = proximity-to-rosterable score · <b>edge</b>: $-gap above $1, board-vs-ADP pick-gap (Np) below · <span class="name-value">TARGET</span>/<span class="name-reach">FADE</span> + confidence dots ●●●. Bench tier gets no TARGET — lean on <b>ceil</b> for upside. # = draft-value rank.</div>`;
+        sorted.map((p, i) => rowHTML(p, p.draftRank ?? "–", starts[i])).join("") +
+        `<div class="boardfoot"><b>Row color + left band</b> = Boris Chen tier (a block of one color is one tier) ·  <b>BC</b> = Boris Chen consensus rank (your primary board) · <b>BC−adp</b> = spots the market lets him fall past that consensus (<span class="name-value">+ = value</span> / <span class="name-reach">− = reach</span>) · <b>$val</b>: ≥$1 = auction price, &lt;$1 = proximity-to-rosterable score · <b>edge</b>: $-gap above $1, board-vs-ADP pick-gap (Np) below · <span class="name-value">TARGET</span>/<span class="name-reach">FADE</span> + confidence dots ●●●. Bench tier gets no TARGET — lean on <b>ceil</b> for upside. # = draft-value rank.</div>`;
     } else {
       $("#board-title").textContent = "Tiers — cliff edges (by draft $)";
       const posList = pos === "ALL" ? ["RB", "WR", "QB", "TE", "K", "DEF"] : [pos];
       $("#board-body").innerHTML = posList.map((ps) => {
         const tiers = tiersFor(list.filter((p) => p.pos === ps));
-        return tiers.map((tier, i) => `
+        // Note these are OUR draft-$ tiers; the row wash is still Boris Chen's tier, so within a
+        // block the colors show how cleanly the two tierings agree. tierStarts() runs per block and
+        // self-disables where the BC tiers interleave, which is the usual case here.
+        return tiers.map((tier, i) => {
+          const st = tierStarts(tier);
+          return `
           <div class="tierhead"><span>${ps} · Tier ${i + 1}</span><span class="faint">${tier.length} players</span></div>
           ${headerHTML}
-          ${tier.map((p, j) => rowHTML(p, `${ps}${p.posRank}`) + (j === tier.length - 1 ? '<div class="cliff">▼ value cliff</div>' : "")).join("")}
-        `).join("");
+          ${tier.map((p, j) => rowHTML(p, `${ps}${p.posRank}`, st[j]) + (j === tier.length - 1 ? '<div class="cliff">▼ value cliff</div>' : "")).join("")}`;
+        }).join("");
       }).join("");
     }
   }

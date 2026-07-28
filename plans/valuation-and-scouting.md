@@ -180,6 +180,38 @@ pick, with the rest one click away.
 Files: `statsHTML` / `detailHTML` / `bcHTML` / `section()` in `site/draft.js`; `.dsects` / `.dsect*` /
 `.dstats-wide` in `site/style.css`.
 
+### 1.12 Tier blocks — full-row color, golden-angle hues — 2026-07-28
+
+The first pass at tier color (a 3px stripe + a faint pill, 47° hue step) was deliberately quiet and read
+as too quiet: neighbouring tiers sat a shade apart and the grouping didn't register. Rebuilt so a Boris
+Chen tier reads as a **slab**, not a hint.
+
+- **Full-row wash + a 5px left band.** Every tiered row carries its tier color as a background wash
+  (alpha 0.17) plus a near-solid band. Applies in **every sort and view** — a tier-2 player buried in an
+  ADP-sorted list still shows his color. Untiered players (outside the fftiers top-200) render
+  transparent but keep the same 5px inset so columns stay aligned with the tiered rows.
+- **Hue steps by the golden angle (137.5°)**, not a small fixed step. Consecutive tiers land on opposite
+  sides of the wheel. Measured on the composited DOM colors: adjacent tiers are **ΔE 66–167** on the band
+  (ΔE ~2.3 is the just-noticeable threshold) and ΔE 11–27 on the wash. The old 47° step also wrapped to a
+  near-repeat every 8 tiers.
+- **Lightness carries two corrections.** A per-hue compensation (HSL blue looks far darker than HSL
+  yellow at equal L) keeps the wash the same visual weight tier to tier; then a **period-3 step** rides on
+  top, so the 8-tier hue near-repeat only becomes a true repeat at 24 tiers — past the end of the board.
+  It also gives every neighbour a second, non-hue axis of difference for a colorblind read. Worst
+  8-apart band pair still measures ΔE 13.
+- **Block-capping rules** (`tierStarts()`): a row gets a rule in its tier's color when it opens a run of
+  2+ same-tier rows *and* that tier hasn't appeared earlier. Both tests are **local**, which is what makes
+  it survive the real data — under the BC sort tiers 1–19 are perfectly contiguous and each gets its rule
+  (20 total), while the tail interleaves (K and DEF carry their own tier scales and land among deep skill
+  players) and correctly gets none. A single global "is this list tier-ordered?" test threw away all 19
+  clean rules to punish that tail. Under every other sort the runs are length 1 and 0–2 rules survive.
+- **Drafted rows drop the wash but keep the band** — the row is spent, and the unwashed gap is itself a
+  signal, while the band keeps the block visually unbroken. The expanded detail sits on its own opaque
+  `--surface-2`, so the wash never bleeds into a wall of text.
+
+Files: `tierColor()` / `tierStarts()` / `rowHTML` in `site/draft.js`; `.drow` custom-property block,
+`.tier-start`, `.drow:not(.dhead):hover`, `.drow.taken` in `site/style.css`.
+
 ## 2. Challenge 2 — `scouting_brief` (public commentary)
 
 ### 2.1 What it is
