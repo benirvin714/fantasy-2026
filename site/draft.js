@@ -18,6 +18,14 @@
   const taken = new Set(JSON.parse(localStorage.getItem(LS_KEY) ?? "[]"));
   const saveTaken = () => localStorage.setItem(LS_KEY, JSON.stringify([...taken]));
 
+  // Target list (the rail beside the board). Stored as the FULL starred set, including players who
+  // have since been drafted — the rail then RENDERS only the ones still available. Filtering rather
+  // than deleting is what makes "cleared when he's picked" survive a mis-click on the drafted button:
+  // un-mark him and he's back on your list, exactly where he was.
+  const TGT_KEY = "hq-draft-2026-targets";
+  const targets = new Set(JSON.parse(localStorage.getItem(TGT_KEY) ?? "[]"));
+  const saveTargets = () => localStorage.setItem(TGT_KEY, JSON.stringify([...targets]));
+
   const KNOB_KEY = "hq-draft-2026-knobs";
   const savedKnobs = JSON.parse(localStorage.getItem(KNOB_KEY) ?? "{}");
   const saveKnobs = () => localStorage.setItem(KNOB_KEY, JSON.stringify({ replBasis }));
@@ -359,6 +367,7 @@
 
   function rowHTML(p, rankLabel, tierStart) {
     const isTaken = taken.has(p.id);
+    const isTgt = targets.has(p.id);
     const isOpen = expandedId === p.id;
     const rec = p.rec, conf = p.conf, adp = p.adp?.half_ppr;
     const sub = p.draftDollar != null && p.draftDollar < 1;          // below the $1 line = proximity/bench tier
@@ -417,6 +426,7 @@
     return `
     <div class="drow ${isTaken ? "taken" : ""}${tierStart ? " tier-start" : ""}" data-id="${p.id}"${tierStyle}>
       <button class="take" data-act="take" aria-pressed="${isTaken}" title="${isTaken ? "Mark available" : "Mark drafted"}">${isTaken ? "✓" : ""}</button>
+      <button class="star${isTgt ? " on" : ""}" data-act="star" aria-pressed="${isTgt}" title="${isTgt ? "Remove from target list" : "Add to target list"}">${isTgt ? "★" : "☆"}</button>
       <button class="dmain" data-act="expand" aria-expanded="${isOpen}">
         <span class="dr">${rankLabel}</span>
         <span class="dname ${nameCls}">${esc(p.name)}</span>
@@ -650,6 +660,7 @@
   const headerHTML = `
     <div class="drow dhead" aria-hidden="true">
       <span></span>
+      <span></span>
       <span class="dmain-head"><span class="dr">#</span><span class="dname">player</span><span class="dpos">pos</span>
       <span class="dbc">BC</span><span class="dbcdiff">BC−adp</span><span class="dadp">adp</span><span class="dval">$val</span><span class="dgap">edge</span><span class="dbcgap">vs BC</span><span class="dceil">ceil</span></span>
     </div>`;
@@ -663,7 +674,70 @@
     return list;
   }
 
+  /* ---------- target list (the rail beside the board) ----------
+     Answers one question on the clock: of the players I actually want, who goes next, and do I have
+     time? "Away" is measured from the LIVE pick number, which is just the count of drafted marks + 1
+     — the take button is already the thing you press on every pick, so the counter costs no extra
+     bookkeeping. It is only as accurate as those marks, which is why the rail states the pick number
+     it's counting from rather than hiding the assumption behind a number.
+     Sorted by ADP ascending: the top of the rail is the target the market takes first. */
+  function paintTargets() {
+    const body = $("#targets-body");
+    if (!body) return;
+    const byId = new Map(rows.map((p) => [p.id, p]));
+    const all = [...targets].map((id) => byId.get(id)).filter(Boolean);
+    const gone = all.filter((p) => taken.has(p.id));
+    const live = all.filter((p) => !taken.has(p.id))
+      .sort((a, b) => (a.adp?.half_ppr ?? Infinity) - (b.adp?.half_ppr ?? Infinity));
+
+    const nextPick = taken.size + 1;
+    const nextRd = Math.floor((nextPick - 1) / TEAMS) + 1;
+    $("#tgt-count").textContent = live.length ? `${live.length}` : "";
+    $("#tgt-clock").innerHTML = `<b class="mono">pick #${nextPick}</b> <span class="faint">· round ${nextRd} · counting ${taken.size} drafted mark${taken.size === 1 ? "" : "s"}</span>`;
+    $("#tgt-clock").title = `Every "away" figure below is measured from pick #${nextPick}, derived from the ${taken.size} players you've marked drafted. Mark each pick as it happens and this stays honest; skip some and the distances read long.`;
+
+    if (!live.length && !gone.length) {
+      body.innerHTML = `<div class="tgt-empty">No targets yet. Hit <span class="tgt-mark">☆</span> on any row to put a player here, and he'll drop off this list the moment you mark him drafted.</div>`;
+      return;
+    }
+    const items = live.map((p) => {
+      const tc = p.fftiers ? tierColor(p.fftiers.tier) : null;
+      const adp = p.adp?.half_ppr;
+      const away = adp == null ? null : Math.round(adp) - nextPick;
+      const adpTxt = adp == null ? `<span class="nodata">no ADP</span>` : `ADP ${adp} <span class="faint">· rd ${Math.ceil(adp / TEAMS)}</span>`;
+      let awayTxt, awayCls, awayTitle;
+      if (away == null) {
+        awayTxt = "–"; awayCls = "tgt-away-none";
+        awayTitle = "No ADP on file for this player, so there's no market expectation to measure against. He's a pure read.";
+      } else if (away > 0) {
+        awayTxt = `${away} pick${away === 1 ? "" : "s"} · ${(away / TEAMS).toFixed(1)} rd`;
+        awayCls = away <= TEAMS ? "tgt-away-soon" : "";
+        awayTitle = `The market takes him around pick ${Math.round(adp)}; you're at pick ${nextPick}. That leaves ${away} picks of room, or ${(away / TEAMS).toFixed(1)} rounds${away <= TEAMS ? ". That's inside the next round, so he may not survive your next turn." : "."}`;
+      } else if (away === 0) {
+        awayTxt = "on the clock"; awayCls = "tgt-away-now";
+        awayTitle = `Pick #${nextPick} is exactly his ADP. This is where the market takes him.`;
+      } else {
+        awayTxt = `${-away} past ADP`; awayCls = "tgt-away-past";
+        awayTitle = `He's lasted ${-away} picks beyond his ADP of ${Math.round(adp)} and is still on the board. The market is letting him fall.`;
+      }
+      const rec = p.rec === "TARGET" || p.rec === "FADE" ? `<span class="tgt-rec ${p.rec === "TARGET" ? "name-value" : "name-reach"}">${p.rec}</span>` : "";
+      return `<div class="tgt" data-id="${p.id}"${tc ? ` style="--tier-stripe:${tc.stripe}"` : ""}>
+        <div class="tgt-main">
+          <div class="tgt-l1"><span class="tgt-name">${esc(p.name)}</span><span class="tgt-adp mono">${adpTxt}</span></div>
+          <div class="tgt-l2"><span class="tgt-pos mono">${esc(p.pos)}${p.posRank ?? ""} · ${esc(p.team)}${p.fftiers ? ` · BC ${p.fftiers.rank}` : ""} · ${fmtD(p.draftDollar)}</span>${rec}<span class="tgt-away mono ${awayCls}" title="${esc(awayTitle)}">${awayTxt}</span></div>
+        </div>
+        <button class="tgt-x" data-act="untarget" title="Remove ${esc(p.name)} from the target list">×</button>
+      </div>`;
+    }).join("");
+    // Drafted targets aren't silently swallowed — during a draft "who sniped my guy" is information.
+    // They're filtered, not deleted, so un-marking one puts him straight back in the list above.
+    const goneHTML = gone.length ? `<div class="tgt-gone" title="Filtered out because they're marked drafted, not deleted. Un-mark one and he returns to the list above.">
+      <b>${gone.length} gone:</b> ${gone.map((p) => `<s>${esc(p.name)}</s>`).join(", ")}</div>` : "";
+    body.innerHTML = (live.length ? items : `<div class="tgt-empty">Every target you set is off the board.</div>`) + goneHTML;
+  }
+
   function paint() {
+    paintTargets();
     const list = visible();
     if (view === "board") {
       const sortLabel = { bc: "by Boris Chen", bcdiff: "by BC−ADP value", adp: "by ADP", draftval: "by draft $", edge: "by edge", bcgap: "by us-vs-consensus" }[sort] ?? "by Boris Chen";
@@ -709,6 +783,9 @@
     if (act.dataset.act === "take") {
       taken.has(id) ? taken.delete(id) : taken.add(id);
       saveTaken();
+    } else if (act.dataset.act === "star") {
+      targets.has(id) ? targets.delete(id) : targets.add(id);
+      saveTargets();
     } else if (act.dataset.act === "expand") {
       expandedId = expandedId === id ? null : id;
     } else if (act.dataset.act === "sect") {
@@ -716,6 +793,17 @@
       openSect.has(k) ? openSect.delete(k) : openSect.add(k);
     }
     paint();
+  });
+
+  // rail: remove a target. Full repaint so the row's own star un-fills in the same tick.
+  $("#targets-body").addEventListener("click", (e) => {
+    const act = e.target.closest('[data-act="untarget"]');
+    const id = act?.closest(".tgt")?.dataset.id;
+    if (!id) return;
+    targets.delete(id); saveTargets(); paint();
+  });
+  $("#clear-targets").addEventListener("click", () => {
+    if (targets.size && confirm(`Clear all ${targets.size} targets?`)) { targets.clear(); saveTargets(); paint(); }
   });
 
   document.querySelectorAll("#toolbar [data-pos]").forEach((b) => b.addEventListener("click", () => {
@@ -779,6 +867,7 @@
     } catch (e) {
       $("#board-body").innerHTML = `<div class="panel-error" role="alert">Draft board unavailable (${esc(e.message)}). Run node scripts/build-draft-board.mjs and publish — nothing is shown rather than invented data.</div>`;
       $("#board-meta").textContent = "no data";
+      paintTargets();   // rail renders its empty state rather than sitting as a blank box
       return;
     }
     rows = rank(board.players.map(compute));

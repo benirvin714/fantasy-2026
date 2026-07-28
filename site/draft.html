@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap">
-  <link rel="stylesheet" href="style.css?v=25">
+  <link rel="stylesheet" href="style.css?v=27">
 </head>
 <body>
   <header>
@@ -59,22 +59,34 @@
       </div>
     </div>
 
-    <section class="panel" id="board-panel">
-      <div class="panel-head">
-        <h2 id="board-title">Value board</h2>
-        <span class="meta" id="board-sub">draft-$ = asset (rate × median games) over scarcity, in auction $ · edge = your $ − market's $ at his ADP slot · TARGET/FADE</span>
-      </div>
-      <div class="panel-body" id="board-body"><div class="loading">Loading draft board…</div></div>
-    </section>
+    <div class="draft-cols">
+      <section class="panel" id="board-panel">
+        <div class="panel-head">
+          <h2 id="board-title">Value board</h2>
+          <span class="meta" id="board-sub">draft-$ = asset (rate × median games) over scarcity, in auction $ · edge = your $ − market's $ at his ADP slot · TARGET/FADE</span>
+        </div>
+        <div class="panel-body" id="board-body"><div class="loading">Loading draft board…</div></div>
+      </section>
+
+      <aside class="panel targets" id="targets-panel" aria-label="Target list">
+        <div class="panel-head tgt-head">
+          <h2>Targets <span class="tgt-count" id="tgt-count"></span></h2>
+          <button id="clear-targets" class="tgt-clear" title="Remove every target">clear</button>
+        </div>
+        <div class="tgt-clock" id="tgt-clock"></div>
+        <div class="panel-body tgt-body" id="targets-body"></div>
+      </aside>
+    </div>
   </main>
 
   <footer>
     Data: <span class="mono">data/site/draft-board.json</span> (Sleeper projections re-scored to HBGBs scoring;
     availability from 3-yr games + age + status). Fields without data say so — nothing is fabricated.
-    Drafted marks persist in this browser only (localStorage) and survive reloads.
+    Drafted marks and your target list persist in this browser only (localStorage) and survive reloads.
+    "Picks away" counts from your drafted marks, so mark every pick as it happens.
   </footer>
 
   <script src="config.js?v=6"></script>
-  <script src="draft.js?v=39"></script>
+  <script src="draft.js?v=42"></script>
 </body>
 </html>

@@ -97,7 +97,9 @@ main {
 }
 
 /* ---------- panels ---------- */
-section.panel {
+/* aside.panel is here for the draft page's target rail — an element+class selector (0,1,1) only
+   matches the element it names, so a bare <aside class="panel"> would have picked up none of this. */
+section.panel, aside.panel {
   background: var(--grad-panel);
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -297,7 +299,9 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
 .navlink.active { color: var(--accent); border-color: var(--accent); }
 
 /* ---------- Draft Day page ---------- */
-.draft-main { display: block; max-width: 1100px; margin: 0 auto; padding: 16px 24px 40px; }
+/* 1440 rather than the old 1100 because the target rail now sits beside the board; the board
+   column itself still lands at ~1090px, so row density is unchanged. */
+.draft-main { display: block; max-width: 1440px; margin: 0 auto; padding: 16px 24px 40px; }
 .draft-toolbar {
   display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
   padding: 0 0 14px;
@@ -327,8 +331,83 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
   .knob .knobval { min-width: 0; }
 }
 
+/* ---------- board + target rail ----------
+   One column by default. The rail is ordered FIRST on narrow viewports: it's a short, live list you
+   act on, and below a 250-row board nobody would ever scroll to it. */
+.draft-cols { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); }
+.draft-cols .targets { order: -1; }
+@media (min-width: 1040px) {
+  .draft-cols { grid-template-columns: minmax(0, 1fr) 292px; align-items: start; }
+  /* on the wide layout the rail parks under the sticky toolbar and scrolls internally, so your
+     targets stay on screen no matter how deep into the board you are. --toolbar-h is measured live
+     in draft.js; the 0px fallback keeps the calc() valid before the first measurement lands. */
+  .draft-cols .targets {
+    order: 0;
+    position: sticky; top: calc(var(--toolbar-h, 0px) + 8px);
+    max-height: calc(100vh - var(--toolbar-h, 0px) - 28px);
+    display: flex; flex-direction: column;
+  }
+}
+.panel.targets .panel-head { padding: 10px 12px; }
+.tgt-head { justify-content: space-between; }
+.tgt-count {
+  font-family: var(--font-data); font-size: 11px; font-weight: 600;
+  color: var(--dim); background: var(--surface-2);
+  border: 1px solid var(--border); border-radius: 999px; padding: 1px 7px; margin-left: 4px;
+}
+.tgt-count:empty { display: none; }
+.tgt-clear {
+  background: none; border: 1px solid var(--border); border-radius: var(--radius);
+  color: var(--faint); font: inherit; font-size: 10px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: .06em; padding: 3px 8px; cursor: pointer;
+}
+.tgt-clear:hover { color: var(--neg); border-color: var(--neg); }
+.tgt-clock {
+  padding: 7px 12px; font-size: 11px; color: var(--dim);
+  border-bottom: 1px solid var(--border); background: rgba(255,255,255,.015);
+}
+.tgt-clock b { color: var(--accent); }
+/* min-height:0 lets this flex child actually shrink so overflow-y has something to bite on */
+.panel.targets .tgt-body { padding: 6px 8px 10px; overflow-y: auto; min-height: 0; max-height: 46vh; }
+@media (min-width: 1040px) { .panel.targets .tgt-body { max-height: none; } }
+.tgt-empty { padding: 10px 6px; font-size: 12px; color: var(--faint); line-height: 1.5; }
+.tgt-mark { color: var(--warn); }
+.tgt {
+  display: grid; grid-template-columns: minmax(0, 1fr) 26px; align-items: center; gap: 4px;
+  padding: 6px 2px 6px 8px;
+  border-left: 4px solid var(--tier-stripe, transparent);   /* same tier band as the board row */
+  border-bottom: 1px solid var(--border);
+}
+.tgt:last-child { border-bottom: none; }
+.tgt:hover { background: var(--surface-2); }
+.tgt-main { min-width: 0; }
+.tgt-l1 { display: flex; align-items: baseline; gap: 6px; justify-content: space-between; }
+.tgt-l2 { display: flex; align-items: baseline; gap: 6px; justify-content: space-between; margin-top: 1px; }
+.tgt-name { font-weight: 600; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tgt-adp { font-size: 10px; color: var(--dim); white-space: nowrap; }
+.tgt-pos { font-size: 10px; color: var(--moss); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tgt-rec { font-family: var(--font-data); font-size: 9px; font-weight: 700; letter-spacing: .04em; }
+.tgt-away { font-size: 10px; color: var(--faint); white-space: nowrap; }
+/* the four distances, loudest first: he's falling to you (good), he's on the clock, he goes inside
+   the next round (act), anything further out stays quiet. */
+.tgt-away.tgt-away-past { color: var(--accent); font-weight: 600; }
+.tgt-away.tgt-away-now { color: var(--warn); font-weight: 600; }
+.tgt-away.tgt-away-soon { color: var(--warn); }
+.tgt-away.tgt-away-none { color: var(--faint); }
+.tgt-x {
+  width: 24px; height: 24px; align-self: center;
+  background: none; border: 1px solid transparent; border-radius: var(--radius);
+  color: var(--faint); font-size: 15px; line-height: 1; cursor: pointer;
+}
+.tgt-x:hover { color: var(--neg); border-color: var(--neg); }
+.tgt-gone {
+  margin-top: 8px; padding: 7px 8px; font-size: 11px; line-height: 1.5;
+  color: var(--faint); border-top: 1px dashed var(--border);
+}
+.tgt-gone b { color: var(--dim); }
+
 .drow {
-  display: grid; grid-template-columns: 40px minmax(0, 1fr);
+  display: grid; grid-template-columns: 40px 30px minmax(0, 1fr);
   border-bottom: 1px solid var(--border);
   /* Boris Chen tier identity: a bold left band plus a full-row wash, both fed by custom properties
      set inline per row (see tierColor() in draft.js). Declared with transparent fallbacks so the
@@ -360,6 +439,16 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
   cursor: pointer; font-size: 14px; line-height: 1;
 }
 .drow .take:hover { border-color: var(--accent); }
+/* star = add to the target rail. Deliberately quieter than the drafted button (no filled surface):
+   drafted is the irreversible-feeling action, starring is cheap and reversible. */
+.drow .star {
+  width: 26px; height: 26px; margin: auto 2px auto 0;
+  background: none; color: var(--faint);
+  border: 1px solid transparent; border-radius: var(--radius);
+  cursor: pointer; font-size: 15px; line-height: 1;
+}
+.drow .star:hover { color: var(--warn); border-color: var(--border); }
+.drow .star.on { color: var(--warn); }
 .drow .dmain, .dmain-head {
   display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;
   width: 100%; text-align: left;
@@ -591,8 +680,11 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
   .drow .dpos { order: 5; flex-basis: 100%; margin-left: 42px; margin-top: -4px; }
   .ddetail { padding-left: 10px; }
   .chip { white-space: normal; }
-  .drow { grid-template-columns: 52px minmax(0, 1fr); }
+  .drow { grid-template-columns: 52px 44px minmax(0, 1fr); }
   .drow .take { width: 44px; height: 44px; margin: auto 4px; }
+  .drow .star { width: 44px; height: 44px; margin: auto 0; font-size: 17px; }
+  .tgt-x { width: 44px; height: 44px; }
+  .tgt { grid-template-columns: minmax(0, 1fr) 44px; }
 }
 
 /* larger touch targets on small screens */

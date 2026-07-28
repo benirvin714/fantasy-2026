@@ -215,6 +215,41 @@ Chen tier reads as a **slab**, not a hint.
 Files: `tierColor()` / `tierStarts()` / `washOn()` / `rowHTML` in `site/draft.js`; `.drow` custom-property block,
 `.tier-start`, `.drow:not(.dhead):hover`, `.drow.taken` in `site/style.css`.
 
+### 1.13 Target rail — the on-the-clock shortlist — 2026-07-28
+
+A sticky column beside the board holding the players you actually want, answering one question during
+a draft: **of my targets, who goes next, and do I have time?**
+
+- **Add/remove** with a ☆/★ button in its own column on every row (a second, deliberately quieter
+  control beside the drafted ✓ — starring is cheap and reversible, marking drafted is the consequential
+  one). Also removable with `×` from the rail itself. State in `localStorage` under
+  `hq-draft-2026-targets`.
+- **Cleared when he's picked** by **filtering, not deleting**: the stored set keeps every star, and the
+  rail renders only the ones not marked drafted. That's what makes the clearing survive a mis-click —
+  un-mark him and he's back in the list, in place. Drafted targets aren't silently swallowed either;
+  a `N gone: <s>name</s>` line stays at the bottom, because during a draft "who sniped my guy" is
+  information.
+- **Distance is measured from a live pick counter**, `taken.size + 1`. The drafted button is already
+  the thing you press on every pick, so the counter costs no extra bookkeeping — but it is only as
+  good as those marks, so the rail **states the pick number it counts from** (`pick #33 · round 4 ·
+  counting 32 drafted marks`) instead of hiding the assumption inside a number.
+- **Four away-states**, loudest first: `N past ADP` (accent green — the market is letting him fall,
+  the best news on the board), `on the clock` (amber), `N picks · R.R rd` inside one round (amber),
+  anything further out stays quiet. No ADP renders an honest "no ADP", never a fabricated distance.
+- **Sorted by ADP ascending**, so the top of the rail is whoever the market takes first.
+- **Independent of the board's own filters** — position filter, sort, view, and hide-drafted don't
+  touch it. It's your list, not a view of the board. It does inherit each player's Boris Chen tier
+  band, so a target's color matches his row.
+- Layout: `.draft-cols` is one column by default with the rail ordered **first** (below a 250-row
+  board nobody would scroll to it); at ≥1040px it becomes `1fr / 292px` and the rail goes sticky under
+  the measured toolbar height with internal scroll. `.draft-main` widened 1100 → 1440px, which leaves
+  the board column at ~1069px, so row density is unchanged.
+
+Files: `paintTargets()` / the `star` + `untarget` handlers / `TGT_KEY` in `site/draft.js`; the
+`.draft-cols` grid, `.tgt*` block, `.drow .star`, and the widened `.drow` grid in `site/style.css`;
+the `<aside class="panel targets">` in `site/draft.html`. Note `section.panel, aside.panel` — the
+original element+class selector wouldn't have matched an `<aside>` at all.
+
 ## 2. Challenge 2 — `scouting_brief` (public commentary)
 
 ### 2.1 What it is
