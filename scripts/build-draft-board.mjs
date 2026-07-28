@@ -28,6 +28,34 @@ const [players, s23, s24, s25, proj] = await Promise.all([
   get("https://api.sleeper.app/v1/stats/nfl/regular/2025"),
   get("https://api.sleeper.app/v1/projections/nfl/regular/2026"),
 ]);
+/* ---- bye weeks, DERIVED from the NFL schedule (not a hand-kept table) ----
+   Sleeper's player objects carry no bye week, so it comes from the regular-season schedule at
+   api.sleeper.app/schedule/nfl/regular/<season> (undocumented but public, read-only GET): a team's
+   bye is the week it appears in no game. Validated on the way through — 32 teams, 18 weeks, and
+   every team must land exactly one bye, or the map is thrown away rather than shipped half-right.
+   Deriving beats a hand-kept table because it self-updates at the next rebuild and can't drift. */
+async function byeWeeks(season) {
+  try {
+    const games = await get(`https://api.sleeper.app/schedule/nfl/regular/${season}`);
+    const weeks = [...new Set(games.map((g) => g.week))].sort((a, b) => a - b);
+    const teams = [...new Set(games.flatMap((g) => [g.home, g.away]))];
+    const map = {};
+    for (const t of teams) {
+      const played = new Set(games.filter((g) => g.home === t || g.away === t).map((g) => g.week));
+      const off = weeks.filter((w) => !played.has(w));
+      if (off.length !== 1) throw new Error(`${t} has ${off.length} bye weeks, expected 1`);
+      map[t] = off[0];
+    }
+    if (teams.length !== 32) throw new Error(`${teams.length} teams in the schedule, expected 32`);
+    console.log(`Bye weeks: derived for ${teams.length} teams from the ${season} schedule (weeks ${Math.min(...Object.values(map))}-${Math.max(...Object.values(map))}).`);
+    return map;
+  } catch (e) {
+    console.warn(`Bye weeks: UNAVAILABLE (${e.message}) — every player will carry bye: null and the board will say so.`);
+    return {};
+  }
+}
+const byes = await byeWeeks(2026);
+
 const scoring = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "raw", "league-2026.json"), "utf8")).scoring_settings;
 const events = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "site", "nfl-events.json"), "utf8")).events;
 // Durable hand-researched overlay (risk flags, injury typing, ADP commentary). Merged in so a
@@ -503,6 +531,7 @@ const rows = [...skill, ...kickers, ...defs].map(([id, p]) => {
   if (rx.injury_history !== undefined) { avail.injury_history = rx.injury_history; avail.partial = rx.injury_history == null; }
   return {
     id, name, pos, team: p.team, age: p.age ?? null, years_exp: p.years_exp ?? null,
+    bye: byes[p.team] ?? null,   // null for a free agent, or if the schedule fetch failed — never guessed
     rookie: p.years_exp === 0,
     ids: { sleeper: id, fantasypros: ext?.fantasypros ?? null, gsis: ext?.gsis ?? null, pfr: ext?.pfr ?? null, espn: ext?.espn ?? null }, // DynastyProcess crosswalk; join key for ID-based sources
     projection: {

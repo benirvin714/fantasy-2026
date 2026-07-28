@@ -762,6 +762,12 @@
       body.innerHTML = `<div class="tgt-empty">No targets yet. Hit <span class="tgt-mark">☆</span> on any row to put a player here, and he'll drop off this list the moment you mark him drafted.</div>`;
       return;
     }
+    // Bye collisions among the players still on the list. A bye column on a shortlist earns its keep
+    // by answering "am I stacking holes in one week?", so a shared week is called out rather than
+    // left for you to spot. Counted over LIVE targets only — a drafted one is somebody else's problem.
+    const byeGroups = {};
+    for (const p of live) if (p.bye != null) (byeGroups[p.bye] ??= []).push(p.name);
+
     const items = live.map((p) => {
       const tc = p.fftiers ? tierColor(p.fftiers.tier) : null;
       const adp = p.adp?.half_ppr;
@@ -783,10 +789,17 @@
         awayTitle = `He's lasted ${-away} picks beyond his ADP of ${Math.round(adp)} and is still on the board. The market is letting him fall.`;
       }
       const rec = p.rec === "TARGET" || p.rec === "FADE" ? `<span class="tgt-rec ${p.rec === "TARGET" ? "name-value" : "name-reach"}">${p.rec}</span>` : "";
+      const shared = p.bye == null ? [] : (byeGroups[p.bye] ?? []).filter((n) => n !== p.name);
+      const byeTitle = p.bye == null
+        ? "No bye week on file for this player. Either he has no NFL team, or the schedule wasn't reachable when the board was built."
+        : shared.length
+          ? `Week ${p.bye} bye, shared with ${shared.join(", ")} on this list. Take ${shared.length === 1 ? "both" : `all ${shared.length + 1}`} and that's ${shared.length + 1} holes to cover in the same week.`
+          : `Week ${p.bye} bye. No other live target here is off that week.`;
+      const byeHTML = `<span class="tgt-bye mono${shared.length ? " clash" : ""}" title="${esc(byeTitle)}">${p.bye == null ? '<span class="nodata">bye –</span>' : `bye ${p.bye}`}</span>`;
       return `<div class="tgt" data-id="${p.id}"${tc ? ` style="--tier-stripe:${tc.stripe}"` : ""}>
         <div class="tgt-main">
           <div class="tgt-l1"><span class="tgt-name">${esc(p.name)}</span><span class="tgt-adp mono">${adpTxt}</span></div>
-          <div class="tgt-l2"><span class="tgt-pos mono">${esc(p.pos)}${p.posRank ?? ""} · ${esc(p.team)}${p.fftiers ? ` · BC ${p.fftiers.rank}` : ""} · ${fmtD(p.draftDollar)}</span>${rec}</div>
+          <div class="tgt-l2"><span class="tgt-pos mono">${esc(p.pos)}${p.posRank ?? ""} · ${esc(p.team)}${p.fftiers ? ` · BC ${p.fftiers.rank}` : ""} · ${fmtD(p.draftDollar)}</span><span class="tgt-r2">${rec}${byeHTML}</span></div>
           <div class="tgt-l3"><span class="tgt-away mono ${awayCls}" title="${esc(awayTitle)}">${awayTxt}</span>${survivalHTML(adp, nextPick, myNext, mine)}</div>
         </div>
         <button class="tgt-x" data-act="untarget" title="Remove ${esc(p.name)} from the target list">×</button>

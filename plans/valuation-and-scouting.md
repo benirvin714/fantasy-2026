@@ -237,6 +237,16 @@ a draft: **of my targets, who goes next, and do I have time?**
   the best news on the board), `on the clock` (amber), `N picks · R.R rd` inside one round (amber),
   anything further out stays quiet. No ADP renders an honest "no ADP", never a fabricated distance.
 - **Sorted by ADP ascending**, so the top of the rail is whoever the market takes first.
+- **Bye column**, right-aligned so it reads as a column across rows. `p.bye` is **derived at build
+  time from the NFL schedule**, not hand-kept: Sleeper's player objects carry no bye week, so
+  `byeWeeks()` in `build-draft-board.mjs` pulls `api.sleeper.app/schedule/nfl/regular/<season>` and
+  takes each team's bye as the week it appears in no game. It **validates before shipping** (32 teams,
+  exactly one bye each) and returns `{}` on any failure, so every player gets `bye: null` and the
+  column says "bye –" rather than the board carrying a plausible-looking wrong number. 2026 came
+  back 32/32, weeks 5–14.
+  - **Collisions are called out**: when two or more *live* targets share a week the chip turns amber
+    and names the others. That's the reason a shortlist wants a bye column at all. Counted over live
+    targets only, so drafting one recomputes the rest and un-drafting brings the warning back.
 - **The snake read (draft slot).** Pick your seat from the rail's `draft slot` selector and it lists
   the picks you still hold and answers, per target, whether he reaches one. Geometry is **measured,
   not assumed**: `draft-meta-2023..25.json` are identical (10 teams, 15 rounds, snake,
@@ -264,7 +274,8 @@ a draft: **of my targets, who goes next, and do I have time?**
   the board column at ~1069px, so row density is unchanged.
 
 Files: `paintTargets()` / `survivalHTML()` / `pickNoFor()` / `myPicksFrom()` / `ROUNDS` / `ADP_SLACK` /
-the `star` + `untarget` + `draft-slot` handlers / `TGT_KEY` in `site/draft.js`; the
+the `star` + `untarget` + `draft-slot` handlers / `TGT_KEY` in `site/draft.js`; `byeWeeks()` and the
+`bye:` field in `scripts/build-draft-board.mjs`; the
 `.draft-cols` grid, `.tgt*` block, `.drow .star`, and the widened `.drow` grid in `site/style.css`;
 the `<aside class="panel targets">` in `site/draft.html`. Note `section.panel, aside.panel` — the
 original element+class selector wouldn't have matched an `<aside>` at all.

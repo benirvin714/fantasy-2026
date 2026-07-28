@@ -418,6 +418,11 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
 .tgt-adp { font-size: 10px; color: var(--dim); white-space: nowrap; }
 .tgt-pos { font-size: 10px; color: var(--moss); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .tgt-rec { font-family: var(--font-data); font-size: 9px; font-weight: 700; letter-spacing: .04em; }
+/* right-hand field of L2, so the bye lands in the same place on every row and reads as a column */
+.tgt-r2 { display: flex; align-items: baseline; gap: 6px; flex: none; }
+.tgt-bye { font-size: 10px; color: var(--dim); white-space: nowrap; }
+/* amber when another live target shares the week: the reason a shortlist wants a bye column at all */
+.tgt-bye.clash { color: var(--warn); font-weight: 600; }
 .tgt-away { font-size: 10px; color: var(--faint); white-space: nowrap; }
 /* the four distances, loudest first: he's falling to you (good), he's on the clock, he goes inside
    the next round (act), anything further out stays quiet. */
