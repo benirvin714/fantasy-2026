@@ -292,6 +292,41 @@ the `star` + `untarget` + `draft-slot` handlers / `TGT_KEY` in `site/draft.js`; 
 the `<aside class="panel targets">` in `site/draft.html`. Note `section.panel, aside.panel` — the
 original element+class selector wouldn't have matched an `<aside>` at all.
 
+### 1.14 Player search — toolbar combobox — 2026-07-28
+
+Sits right of the scarcity knob. Type a name, the list filters live, picking a match lands you on
+that player with his drop-down already open, and every match carries a star.
+
+- **Ranking**: any word starting with the query is one tier, broken by draft-value rank; mid-word
+  hits sort below. Ranking first names above surnames was tried and cut — it put Chase Brown and
+  Chase McLaughlin over Ja'Marr Chase on "chase", which is consistent and obviously not the intent.
+  Normalization keeps word boundaries (`Ja'Marr Chase` → `jamarr chase`), so both `chase` and
+  `jamarr` hit and `ja'marr` and `jamarr` are the same query. Two-character minimum, 8 results.
+- **Jumping relaxes what hides him.** "Take me to him" is a promise, so the position filter,
+  hide-drafted and hide-risk-flagged step aside as needed, and a note under the field **says which
+  control moved** — a filter silently resetting itself is worse than the filter being on. The row
+  expands and takes a static outline (`.drow.found`, dropped after 2.6s) so it reads the same under
+  `prefers-reduced-motion`, which kills every animation on this page.
+- **Scroll is smooth only for short hops.** A jump across the tiers view is ~10,500px and takes ~2s
+  smooth, which is a delay with a blur in it and long enough that the landing outline can expire
+  before you arrive. Past two viewport heights it goes instant: 2s → 180ms measured.
+  `scroll-margin-top` on `.drow` is `--toolbar-h + 46px`, so the row clears the sticky column header
+  rather than parking under it.
+- **The star does not navigate or close the list**, since you're often adding two or three names off
+  one search. `e.stopPropagation()` in that branch is load-bearing, not defensive: re-rendering the
+  list detaches the clicked button, so the document's outside-click handler would walk an orphaned
+  node, get `null` from `closest(".srchwrap")`, and read its own click as a click outside.
+- Full combobox keyboard: ↓/↑ cycle, Enter selects, Escape clears. `role="combobox"` +
+  `aria-expanded` + `aria-activedescendant`; the star is a **sibling** of `role="option"`, not a
+  child, with a `role="presentation"` wrapper so the listbox still owns its options directly.
+- Closing is its own state, not "zero results" — after you pick someone the input holds his full
+  name, and a shared path would pop the list back open saying "No player matches that" about the
+  name you just chose.
+
+Files: `searchFor()` / `renderSearch()` / `closeSearch()` / `gotoPlayer()` / `setGroup()` / `normS`
+in `site/draft.js`; `.srch*` block, `.drow.found`, `.drow { scroll-margin-top }` in `site/style.css`;
+`.srchwrap` in `site/draft.html`.
+
 ## 2. Challenge 2 — `scouting_brief` (public commentary)
 
 ### 2.1 What it is

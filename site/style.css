@@ -442,8 +442,58 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
 }
 .tgt-gone b { color: var(--dim); }
 
+/* ---------- player search (toolbar combobox) ---------- */
+.srchwrap { position: relative; display: flex; flex-direction: column; gap: 2px; }
+.srch {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--grad-raise); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 4px 8px 4px 10px; min-height: 36px;
+}
+.srch:focus-within { border-color: var(--accent); }
+.srch-icon { color: var(--faint); font-size: 15px; line-height: 1; }
+.srch input {
+  background: none; border: none; outline: none; color: var(--text);
+  font-family: var(--font-body); font-size: 12px; font-weight: 500; width: 168px;
+}
+.srch input::placeholder { color: var(--faint); }
+.srch-clear {
+  background: none; border: none; color: var(--faint);
+  font-size: 15px; line-height: 1; cursor: pointer; padding: 0 2px;
+}
+.srch-clear:hover { color: var(--neg); }
+/* z-index 30 clears the sticky toolbar (10) and column header (6) so the list lies over the board */
+.srch-list {
+  position: absolute; top: calc(100% + 4px); left: 0; z-index: 30;
+  width: 320px; max-width: 82vw; max-height: 336px; overflow-y: auto;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  box-shadow: 0 1px 2px rgba(0,0,0,.55), 0 16px 36px -12px rgba(0,0,0,.7);
+}
+.srch-row {
+  display: grid; grid-template-columns: minmax(0, 1fr) 30px; align-items: center;
+  border-left: 4px solid var(--tier-stripe, transparent);   /* same tier band as the board row */
+  border-bottom: 1px solid var(--border);
+}
+.srch-row:last-child { border-bottom: none; }
+.srch-opt { padding: 7px 4px 7px 8px; cursor: pointer; min-width: 0; }
+.srch-opt:hover, .srch-opt.on { background: var(--surface-2); }
+.srch-name { display: block; font-size: 13px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.srch-name.gone { text-decoration: line-through; color: var(--dim); }
+.srch-meta { display: block; font-size: 10px; color: var(--moss); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.srch-star {
+  width: 26px; height: 26px; justify-self: center;
+  background: none; border: 1px solid transparent; border-radius: var(--radius);
+  color: var(--faint); font-size: 15px; line-height: 1; cursor: pointer;
+}
+.srch-star:hover { color: var(--warn); border-color: var(--border); }
+.srch-star.on { color: var(--warn); }
+.srch-empty { padding: 10px; font-size: 12px; color: var(--faint); }
+.srch-note { font-size: 10px; color: var(--warn); max-width: 240px; line-height: 1.35; }
+.srch-note:empty { display: none; }
+
 .drow {
   display: grid; grid-template-columns: 40px 30px minmax(0, 1fr);
+  /* search jumps land the row below the sticky toolbar + column header instead of under them */
+  scroll-margin-top: calc(var(--toolbar-h, 0px) + 46px);
   border-bottom: 1px solid var(--border);
   /* Boris Chen tier identity: a bold left band plus a full-row wash, both fed by custom properties
      set inline per row (see tierColor() in draft.js). Declared with transparent fallbacks so the
@@ -455,6 +505,9 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
 /* the row opening a tier block gets a rule in that tier's own color, so blocks read as slabs.
    Only applied where the board is genuinely tier-ordered — see tierStarts() in draft.js. */
 .drow.tier-start { border-top: 1px solid var(--tier-edge, transparent); }
+/* where a search jump landed. A static outline rather than a flash, so it reads the same under
+   prefers-reduced-motion (which kills every animation on this page); JS drops it after ~2.6s. */
+.drow.found { outline: 2px solid var(--accent); outline-offset: -2px; }
 /* :not(.dhead) keeps the sticky column header opaque — it has no tier vars, so a hover rule that
    matched it would resolve to transparent and let rows scroll visibly through it. */
 .drow:not(.dhead):hover { background: var(--tier-hover, transparent); }
@@ -733,6 +786,14 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
   .drow .dceil { min-width: 42px; }
   .drow .dbye { min-width: 24px; }
   .drow .dmain, .dmain-head { gap: 6px; }
+  /* search: full-width field and a 44px tap target on each result's star */
+  .srchwrap { flex: 1 1 100%; }
+  .srch input { width: 100%; }
+  .srch-list { width: 100%; max-width: none; }
+  .srch-row { grid-template-columns: minmax(0, 1fr) 44px; }
+  .srch-star { width: 44px; height: 44px; }
+  .srch-opt { min-height: 44px; display: flex; flex-direction: column; justify-content: center; }
+  .srch-clear { min-width: 32px; min-height: 32px; }
 
   .drow { grid-template-columns: 52px 44px minmax(0, 1fr); }
   .drow .take { width: 44px; height: 44px; margin: auto 4px; }

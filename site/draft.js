@@ -42,6 +42,7 @@
   // (paintTargets runs first, so the board render behind it always reads fresh data) and shared by
   // the rail and the board's bye column, so the two can never disagree about a stack.
   let tgtByes = {};
+  let searchHits = [], searchIdx = -1;   // combobox: current matches and the keyboard-highlighted one
 
   /* ---------- the value engine (transparent, in one place) ---------- */
   // Replacement (scarcity) line per position; the knob slides between the STARTER line
@@ -927,6 +928,159 @@
   $("#reset-draft").addEventListener("click", () => {
     if (taken.size && confirm(`Clear ${taken.size} drafted marks?`)) { taken.clear(); saveTaken(); paint(); }
   });
+
+  /* ---------- player search (combobox in the toolbar) ----------
+     Type a name, pick a match, land on that player with his drop-down already open. Each match also
+     carries a star, so the common draft-day move — "someone just mentioned a name, is he worth
+     wanting?" — is two keystrokes and one click without ever leaving your place on the board. */
+
+  // Normalize for matching but KEEP word boundaries: "Ja'Marr Chase" -> "jamarr chase". That's what
+  // lets a bare surname rank above a mid-word hit, which is how people actually search.
+  const normS = (s) => String(s ?? "").toLowerCase().replace(/[^a-z0-9 ]/g, "").replace(/\s+/g, " ").trim();
+  const SEARCH_MAX = 8;
+
+  function searchFor(q) {
+    const n = normS(q);
+    if (n.length < 2) return [];          // 1 letter matches half the league; not worth rendering
+    const out = [];
+    for (const p of rows) {
+      const nm = normS(p.name);
+      if (!nm.includes(n)) continue;
+      // Any word starting with the query counts the same, then board value breaks the tie. Ranking
+      // first-name matches above surname matches instead put Chase Brown and Chase McLaughlin over
+      // Ja'Marr Chase on "chase" — technically consistent, obviously not what you meant. Mid-word
+      // hits fall to the bottom, which is where "marr" belongs.
+      const tier = nm.split(" ").some((w) => w.startsWith(n)) ? 0 : 1;
+      out.push({ p, tier });
+    }
+    out.sort((a, b) => a.tier - b.tier || (a.p.draftRank ?? 1e9) - (b.p.draftRank ?? 1e9));
+    return out.slice(0, SEARCH_MAX).map((o) => o.p);
+  }
+
+  // Shut the list and reset its ARIA. Kept separate from renderSearch's no-match branch on purpose:
+  // after you pick someone the input holds his full name, so a shared "empty means no match" path
+  // would pop the list straight back open reading "No player matches that" about the name you just
+  // chose. Closing is a state, not the absence of results.
+  function closeSearch() {
+    searchHits = []; searchIdx = -1;
+    const list = $("#search-list"), input = $("#search");
+    list.hidden = true; list.innerHTML = "";
+    input.setAttribute("aria-expanded", "false");
+    input.removeAttribute("aria-activedescendant");
+    $("#search-clear").hidden = !input.value;
+  }
+
+  function renderSearch() {
+    const list = $("#search-list"), input = $("#search");
+    $("#search-clear").hidden = !input.value;
+    if (!searchHits.length) {
+      input.setAttribute("aria-expanded", "false");
+      input.removeAttribute("aria-activedescendant");
+      const noMatch = normS(input.value).length >= 2;
+      list.hidden = !noMatch;
+      list.innerHTML = noMatch ? `<div class="srch-empty">No player matches that.</div>` : "";
+      return;
+    }
+    list.hidden = false;
+    input.setAttribute("aria-expanded", "true");
+    // The star is a sibling of the option, not a child: role="option" owning a button is malformed,
+    // and the wrapper carries role="presentation" so the listbox still owns its options directly.
+    list.innerHTML = searchHits.map((p, i) => {
+      const isTgt = targets.has(p.id), isTaken = taken.has(p.id);
+      const tc = p.fftiers ? tierColor(p.fftiers.tier) : null;
+      return `<div class="srch-row" role="presentation"${tc ? ` style="--tier-stripe:${tc.stripe}"` : ""}>
+        <div class="srch-opt${i === searchIdx ? " on" : ""}" role="option" id="srch-opt-${i}" data-id="${p.id}" aria-selected="${i === searchIdx}">
+          <span class="srch-name${isTaken ? " gone" : ""}">${esc(p.name)}</span>
+          <span class="srch-meta mono">${esc(p.pos)}${p.posRank ?? ""} · ${esc(p.team)}${p.fftiers ? ` · BC ${p.fftiers.rank}` : ""} · ${fmtD(p.draftDollar)}${p.bye != null ? ` · bye ${p.bye}` : ""}${isTaken ? " · drafted" : ""}</span>
+        </div>
+        <button class="srch-star${isTgt ? " on" : ""}" data-act="srch-star" data-id="${p.id}" aria-pressed="${isTgt}" title="${isTgt ? `Remove ${esc(p.name)} from the target list` : `Add ${esc(p.name)} to the target list`}">${isTgt ? "★" : "☆"}</button>
+      </div>`;
+    }).join("");
+    if (searchIdx >= 0) input.setAttribute("aria-activedescendant", `srch-opt-${searchIdx}`);
+    else input.removeAttribute("aria-activedescendant");
+  }
+
+  /* Jump to a player. "Take me to him" is a promise, so anything currently hiding him gets relaxed
+     rather than leaving you staring at a board he isn't on — and the note says which control moved,
+     because a filter silently resetting itself is worse than the filter being on. */
+  function gotoPlayer(id) {
+    const p = rows.find((x) => x.id === id);
+    if (!p) return;
+    const moved = [];
+    if (pos !== "ALL" && p.pos !== pos) { setGroup("data-pos", "ALL"); pos = "ALL"; moved.push("position filter"); }
+    if (hideDrafted && taken.has(id)) { hideDrafted = false; $("#hide-drafted").setAttribute("aria-pressed", "false"); moved.push("hide-drafted"); }
+    if (hideFlagged && p.flagged.length) { hideFlagged = false; $("#hide-flagged").setAttribute("aria-pressed", "false"); moved.push("hide-risk-flagged"); }
+    expandedId = id;
+    paint();
+    // the tiers view drops players with no draft-$ entirely, so if he still isn't on the page after
+    // the filters were relaxed, fall back to the board rather than scrolling to nothing
+    if (!document.querySelector(`.drow[data-id="${id}"]`) && view !== "board") {
+      setGroup("data-view", "board"); view = "board"; moved.push("view → value board");
+      paint();
+    }
+    const el = document.querySelector(`.drow[data-id="${id}"]`);
+    if (!el) { $("#search-note").textContent = `${p.name} isn't on the board right now.`; return; }
+    // Smooth only for short hops, where the animation tells you which way the board moved. A jump
+    // across the tiers view is 10,000px and takes ~2s smooth, which on the clock is just a delay
+    // with a blur in it — and long enough that the landing outline can expire before you arrive.
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const far = Math.abs(el.getBoundingClientRect().top) > window.innerHeight * 2;
+    el.scrollIntoView({ block: "start", behavior: (reduced || far) ? "auto" : "smooth" });
+    el.classList.add("found");
+    setTimeout(() => el.classList.remove("found"), 2600);
+    $("#search").value = p.name;
+    $("#search-note").textContent = moved.length ? `Cleared ${moved.join(" + ")} to show him.` : "";
+    closeSearch();
+  }
+
+  // set a toolbar toggle group to one value, keeping aria-pressed truthful across the group
+  function setGroup(attr, val) {
+    document.querySelectorAll(`#toolbar [${attr}]`).forEach((b) =>
+      b.setAttribute("aria-pressed", String(b.getAttribute(attr) === val)));
+  }
+
+  const searchInput = $("#search");
+  searchInput.addEventListener("input", () => {
+    searchHits = searchFor(searchInput.value);
+    searchIdx = searchHits.length ? 0 : -1;
+    $("#search-note").textContent = "";
+    renderSearch();
+  });
+  searchInput.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") { searchInput.value = ""; $("#search-note").textContent = ""; closeSearch(); return; }
+    if (!searchHits.length) return;
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      e.preventDefault();
+      searchIdx = (searchIdx + (e.key === "ArrowDown" ? 1 : -1) + searchHits.length) % searchHits.length;
+      renderSearch();
+      $(`#srch-opt-${searchIdx}`)?.scrollIntoView({ block: "nearest" });
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      gotoPlayer(searchHits[Math.max(0, searchIdx)].id);
+    }
+  });
+  searchInput.addEventListener("focus", () => { if (searchInput.value) { searchHits = searchFor(searchInput.value); renderSearch(); } });
+  $("#search-clear").addEventListener("click", () => {
+    searchInput.value = ""; $("#search-note").textContent = ""; closeSearch(); searchInput.focus();
+  });
+  $("#search-list").addEventListener("click", (e) => {
+    const star = e.target.closest('[data-act="srch-star"]');
+    if (star) {
+      // Starring must NOT navigate or close: you're often adding two or three off one search.
+      // stopPropagation is load-bearing, not defensive. Re-rendering the list detaches the button
+      // that was clicked, so by the time this event reaches the document's outside-click handler
+      // e.target.closest(".srchwrap") walks an orphaned node and returns null — the list would read
+      // that as a click outside itself and shut.
+      e.stopPropagation();
+      const id = star.dataset.id;
+      targets.has(id) ? targets.delete(id) : targets.add(id);
+      saveTargets(); paint(); renderSearch();
+      return;
+    }
+    const opt = e.target.closest(".srch-opt");
+    if (opt) gotoPlayer(opt.dataset.id);
+  });
+  document.addEventListener("click", (e) => { if (!e.target.closest(".srchwrap")) closeSearch(); });
 
   /* ---------- replacement (scarcity) knob ---------- */
   function updateKnobReadouts() {
