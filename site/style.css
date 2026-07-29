@@ -515,8 +515,11 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
 .drow .dbcgap.bc-out, .drow .dbcgap.bc-out-strong, .ddetail .bc-out { color: var(--warn); }
 .drow .dbcgap.bc-out-strong { font-weight: 700; }
 .drow .dceil { font-size: 13px; min-width: 48px; text-align: right; color: var(--dim); }
+/* deliberately uncolored — see rowHTML() in draft.js: a target-collision highlight here lit 44 of
+   248 rows, because a bye is a property of the team, not the player. The read lives in the title. */
+.drow .dbye { font-size: 13px; min-width: 34px; text-align: right; color: var(--faint); }
 .dhead .dbc { font-weight: 600; }
-.dhead .dbc, .dhead .dbcdiff, .dhead .dadp, .dhead .dval, .dhead .dgap, .dhead .dbcgap, .dhead .dceil { font-size: 11px; }
+.dhead .dbc, .dhead .dbcdiff, .dhead .dadp, .dhead .dval, .dhead .dgap, .dhead .dbcgap, .dhead .dceil, .dhead .dbye { font-size: 11px; }
 .ceil-boom { color: var(--accent); }
 .ceil-steady { color: var(--faint); }
 .gap-value { color: var(--accent); }
@@ -716,6 +719,21 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
   .drow .dpos { order: 5; flex-basis: 100%; margin-left: 42px; margin-top: -4px; }
   .ddetail { padding-left: 10px; }
   .chip { white-space: normal; }
+  /* the metric cluster is 8 cells wide once bye joins it, which at 375px pushed half the rows onto a
+     third wrapped line (121px -> 149px). Trimming the min-widths, which were set for a roomier
+     desktop cluster, fits all 8 into the two lines the old 7 used and actually lands shorter than
+     before (115px). Measured at 375px; the values are still wider than the longest string each cell
+     renders, so nothing clips. */
+  .drow .dbc { min-width: 46px; }
+  .drow .dbcdiff { min-width: 42px; }
+  .drow .dadp { min-width: 36px; }
+  .drow .dval { min-width: 42px; }
+  .drow .dgap { min-width: 36px; }
+  .drow .dbcgap { min-width: 40px; }
+  .drow .dceil { min-width: 42px; }
+  .drow .dbye { min-width: 24px; }
+  .drow .dmain, .dmain-head { gap: 6px; }
+
   .drow { grid-template-columns: 52px 44px minmax(0, 1fr); }
   .drow .take { width: 44px; height: 44px; margin: auto 4px; }
   .drow .star { width: 44px; height: 44px; margin: auto 0; font-size: 17px; }

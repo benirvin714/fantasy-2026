@@ -247,6 +247,18 @@ a draft: **of my targets, who goes next, and do I have time?**
   - **Collisions are called out**: when two or more *live* targets share a week the chip turns amber
     and names the others. That's the reason a shortlist wants a bye column at all. Counted over live
     targets only, so drafting one recomputes the rest and un-drafting brings the warning back.
+- **The board carries the same column** (last cell of the metric cluster, after `ceil` — it's a
+  roster-construction attribute, not a value read, so it doesn't displace BC at the head). Its
+  tooltip escalates through the same three states as the rail, naming which targets share the week.
+  - **But it takes no color, and that's measured.** A collision highlight was built here first and
+    cut: a bye belongs to the TEAM, so "two targets already off this week" is true of every player on
+    the 2–6 teams sharing it — with two week-11 targets starred it lit **44 of 248 rows**. That's the
+    same wallpaper bar `REVISIT_UP` was calibrated against. The rail keeps its amber because there
+    it's 2 rows out of ~8, where a shared week really is the exception.
+  - The 8-cell cluster pushed half the rows onto a third wrapped line at 375px (121px → 149px), so
+    the mobile `min-width`s (tuned for a roomier desktop cluster) were trimmed. Eight cells now fit
+    the two lines seven used, landing at **115px, shorter than before the column existed**, with no
+    cell narrower than its longest rendered string.
 - **The snake read (draft slot).** Pick your seat from the rail's `draft slot` selector and it lists
   the picks you still hold and answers, per target, whether he reaches one. Geometry is **measured,
   not assumed**: `draft-meta-2023..25.json` are identical (10 teams, 15 rounds, snake,

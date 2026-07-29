@@ -38,6 +38,10 @@
   // Which secondary sections of the drop-down are revealed. Keyed by SECTION, not by player, so the
   // choice is a board-wide preference that follows you player to player; resets compact on reload.
   const openSect = new Set();
+  // Bye weeks covered by the targets still on your list, {week: [names]}. Recomputed once per paint
+  // (paintTargets runs first, so the board render behind it always reads fresh data) and shared by
+  // the rail and the board's bye column, so the two can never disagree about a stack.
+  let tgtByes = {};
 
   /* ---------- the value engine (transparent, in one place) ---------- */
   // Replacement (scarcity) line per position; the knob slides between the STARTER line
@@ -426,6 +430,21 @@
     const gTxt = g == null ? "–" : ga <= 7 ? "≈" : (g > 0 ? "▼" : "▲") + ga;
     const gTitle = g == null ? "no Boris Chen rank — no consensus comparison"
       : `You rank him ${esc(p.pos)}${p.posRank}; Boris Chen consensus ${esc(p.pos)}${p.bcPosRank} → you're ${ga} spot${ga === 1 ? "" : "s"} ${g > 0 ? "LOWER (more bearish)" : g < 0 ? "HIGHER (more bullish)" : "even"} than the experts. ${ga < BC_OUT_SOME ? "In line with consensus." : g > 0 ? (rec === "FADE" ? "CONTRARIAN fade — the crowd rates him higher than your value does; trust it only if you back the cold projection over the consensus." : "Your board sits below consensus here.") : (rec === "TARGET" ? "CONTRARIAN target — you rate him higher than the experts do." : "Your board sits above consensus here.")}`;
+    // bye: a roster-construction attribute, not a value read, so it sits at the tail of the cluster
+    // rather than ahead of BC.
+    //
+    // It carries NO COLOR, unlike the rail's version, and that's measured rather than assumed. A
+    // collision highlight was built and rejected: bye week is a property of the TEAM, so "two targets
+    // already off this week" is true of every player on the 2-6 teams sharing it — with two week-11
+    // targets starred it lit 44 of 248 rows. That's the same wallpaper bar the revisit flag was cut
+    // against (see REVISIT_UP above). The rail keeps its amber because there it's 2 rows out of ~8,
+    // where a shared week is genuinely the exception. Here the read lives in the tooltip, which
+    // costs nothing on a row you aren't pointing at.
+    const byeShare = p.bye == null ? [] : (tgtByes[p.bye] ?? []).filter((n) => n !== p.name);
+    const byeTitle = p.bye == null ? "No bye week on file for this player."
+      : byeShare.length === 0 ? `Week ${p.bye} bye. Nobody on your target list is off that week.`
+      : byeShare.length === 1 ? `Week ${p.bye} bye, the same week as ${byeShare[0]} on your target list.`
+      : `Week ${p.bye} bye, and ${byeShare.length} players already on your target list are off that week (${byeShare.join(", ")}). Adding him makes ${byeShare.length + 1} holes to cover at once.`;
     const cl = p.ceiling, clr = p.ceilRatio;
     const clCls = clr == null ? "" : clr >= 1.5 ? "ceil-boom" : clr <= 0.6 ? "ceil-steady" : "";
     const clArrow = clr == null ? "" : clr >= 1.5 ? "▲" : clr <= 0.6 ? "▾" : "";
@@ -461,6 +480,7 @@
         <span class="dgap mono ${edgeCls}" title="${esc(edgeTitle)}">${edgeTxt}</span>
         <span class="dbcgap mono ${gCls}" title="${esc(gTitle)}">${gTxt}</span>
         <span class="dceil mono ${clCls}" title="${esc(clTitle)}">${clTxt}</span>
+        <span class="dbye mono" title="${esc(byeTitle)}">${p.bye ?? "–"}</span>
       </button>
       ${isOpen ? detailHTML(p) : ""}
     </div>`;
@@ -684,7 +704,7 @@
       <span></span>
       <span></span>
       <span class="dmain-head"><span class="dr">#</span><span class="dname">player</span><span class="dpos">pos</span>
-      <span class="dbc">BC</span><span class="dbcdiff">BC−adp</span><span class="dadp">adp</span><span class="dval">$val</span><span class="dgap">edge</span><span class="dbcgap">vs BC</span><span class="dceil">ceil</span></span>
+      <span class="dbc">BC</span><span class="dbcdiff">BC−adp</span><span class="dadp">adp</span><span class="dval">$val</span><span class="dgap">edge</span><span class="dbcgap">vs BC</span><span class="dceil">ceil</span><span class="dbye">bye</span></span>
     </div>`;
 
   /* ---------- views ---------- */
@@ -765,8 +785,8 @@
     // Bye collisions among the players still on the list. A bye column on a shortlist earns its keep
     // by answering "am I stacking holes in one week?", so a shared week is called out rather than
     // left for you to spot. Counted over LIVE targets only — a drafted one is somebody else's problem.
-    const byeGroups = {};
-    for (const p of live) if (p.bye != null) (byeGroups[p.bye] ??= []).push(p.name);
+    tgtByes = {};
+    for (const p of live) if (p.bye != null) (tgtByes[p.bye] ??= []).push(p.name);
 
     const items = live.map((p) => {
       const tc = p.fftiers ? tierColor(p.fftiers.tier) : null;
@@ -789,7 +809,7 @@
         awayTitle = `He's lasted ${-away} picks beyond his ADP of ${Math.round(adp)} and is still on the board. The market is letting him fall.`;
       }
       const rec = p.rec === "TARGET" || p.rec === "FADE" ? `<span class="tgt-rec ${p.rec === "TARGET" ? "name-value" : "name-reach"}">${p.rec}</span>` : "";
-      const shared = p.bye == null ? [] : (byeGroups[p.bye] ?? []).filter((n) => n !== p.name);
+      const shared = p.bye == null ? [] : (tgtByes[p.bye] ?? []).filter((n) => n !== p.name);
       const byeTitle = p.bye == null
         ? "No bye week on file for this player. Either he has no NFL team, or the schedule wasn't reachable when the board was built."
         : shared.length
@@ -830,7 +850,7 @@
       const starts = tierStarts(sorted);
       $("#board-body").innerHTML = headerHTML +
         sorted.map((p, i) => rowHTML(p, p.draftRank ?? "–", starts[i])).join("") +
-        `<div class="boardfoot">${washOn() ? "<b>Row color + left band</b> = Boris Chen tier (a block of one color is one tier)" : "<b>Left band</b> = Boris Chen tier (the full-row wash is on the BC sort only, where tiers run contiguous)"} · <b>BC</b> = Boris Chen consensus rank (your primary board) · <b>BC−adp</b> = spots the market lets him fall past that consensus (<span class="name-value">+ = value</span> / <span class="name-reach">− = reach</span>) · <b>$val</b>: ≥$1 = auction price, &lt;$1 = proximity-to-rosterable score · <b>edge</b>: $-gap above $1, board-vs-ADP pick-gap (Np) below · <span class="name-value">TARGET</span>/<span class="name-reach">FADE</span> + confidence dots ●●●. Bench tier gets no TARGET — lean on <b>ceil</b> for upside. # = draft-value rank.</div>`;
+        `<div class="boardfoot">${washOn() ? "<b>Row color + left band</b> = Boris Chen tier (a block of one color is one tier)" : "<b>Left band</b> = Boris Chen tier (the full-row wash is on the BC sort only, where tiers run contiguous)"} · <b>BC</b> = Boris Chen consensus rank (your primary board) · <b>BC−adp</b> = spots the market lets him fall past that consensus (<span class="name-value">+ = value</span> / <span class="name-reach">− = reach</span>) · <b>$val</b>: ≥$1 = auction price, &lt;$1 = proximity-to-rosterable score · <b>edge</b>: $-gap above $1, board-vs-ADP pick-gap (Np) below · <span class="name-value">TARGET</span>/<span class="name-reach">FADE</span> + confidence dots ●●●. Bench tier gets no TARGET — lean on <b>ceil</b> for upside · hover <b>bye</b> to see who on your target list shares that week. # = draft-value rank.</div>`;
     } else {
       $("#board-title").textContent = "Tiers — cliff edges (by draft $)";
       const posList = pos === "ALL" ? ["RB", "WR", "QB", "TE", "K", "DEF"] : [pos];
