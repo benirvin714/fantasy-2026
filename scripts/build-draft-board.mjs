@@ -516,16 +516,19 @@ const rows = [...skill, ...kickers, ...defs].map(([id, p]) => {
   const rookieCap = (p.years_exp === 0 && ext?.draft_ovr != null)
     ? { year: ext.draft_year, round: ext.draft_round, pick: ext.draft_pick, overall: ext.draft_ovr, source: "DynastyProcess db_playerids" }
     : null;
-  // detailed overlay first; else expand a clean_researched id into derived-clean flags
+  // clean_researched base (derived-clean flags), then any detailed overlay on top — so adding
+  // just a scouting_brief to a clean player (the sweep's common case) keeps his clean
+  // risk_flags/injury_history instead of dropping them to the unresearched default.
   let rx = research[id];
-  if (!rx && cleanIds.has(id)) {
+  if (cleanIds.has(id)) {
     const yrs = ["2023", "2024", "2025"].map((y) => avail.games_played[y]);
     const hasHistory = yrs.some((v) => v != null);
-    rx = {
+    const clean = {
       injury_history: hasHistory ? `No significant missed time (${yrs.map((v) => v ?? "--").join("/")}).` : null,
       risk_flags: { suspension: false, contract: false, legal: false, researched: true, notes: ["Swept clean in the league-wide suspension/holdout pass; games-played durable (rookie = no NFL history)."] },
       adp_commentary: null,
     };
+    rx = { ...clean, ...(rx ?? {}) };
   }
   rx = rx ?? {};
   if (rx.injury_history !== undefined) { avail.injury_history = rx.injury_history; avail.partial = rx.injury_history == null; }
