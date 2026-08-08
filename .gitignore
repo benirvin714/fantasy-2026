@@ -4,6 +4,10 @@
 # Not committed — the build runs locally and Cloudflare only serves the derived JSON.
 data/raw/db_playerids.csv
 
+# Local quarantine record written by scripts/validate-events.mjs each run. Reviewed via
+# the routine's morning summary, not published. Regenerated every run, never committed.
+data/raw/nfl-events-flags.json
+
 # Throwaway prototype — lives on branch prototype/adp-mispricing, never on main.
 # Ignored here because OneDrive restores the directory after deletion, so it would
 # otherwise keep reappearing as untracked and risk being swept into a `git add .`.
