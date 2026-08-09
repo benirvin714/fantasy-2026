@@ -16,6 +16,18 @@ Three constraints run through all of it, and they're the part that generalizes: 
 
 The HBGBs, a 10-team half-PPR Sleeper fantasy football league, 2026 season. Built July 2026. The format has enough scoring quirks (2 FLEX, 4-point passing TDs, banded kicker misses, a 5-man bench) that off-the-shelf rankings are actively wrong for it, which is what makes it a real test of the architecture rather than a demo of one.
 
+## The evidence layer
+
+The priors aren't tuned by feel. [`league-tendencies.md`](league-tendencies.md) is six seasons of raw Sleeper JSON (900 draft picks, ~2,100 completed transactions, 22 trades, every playoff bracket) reduced to per-owner behavioral priors, with every figure recomputed from source and cross-validated: FAAB totals reconcile to 100% against Sleeper's own `waiver_budget_used`, including the season where budget itself was traded.
+
+The test of whether a system like this is measuring anything is what it says about the person running it. Two findings from the self-scout section:
+
+> You drafted the league's first K and/or first DEF in five of six drafts, as early as round 10, and no run ever followed. That's roughly one wasted mid-round pick per year.
+
+> Serial frenzy runner-up: $45 on Achane (won at $85), $35 on Ford (won at $66), $26 on Guerendo (won at $73). In this league's frenzies, bid $60+ or abstain.
+
+Neither is a flattering result, and neither came from a hunch. Both fall out of `scripts/` reading `data/raw/`, so any line in that file can be walked back to the JSON it came from.
+
 ## What exists
 
 | Piece | What it is |
