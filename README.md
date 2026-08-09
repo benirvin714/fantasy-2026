@@ -1,6 +1,20 @@
-# The HBGBs Decision-Support System
+# Agentic decision-support system
 
-Fantasy football decision support for the 2026 season of The HBGBs (10-team Sleeper league). Built July 2026. All Sleeper access is read-only; all analysis is translated into this league's exact scoring.
+An agent harness for a rules-heavy domain, built so its recommendations can be *checked* rather than trusted. The design problem: a general model asked a domain question will answer in generic terms, from training data of unknown age, with a confidence it hasn't earned. Every layer here exists to close one of those three gaps.
+
+| Layer | Where | What it does |
+|---|---|---|
+| **Command workflows** | `.claude/commands/` | Four slash commands, each a written spec rather than a prompt: which sources to pull, how to weigh them, what the output must contain, and what the command is forbidden to do. |
+| **Encoded domain rules** | `CLAUDE.md`, `league-profile.md` | The scoring system and its second-order consequences, written down once, loaded every session. No answer is ever produced in generic terms. |
+| **Quantitative models** | `scripts/measure-*.mjs`, `scripts/build-*.mjs` | Six seasons of raw league JSON reduced to measured priors (positional value ladder, FLEX usage, draft-pick expectation, FAAB clearing prices) instead of borrowed consensus. Zero dependencies, Node builtins only. |
+| **Deterministic validators** | `scripts/validate-*.mjs` | Gates that run before any automated output publishes. Unsourced, stale, or out-of-range items are quarantined, not printed. |
+| **Published surface** | `site/`, `data/site/` | Static dashboard on zero-cost hosting behind an auth gate. Commands write JSON, the page reads it, publishing is a git push. |
+
+Three constraints run through all of it, and they're the part that generalizes: **read-only by construction** (the system recommends, a human executes), **no stale claims** (a fact is grounded in live data or it's labeled unverified), and an **honesty contract** in the data layer (a field that can't be derived is `null` with a stated reason, never a plausible-looking guess).
+
+## Applied to
+
+The HBGBs, a 10-team half-PPR Sleeper fantasy football league, 2026 season. Built July 2026. The format has enough scoring quirks (2 FLEX, 4-point passing TDs, banded kicker misses, a 5-man bench) that off-the-shelf rankings are actively wrong for it, which is what makes it a real test of the architecture rather than a demo of one.
 
 ## What exists
 

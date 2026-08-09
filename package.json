@@ -1,0 +1,27 @@
+{
+  "name": "hbgbs-decision-support",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Agentic decision-support system: slash-command workflows, encoded domain rules, quantitative models built from six seasons of raw league data, and deterministic validators.",
+  "type": "module",
+  "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/benirvin714/fantasy-2026.git"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "serve": "python scripts/serve.py 8642",
+    "build:draft-board": "node scripts/build-draft-board.mjs",
+    "build:faab-model": "node scripts/build-faab-model.mjs",
+    "measure:positional-ladder": "node scripts/measure-positional-ladder.mjs",
+    "measure:flex-split": "node scripts/measure-flex-split.mjs",
+    "measure:pick-expectation": "node scripts/measure-pick-expectation.mjs",
+    "measure:ceiling-vs-floor": "node scripts/measure-ceiling-vs-floor.mjs",
+    "validate:events": "node scripts/validate-events.mjs",
+    "validate:scouting": "node scripts/validate-scouting.mjs",
+    "nfl-state": "node scripts/nfl-state.mjs"
+  }
+}
