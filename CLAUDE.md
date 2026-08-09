@@ -12,6 +12,11 @@ Half PPR (0.5/rec), 1pt/10 rush+rec yds, 6pt TDs from scrimmage; passing 1pt/25y
 1. **Read-only on Sleeper.** Never execute any write action against the league (waivers, lineups, trades, drops). The current MCP is read-only-by-construction, but if write tools ever appear: show the exact action and get explicit confirmation first, every time.
 2. **No stale player analysis.** Training data on player values/depth charts/ADP is outdated. Any player-facing claim must be grounded in live Sleeper MCP data or current web search; if unverifiable, say so — never guess.
 3. **Everything scored in THIS league's format** — never hand over generic/standard-scoring takes without translating.
+4. **Docs track reality, in the same commit as the work.** A handoff doc that contradicts itself is worse than no doc: it reads as authoritative and sends the next reader down a dead end. Concretely, when you ship anything:
+   - Move **`progress.md`**'s `Last updated:` stamp to the date you're actually committing. If you edited the body, the stamp moves. No exceptions.
+   - Anything in **Next steps** that the work just completed comes **out of the list** — don't leave "not yet built" next to a section describing it working.
+   - **One canonical dashboard URL: `https://hbgbs.irvinfamily.com/site/`.** The `hbgbs-hq.pages.dev` address still resolves and is still gated, but it appears in prose **only** as "the old URL also works" (currently just the Files entry below). If you're adding a link, use the custom domain. Files that carry it today: `progress.md` (header), `CLAUDE.md` (below), `.claude/commands/brief.md`, `.claude/commands/scout.md`.
+   - Same discipline for the design of record, `plans/valuation-and-scouting.md`: new behavior gets its numbered subsection, and a claim that stops being true gets corrected rather than layered over.
 
 ## Files
 - `league-profile.md` — rules + how the format distorts consensus value (draft/trade doctrine).
@@ -19,7 +24,7 @@ Half PPR (0.5/rec), 1pt/10 rush+rec yds, 6pt TDs from scrimmage; passing 1pt/25y
 - `data/raw/` — raw Sleeper JSON 2020–2025 (leagues, rosters, drafts, transactions, brackets). Refresh via `scripts/fetch-league-data.ps1` (read-only GETs; update its `$leagueId` for 2026).
 - `data/faab-market.json` — compact FAAB pricing model (per-owner price-to-beat, bands, sample sizes). /waivers reads THIS for bids, never the raw transactions. Regenerate on demand: `node scripts/build-faab-model.mjs`.
 - `briefs/` — dated outputs of /brief.
-- Commands: `.claude/commands/` — brief, waivers, startsit, trade. /waivers and /brief also publish JSON to `data/site/` for the dashboard.
+- Commands: `.claude/commands/` — brief, waivers, startsit, trade, scout. /waivers and /brief also publish JSON to `data/site/` for the dashboard.
 - `site/` — HBGBs HQ dashboard (static; serve project root on :8642, open /site/). League ID lives in `site/config.js` too — update BOTH at renewal.
 - **Live dashboard: https://hbgbs.irvinfamily.com/site/** (custom domain, added 2026-07-27; the old `https://hbgbs-hq.pages.dev/site/` still works and is still gated) — Cloudflare Pages, login-gated (ben.p.irvin@gmail.com email code). Auto-deploys on push to `main` of the private repo `benirvin714/fantasy-2026`; only `site/` + `data/site/` are served (build copies them to `dist/`), the rest of the repo stays unserved. Publishing = commit + push (the /brief and /waivers commands do this in their final step). Hosting details: `..\hosting-plan.md`.
 

@@ -1,7 +1,7 @@
 # Plan — Player Valuation & Scouting Briefs
 
 > Design doc for two dashboard upgrades, settled via a full grilling pass on 2026-07-20.
-> Status: **Valuation REDESIGNED 2026-07-20 (§1, 3-layer model). Phases A ($-engine + edge) and B (uncertainty band + rec-confidence) both shipped. Scouting (§2) not yet built.** Build sequence in §6.
+> Status (2026-08-09): **Valuation redesigned 2026-07-20 (§1, 3-layer model); Phases A ($-engine + edge) and B (uncertainty band + rec-confidence) both shipped. Scouting (§2) shipped too** — `/scout` has covered the whole 200-player skill pool, and `role_stability` is feeding `confidence()`. Build sequence in §6.
 > The original VORP-as-value design (Phase 1, shipped then superseded) is preserved in git history; §1 below is the current algorithm.
 > Scope note: neither of these is a from-scratch build — both finish and integrate machinery that already exists but is stubbed to `null`.
 
@@ -180,7 +180,7 @@ pick, with the rest one click away.
 Files: `statsHTML` / `detailHTML` / `bcHTML` / `section()` in `site/draft.js`; `.dsects` / `.dsect*` /
 `.dstats-wide` in `site/style.css`.
 
-### 1.12 Tier blocks — full-row color, golden-angle hues — 2026-07-28
+### 1.12 Tier blocks — full-row color, golden-angle hues — 2026-08-09
 
 The first pass at tier color (a 3px stripe + a faint pill, 47° hue step) was deliberately quiet and read
 as too quiet: neighbouring tiers sat a shade apart and the grouping didn't register. Rebuilt so a Boris
@@ -215,7 +215,7 @@ Chen tier reads as a **slab**, not a hint.
 Files: `tierColor()` / `tierStarts()` / `washOn()` / `rowHTML` in `site/draft.js`; `.drow` custom-property block,
 `.tier-start`, `.drow:not(.dhead):hover`, `.drow.taken` in `site/style.css`.
 
-### 1.13 Target rail — the on-the-clock shortlist — 2026-07-28
+### 1.13 Target rail — the on-the-clock shortlist — 2026-08-09
 
 A sticky column beside the board holding the players you actually want, answering one question during
 a draft: **of my targets, who goes next, and do I have time?**
@@ -292,7 +292,7 @@ the `star` + `untarget` + `draft-slot` handlers / `TGT_KEY` in `site/draft.js`; 
 the `<aside class="panel targets">` in `site/draft.html`. Note `section.panel, aside.panel` — the
 original element+class selector wouldn't have matched an `<aside>` at all.
 
-### 1.14 Player search — toolbar combobox — 2026-07-28
+### 1.14 Player search — toolbar combobox — 2026-08-09
 
 Sits right of the scarcity knob. Type a name, the list filters live, picking a match lands you on
 that player with his drop-down already open, and every match carries a star.

@@ -39,7 +39,7 @@ Skim `plans/valuation-and-scouting.md` §2. The essentials:
    - `git add data/draft-research.json data/site/draft-board.json`
    - `git commit -m "Scout batch: <N> players (<covered>/<pool> briefs)"` (fill in the counts from the validator)
    - `git pull --rebase` then `git push`
-8. **Report:** coverage progress (e.g. "23/200, +10 this batch"), the players you scouted with a one-line read each, **any player you left `null` and why** (honest thin-sourcing), and the validator's clean result. Remind that the sweep is resumable — run `/scout` again for the next batch. The live dashboard: https://hbgbs-hq.pages.dev/site/
+8. **Report:** coverage progress (e.g. "23/200, +10 this batch"), the players you scouted with a one-line read each, **any player you left `null` and why** (honest thin-sourcing), and the validator's clean result. Remind that the sweep is resumable — run `/scout` again for the next batch. The live dashboard: https://hbgbs.irvinfamily.com/site/
 
 ## Degradation
 - **No web search** → stop and say so. A brief without current sources is worthless and must not be written from memory.
