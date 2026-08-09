@@ -35,6 +35,7 @@ const [players, s23, s24, s25, proj] = await Promise.all([
    every team must land exactly one bye, or the map is thrown away rather than shipped half-right.
    Deriving beats a hand-kept table because it self-updates at the next rebuild and can't drift. */
 async function byeWeeks(season) {
+  const cache = path.join(ROOT, "data", "raw", `byes-${season}.json`);
   try {
     const games = await get(`https://api.sleeper.app/schedule/nfl/regular/${season}`);
     const weeks = [...new Set(games.map((g) => g.week))].sort((a, b) => a - b);
@@ -48,9 +49,16 @@ async function byeWeeks(season) {
     }
     if (teams.length !== 32) throw new Error(`${teams.length} teams in the schedule, expected 32`);
     console.log(`Bye weeks: derived for ${teams.length} teams from the ${season} schedule (weeks ${Math.min(...Object.values(map))}-${Math.max(...Object.values(map))}).`);
+    fs.writeFileSync(cache, JSON.stringify(map)); // byes are fixed once the schedule is out; cache for unattended runs
     return map;
   } catch (e) {
-    console.warn(`Bye weeks: UNAVAILABLE (${e.message}) — every player will carry bye: null and the board will say so.`);
+    // Byes never change mid-season, so a cached map is strictly better than nulling every player.
+    if (fs.existsSync(cache)) {
+      const map = JSON.parse(fs.readFileSync(cache, "utf8"));
+      console.warn(`Bye weeks: fetch failed (${e.message}); using cached map for ${Object.keys(map).length} teams.`);
+      return map;
+    }
+    console.warn(`Bye weeks: UNAVAILABLE (${e.message}) and no cache. Every player will carry bye: null and the board will say so.`);
     return {};
   }
 }
@@ -83,23 +91,36 @@ const parseCsvLine = (line) => {
   }
   out.push(cur); return out;
 };
+// Cached locally (like the ID crosswalk) so a transient S3 blip during an UNATTENDED rebuild
+// degrades to yesterday's tiers instead of silently publishing a board with no tiers at all.
+const FFT_CACHE = path.join(ROOT, "data", "raw", "fftiers-half-ppr.csv");
 let fftMap = new Map(), fftStatus = "ok";
-try {
-  const csv = await (await fetch(FFTIERS_URL)).text();
-  const lines = csv.trim().split("\n");
-  const header = parseCsvLine(lines[0]).map((h) => h.replace(/"/g, ""));
-  const col = (n) => header.indexOf(n);
-  for (const line of lines.slice(1)) {
-    const c = parseCsvLine(line);
-    const name = c[col("Player.Name")];
-    if (!name) continue;
-    fftMap.set(normName(name), {
-      rank: +c[col("Rank")], tier: +c[col("Tier")], pos: c[col("Position")],
-      avg_rank: +c[col("Avg.Rank")], best_rank: +c[col("Best.Rank")],
-      worst_rank: +c[col("Worst.Rank")], std_dev: +c[col("Std.Dev")],
-    });
+{
+  let csv = null;
+  try {
+    csv = await (await fetch(FFTIERS_URL)).text();
+    if (!csv || csv.length < 5000 || !csv.includes("Player.Name")) throw new Error("payload too small / wrong shape");
+    fs.writeFileSync(FFT_CACHE, csv); // refresh the local cache on a good fetch
+  } catch (e) {
+    if (fs.existsSync(FFT_CACHE)) { csv = fs.readFileSync(FFT_CACHE, "utf8"); fftStatus = `fetch failed, using cache: ${e.message}`; }
+    else { csv = null; fftStatus = `unavailable (no cache): ${e.message}`; }
   }
-} catch (e) { fftStatus = `fetch failed: ${e.message}`; }
+  if (csv) {
+    const lines = csv.trim().split("\n");
+    const header = parseCsvLine(lines[0]).map((h) => h.replace(/"/g, ""));
+    const col = (n) => header.indexOf(n);
+    for (const line of lines.slice(1)) {
+      const c = parseCsvLine(line);
+      const name = c[col("Player.Name")];
+      if (!name) continue;
+      fftMap.set(normName(name), {
+        rank: +c[col("Rank")], tier: +c[col("Tier")], pos: c[col("Position")],
+        avg_rank: +c[col("Avg.Rank")], best_rank: +c[col("Best.Rank")],
+        worst_rank: +c[col("Worst.Rank")], std_dev: +c[col("Std.Dev")],
+      });
+    }
+  }
+}
 
 // ---- DynastyProcess player-ID crosswalk: sleeper_id -> external IDs + draft capital ----------
 // Source: github.com/DynastyProcess/data (db_playerids.csv, GPL-3.0, daily auto-pipeline). This is
@@ -110,6 +131,10 @@ try {
 const PIDS_URL = "https://raw.githubusercontent.com/DynastyProcess/data/master/files/db_playerids.csv";
 const PIDS_CACHE = path.join(ROOT, "data", "raw", "db_playerids.csv");
 let pidsBySleeper = new Map(), pidsStatus = "ok";
+// Crosswalk formal-name -> sleeper_id. The events feed is written with the formal name
+// ("Kenneth Gainwell") while Sleeper and the board use the common one ("Kenny Gainwell"),
+// so an exact name join silently drops the tag. Resolving through the id fixes that class.
+let pidsNameToSleeper = new Map();
 {
   let csv = null;
   try {
@@ -130,6 +155,8 @@ let pidsBySleeper = new Map(), pidsStatus = "ok";
       const c = parseCsvLine(line);
       const sid = na(c[ci("sleeper_id")]);
       if (!sid) continue;
+      const xwalkName = na(c[ci("name")]);
+      if (xwalkName) pidsNameToSleeper.set(normName(xwalkName), String(sid));
       pidsBySleeper.set(String(sid), {
         fantasypros: na(c[ci("fantasypros_id")]), gsis: na(c[ci("gsis_id")]),
         pfr: na(c[ci("pfr_id")]), espn: na(c[ci("espn_id")]),
@@ -210,7 +237,7 @@ const precededByOtherName = (text, last, first) => {
   while ((m = re.exec(text))) if (m[1] !== first) return true; // "<OtherFirst> <surname>"
   return false;
 };
-function situationFacts(name, pos) {
+function situationFacts(name, pos, id) {
   const inText = (e) => `${e.headline}\n${e.detail}`;
   const fact = (e) => ({ date: e.date, type: e.type, fact: e.headline, source: e.source?.url ?? null });
   // DEF: the entity is a team; players[] tags cover skill players, so match the team nickname.
@@ -222,7 +249,12 @@ function situationFacts(name, pos) {
   return events.filter((e) => {
     // Explicit players[] tag is authoritative for skill players — set by the nfl-daily-events
     // routine, so matching is exact (no surname collisions, no coach/team false positives).
-    if (Array.isArray(e.players)) return e.players.some((pn) => normName(pn) === nn);
+    // Match on the name, then fall back to the crosswalk's formal-name -> sleeper_id
+    // resolution so a nickname variant ("Kenneth" vs "Kenny") still files onto the card.
+    if (Array.isArray(e.players)) return e.players.some((pn) => {
+      const pnn = normName(pn);
+      return pnn === nn || (id != null && pidsNameToSleeper.get(pnn) === String(id));
+    });
     // Fallback for untagged events only: full name, then a safe bare-surname heuristic.
     const text = inText(e);
     if (text.includes(name)) return true;
@@ -546,7 +578,7 @@ const rows = [...skill, ...kickers, ...defs].map(([id, p]) => {
       updated: TODAY,
     },
     availability: avail,
-    situation: { modifier: null, facts: situationFacts(name, pos) }, // modifier set by analysis pass, from facts only
+    situation: { modifier: null, facts: situationFacts(name, pos, id) }, // modifier set by analysis pass, from facts only
     risk_flags: rx.risk_flags ?? { suspension: null, contract: null, legal: null, researched: false, notes: [] },
     adp: { half_ppr: adp, updated: TODAY },
     adp_commentary: rx.adp_commentary ?? null,
@@ -588,7 +620,55 @@ const board = {
   ],
   players: rows,
 };
+/* ---- publish guard (matters most for the UNATTENDED daily rebuild) -------------------
+   The core Sleeper fetches throw and abort the run, which is safe: the board on disk stays
+   live. But the soft-degrading subsystems (byes, fftiers) used to write nulls over good
+   data after a transient blip, and an automated commit would then publish that. Compare
+   against the board already on disk and refuse to write if a populated subsystem collapsed.
+   Same lesson as validate-events.mjs's network-blip circuit breaker. --force overrides. */
+const FORCE = process.argv.includes("--force");
+let prevBoard = null;
+try { prevBoard = JSON.parse(fs.readFileSync(OUT, "utf8")); } catch { /* first run */ }
+if (prevBoard?.players?.length) {
+  const cnt = (arr, f) => arr.filter(f).length;
+  const checks = [
+    ["fftiers tiers", cnt(prevBoard.players, (p) => p.fftiers), cnt(rows, (r) => r.fftiers), 0.5, fftStatus],
+    ["bye weeks", cnt(prevBoard.players, (p) => p.bye != null), cnt(rows, (r) => r.bye != null), 0.5, ""],
+    ["ADP", cnt(prevBoard.players, (p) => p.adp?.half_ppr != null), cnt(rows, (r) => r.adp.half_ppr != null), 0.5, ""],
+    ["projections", cnt(prevBoard.players, (p) => p.projection?.pts != null), cnt(rows, (r) => r.projection.pts != null), 0.5, ""],
+  ];
+  const regressions = checks
+    .filter(([, was, now, frac]) => was > 0 && now < was * frac)
+    .map(([label, was, now, , note]) => `${label}: ${was} -> ${now}${note ? ` (${note})` : ""}`);
+  if (regressions.length && !FORCE) {
+    console.error("REFUSING TO WRITE: the rebuild lost data vs the board already on disk.");
+    for (const r of regressions) console.error(`  ${r}`);
+    console.error("Previous board stays live. Re-run when the upstream source recovers, or pass --force to publish anyway.");
+    process.exit(1);
+  }
+  if (regressions.length) console.warn(`--force: publishing despite regressions: ${regressions.join("; ")}`);
+}
+
 fs.writeFileSync(OUT, JSON.stringify(board) + "\n");
+
+/* ---- ADP history: one snapshot per day, so drift is computable ------------------------
+   Feeds the re-scout trigger in validate-scouting.mjs: a player whose ADP has moved sharply
+   since his brief was written is evidence the market learned something the brief predates.
+   This catches role changes that never make the 25-item events feed. */
+const ADP_HIST = path.join(ROOT, "data", "adp-history.json");
+try {
+  let hist = { note: "One ADP snapshot per day (half-PPR, from Sleeper projections). Feeds the ADP-drift re-scout trigger; capped at 60 days.", snapshots: [] };
+  if (fs.existsSync(ADP_HIST)) hist = JSON.parse(fs.readFileSync(ADP_HIST, "utf8"));
+  const adpToday = {};
+  for (const r of rows) if (r.adp.half_ppr != null) adpToday[r.id] = r.adp.half_ppr;
+  hist.snapshots = hist.snapshots.filter((s) => s.date !== TODAY); // idempotent re-runs
+  hist.snapshots.push({ date: TODAY, adp: adpToday });
+  hist.snapshots.sort((a, b) => a.date.localeCompare(b.date));
+  if (hist.snapshots.length > 60) hist.snapshots = hist.snapshots.slice(-60);
+  fs.writeFileSync(ADP_HIST, JSON.stringify(hist) + "\n");
+  console.log(`adp-history: ${Object.keys(adpToday).length} players snapshotted for ${TODAY} (${hist.snapshots.length} days retained)`);
+} catch (e) { console.warn(`adp-history: NOT updated (${e.message})`); }
+
 const withProj = rows.filter((r) => r.projection.pts != null).length;
 const withAdp = rows.filter((r) => r.adp.half_ppr != null).length;
 console.log(`Wrote ${OUT} (${(fs.statSync(OUT).size / 1024).toFixed(0)}KB): ${rows.length} players, proj=${withProj}, adp=${withAdp}`);

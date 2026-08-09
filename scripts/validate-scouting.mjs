@@ -12,15 +12,23 @@
 //   (role_stability/scheme_fit/source.type), the honesty contract holds (prose present =>
 //   sources present; prose null => a rationale says why), and as_of isn't stale.
 //
+//   RE-SCOUT — once coverage is complete, the live question becomes which briefs have been
+//   overtaken by events. Evidence-driven (news / ADP drift / a narrow calendar backstop),
+//   accumulated in data/rescout-queue.json. See the engine block below for why.
+//
 // REPORT ONLY. Unlike validate-events, this NEVER mutates draft-research.json — that is
 // durable hand/agent work, so a dead link or bad enum is flagged for a human to fix, not
-// silently stripped. Findings -> data/raw/scouting-flags.json. Exit code is always 0.
+// silently stripped. Findings -> data/raw/scouting-flags.json, re-scout queue ->
+// data/rescout-queue.json (the only two files it writes). Exit code is always 0.
 //
 // Usage:
-//   node scripts/validate-scouting.mjs               coverage + validate every brief (URL check on)
+//   node scripts/validate-scouting.mjs               coverage + validate + re-scout queue
 //   node scripts/validate-scouting.mjs --no-net       skip URL liveness (offline / fast)
 //   node scripts/validate-scouting.mjs --worklist 12  also print the next N unscouted (pool order)
-//   node scripts/validate-scouting.mjs --stale-days 14 age past which a brief is "re-verify" (default 21)
+//   node scripts/validate-scouting.mjs --stale-days 14 age past which a brief is "aged" (default 21)
+//   node scripts/validate-scouting.mjs --rescout 30   how many queue rows to print (default 15)
+//   node scripts/validate-scouting.mjs --stale-top 40 calendar backstop applies to top N by ADP (default 60)
+//   node scripts/validate-scouting.mjs --adp-drift 8  min ADP move, in picks, to trigger (default 10, scales with ADP)
 
 import fs from "node:fs";
 import path from "node:path";
@@ -137,12 +145,92 @@ if (!NO_NET && urlJobs.length) {
   });
 }
 
+/* ---- RE-SCOUT ENGINE -------------------------------------------------------------------
+   Coverage answers "who was never scouted". This answers the harder question once the sweep
+   is complete: "whose brief has been overtaken by events?" Re-scouting 200 players on a
+   calendar is infeasible, and a blanket age rule expires the whole board at once (every
+   brief written in the same sweep shares an as_of), which is noise exactly when it matters.
+
+   So the trigger is EVIDENCE, from three independent sources:
+     news           a tagged event in nfl-events.json dated after the brief
+     adp_drift      the market repriced him materially since the brief was written
+     stale_backstop calendar age, but only near the top of the board where it's affordable
+
+   PERSISTENT by design: the events feed ages items out at 14 days while briefs go stale at
+   21, so a news trigger could appear and silently vanish before it was ever acted on. The
+   queue therefore accretes on disk and an entry only clears when the brief's as_of advances
+   past the trigger date, i.e. when the player was actually re-scouted. */
+const QUEUE_PATH = path.join(ROOT, "data", "rescout-queue.json");
+const ADP_HIST_PATH = path.join(ROOT, "data", "adp-history.json");
+const ADP_DRIFT_MIN = parseInt(flagVal("--adp-drift", "10"), 10) || 10;
+const STALE_TOP_N = parseInt(flagVal("--stale-top", "60"), 10) || 60;
+
+let snaps = [];
+try { snaps = JSON.parse(fs.readFileSync(ADP_HIST_PATH, "utf8")).snapshots ?? []; } catch { /* no history yet */ }
+const latestSnap = snaps.length ? snaps[snaps.length - 1] : null;
+const poolRank = new Map(pool.map((p, i) => [String(p.id), i + 1]));
+
+const fresh = [];
+for (const p of pool) {
+  const b = briefOf(p.id);
+  if (!b || !b.as_of) continue;
+  const rank = poolRank.get(String(p.id)), adp = p.adp?.half_ppr ?? null;
+  const base = { id: String(p.id), name: p.name, pos: p.pos, adp, rank };
+
+  // (1) news dated after the brief
+  const newer = (p.situation?.facts ?? []).filter((f) => f.date > b.as_of).sort((x, y) => y.date.localeCompare(x.date));
+  if (newer.length) fresh.push({ ...base, reason: "news", trigger_date: newer[0].date, detail: String(newer[0].fact ?? "").slice(0, 150) });
+
+  // (2) ADP drift since the brief. Threshold scales with draft position: a 10-pick move at
+  //     pick 5 is a real repricing, the same move at pick 180 is noise.
+  if (adp != null && latestSnap) {
+    const baseSnap = snaps.find((s) => s.date >= b.as_of);
+    const baseAdp = baseSnap?.adp?.[String(p.id)];
+    if (baseSnap && baseAdp != null && baseSnap.date !== latestSnap.date) {
+      const delta = +(adp - baseAdp).toFixed(1);
+      const thr = Math.max(ADP_DRIFT_MIN, baseAdp * 0.2);
+      if (Math.abs(delta) >= thr) fresh.push({ ...base, reason: "adp_drift", trigger_date: latestSnap.date,
+        detail: `ADP ${baseAdp} -> ${adp} (${delta > 0 ? "+" : ""}${delta}) since ${baseSnap.date}; threshold ${thr.toFixed(1)}` });
+    }
+  }
+}
+// (3) calendar backstop, deliberately limited to the top of the board
+for (const s of stale) {
+  const rank = poolRank.get(String(s.id)) ?? 9999;
+  if (rank > STALE_TOP_N) continue;
+  const p = pool.find((x) => String(x.id) === String(s.id));
+  fresh.push({ id: String(s.id), name: s.name, pos: p?.pos ?? null, adp: p?.adp?.half_ppr ?? null, rank,
+    reason: "stale_backstop", trigger_date: TODAY, detail: `brief ${s.age_days}d old (>${STALE_DAYS}d) and inside the top ${STALE_TOP_N} by ADP` });
+}
+
+// merge with the persisted queue, then clear anything already re-scouted
+let queue = { note: "", entries: [] };
+try { queue = JSON.parse(fs.readFileSync(QUEUE_PATH, "utf8")); } catch { /* first run */ }
+const keyOf = (e) => `${e.id}|${e.reason}`;
+const merged = new Map((Array.isArray(queue.entries) ? queue.entries : []).map((e) => [keyOf(e), e]));
+for (const f of fresh) {
+  const prev = merged.get(keyOf(f));
+  merged.set(keyOf(f), prev ? { ...prev, ...f, first_seen: prev.first_seen } : { ...f, first_seen: TODAY });
+}
+const resolved = [];
+for (const [k, e] of [...merged]) {
+  const b = briefOf(e.id);
+  if (b?.as_of && b.as_of >= e.trigger_date) { merged.delete(k); resolved.push(e); }
+}
+const rescout = [...merged.values()].sort((a, b) => (a.rank ?? 9999) - (b.rank ?? 9999));
+const byReason = (r) => rescout.filter((e) => e.reason === r).length;
+fs.writeFileSync(QUEUE_PATH, JSON.stringify({
+  note: "Players whose scouting_brief has been overtaken by evidence. Written by validate-scouting.mjs; an entry clears when the brief's as_of advances past trigger_date. Persistent so a news trigger survives the events feed's 14-day age-out.",
+  updated: TODAY, open: rescout.length, entries: rescout,
+}, null, 2) + "\n");
+
 // ---- write flags + summary ------------------------------------------------------------
 const flags = {
   generated_at: new Date().toISOString(),
   net: !NO_NET,
   coverage: { pool: pool.length, scouted: scouted.length, missing: missing.length, by_tier: tiers },
   worklist: worklist.slice(0, 60),
+  rescout,
   brief_issues: issues,
   dead_sources: deadSources,
   inconclusive_urls: inconclusive,
@@ -155,13 +243,21 @@ const pct = pool.length ? Math.round((scouted.length / pool.length) * 100) : 0;
 console.log(`validate-scouting  net=${!NO_NET}  stale>${STALE_DAYS}d`);
 console.log(`  COVERAGE  ${scouted.length}/${pool.length} skill players scouted (${pct}%)  ·  ${missing.length} missing`);
 console.log(`    top50 ${tiers.top50.have}/${tiers.top50.of}   51-100 ${tiers["51-100"].have}/${tiers["51-100"].of}   101+ ${tiers["101+"].have}/${tiers["101+"].of}`);
-console.log(`  VALIDATION  ${issues.length} brief issues · ${deadSources.length} dead sources · ${inconclusive.length} inconclusive · ${stale.length} stale (>${STALE_DAYS}d)`);
+console.log(`  VALIDATION  ${issues.length} brief issues · ${deadSources.length} dead sources · ${inconclusive.length} inconclusive · ${stale.length} aged >${STALE_DAYS}d`);
 if (urlNote) console.log(`  ${urlNote}`);
 for (const x of issues) console.log(`  ISSUE  ${x.id} ${x.name}: ${x.issue}`);
 for (const d of deadSources) console.log(`  DEAD   ${d.id} ${d.name}: "${d.label}" ${d.code}  ${d.url}`);
-for (const s of stale) console.log(`  STALE  ${s.id} ${s.name}: as_of ${s.as_of} (${s.age_days}d)`);
+// The aged-brief list is deliberately NOT dumped: one sweep writes ~200 briefs on the same
+// day, so they all age out together and printing them is noise. The re-scout queue below is
+// the actionable subset.
+console.log(`  RE-SCOUT  ${rescout.length} open  (news ${byReason("news")} · adp-drift ${byReason("adp_drift")} · stale-backstop ${byReason("stale_backstop")})${resolved.length ? ` · ${resolved.length} cleared this run` : ""}`);
+if (snaps.length < 2) console.log(`    adp-drift: dormant until 2+ daily ADP snapshots exist (have ${snaps.length}); the daily rebuild adds one per day`);
+const RESCOUT_SHOW = parseInt(flagVal("--rescout", "15"), 10) || 15;
+for (const e of rescout.slice(0, RESCOUT_SHOW))
+  console.log(`    #${e.rank ?? "-"} ${e.pos ?? "?"} ${e.name}  adp=${e.adp ?? "-"}  [${e.reason} ${e.trigger_date}]  ${e.detail}`);
+if (rescout.length > RESCOUT_SHOW) console.log(`    ... +${rescout.length - RESCOUT_SHOW} more (full list in rescout-queue.json)`);
 if (WORKLIST) {
   console.log(`  NEXT ${Math.min(WORKLIST, worklist.length)} TO SCOUT (pool order):`);
   for (const w of worklist.slice(0, WORKLIST)) console.log(`    #${w.rank} ${w.pos} ${w.id} ${w.name}  adp=${w.adp ?? "-"} bc=${w.bc ?? "-"}`);
 }
-console.log(`  flags -> ${path.relative(ROOT, FLAGS_PATH)}`);
+console.log(`  flags -> ${path.relative(ROOT, FLAGS_PATH)}  ·  queue -> ${path.relative(ROOT, QUEUE_PATH)}`);
