@@ -432,7 +432,7 @@ try {
         delta: d, direction: d >= dthr ? "up" : d <= -dthr ? "down" : "steady", threshold: dthr,
       };
     } else if (dm) {
-      direction = { metric: dm, direction: null, reason: `only ${qual.length} season(s) with ${MIN_SEASON_G}+ games — no direction claimed` };
+      direction = { metric: dm, direction: null, reason: `only ${qual.length} season(s) with ${MIN_SEASON_G}+ games, so no direction claimed` };
     }
     // --- within-season trend (2025): last 4 games played vs first 4. Needs 2*TREND_BLOCK
     // games so the halves never overlap. Catch rate gets an arrow only at real target volume.
@@ -452,7 +452,7 @@ try {
           const fc = first.reduce((s, l) => s + l.rec, 0) / ft, lc = last.reduce((s, l) => s + l.rec, 0) / lt;
           const cd = +(lc - fc).toFixed(3);
           cr = { first: +fc.toFixed(3), last: +lc.toFixed(3), delta: cd, direction: cd >= CR_DELTA ? "up" : cd <= -CR_DELTA ? "down" : "steady" };
-        } else cr = { direction: null, reason: `under ${CR_MIN_TGT} targets in a 4-game block — catch-rate trend not claimed` };
+        } else cr = { direction: null, reason: `under ${CR_MIN_TGT} targets in a 4-game block, so catch-rate trend not claimed` };
       }
       trend = {
         season: "2025", metric: tm, games: lines.length,
@@ -463,7 +463,7 @@ try {
         catch_rate: cr,
       };
     } else if (tm) {
-      trend = { season: "2025", metric: tm, direction: null, games: lines.length, reason: `${lines.length} games played — needs ${TREND_BLOCK * 2} for a first-4 vs last-4 split` };
+      trend = { season: "2025", metric: tm, direction: null, games: lines.length, reason: `${lines.length} games played; needs ${TREND_BLOCK * 2} for a first-4 vs last-4 split` };
     }
     // last season's ACTUAL league-scored production — the baseline the projection is checked against
     const act = s25[id];
@@ -539,7 +539,7 @@ const rows = [...skill, ...kickers, ...defs].map(([id, p]) => {
     ids: { sleeper: id, fantasypros: ext?.fantasypros ?? null, gsis: ext?.gsis ?? null, pfr: ext?.pfr ?? null, espn: ext?.espn ?? null }, // DynastyProcess crosswalk; join key for ID-based sources
     projection: {
       pts, ppg: pts != null ? +(pts / 17).toFixed(1) : null,
-      method: pos === "DEF" ? "partial: only sack/int/fum/blk project; points-allowed tiers do not — low confidence"
+      method: pos === "DEF" ? "partial: only sack/int/fum/blk project; points-allowed tiers do not, so low confidence"
         : pos === "K" ? "league bands; 50+ scored at 5 (60+ bonus unprojectable)"
         : "Sleeper projected stat line re-scored with exact league settings",
       sleeper_half_ppr: pr?.pts_half_ppr ?? null, // sanity anchor, NOT the number to use
@@ -567,14 +567,14 @@ const board = {
   ceiling: { source: "Sleeper weekly stats 2023-25 re-scored; spike week = top-5 weekly finish at position", status: ceilingStatus, pos_avg: ceilingPosAvg, boom_line: ceilingBoomLine, spike_rank: SPIKE_RANK, min_weeks: MIN_CEIL_WEEKS, scored: rows.filter((r) => r.ceiling).length, updated: TODAY },
   usage: {
     source: "Sleeper weekly stats 2023-25; team totals via the per-week (tm_off_snp,tm_def_snp,tm_st_snp) team fingerprint",
-    role: "EVIDENCE + confidence (role-stability) + trajectory/override only — never an input to asset value or the edge (the projection already prices raw share and age)",
+    role: "EVIDENCE + confidence (role-stability) + trajectory/override only. Never an input to asset value or the edge (the projection already prices raw share and age)",
     status: usageStatus, players: usageById.size, updated: TODAY,
     gates: { min_season_games: MIN_SEASON_G, trend_block: TREND_BLOCK, direction_thresholds: DIR_METRIC, trend_thresholds: TREND_METRIC, catch_rate_min_targets: CR_MIN_TGT },
     cluster_warnings: clusterWarn,
   },
   gaps: [
     { field: "usage (rookies / K / DEF)", status: "null by design", fill: "no NFL usage history exists (or the position has none); page shows no-data" },
-    { field: "usage.direction / usage.trend", status: "null when under-sampled", fill: `direction needs 2+ seasons at ${MIN_SEASON_G}+ games; trend needs ${TREND_BLOCK * 2}+ games in 2025 — no arrow is claimed below that` },
+    { field: "usage.direction / usage.trend", status: "null when under-sampled", fill: `direction needs 2+ seasons at ${MIN_SEASON_G}+ games; trend needs ${TREND_BLOCK * 2}+ games in 2025. No arrow is claimed below that` },
     { field: "ceiling (rookies / thin sample)", status: "null by design", fill: `<${MIN_CEIL_WEEKS} career weeks -> no stable spike-rate; page shows no-data` },
     { field: "availability.injury_history", status: `researched for top ~35 (overlay); ${Object.keys(research).length} players in draft-research.json`, fill: "extend the web research pass deeper than ~35 as draft nears" },
     { field: "availability.score (rookies)", status: "null by design", fill: "no NFL history exists; page shows no-data" },
