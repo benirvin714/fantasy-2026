@@ -164,6 +164,12 @@ const QUEUE_PATH = path.join(ROOT, "data", "rescout-queue.json");
 const ADP_HIST_PATH = path.join(ROOT, "data", "adp-history.json");
 const ADP_DRIFT_MIN = parseInt(flagVal("--adp-drift", "10"), 10) || 10;
 const STALE_TOP_N = parseInt(flagVal("--stale-top", "60"), 10) || 60;
+// --drip N: print the next N queue entries the nightly routine should actually re-scout.
+// Capped and rank-limited on purpose: draining a few per night across the run-up to the draft
+// beats one huge catch-up pass the day of. Only players inside DRIP_MAX_RANK are worth tokens
+// (10 teams x 16 roster spots = 160 picks, so past ~150 by ADP it is waiver fodder).
+const DRIP = parseInt(flagVal("--drip", "0"), 10) || 0;
+const DRIP_MAX_RANK = parseInt(flagVal("--drip-rank", "150"), 10) || 150;
 
 let snaps = [];
 try { snaps = JSON.parse(fs.readFileSync(ADP_HIST_PATH, "utf8")).snapshots ?? []; } catch { /* no history yet */ }
@@ -256,6 +262,35 @@ const RESCOUT_SHOW = parseInt(flagVal("--rescout", "15"), 10) || 15;
 for (const e of rescout.slice(0, RESCOUT_SHOW))
   console.log(`    #${e.rank ?? "-"} ${e.pos ?? "?"} ${e.name}  adp=${e.adp ?? "-"}  [${e.reason} ${e.trigger_date}]  ${e.detail}`);
 if (rescout.length > RESCOUT_SHOW) console.log(`    ... +${rescout.length - RESCOUT_SHOW} more (full list in rescout-queue.json)`);
+
+// --drip N: the bounded nightly work order. Deliberately computed here rather than left to the
+// routine's judgement, so "which players tonight" is deterministic and reviewable.
+if (DRIP) {
+  // One slot per PLAYER, not per trigger. A player can legitimately hold several open entries
+  // (news AND stale_backstop, say) because each clears independently, but re-scouting him once
+  // resolves all of them, and letting him take two of three nightly slots wastes the budget.
+  const REASON_RANK = { news: 0, adp_drift: 1, stale_backstop: 2 };
+  const eligible = rescout
+    .filter((e) => (e.rank ?? 9999) <= DRIP_MAX_RANK)
+    .sort((a, b) => (a.rank ?? 9999) - (b.rank ?? 9999) || (REASON_RANK[a.reason] ?? 9) - (REASON_RANK[b.reason] ?? 9));
+  const reasonsById = new Map();
+  for (const e of eligible) reasonsById.set(e.id, [...(reasonsById.get(e.id) ?? []), e.reason]);
+  const drip = [];
+  const seen = new Set();
+  for (const e of eligible) {
+    if (seen.has(e.id)) continue;
+    seen.add(e.id);
+    drip.push(e);
+    if (drip.length >= DRIP) break;
+  }
+  console.log(`  DRIP  re-scout these ${drip.length} tonight (cap ${DRIP}, ADP rank <= ${DRIP_MAX_RANK}; ${rescout.length} open entries across ${new Set(rescout.map((e) => e.id)).size} players):`);
+  if (!drip.length) console.log("    none. Queue is empty or everything left is outside the draftable range. Do NOT scout anything.");
+  for (const e of drip) {
+    const all = reasonsById.get(e.id) ?? [e.reason];
+    const also = all.length > 1 ? `  (also: ${all.filter((r) => r !== e.reason).join(", ")}; one re-scout clears all)` : "";
+    console.log(`    id=${e.id} #${e.rank} ${e.pos} ${e.name}  [${e.reason} ${e.trigger_date}]  ${e.detail}${also}`);
+  }
+}
 if (WORKLIST) {
   console.log(`  NEXT ${Math.min(WORKLIST, worklist.length)} TO SCOUT (pool order):`);
   for (const w of worklist.slice(0, WORKLIST)) console.log(`    #${w.rank} ${w.pos} ${w.id} ${w.name}  adp=${w.adp ?? "-"} bc=${w.bc ?? "-"}`);
