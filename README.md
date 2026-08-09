@@ -20,7 +20,7 @@ The HBGBs, a 10-team half-PPR Sleeper fantasy football league, 2026 season. Buil
 
 | Piece | What it is |
 |---|---|
-| `CLAUDE.md` | Session memory: league/roster IDs, scoring quirks, hard rules. Every session reads this first. |
+| `CLAUDE.md` | The always-loaded context file (Claude Code reads it at the start of every session, ahead of any prompt): league/roster IDs, scoring quirks, hard rules. This is where the domain gets encoded so no session can forget it. |
 | `league-profile.md` | The rules + how this format distorts consensus value (draft/trade doctrine). |
 | `league-tendencies.md` | Six seasons of verified owner dossiers: draft habits, FAAB market prices, trade-partner map, self-scout. |
 | `data/raw/` | Raw Sleeper JSON, 2020–2025 (drafts, transactions, rosters, brackets). Refresh: `scripts/fetch-league-data.ps1`. |
