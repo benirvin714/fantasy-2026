@@ -40,6 +40,17 @@ Neither is a flattering result, and neither came from a hunch. Both fall out of 
 | `.claude/commands/` | The four commands below. |
 | `site/` | **HBGBs HQ dashboard** — static, zero-cost, read-only. Live standings + season state straight from Sleeper's public API (client-side), an NFL-updates panel fed by the daily `nfl-events` routine, plus waiver-board and latest-brief panels fed by `data/site/*.json` (published by /waivers and /brief). Standings show the playoff cut line (top 6) and inline points-for bars; a header refresh button re-pulls live data. Start: `python scripts/serve.py 8642` from the project root (or the `hbgbs-hq` launch config — it runs the no-cache server), open `http://localhost:8642/site/`. Update `site/config.js` with the new league ID at renewal. **After editing `site/style.css` or `site/app.js`, bump the `?v=N` query on their `<link>`/`<script>` tags in `site/index.html`** so browsers fetch the change. |
 | `plans/` | Design docs — **confirmed, pre-build**. [valuation-and-scouting.md](plans/valuation-and-scouting.md): the VORP/replacement + ceiling valuation fixes and the `scouting_brief` commentary layer that feeds a capped `situation.modifier`. |
+| [`progress.md`](progress.md) | The engineering log: what shipped, what it cost, and why each call was made. Start here if you want the reasoning rather than the inventory (see below). |
+
+### Why `progress.md` is worth opening
+
+It's where the decisions get shown rather than asserted. Three examples of the house style:
+
+- **Color as an encoding, not decoration.** Draft-board tier bands step their hues by the golden angle, so adjacent tiers measure ΔE 66–167 against a just-noticeable threshold of about 2.3. A period-3 lightness step adds a second, colorblind-safe axis and pushes the hue cycle's near-repeat past the end of the board. The full-row wash appears only on the sort where tiers run contiguous, because everywhere else it's confetti.
+- **Geometry that got validated before it got trusted.** Snake-draft math is measured from three seasons of real draft metadata and checked against the actual 2025 picks. The ±5-pick slack is labeled in the UI as a rule of thumb rather than a computed probability, because that's what it is.
+- **Subtraction treated as work.** A player drop-down went from 1577px to 523px with no field removed and no black box: everything is one click away, section state survives repaints. There's a matching entry for a highlight that was cut after it lit 44 of 248 rows and failed its own wallpaper test.
+
+The **Watch-outs** section at the bottom is the honest part. It records why so few recommendations carry high confidence: the valuation is deliberately single-source, and divergence from an outside ranking is surfaced as low confidence instead of blended away. That's a design decision with a cost, written down as a cost.
 
 ## Commands
 
