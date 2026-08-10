@@ -11,7 +11,12 @@ import { fileURLToPath } from "node:url";
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const OUT = path.join(ROOT, "data", "site", "draft-board.json");
-const TODAY = new Date().toISOString().slice(0, 10);
+// LOCAL date, not toISOString() (which is UTC). This is not cosmetic: TODAY keys the one-per-day
+// adp-history snapshots below, and after ~7pm Central a UTC stamp rolls to tomorrow — so an evening
+// rebuild filed a SECOND snapshot for the same real day under tomorrow's date, breaking the
+// one-per-day invariant the file documents and flattening the day-over-day delta the ADP-drift
+// re-scout trigger reads. en-CA formats as YYYY-MM-DD.
+const TODAY = new Date().toLocaleDateString("en-CA");
 const POOL_SIZE = 200; // skill players by Sleeper search_rank; plus all 32 DEF
 
 const get = async (url) => {
@@ -510,11 +515,47 @@ try {
 } catch (e) { usageStatus = `usage compute failed: ${e.message}`; console.log(`usage: ${usageStatus}`); }
 
 // ---- build the pool ----------------------------------------------------------
-const ranked = (posList, n) => Object.entries(players)
-  .filter(([, p]) => posList.includes(p.position) && p.team && p.search_rank && p.search_rank < 9999999)
-  .sort(([, a], [, b]) => a.search_rank - b.search_rank)
-  .slice(0, n);
+
+/* Drop dead entries: players Sleeper still lists as rostered who are not going to play.
+   Ben Roethlisberger occupied a top-200 skill slot for the 2026 board — retired since the 2021
+   season, yet Sleeper carries him as active:true, status:"Active", team:"PIT", search_rank 176.
+   The upstream record is simply wrong, so `p.active` (which the kicker filter below relies on)
+   cannot catch him.
+
+   The test is deliberately a conjunction of three independent misses, not just "low projection":
+   no 2026 projection AND no snap of NFL work in 2023-25 AND not a rookie. A holdout, a suspended
+   player or a season-ending injury can zero out a projection, and any of them would still show
+   recent-season stats; a genuine rookie has no stats but is always projected (the thinnest in this
+   pool is 13.6 pts). Only a player who fails all three is unreachable by the board — he can't be
+   assigned an asset value, so he can never surface a recommendation, he just displaces a real
+   player from the 200 slots. Filtering before the slice means the next-ranked player takes the
+   spot, so the pool stays 200 deep.
+   Logged by name, never silently: a filter that quietly eats players is how the opposite bug hides. */
+const playedRecently = (id) => [s23, s24, s25].some((s) => s[id] && (s[id].gp ?? 0) > 0);
+const deadEntry = ([id, p]) =>
+  !(rescore(proj[id], p.position) > 0) && !playedRecently(id) && p.years_exp !== 0;
+
+// Walk the ranked list taking live players until the pool is full, rather than filtering then
+// slicing: a plain .filter() is eager and would sweep every dead entry in the whole player
+// universe (thousands of ranked-but-inactive names), reporting drops that were never in contention.
+// Only a player who would actually have made the top n is worth naming.
+const dropped = [];
+const ranked = (posList, n) => {
+  const sorted = Object.entries(players)
+    .filter(([, p]) => posList.includes(p.position) && p.team && p.search_rank && p.search_rank < 9999999)
+    .sort(([, a], [, b]) => a.search_rank - b.search_rank);
+  const out = [];
+  for (const e of sorted) {
+    if (out.length >= n) break;
+    if (deadEntry(e)) { dropped.push(`${e[1].full_name} (${e[1].position} ${e[1].team}, rank ${e[1].search_rank})`); continue; }
+    out.push(e);
+  }
+  return out;
+};
 const skill = ranked(["QB", "RB", "WR", "TE"], POOL_SIZE);
+console.log(dropped.length
+  ? `pool: dropped ${dropped.length} dead entr${dropped.length === 1 ? "y" : "ies"} (no 2026 projection, no 2023-25 snaps, not a rookie): ${dropped.join("; ")}`
+  : "pool: no dead entries to drop");
 // search_rank is unreliable for K (Aubrey ranks below journeymen) — select K by our own
 // league-scored projection instead.
 const kickers = Object.entries(players)

@@ -31,6 +31,8 @@ The draft board runs a **3-layer valuation model** (asset → scarcity → aucti
 - Team-level denominators come from a **per-week team fingerprint** (`tm_off_snp|tm_def_snp|tm_st_snp` is identical across a team's players), so no historical roster data is needed and mid-season trades stay correct. Collided clusters and 2025-wk18's missing snap data are detected and excluded, which is why each season stamps both `g` and `share_g`.
 
 ### Data integrity
+- **Dead board entries are filtered at build time** (2026-08-09): Ben Roethlisberger held a top-200 skill slot for 2026 despite retiring after the 2021 season, because Sleeper's own record still reads `active: true`, `status: "Active"`, `team: "PIT"`, `search_rank: 176`. An `active` check can't catch that, so `deadEntry()` requires **three independent misses** — no 2026 projection, no snap of NFL work in 2023–25, and not a rookie. Any one alone would be wrong (a holdout or suspension zeroes a projection but leaves recent stats; a rookie has no stats but is always projected, the thinnest here being 13.6 pts). Filtering happens while walking the ranked list, so the next live player takes the slot and the pool stays 200 deep; drops are **logged by name**, never silent. Demond Claiborne (RB MIN) took the vacated spot.
+- **Build stamps use the LOCAL date**, not `toISOString()` (UTC). `TODAY` keys the one-per-day `data/adp-history.json` snapshots, so after ~7pm Central a UTC stamp filed a second snapshot for the same real day under tomorrow's date — breaking the invariant the file documents and flattening the day-over-day delta the ADP-drift re-scout trigger reads.
 - **`situation.facts` now match players by explicit `players[]` tags** on each `nfl-events.json` item (not surname substrings). Fixed the "Bijan showing Egbuka/Zac-Robinson news" class of bug across the whole board. The `nfl-daily-events` scheduled routine emits the tag going forward; existing events were backfilled.
 
 ### Waivers
@@ -38,7 +40,7 @@ The draft board runs a **3-layer valuation model** (asset → scarcity → aucti
 
 ### Scouting brief (evidence layer)
 - `scouting_brief` = prose (analyst/coach/player sentiment + scheme fit) + `{role_stability, scheme_fit, override_flag}`, retrieval-grounded-or-null. `role_stability` feeds `confidence()` (worst-of with the historical-usage read); scheme_fit is descriptive + an override trigger. **Never moves value.**
-- Filled by **`/scout`**, a resumable batch sweep, and kept current by the nightly re-scout drip. **Coverage is complete over the scope that has one**: 199 of the board's 200 skill players carry a brief with a `role_stability` the confidence model consumes. The 49 without are 16 K + 32 DEF (no usage profile exists for those positions, so scouting doesn't apply) plus one dead board entry, Ben Roethlisberger — 0 projected points, no ADP, no Boris Chen rank, so he's inert and can't reach a recommendation. Original design: [`plans/scouting-fork-prompt.md`](plans/scouting-fork-prompt.md).
+- Filled by **`/scout`**, a resumable batch sweep, and kept current by the nightly re-scout drip. **Coverage is complete over the scope that has one**: all 200 skill players carry a brief with a `role_stability` the confidence model consumes. The 48 without are 16 K + 32 DEF, where no usage profile exists and scouting doesn't apply. Original design: [`plans/scouting-fork-prompt.md`](plans/scouting-fork-prompt.md).
 
 ## Next steps (rough priority)
 
