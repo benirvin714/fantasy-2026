@@ -717,6 +717,23 @@ const sanity = rows.filter((r) => r.projection.pts != null && r.projection.sleep
   .map((r) => Math.abs(r.projection.pts - r.projection.sleeper_half_ppr));
 console.log(`skill re-score vs sleeper_half_ppr: max diff ${Math.max(...sanity).toFixed(1)}, mean ${(sanity.reduce((a, b) => a + b, 0) / sanity.length).toFixed(2)}`);
 console.log(`fftiers: status=${fftStatus}, csv-rows=${fftMap.size}, matched to board=${rows.filter((r) => r.fftiers).length}`);
+
+/* Retirement tripwire — a SECOND, independent route to the bug deadEntry() was written for.
+   deadEntry() needs a player to fail all three of {no projection, no 2023-25 snaps, not a rookie},
+   which by construction cannot see someone who retires after a season he played: he keeps his
+   recent stats and only goes quiet in the next projection cycle.
+   What every retiree does lose is the MARKET. Nobody drafts him, so ADP goes null, and no expert
+   ranks him, so Boris Chen drops him. That pair is what exposed Roethlisberger, and it stays true
+   whether a player stopped after 2021 or after last season.
+   This only WARNS — it must never filter. A genuinely deep but active player can lack both for
+   ordinary reasons, and silently dropping him would be the mirror of the bug being guarded against.
+   Currently prints nothing (0 market-blind non-rookies); if it ever fires, check the names by hand
+   against a live source before touching the pool. */
+const marketBlind = rows.filter((r) => ["QB", "RB", "WR", "TE"].includes(r.pos)
+  && !r.rookie && r.adp?.half_ppr == null && !r.fftiers);
+if (marketBlind.length) {
+  console.warn(`retirement tripwire: ${marketBlind.length} non-rookie skill player(s) have NO ADP and NO Boris Chen rank — verify each is actually playing before trusting the board: ${marketBlind.map((r) => `${r.name} (${r.pos} ${r.team}, age ${r.age ?? "?"}, last played ${["2025", "2024", "2023"].find((y) => r.availability?.games_played?.[y] > 0) ?? "not since 2023"})`).join("; ")}`);
+}
 console.log(`player-ids: status=${pidsStatus}, FP-id resolved ${rows.filter((r) => r.ids?.fantasypros).length}/${rows.length}; rookie_capital filled for ${rows.filter((r) => r.context.rookie_capital).length} rookies`);
 // usage sanity: team-fingerprint shares must reproduce known 2025 anchors (Chase target share ~32.6%).
 for (const nm of ["Ja'Marr Chase", "Bijan Robinson", "Josh Allen"]) {
