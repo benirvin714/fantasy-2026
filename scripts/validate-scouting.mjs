@@ -164,12 +164,21 @@ const QUEUE_PATH = path.join(ROOT, "data", "rescout-queue.json");
 const ADP_HIST_PATH = path.join(ROOT, "data", "adp-history.json");
 const ADP_DRIFT_MIN = parseInt(flagVal("--adp-drift", "10"), 10) || 10;
 const STALE_TOP_N = parseInt(flagVal("--stale-top", "60"), 10) || 60;
-// --drip N: print the next N queue entries the nightly routine should actually re-scout.
-// Capped and rank-limited on purpose: draining a few per night across the run-up to the draft
-// beats one huge catch-up pass the day of. Only players inside DRIP_MAX_RANK are worth tokens
-// (10 teams x 16 roster spots = 160 picks, so past ~150 by ADP it is waiver fodder).
+// --drip N: print the next N queue entries the routine should actually re-scout this run.
+// Capped and rank-limited on purpose: draining a few per run across the run-up to the draft
+// beats one huge catch-up pass the day of. Non-target players past DRIP_MAX_RANK aren't worth
+// tokens (10 teams x 16 roster spots = 160 picks, so past ~150 by ADP it is waiver fodder);
+// shortlist targets from data/draft-targets.json are exempt and float first (see below).
 const DRIP = parseInt(flagVal("--drip", "0"), 10) || 0;
 const DRIP_MAX_RANK = parseInt(flagVal("--drip-rank", "150"), 10) || 150;
+// Your draft shortlist (data/draft-targets.json, optional): ids the drip re-scouts FIRST.
+// They float ahead of the ADP-ordered queue and bypass DRIP_MAX_RANK, because a player you
+// actually plan to draft is worth a fresh brief even if he sits past the general cutoff.
+const TARGETS_PATH = path.join(ROOT, "data", "draft-targets.json");
+let targetIds = new Set();
+try { targetIds = new Set((JSON.parse(fs.readFileSync(TARGETS_PATH, "utf8")).ids ?? []).map(String)); }
+catch { /* absent/empty = no explicit targets; drip keeps its default top-of-board order */ }
+const isTarget = (id) => targetIds.has(String(id));
 
 let snaps = [];
 try { snaps = JSON.parse(fs.readFileSync(ADP_HIST_PATH, "utf8")).snapshots ?? []; } catch { /* no history yet */ }
@@ -270,9 +279,14 @@ if (DRIP) {
   // (news AND stale_backstop, say) because each clears independently, but re-scouting him once
   // resolves all of them, and letting him take two of three nightly slots wastes the budget.
   const REASON_RANK = { news: 0, adp_drift: 1, stale_backstop: 2 };
+  // Targets jump the queue and are exempt from the rank cap; everyone else must be inside it.
+  // Ordering within a group is unchanged: ADP rank, then reason.
   const eligible = rescout
-    .filter((e) => (e.rank ?? 9999) <= DRIP_MAX_RANK)
-    .sort((a, b) => (a.rank ?? 9999) - (b.rank ?? 9999) || (REASON_RANK[a.reason] ?? 9) - (REASON_RANK[b.reason] ?? 9));
+    .filter((e) => isTarget(e.id) || (e.rank ?? 9999) <= DRIP_MAX_RANK)
+    .sort((a, b) =>
+      (isTarget(a.id) ? 0 : 1) - (isTarget(b.id) ? 0 : 1)
+      || (a.rank ?? 9999) - (b.rank ?? 9999)
+      || (REASON_RANK[a.reason] ?? 9) - (REASON_RANK[b.reason] ?? 9));
   const reasonsById = new Map();
   for (const e of eligible) reasonsById.set(e.id, [...(reasonsById.get(e.id) ?? []), e.reason]);
   const drip = [];
@@ -283,12 +297,13 @@ if (DRIP) {
     drip.push(e);
     if (drip.length >= DRIP) break;
   }
-  console.log(`  DRIP  re-scout these ${drip.length} tonight (cap ${DRIP}, ADP rank <= ${DRIP_MAX_RANK}; ${rescout.length} open entries across ${new Set(rescout.map((e) => e.id)).size} players):`);
+  const tgtInQueue = rescout.filter((e) => isTarget(e.id)).length;
+  console.log(`  DRIP  re-scout these ${drip.length} this run (cap ${DRIP}, ADP rank <= ${DRIP_MAX_RANK}${targetIds.size ? `; ${targetIds.size} shortlist targets float first + bypass the cap` : ""}; ${rescout.length} open across ${new Set(rescout.map((e) => e.id)).size} players${tgtInQueue ? `, ${tgtInQueue} on your shortlist` : ""}):`);
   if (!drip.length) console.log("    none. Queue is empty or everything left is outside the draftable range. Do NOT scout anything.");
   for (const e of drip) {
     const all = reasonsById.get(e.id) ?? [e.reason];
     const also = all.length > 1 ? `  (also: ${all.filter((r) => r !== e.reason).join(", ")}; one re-scout clears all)` : "";
-    console.log(`    id=${e.id} #${e.rank} ${e.pos} ${e.name}  [${e.reason} ${e.trigger_date}]  ${e.detail}${also}`);
+    console.log(`    ${isTarget(e.id) ? "★ " : ""}id=${e.id} #${e.rank} ${e.pos} ${e.name}  [${e.reason} ${e.trigger_date}]  ${e.detail}${also}`);
   }
 }
 if (WORKLIST) {

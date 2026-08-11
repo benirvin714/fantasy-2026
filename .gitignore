@@ -17,6 +17,12 @@ data/raw/nfl-events-flags.json
 # each run, reviewed on demand, never committed.
 data/raw/scouting-flags.json
 
+# Your personal draft shortlist, read by scripts/validate-scouting.mjs --drip to re-scout
+# targeted players first. Kept LOCAL on purpose: this repo is public, and a committed shortlist
+# would tip your draft plan to leaguemates. The drip reads it from the working tree, so it never
+# needs to be pushed. Absent or empty = the drip keeps its default top-of-board order.
+data/draft-targets.json
+
 # Throwaway prototype — lives on branch prototype/adp-mispricing, never on main.
 # Ignored here because OneDrive restores the directory after deletion, so it would
 # otherwise keep reappearing as untracked and risk being swept into a `git add .`.

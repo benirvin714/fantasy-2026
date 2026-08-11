@@ -1,12 +1,12 @@
 # HBGBs — Progress & Handoff
 
-_Last updated: 2026-08-09. Live dashboard: **https://hbgbs.irvinfamily.com/site/** (draft board at `/site/draft.html`). The old `hbgbs-hq.pages.dev` address still resolves and is still gated, but the custom domain is the canonical one._
+_Last updated: 2026-08-11. Live dashboard: **https://hbgbs.irvinfamily.com/site/** (draft board at `/site/draft.html`). The old `hbgbs-hq.pages.dev` address still resolves and is still gated, but the custom domain is the canonical one._
 _Design of record: [`plans/valuation-and-scouting.md`](plans/valuation-and-scouting.md) — §1 is the **current** valuation algorithm._
 _**Keep this file honest**: the stamp above and the "Next steps" list are load-bearing for a reader picking the project up cold. Move both in the same commit as the work they describe — see the doc-freshness rule in [`CLAUDE.md`](CLAUDE.md)._
 
 ## TL;DR — current state
 
-The draft board runs a **3-layer valuation model** (asset → scarcity → auction-$ → market edge → recommendation + confidence), differentiated cleanly from the top of the board to the deepest bench dart. The **historical-usage panel** now backs every drop-down with real share/efficiency evidence, gated trends, and a role-stability input to confidence. The `/waivers` command speaks the same language against the FAAB market (live once the season starts). The **scouting-brief evidence layer** is built and **complete across the 200-player skill pool** (`/scout`, resumable, kept fresh by a nightly re-scout drip). The board itself is now a draft-day tool, not just a ranking: a **target rail** with snake-aware "will he last to my pick?", bye columns, and a player search.
+The draft board runs a **3-layer valuation model** (asset → scarcity → auction-$ → market edge → recommendation + confidence), differentiated cleanly from the top of the board to the deepest bench dart. The **historical-usage panel** now backs every drop-down with real share/efficiency evidence, gated trends, and a role-stability input to confidence. The `/waivers` command speaks the same language against the FAAB market (live once the season starts). The **scouting-brief evidence layer** is built and **complete across the 200-player skill pool** (`/scout`, resumable, kept fresh by a twice-daily re-scout drip). The board itself is now a draft-day tool, not just a ranking: a **target rail** with snake-aware "will he last to my pick?", bye columns, and a player search.
 
 ## What's built & live
 
@@ -41,7 +41,7 @@ The draft board runs a **3-layer valuation model** (asset → scarcity → aucti
 
 ### Scouting brief (evidence layer)
 - `scouting_brief` = prose (analyst/coach/player sentiment + scheme fit) + `{role_stability, scheme_fit, override_flag}`, retrieval-grounded-or-null. `role_stability` feeds `confidence()` (worst-of with the historical-usage read); scheme_fit is descriptive + an override trigger. **Never moves value.**
-- Filled by **`/scout`**, a resumable batch sweep, and kept current by the nightly re-scout drip. **Coverage is complete over the scope that has one**: all 200 skill players carry a brief with a `role_stability` the confidence model consumes. The 48 without are 16 K + 32 DEF, where no usage profile exists and scouting doesn't apply. Original design: [`plans/scouting-fork-prompt.md`](plans/scouting-fork-prompt.md).
+- Filled by **`/scout`**, a resumable batch sweep, and kept current by the twice-daily re-scout drip. **Coverage is complete over the scope that has one**: all 200 skill players carry a brief with a `role_stability` the confidence model consumes. The 48 without are 16 K + 32 DEF, where no usage profile exists and scouting doesn't apply. Original design: [`plans/scouting-fork-prompt.md`](plans/scouting-fork-prompt.md).
 
 ## Next steps (rough priority)
 
@@ -56,9 +56,9 @@ The draft board runs a **3-layer valuation model** (asset → scarcity → aucti
 - **`scripts/build-draft-board.mjs`** — build-time data layer (projections re-scored to league format, ceiling metric, **historical usage + gated trends**, availability, `players[]`-tag matching). Regenerate: `node scripts/build-draft-board.mjs`. Usage gates are constants near the usage block: `MIN_SEASON_G`, `TREND_BLOCK`, `DIR_METRIC`, `TREND_METRIC`, `CR_MIN_TGT`, `MERGED_CLUSTER`.
 - **`.claude/commands/`** — `waivers` (in-season FAAB board), `brief`, `startsit`, `trade`, `scout` (resumable scouting sweep).
 - **`plans/valuation-and-scouting.md`** — design of record (§1 valuation is current; §2 scouting; §1.8 low-tier).
-- **`~/.claude/scheduled-tasks/nfl-daily-events/SKILL.md`** — the daily news routine (outside the repo).
+- **`~/.claude/scheduled-tasks/nfl-daily-events/SKILL.md`** — the twice-daily (4:05am/4:05pm CT) news + board-refresh + re-scout-drip routine (outside the repo). Doubled from once daily on 2026-08-11 for the pre-draft run-up.
 
 ## Watch-outs
 
-- Publishing = commit + push to `main` (Cloudflare auto-deploys `site/` + `data/site/`). The `nfl-daily-events` routine also commits daily, so `git pull --rebase` before pushing if needed.
+- Publishing = commit + push to `main` (Cloudflare auto-deploys `site/` + `data/site/`). The `nfl-daily-events` routine also commits up to twice daily (4:05am/4:05pm), so `git pull --rebase` before pushing if needed.
 - The valuation is **single-source (Sleeper projection)** by design; divergence from Boris Chen is surfaced as *low confidence*, not blended away. That's why so few edges are high-confidence — it's honest, not broken.

@@ -63,7 +63,7 @@ The **Watch-outs** section at the bottom is the honest part. It records why so f
 
 ## Automated
 
-- **`nfl-daily-events`** (scheduled task, daily ~8:05 AM): scans NFL news across four lanes (injuries, roles, coaching, market), dedupes against what it already reported, and publishes `data/site/nfl-events.json` — the dashboard's "NFL updates" panel. Runs while the Claude app is open (queued runs fire on next launch). Manage it from the Scheduled section in the sidebar; the panel warns if the feed goes stale (>2 days).
+- **`nfl-daily-events`** (scheduled task, twice daily at 4:05am and 4:05pm CT): scans NFL news across four lanes (injuries, roles, coaching, market) and publishes `data/site/nfl-events.json` (the dashboard's "NFL updates" panel), then refreshes the deterministic board layer (ADP, Boris Chen tiers, Sleeper projections) and drains up to three players from the re-scout queue so briefs stay current between manual sweeps. Runs while the Claude app is open (queued runs fire on next launch). Manage it from the Scheduled section in the sidebar; the panel warns if the feed goes stale (>2 days).
 
 ## Weekly rhythm (in season)
 
