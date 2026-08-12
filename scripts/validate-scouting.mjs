@@ -171,6 +171,7 @@ const STALE_TOP_N = parseInt(flagVal("--stale-top", "60"), 10) || 60;
 // shortlist targets from data/draft-targets.json are exempt and float first (see below).
 const DRIP = parseInt(flagVal("--drip", "0"), 10) || 0;
 const DRIP_MAX_RANK = parseInt(flagVal("--drip-rank", "150"), 10) || 150;
+const THIN_RESERVE = parseInt(flagVal("--drip-thin", "1"), 10) || 0; // slots per run reserved for the thin_source quality sweep
 // Your draft shortlist (data/draft-targets.json, optional): ids the drip re-scouts FIRST.
 // They float ahead of the ADP-ordered queue and bypass DRIP_MAX_RANK, because a player you
 // actually plan to draft is worth a fresh brief even if he sits past the general cutoff.
@@ -179,6 +180,19 @@ let targetIds = new Set();
 try { targetIds = new Set((JSON.parse(fs.readFileSync(TARGETS_PATH, "utf8")).ids ?? []).map(String)); }
 catch { /* absent/empty = no explicit targets; drip keeps its default top-of-board order */ }
 const isTarget = (id) => targetIds.has(String(id));
+
+// (4) thin_source: a one-time PRE-DRAFT quality sweep of the 100-200 range, where ~85% of
+// briefs rested on national-analyst blurbs with no beat writer or coach quote. Flags an
+// in-range brief whose sources include no coach/beat type so the drip (and /scout) re-scout
+// it under the beat-first bar in the SKILL/command. Gated to as_of BEFORE the bar's adoption
+// date so each player gets exactly ONE upgraded attempt and it never churns: once re-scouted
+// (as_of >= the bar date) it stops triggering even where beat coverage genuinely doesn't exist.
+const BEAT_BAR_DATE = flagVal("--beat-bar-since", "2026-08-11");
+const THIN_MIN_ADP = 100, THIN_MAX_ADP = 180; // the draftable-plus part of the 100-200 range
+const analystOnly = (b) => {
+  const t = (b.sources ?? []).map((s) => s?.type).filter(Boolean);
+  return t.length > 0 && !t.some((x) => x === "coach" || x === "beat");
+};
 
 let snaps = [];
 try { snaps = JSON.parse(fs.readFileSync(ADP_HIST_PATH, "utf8")).snapshots ?? []; } catch { /* no history yet */ }
@@ -208,6 +222,13 @@ for (const p of pool) {
         detail: `ADP ${baseAdp} -> ${adp} (${delta > 0 ? "+" : ""}${delta}) since ${baseSnap.date}; threshold ${thr.toFixed(1)}` });
     }
   }
+
+  // (4) thin_source quality upgrade (pre-draft, one-time): in-range brief with no beat/coach source
+  if (adp != null && adp >= THIN_MIN_ADP && adp <= THIN_MAX_ADP && b.prose != null
+      && analystOnly(b) && b.as_of < BEAT_BAR_DATE) {
+    fresh.push({ ...base, reason: "thin_source", trigger_date: BEAT_BAR_DATE,
+      detail: "analyst-only sources (no beat/coach); re-scout to the beat-first bar" });
+  }
 }
 // (3) calendar backstop, deliberately limited to the top of the board
 for (const s of stale) {
@@ -234,8 +255,11 @@ for (const [k, e] of [...merged]) {
 }
 const rescout = [...merged.values()].sort((a, b) => (a.rank ?? 9999) - (b.rank ?? 9999));
 const byReason = (r) => rescout.filter((e) => e.reason === r).length;
+const inRange = (p) => { const a = p.adp?.half_ppr; return a != null && a >= 100 && a <= 200; };
+const inRangeTotal = pool.filter(inRange).length;
+const analystOnlyInRange = pool.filter((p) => { const b = briefOf(p.id); return b && b.prose != null && inRange(p) && analystOnly(b); }).length;
 fs.writeFileSync(QUEUE_PATH, JSON.stringify({
-  note: "Players whose scouting_brief has been overtaken by evidence. Written by validate-scouting.mjs; an entry clears when the brief's as_of advances past trigger_date. Persistent so a news trigger survives the events feed's 14-day age-out.",
+  note: "Players whose scouting_brief has been overtaken by evidence (news, ADP drift, calendar backstop) or, pre-draft, rests on thin analyst-only sourcing (thin_source). Written by validate-scouting.mjs; an entry clears when the brief's as_of advances past trigger_date. Persistent so a news trigger survives the events feed's 14-day age-out.",
   updated: TODAY, open: rescout.length, entries: rescout,
 }, null, 2) + "\n");
 
@@ -265,7 +289,8 @@ for (const d of deadSources) console.log(`  DEAD   ${d.id} ${d.name}: "${d.label
 // The aged-brief list is deliberately NOT dumped: one sweep writes ~200 briefs on the same
 // day, so they all age out together and printing them is noise. The re-scout queue below is
 // the actionable subset.
-console.log(`  RE-SCOUT  ${rescout.length} open  (news ${byReason("news")} · adp-drift ${byReason("adp_drift")} · stale-backstop ${byReason("stale_backstop")})${resolved.length ? ` · ${resolved.length} cleared this run` : ""}`);
+console.log(`  RE-SCOUT  ${rescout.length} open  (news ${byReason("news")} · adp-drift ${byReason("adp_drift")} · stale-backstop ${byReason("stale_backstop")} · thin-source ${byReason("thin_source")})${resolved.length ? ` · ${resolved.length} cleared this run` : ""}`);
+console.log(`  QUALITY   ${analystOnlyInRange}/${inRangeTotal} briefs in ADP 100-200 are analyst-only (no beat/coach source); the thin_source sweep drains the <=${THIN_MAX_ADP} ones to the beat-first bar`);
 if (snaps.length < 2) console.log(`    adp-drift: dormant until 2+ daily ADP snapshots exist (have ${snaps.length}); the daily rebuild adds one per day`);
 const RESCOUT_SHOW = parseInt(flagVal("--rescout", "15"), 10) || 15;
 for (const e of rescout.slice(0, RESCOUT_SHOW))
@@ -278,27 +303,37 @@ if (DRIP) {
   // One slot per PLAYER, not per trigger. A player can legitimately hold several open entries
   // (news AND stale_backstop, say) because each clears independently, but re-scouting him once
   // resolves all of them, and letting him take two of three nightly slots wastes the budget.
-  const REASON_RANK = { news: 0, adp_drift: 1, stale_backstop: 2 };
-  // Targets jump the queue and are exempt from the rank cap; everyone else must be inside it.
-  // Ordering within a group is unchanged: ADP rank, then reason.
+  const REASON_RANK = { news: 0, adp_drift: 1, stale_backstop: 2, thin_source: 3 };
+  // Targets jump the queue and bypass the rank cap. Then time-sensitive reasons (news, adp,
+  // stale) drain by rank, and the pre-draft thin_source quality sweep fills only the leftover
+  // capacity, so a hot news item is never starved by the sourcing upgrade.
   const eligible = rescout
     .filter((e) => isTarget(e.id) || (e.rank ?? 9999) <= DRIP_MAX_RANK)
     .sort((a, b) =>
       (isTarget(a.id) ? 0 : 1) - (isTarget(b.id) ? 0 : 1)
+      || (a.reason === "thin_source" ? 1 : 0) - (b.reason === "thin_source" ? 1 : 0)
       || (a.rank ?? 9999) - (b.rank ?? 9999)
       || (REASON_RANK[a.reason] ?? 9) - (REASON_RANK[b.reason] ?? 9));
   const reasonsById = new Map();
   for (const e of eligible) reasonsById.set(e.id, [...(reasonsById.get(e.id) ?? []), e.reason]);
-  const drip = [];
+  // Reserve a slot or two for the thin_source quality sweep so it makes steady progress even on
+  // busy news days: news fills the rest, and a player who is BOTH drains once (as news) and clears both.
+  const RESERVE = Math.min(THIN_RESERVE, DRIP);
   const seen = new Set();
-  for (const e of eligible) {
-    if (seen.has(e.id)) continue;
-    seen.add(e.id);
-    drip.push(e);
-    if (drip.length >= DRIP) break;
-  }
+  const take = (list, n) => {
+    const out = [];
+    for (const e of list) {
+      if (out.length >= n) break;
+      if (seen.has(e.id)) continue;
+      seen.add(e.id); out.push(e);
+    }
+    return out;
+  };
+  const main = take(eligible, DRIP - RESERVE);                                   // news-first (demotion sort)
+  const thin = take(eligible.filter((e) => e.reason === "thin_source"), RESERVE); // guaranteed quality slots
+  const drip = [...main, ...thin];
   const tgtInQueue = rescout.filter((e) => isTarget(e.id)).length;
-  console.log(`  DRIP  re-scout these ${drip.length} this run (cap ${DRIP}, ADP rank <= ${DRIP_MAX_RANK}${targetIds.size ? `; ${targetIds.size} shortlist targets float first + bypass the cap` : ""}; ${rescout.length} open across ${new Set(rescout.map((e) => e.id)).size} players${tgtInQueue ? `, ${tgtInQueue} on your shortlist` : ""}):`);
+  console.log(`  DRIP  re-scout these ${drip.length} this run (cap ${DRIP}${RESERVE ? `, ${RESERVE} reserved for the thin_source quality sweep` : ""}, ADP rank <= ${DRIP_MAX_RANK}${targetIds.size ? `; ${targetIds.size} shortlist targets float first + bypass the cap` : ""}; ${rescout.length} open across ${new Set(rescout.map((e) => e.id)).size} players${tgtInQueue ? `, ${tgtInQueue} on your shortlist` : ""}):`);
   if (!drip.length) console.log("    none. Queue is empty or everything left is outside the draftable range. Do NOT scout anything.");
   for (const e of drip) {
     const all = reasonsById.get(e.id) ?? [e.reason];
