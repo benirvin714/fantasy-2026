@@ -181,14 +181,14 @@ try { targetIds = new Set((JSON.parse(fs.readFileSync(TARGETS_PATH, "utf8")).ids
 catch { /* absent/empty = no explicit targets; drip keeps its default top-of-board order */ }
 const isTarget = (id) => targetIds.has(String(id));
 
-// (4) thin_source: a PRE-DRAFT quality sweep of the ADP 50-180 draftable core (the 100-200
+// (4) thin_source: a PRE-DRAFT quality sweep of the full draftable board, ADP 1-180 (the 100-200
 // band came first, where ~85% of briefs rested on analyst blurbs with no beat or coach quote). Flags an
 // in-range brief whose sources include no coach/beat type so the drip (and /scout) re-scout
 // it under the beat-first bar in the SKILL/command. Gated to as_of BEFORE the bar's adoption
 // date so each player gets exactly ONE upgraded attempt and it never churns: once re-scouted
 // (as_of >= the bar date) it stops triggering even where beat coverage genuinely doesn't exist.
 const BEAT_BAR_DATE = flagVal("--beat-bar-since", "2026-08-11");
-const THIN_MIN_ADP = 50, THIN_MAX_ADP = 180; // ADP 50-180: the draftable core held to the beat-first bar (extended down from 100)
+const THIN_MIN_ADP = 1, THIN_MAX_ADP = 180; // the full draftable board (ADP 1-180) held to the beat-first bar (swept 100-200, then 50-100, then the top 50)
 const analystOnly = (b) => {
   const t = (b.sources ?? []).map((s) => s?.type).filter(Boolean);
   return t.length > 0 && !t.some((x) => x === "coach" || x === "beat");
@@ -255,7 +255,7 @@ for (const [k, e] of [...merged]) {
 }
 const rescout = [...merged.values()].sort((a, b) => (a.rank ?? 9999) - (b.rank ?? 9999));
 const byReason = (r) => rescout.filter((e) => e.reason === r).length;
-const inRange = (p) => { const a = p.adp?.half_ppr; return a != null && a >= 50 && a <= 200; };
+const inRange = (p) => { const a = p.adp?.half_ppr; return a != null && a <= 200; };
 const inRangeTotal = pool.filter(inRange).length;
 const analystOnlyInRange = pool.filter((p) => { const b = briefOf(p.id); return b && b.prose != null && inRange(p) && analystOnly(b); }).length;
 fs.writeFileSync(QUEUE_PATH, JSON.stringify({
@@ -290,7 +290,7 @@ for (const d of deadSources) console.log(`  DEAD   ${d.id} ${d.name}: "${d.label
 // day, so they all age out together and printing them is noise. The re-scout queue below is
 // the actionable subset.
 console.log(`  RE-SCOUT  ${rescout.length} open  (news ${byReason("news")} · adp-drift ${byReason("adp_drift")} · stale-backstop ${byReason("stale_backstop")} · thin-source ${byReason("thin_source")})${resolved.length ? ` · ${resolved.length} cleared this run` : ""}`);
-console.log(`  QUALITY   ${analystOnlyInRange}/${inRangeTotal} briefs in ADP 50-200 are analyst-only (no beat/coach source); the thin_source sweep drains the <=${THIN_MAX_ADP} ones to the beat-first bar`);
+console.log(`  QUALITY   ${analystOnlyInRange}/${inRangeTotal} briefs in ADP 1-200 are analyst-only (no beat/coach source); the thin_source sweep drains the <=${THIN_MAX_ADP} ones to the beat-first bar`);
 if (snaps.length < 2) console.log(`    adp-drift: dormant until 2+ daily ADP snapshots exist (have ${snaps.length}); the daily rebuild adds one per day`);
 const RESCOUT_SHOW = parseInt(flagVal("--rescout", "15"), 10) || 15;
 for (const e of rescout.slice(0, RESCOUT_SHOW))
