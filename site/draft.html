@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap">
-  <link rel="stylesheet" href="style.css?v=33">
+  <link rel="stylesheet" href="style.css?v=35">
 </head>
 <body>
   <header>
@@ -24,6 +24,14 @@
 
   <main class="draft-main">
     <div class="draft-toolbar" id="toolbar">
+      <div class="livesync" role="group" aria-label="Live draft sync">
+        <label class="lsync-lab" for="draft-id">draft ID</label>
+        <input type="text" id="draft-id" class="lsync-in" placeholder="paste Sleeper draft ID"
+               autocomplete="off" spellcheck="false" inputmode="numeric"
+               title="The draft_id from the Sleeper draft URL: sleeper.com/draft/nfl/&lt;this number&gt;">
+        <button id="lsync-btn" class="lsync-btn">connect</button>
+        <span class="lsync-status" id="lsync-status" role="status">not connected · marking drafted by hand</span>
+      </div>
       <div class="filters" role="group" aria-label="Position filter">
         <button data-pos="ALL" aria-pressed="true">all</button>
         <button data-pos="QB" aria-pressed="false">QB</button>
@@ -111,6 +119,6 @@
   </footer>
 
   <script src="config.js?v=6"></script>
-  <script src="draft.js?v=52"></script>
+  <script src="draft.js?v=53"></script>
 </body>
 </html>

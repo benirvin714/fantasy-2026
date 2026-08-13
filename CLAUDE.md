@@ -25,7 +25,9 @@ Half PPR (0.5/rec), 1pt/10 rush+rec yds, 6pt TDs from scrimmage; passing 1pt/25y
 - `data/faab-market.json` — compact FAAB pricing model (per-owner price-to-beat, bands, sample sizes). /waivers reads THIS for bids, never the raw transactions. Regenerate on demand: `node scripts/build-faab-model.mjs`.
 - `briefs/` — dated outputs of /brief.
 - Commands: `.claude/commands/` — brief, waivers, startsit, trade, scout. /waivers and /brief also publish JSON to `data/site/` for the dashboard.
-- `site/` — HBGBs HQ dashboard (static; serve project root on :8642, open /site/). League ID lives in `site/config.js` too — update BOTH at renewal.
+- `site/` — HBGBs HQ dashboard (static; serve project root on :8642, open /site/). League ID lives in `site/config.js` too — update BOTH at renewal. The Draft Day page (`/site/draft.html`) **syncs live with a Sleeper draft**: paste a draft ID, hit connect, and it marks picks off itself (`?draft=<id>` overrides the stored ID). Spec: `plans/valuation-and-scouting.md` §1.15.
+- `scripts/draft-live.mjs` — live draft state as a compact CLI snapshot (on-the-clock, recent picks, position runs, best available, all 10 rosters). `node scripts/draft-live.mjs [--real|<draft_id>]`.
+- **Sleeper REST is Cloudflare-cached and WILL serve stale data** (`stale-while-revalidate=300`; measured 41 picks vs 65 on the same endpoint mid-draft). Any read of a fast-changing endpoint must add a unique cache-busting query param. Applies to anything new that hits `api.sleeper.app`.
 - **Live dashboard: https://hbgbs.irvinfamily.com/site/** (custom domain, added 2026-07-27; the old `https://hbgbs-hq.pages.dev/site/` still works and is still gated) — Cloudflare Pages, login-gated (ben.p.irvin@gmail.com email code). Auto-deploys on push to `main` of the private repo `benirvin714/fantasy-2026`; only `site/` + `data/site/` are served (build copies them to `dist/`), the rest of the repo stays unserved. Publishing = commit + push (the /brief and /waivers commands do this in their final step). Hosting details: `..\hosting-plan.md`.
 
 ## MCP notes

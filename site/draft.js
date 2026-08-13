@@ -14,9 +14,24 @@
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) =>
     ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
+  /* Drafted players arrive from two sources that must never be conflated: marks YOU made by hand,
+     and picks Sleeper reports for a connected draft. Keeping them in separate sets is what lets a
+     resync avoid eating your manual corrections, and lets "reset draft" clear your marks without
+     pretending it can delete what the league actually did. `taken` stays the union that every
+     renderer already reads, and is rebuilt IN PLACE rather than reassigned so the existing closures
+     over it stay valid. liveTaken is deliberately never persisted — it is refetched from Sleeper on
+     every poll, so a stale localStorage can't carry last week's mock draft into the real one. */
   const LS_KEY = "hq-draft-2026-taken";
-  const taken = new Set(JSON.parse(localStorage.getItem(LS_KEY) ?? "[]"));
-  const saveTaken = () => localStorage.setItem(LS_KEY, JSON.stringify([...taken]));
+  const manualTaken = new Set(JSON.parse(localStorage.getItem(LS_KEY) ?? "[]"));
+  const liveTaken = new Set();
+  const livePickNo = new Map();   // player_id -> pick_no, so a row can say WHEN he went
+  const taken = new Set(manualTaken);
+  const saveTaken = () => localStorage.setItem(LS_KEY, JSON.stringify([...manualTaken]));
+  const rebuildTaken = () => {
+    taken.clear();
+    for (const id of manualTaken) taken.add(id);
+    for (const id of liveTaken) taken.add(id);
+  };
 
   // Target list (the rail beside the board). Stored as the FULL starred set, including players who
   // have since been drafted — the rail then RENDERS only the ones still available. Filtering rather
@@ -394,6 +409,7 @@
 
   function rowHTML(p, rankLabel, tierStart) {
     const isTaken = taken.has(p.id);
+    const isLive = liveTaken.has(p.id);   // came from Sleeper, not from a click — button is inert
     const isTgt = targets.has(p.id);
     const isOpen = expandedId === p.id;
     const rec = p.rec, conf = p.conf, adp = p.adp?.half_ppr;
@@ -467,7 +483,7 @@
       : "";
     return `
     <div class="drow ${isTaken ? "taken" : ""}${tierStart ? " tier-start" : ""}" data-id="${p.id}"${tierStyle}>
-      <button class="take" data-act="take" aria-pressed="${isTaken}" title="${isTaken ? "Mark available" : "Mark drafted"}">${isTaken ? "✓" : ""}</button>
+      <button class="take${isLive ? " take-live" : ""}" data-act="take" aria-pressed="${isTaken}" ${isLive ? 'aria-disabled="true" ' : ""}title="${isLive ? `Drafted at pick #${esc(livePickNo.get(p.id) ?? "?")} — from the live Sleeper feed, so this can't be un-marked here` : isTaken ? "Mark available" : "Mark drafted"}">${isTaken ? "✓" : ""}</button>
       <button class="star${isTgt ? " on" : ""}" data-act="star" aria-pressed="${isTgt}" title="${isTgt ? "Remove from target list" : "Add to target list"}">${isTgt ? "★" : "☆"}</button>
       <button class="dmain" data-act="expand" aria-expanded="${isOpen}">
         <span class="dr">${rankLabel}</span>
@@ -759,25 +775,36 @@
     const live = all.filter((p) => !taken.has(p.id))
       .sort((a, b) => (a.adp?.half_ppr ?? Infinity) - (b.adp?.half_ppr ?? Infinity));
 
-    const nextPick = taken.size + 1;
+    // Pick number: Sleeper's actual count when connected, otherwise the old count-your-marks
+    // fallback. The fallback is only as good as your clicking, which is exactly why the live feed
+    // exists — but it stays, because an unconnected board should still work.
+    const nextPick = sync.connected && sync.picksMade != null ? sync.picksMade + 1 : manualTaken.size + 1;
     const nextRd = Math.floor((nextPick - 1) / TEAMS) + 1;
     const over = nextPick > ROUNDS * TEAMS;
-    // your seat in the snake: the picks you still hold, soonest first. Null slot = the rail simply
-    // doesn't make the claim, rather than guessing a seat.
-    const mine = draftSlot ? myPicksFrom(nextPick, draftSlot) : [];
+    // your seat in the snake: the picks you still hold, soonest first. A connected draft publishes
+    // draft_order, so the seat is read rather than set by hand; the dropdown remains the fallback.
+    // Null on both = the rail simply doesn't make the claim, rather than guessing a seat.
+    const slot = sync.mySlot ?? draftSlot;
+    const mine = slot ? myPicksFrom(nextPick, slot) : [];
     const myNext = mine[0] ?? null;
     const onMe = myNext === nextPick;
 
     $("#tgt-count").textContent = live.length ? `${live.length}` : "";
-    const clockTxt = over ? `<b class="mono">draft complete</b> <span class="faint">· all ${ROUNDS * TEAMS} picks marked</span>`
-      : `<b class="mono">pick #${nextPick}</b> <span class="faint">· rd ${nextRd} · ${taken.size} drafted mark${taken.size === 1 ? "" : "s"}</span>`;
-    const mineTxt = !draftSlot
+    const srcTxt = sync.connected
+      ? `<span class="tgt-livedot" title="Live from Sleeper">●</span> ${liveTaken.size} from Sleeper${manualTaken.size ? ` · ${manualTaken.size} manual` : ""}`
+      : `${manualTaken.size} drafted mark${manualTaken.size === 1 ? "" : "s"}`;
+    const clockTxt = over ? `<b class="mono">draft complete</b> <span class="faint">· all ${ROUNDS * TEAMS} picks in</span>`
+      : `<b class="mono">pick #${nextPick}</b> <span class="faint">· rd ${nextRd} · ${srcTxt}</span>`;
+    const mineTxt = !slot
       ? `<span class="faint">set your draft slot for "will he last to my pick?"</span>`
       : mine.length
         ? `<span class="tgt-mine${onMe ? " on-me" : ""}">${onMe ? "YOU'RE UP" : "you"}:</span> <span class="mono">${mine.slice(0, 4).map((n) => `#${n}`).join(" · ")}${mine.length > 4 ? " …" : ""}</span>`
-        : `<span class="faint">no picks left from slot ${draftSlot}</span>`;
+        : `<span class="faint">no picks left from slot ${slot}</span>`;
     $("#tgt-clockline").innerHTML = `${clockTxt}<br>${mineTxt}`;
-    $("#tgt-clockline").title = `The pick number is derived from the ${taken.size} players you've marked drafted, so mark every pick as it happens; skip some and the distances read long.${draftSlot ? ` Your picks come from slot ${draftSlot} of a ${TEAMS}-team, ${ROUNDS}-round snake with no reversal round, which is how this league has drafted every year on record.` : ""}`;
+    $("#tgt-clockline").title = (sync.connected
+      ? `Pick number comes from Sleeper's live pick count for draft ${sync.draftId}, not from your clicking, so it stays right even if you never touch a row.`
+      : `The pick number is derived from the ${manualTaken.size} players you've marked drafted, so mark every pick as it happens; skip some and the distances read long. Connect a draft ID up top to have Sleeper keep this count for you.`)
+      + (slot ? ` Your picks come from slot ${slot}${sync.mySlot ? " (read from Sleeper's draft order)" : " (set by hand)"} of a ${TEAMS}-team, ${ROUNDS}-round snake with no reversal round, which is how this league has drafted every year on record.` : "");
 
     if (!live.length && !gone.length) {
       body.innerHTML = `<div class="tgt-empty">No targets yet. Hit <span class="tgt-mark">☆</span> on any row to put a player here, and he'll drop off this list the moment you mark him drafted.</div>`;
@@ -834,6 +861,7 @@
   }
 
   function paint() {
+    paintSyncStatus();
     paintTargets();
     const list = visible();
     if (view === "board") {
@@ -878,8 +906,12 @@
     const id = act.closest(".drow")?.dataset.id;
     if (!id) return;
     if (act.dataset.act === "take") {
-      taken.has(id) ? taken.delete(id) : taken.add(id);
-      saveTaken();
+      // Sleeper is authoritative for a connected draft: a player the league actually picked cannot
+      // be un-drafted here, so the button is inert on him rather than silently disagreeing with the
+      // feed for the ten seconds until the next poll puts him back. Manual marks stay reversible.
+      if (liveTaken.has(id)) return;
+      manualTaken.has(id) ? manualTaken.delete(id) : manualTaken.add(id);
+      saveTaken(); rebuildTaken();
     } else if (act.dataset.act === "star") {
       targets.has(id) ? targets.delete(id) : targets.add(id);
       saveTargets();
@@ -926,7 +958,17 @@
     hideFlagged = !hideFlagged; e.target.setAttribute("aria-pressed", String(hideFlagged)); paint();
   });
   $("#reset-draft").addEventListener("click", () => {
-    if (taken.size && confirm(`Clear ${taken.size} drafted marks?`)) { taken.clear(); saveTaken(); paint(); }
+    // Only your own marks are yours to clear. Sleeper's picks are re-fetched on the next poll
+    // regardless, so offering to "clear" them would be a button that visibly undoes itself.
+    if (!manualTaken.size) {
+      alert(sync.connected
+        ? `No manual marks to clear. The ${liveTaken.size} drafted players come from Sleeper's live feed — disconnect to drop them.`
+        : "No drafted marks to clear.");
+      return;
+    }
+    if (confirm(`Clear ${manualTaken.size} manual mark${manualTaken.size === 1 ? "" : "s"}?${sync.connected ? ` The ${liveTaken.size} from Sleeper stay.` : ""}`)) {
+      manualTaken.clear(); saveTaken(); rebuildTaken(); paint();
+    }
   });
 
   /* ---------- player search (combobox in the toolbar) ----------
@@ -1112,6 +1154,175 @@
   // fonts settle after first paint (the toolbar reflows taller), so re-measure on load too
   window.addEventListener("load", syncToolbarH);
 
+  /* ---------- live draft sync (Sleeper) ----------
+     Paste a draft ID, hit connect, and the board marks players off by itself. This exists so that
+     during a draft your attention goes to reading players, not to clicking a ✓ 150 times and
+     silently corrupting the pick math the one time you forget.
+
+     CACHE BUSTING IS LOAD-BEARING, not defensive habit. Measured live against a running mock on
+     2026-08-13: the plain picks URL returned 41 picks while a unique-query-param URL returned 65,
+     and moments later 65 vs 119. Sleeper fronts the API with Cloudflare (picks: s-maxage=15,
+     draft: s-maxage=30) plus stale-while-revalidate=300, so the CDN will happily hand back a
+     response 80+ seconds old with cf-cache-status=UPDATING. The gap scales as roughly
+     cache_age × pick_rate, so a fast draft goes dozens of picks stale. A unique param forces a
+     MISS for about 100ms of latency. CORS is wide open (access-control-allow-origin: *) and the
+     preflight permits Cache-Control, verified against this origin, so no proxy is needed.
+
+     We cannot read the `age` header from JS — Sleeper only exposes etag and date — so freshness is
+     asserted by always busting rather than by inspecting the response. */
+  const SYNC_KEY = "hq-draft-2026-draftid";
+  const POLL_MS = 10000, POLL_MAX_MS = 60000;
+  const sync = {
+    draftId: null, connected: false, status: null, picksMade: null, mySlot: null,
+    reversal: 0, lastOk: null, err: null, timer: null, delay: POLL_MS, shape: null,
+  };
+
+  const sleeperGet = async (path) => {
+    const bust = `_=${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`;
+    const r = await fetch(`${C.API}${path}${path.includes("?") ? "&" : "?"}${bust}`,
+      { cache: "no-store", headers: { "cache-control": "no-cache" } });
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    return r.json();
+  };
+
+  function paintSyncStatus() {
+    const el = $("#lsync-status"); const btn = $("#lsync-btn");
+    if (!el) return;
+    btn.textContent = sync.connected ? "disconnect" : "connect";
+    btn.classList.toggle("on", sync.connected);
+    el.className = "lsync-status";
+
+    // The hand-set slot dropdown yields to Sleeper's draft_order while connected, and is handed
+    // back on disconnect. It is disabled rather than hidden so it stays obvious where the seat came
+    // from — a silently-overridden control is how you end up distrusting the whole rail.
+    const slotSel = $("#draft-slot");
+    if (slotSel) {
+      const overridden = sync.connected && sync.mySlot != null;
+      slotSel.disabled = overridden;
+      slotSel.value = overridden ? String(sync.mySlot) : (draftSlot ?? "");
+      slotSel.title = overridden
+        ? `Slot ${sync.mySlot}, read from Sleeper's draft order for draft ${sync.draftId}. Disconnect to set it by hand.`
+        : "Your seat in the snake. Connect a live draft and Sleeper fills this in for you.";
+    }
+    if (!sync.connected) {
+      el.textContent = sync.err ? `not connected · ${sync.err}` : "not connected · marking drafted by hand";
+      el.classList.add(sync.err ? "bad" : "idle");
+      el.title = sync.err ?? "Paste the draft_id from the Sleeper draft URL and hit connect.";
+      return;
+    }
+    if (sync.err) {
+      el.classList.add("bad");
+      el.textContent = `SYNC FAILING · ${sync.err} · last good ${sync.lastOk ? Math.round((Date.now() - sync.lastOk) / 1000) + "s ago" : "never"}`;
+      el.title = `Retrying every ${Math.round(sync.delay / 1000)}s. The board is frozen at the last good fetch — treat the pick count as a floor, not a fact.`;
+      return;
+    }
+    const done = sync.status === "complete" || sync.picksMade >= ROUNDS * TEAMS;
+    const nextPick = (sync.picksMade ?? 0) + 1;
+    const mine = sync.mySlot ? myPicksFrom(nextPick, sync.mySlot) : [];
+    const away = mine.length ? mine[0] - nextPick : null;
+    el.classList.add(done ? "done" : "live");
+    const bits = [
+      done ? "COMPLETE" : (sync.status === "pre_draft" ? "CONNECTED · not started" : "LIVE"),
+      `${sync.picksMade ?? 0}/${ROUNDS * TEAMS}`,
+    ];
+    if (!done && sync.status !== "pre_draft") bits.push(`on the clock #${nextPick}`);
+    if (!done && away != null) bits.push(away === 0 ? "YOU'RE UP" : `you in ${away}`);
+    if (sync.shape) bits.push(sync.shape);
+    el.textContent = bits.join(" · ");
+    el.title = `Draft ${sync.draftId}. Polling every ${Math.round(sync.delay / 1000)}s with cache-busting.`
+      + ` Last good sync ${sync.lastOk ? Math.round((Date.now() - sync.lastOk) / 1000) + "s ago" : "pending"}.`
+      + (sync.mySlot ? ` Your slot ${sync.mySlot} read from Sleeper's draft order.` : " Your slot is not published yet; Sleeper sets draft_order when the draft starts.");
+  }
+
+  async function pollOnce() {
+    const [meta, picks] = await Promise.all([
+      sleeperGet(`/draft/${sync.draftId}`),
+      sleeperGet(`/draft/${sync.draftId}/picks`),
+    ]);
+    sync.status = meta.status;
+    sync.picksMade = picks.length;
+    sync.mySlot = meta.draft_order?.[C.MY_USER_ID] ?? null;
+    sync.reversal = meta.settings?.reversal_round ?? 0;
+
+    // This page hardcodes a 10-team / 15-round snake because that is what the league has run every
+    // year on record. If a connected draft disagrees, say so loudly instead of rendering pick math
+    // that is quietly wrong — same reason the reversal case was never implemented.
+    const t = meta.settings?.teams, rd = meta.settings?.rounds;
+    const wrongShape = (t && t !== TEAMS) || (rd && rd !== ROUNDS) || meta.type !== "snake";
+    sync.shape = sync.reversal ? `⚠ reversal_round=${sync.reversal}: pick math invalid`
+      : wrongShape ? `⚠ ${t}tm/${rd}rd ${meta.type}: page assumes ${TEAMS}tm/${ROUNDS}rd snake`
+      : null;
+
+    liveTaken.clear(); livePickNo.clear();
+    for (const p of picks) {
+      if (!p.player_id) continue;
+      liveTaken.add(p.player_id);
+      livePickNo.set(p.player_id, p.pick_no);
+    }
+    rebuildTaken();
+    sync.lastOk = Date.now();
+    sync.err = null;
+  }
+
+  function schedule() {
+    clearTimeout(sync.timer);
+    if (!sync.connected) return;
+    // Nothing more will change once it's over; stop hitting their origin.
+    if (sync.status === "complete") { paintSyncStatus(); return; }
+    sync.timer = setTimeout(tick, sync.delay);
+  }
+
+  async function tick() {
+    if (!sync.connected) return;
+    try {
+      await pollOnce();
+      sync.delay = POLL_MS;                                  // recovered: back to normal cadence
+      paint();
+    } catch (e) {
+      // Back off rather than hammer a failing origin, and never wipe the last good picture —
+      // a frozen board that says it's frozen beats an empty one that says nothing.
+      sync.err = e.message;
+      sync.delay = Math.min(POLL_MAX_MS, sync.delay * 2);
+      paintSyncStatus();
+    }
+    schedule();
+  }
+
+  async function connect(id) {
+    sync.draftId = id; sync.connected = true; sync.err = null; sync.delay = POLL_MS;
+    $("#lsync-status").textContent = "connecting…";
+    try {
+      await pollOnce();
+      localStorage.setItem(SYNC_KEY, id);
+      paint();
+      schedule();
+    } catch (e) {
+      sync.connected = false; sync.err = `${e.message} — check the draft ID`;
+      liveTaken.clear(); livePickNo.clear(); rebuildTaken();
+      paint();
+    }
+  }
+
+  function disconnect() {
+    sync.connected = false; sync.err = null; sync.status = null;
+    sync.picksMade = null; sync.mySlot = null; sync.shape = null;
+    clearTimeout(sync.timer);
+    liveTaken.clear(); livePickNo.clear(); rebuildTaken();
+    localStorage.removeItem(SYNC_KEY);
+    paint();
+  }
+
+  $("#lsync-btn").addEventListener("click", () => {
+    if (sync.connected) return disconnect();
+    const raw = $("#draft-id").value.trim();
+    // Accept a pasted URL as readily as a bare ID — on draft day you copy the address bar.
+    const id = (raw.match(/(\d{8,})/) ?? [])[1];
+    if (!id) { sync.err = "need a numeric draft ID"; paintSyncStatus(); return; }
+    $("#draft-id").value = id;
+    connect(id);
+  });
+  $("#draft-id").addEventListener("keydown", (e) => { if (e.key === "Enter") $("#lsync-btn").click(); });
+
   /* ---------- boot ---------- */
   (async () => {
     try {
@@ -1131,5 +1342,12 @@
     $("#board-meta").textContent = `board ${board.generated} · ${rows.length} players · ADP as of ${board.generated}`;
     paint();
     syncToolbarH(); // board is now in flow; lock the header offset to the settled toolbar height
+
+    // Reconnect to whatever draft you were on. Draft day means reloads — a dropped tab shouldn't
+    // cost you the sync. ?draft=<id> in the URL wins, so pointing at a mock needs no config edit.
+    const urlId = (new URLSearchParams(location.search).get("draft") ?? "").match(/\d{8,}/)?.[0];
+    const savedId = localStorage.getItem(SYNC_KEY);
+    const bootId = urlId ?? savedId;
+    if (bootId) { $("#draft-id").value = bootId; await connect(bootId); }
   })();
 })();

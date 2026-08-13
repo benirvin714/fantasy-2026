@@ -312,6 +312,50 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
 .draft-toolbar .filters { margin-left: 0; }
 #reset-draft { color: var(--neg); }
 
+/* ---- live draft sync: the draft-ID field + connect button + status ----
+   Given its own full-width row at the top of the toolbar because it governs everything under it:
+   when this is connected the board stops being a static value sheet and starts tracking a draft. */
+.livesync {
+  display: flex; align-items: center; gap: 8px; flex: 1 0 100%; flex-wrap: wrap;
+  padding-bottom: 10px; border-bottom: 1px solid var(--border);
+}
+.lsync-lab {
+  font-family: var(--font-body); font-size: 11px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: .05em; color: var(--dim);
+}
+.lsync-in {
+  background: var(--grad-raise); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 0 10px; min-height: 32px; width: 210px;
+  color: var(--text); font-family: var(--font-data); font-size: 12px; outline: none;
+}
+.lsync-in:focus { border-color: var(--accent); }
+.lsync-in::placeholder { color: var(--faint); font-family: var(--font-body); }
+.lsync-in:disabled { opacity: .55; }
+.lsync-btn {
+  border: 1px solid var(--border); border-radius: var(--radius);
+  background: var(--grad-raise); color: var(--dim);
+  padding: 0 14px; min-height: 32px; cursor: pointer;
+  font-family: var(--font-body); font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .05em;
+}
+.lsync-btn:hover { color: var(--accent); border-color: var(--accent); }
+.lsync-btn.on { color: var(--neg); border-color: var(--neg); }
+.lsync-status {
+  font-family: var(--font-data); font-size: 11.5px; color: var(--faint);
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.lsync-status.live { color: var(--accent); }
+.lsync-status.live::before {
+  content: "●"; font-size: 9px; animation: lsync-pulse 2s ease-in-out infinite;
+}
+.lsync-status.done { color: var(--dim); }
+.lsync-status.bad { color: var(--neg); }
+.lsync-status.idle { color: var(--faint); }
+@keyframes lsync-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .25; } }
+@media (prefers-reduced-motion: reduce) { .lsync-status.live::before { animation: none; } }
+
+.tgt-livedot { color: var(--accent); font-size: 9px; vertical-align: middle; }
+
 /* value knobs — scarcity/replacement basis (the only knob; a ceiling tilt was never built) */
 .knobs { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
 .knob {
@@ -528,6 +572,10 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
   cursor: pointer; font-size: 14px; line-height: 1;
 }
 .drow .take:hover { border-color: var(--accent); }
+/* Drafted per the live Sleeper feed: a statement of fact, not a toggle. Must sit AFTER `.drow .take`
+   — same specificity, so source order is what makes the non-interactive cursor stick. */
+.drow .take.take-live { cursor: default; opacity: .8; }
+.drow .take.take-live:hover { border-color: var(--border); }
 /* star = add to the target rail. Deliberately quieter than the drafted button (no filled surface):
    drafted is the irreversible-feeling action, starring is cheap and reversible. */
 .drow .star {

@@ -233,6 +233,9 @@ a draft: **of my targets, who goes next, and do I have time?**
   the thing you press on every pick, so the counter costs no extra bookkeeping — but it is only as
   good as those marks, so the rail **states the pick number it counts from** (`pick #33 · round 4 ·
   counting 32 drafted marks`) instead of hiding the assumption inside a number.
+  **Superseded 2026-08-13 by §1.15**: with a draft connected the counter is Sleeper's actual pick
+  count, not a count of your clicks, and the stated-derivation tooltip changes to say so. The
+  click-counting fallback survives only for an unconnected board.
 - **Four away-states**, loudest first: `N past ADP` (accent green — the market is letting him fall,
   the best news on the board), `on the clock` (amber), `N picks · R.R rd` inside one round (amber),
   anything further out stays quiet. No ADP renders an honest "no ADP", never a fabricated distance.
@@ -326,6 +329,57 @@ that player with his drop-down already open, and every match carries a star.
 Files: `searchFor()` / `renderSearch()` / `closeSearch()` / `gotoPlayer()` / `setGroup()` / `normS`
 in `site/draft.js`; `.srch*` block, `.drow.found`, `.drow { scroll-margin-top }` in `site/style.css`;
 `.srchwrap` in `site/draft.html`.
+
+### 1.15 Live draft sync — the board marks itself off — 2026-08-13
+
+Paste a Sleeper draft ID into the toolbar, hit connect, and drafted players strike themselves off
+every 10 seconds. The point is attention: during a draft you should be reading players, not clicking
+a ✓ 150 times and silently breaking the pick math the one time you forget.
+
+**Cloudflare caching is the whole problem, and it is not theoretical.** Measured live against a
+running mock on 2026-08-13: the plain picks URL returned **41 picks while a cache-busted URL returned
+65**, and moments later **65 vs 119**. Sleeper fronts the API with Cloudflare — picks `s-maxage=15`,
+draft `s-maxage=30`, both with `stale-while-revalidate=300` — so the CDN serves responses 80+ seconds
+old with `cf-cache-status: UPDATING`. Staleness scales as roughly `cache_age × pick_rate`, so a fast
+draft goes dozens of picks behind while looking perfectly healthy. Every request therefore carries a
+unique query param, which forces a MISS for ~100ms. **Any other code in this repo hitting Sleeper
+REST has the same exposure.** `scripts/draft-live.mjs` was fixed the same day.
+
+- **CORS is open**: `access-control-allow-origin: *`, and the preflight permits `Cache-Control`.
+  Verified against this origin, so the page calls Sleeper directly — no proxy, no Worker. The `age`
+  header is *not* readable from JS (only `etag` and `date` are exposed), so freshness is asserted by
+  always busting rather than by inspecting the response.
+- **Two sets, never one.** `manualTaken` (your clicks, persisted) and `liveTaken` (Sleeper's picks,
+  **never** persisted) union into the `taken` set every renderer already reads, rebuilt in place so
+  existing closures stay valid. Not persisting the live set is what stops a stale `localStorage` from
+  carrying last week's mock into the real draft. A player Sleeper reports as drafted **cannot** be
+  un-marked — the feed would put him back within 10s, so the button is inert with a tooltip naming
+  the pick he went at. `reset draft` clears only your marks and says so.
+- **Pick number comes from the feed**, not from `taken.size`, which is what retires §1.13's known
+  weakness. Your **draft slot** likewise comes from `draft_order[MY_USER_ID]`; the hand-set dropdown
+  is disabled (not hidden) while connected, so it stays obvious where the seat came from.
+- **Refuses rather than guesses**, same bar as the rest of the board: `reversal_round > 0` or a
+  teams/rounds/type mismatch against the hardcoded 10×15 snake prints a warning in the status chip
+  instead of rendering pick math that is quietly wrong. Before a draft starts, `draft_order` is null,
+  so the slot reads as unpublished rather than assumed.
+- **Failure is loud and non-destructive**: errors back off 10s → 60s, keep the last good picture, and
+  the chip says `SYNC FAILING` with the age of the last good fetch. Polling stops at
+  `status: complete`. A bad ID leaves the board untouched and is not persisted.
+- **Board coverage is not pick coverage.** The board holds 248 players (top-200 skill + 32 DEF), so a
+  150-pick draft typically strikes 148 — the misses are deep kickers outside the 16-K pool. The pick
+  *count* is unaffected because it reads the feed length, not the match count.
+
+**Measured latency**, three live mocks, browser-side strike timestamps against Sleeper's own
+`last_picked`: median **~900ms**, min **369ms**, max **9.2s**. The max is the designed worst case, a
+pick landing just after a poll and waiting a full cycle. Local clock ran ~730ms ahead of Sleeper's, so
+true figures are lower. Bot mocks fire ~1 pick/sec so each poll struck 6-10 players at once; a real
+draft at 30-40s per pick catches 0-1 per poll, putting a player on the board a median of ~5s after he
+is taken, 10s at the outside — about a seventh of one pick window.
+
+Files: the live-sync block (`sleeperGet` / `pollOnce` / `paintSyncStatus` / `connect` / `disconnect` /
+`schedule` / `tick`), `manualTaken` / `liveTaken` / `livePickNo` / `rebuildTaken`, and the boot
+reconnect in `site/draft.js`; `.livesync` / `.lsync-*` / `.drow .take.take-live` in `site/style.css`;
+the `.livesync` toolbar row in `site/draft.html`. `?draft=<id>` overrides the stored ID for testing.
 
 ## 2. Challenge 2 — `scouting_brief` (public commentary)
 
