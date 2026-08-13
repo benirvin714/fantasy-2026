@@ -381,6 +381,59 @@ Files: the live-sync block (`sleeperGet` / `pollOnce` / `paintSyncStatus` / `con
 reconnect in `site/draft.js`; `.livesync` / `.lsync-*` / `.drow .take.take-live` in `site/style.css`;
 the `.livesync` toolbar row in `site/draft.html`. `?draft=<id>` overrides the stored ID for testing.
 
+### 1.16 On-deck prep + replay mode — 2026-08-13
+
+Phase 1 of the N-3 module: when your pick is **3 or fewer picks away**, a panel appears at the top of
+the rail with what you need to decide. The point is to move the thinking into somebody else's clock so
+your own 60 seconds are spent reading, not waiting.
+
+**Deterministic on purpose.** Everything is arithmetic over data the page already holds — no LLM, no
+network beyond the pick feed, no session required. It works on the deployed dashboard with nothing
+else running. A later Claude layer can enrich it without this half ever going dark.
+
+**It names no single player.** Two reasons pointing the same way: one name dies the moment somebody
+drafts him while you're reading it, and a shortlist is the opposite of how this board is meant to be
+used — the value is breadth across the pool, freshly ranked. Output is ranked candidates per position
+of need, with the tier cliff behind them.
+
+- **Candidates** = available players at positions you still need, ranked by **Boris Chen** (the
+  board's own default sort; ADP rides alongside as the market's disagreeing opinion), capped at 6
+  players across at most 3 position blocks.
+- **The cap is what makes it usable.** Filtering only on "open starting slot" put K and DEF in a
+  round-3 panel — technically an open slot, obviously not a round-3 decision. The first cut printed
+  18 players across 6 blocks with a meaningless `1 left in tier 22` cliff on kickers. Ranking the
+  whole eligible pool and taking the top few drops K/DEF on their own merits until they really are
+  the best thing left, with **no round-number heuristic** to tune or get wrong. Verified at pick 138:
+  `open: K` alone, kickers surface correctly.
+- **Tier cliff** = how many remain in the best tier still on the board at that position, the read
+  that decides "can I wait a round". `topTier` is the **minimum** tier among the available, not the
+  first walking the list — `avail` is in board-rank order, not tier order, and `.find()` reported
+  `2 left in tier 5` directly above a tier-2 player. Each row also carries its own tier, because
+  "1 left in tier 2" above three names otherwise reads as if all three were in tier 2.
+- **Survival per candidate** reuses §1.13's three buckets and the same half-round slack. No new
+  precision is invented.
+- **`have:` beats `need:`** early on. "You need QB, WR, TE, K, DEF" is true of everyone in round 3;
+  the roster you've built is the actual context. Open slots get named once the list is short enough
+  to mean something (≤3).
+- **Run pressure**: positions taken in the last 10 picks, the pivot signal ADP can't give you.
+- **Hidden when it can't be honest**: more than 3 picks out, no slot, `reversal_round` set, or
+  **disconnected** — without the feed there is no way to know which drafted players are *yours*, so
+  it renders nothing rather than guessing a roster.
+
+**Replay mode** (`?at=<pickNo>`) truncates a finished draft to its first N picks so the board reads
+exactly as it did at that moment. Built for rehearsing against a real pick sequence, and it's how the
+prep panel is testable without burning a live mock. Labelled `REPLAY` in the status chip and freezes
+polling — a practice board mistakable for a live one would be worse than none.
+
+Files: `paintPrep()` / `openSlots()` / `PREP_WINDOW` / `RUN_LOOKBACK` / `STARTERS` / `FLEX_N` and
+`REPLAY_AT` + the replay slice in `pollOnce()`, all `site/draft.js`; `.prep*` in `site/style.css`;
+`#prep` in `site/draft.html`.
+
+**Phase 2 (not built)**: a Claude-written JSON the panel reads for judgment the arithmetic can't
+reach. The in-page question box was considered and **cut** — the page cannot call Claude, and the
+alternatives (an API key in a public frontend, or a poll-a-file loop that only works locally) both
+lose to just asking in chat, where `scripts/draft-live.mjs` supplies live state in 273ms.
+
 ## 2. Challenge 2 — `scouting_brief` (public commentary)
 
 ### 2.1 What it is

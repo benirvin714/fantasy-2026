@@ -862,6 +862,7 @@
 
   function paint() {
     paintSyncStatus();
+    paintPrep();
     paintTargets();
     const list = visible();
     if (view === "board") {
@@ -1154,6 +1155,147 @@
   // fonts settle after first paint (the toolbar reflows taller), so re-measure on load too
   window.addEventListener("load", syncToolbarH);
 
+  /* ---------- on-deck prep (deterministic; Phase 1 of the N-3 module) ----------
+     Fires when your pick is PREP_WINDOW picks out or closer, so the thinking happens inside somebody
+     else's clock and your own 60 seconds are spent reading, not waiting.
+
+     Everything here is arithmetic over data the page already holds — no LLM, no network, no session
+     required. That is deliberate: it works on the deployed dashboard with nothing else running, and
+     a later Claude layer can enrich it without this half ever going dark.
+
+     It deliberately does NOT name one player. Two reasons, and they point the same way: a single name
+     dies the moment someone drafts him while you're reading, and a shortlist is the opposite of how
+     this board is meant to be used — the whole point is breadth across the pool, freshly ranked, not
+     a pre-committed list. So the output is ranked candidates per position of need, plus the tier
+     cliff behind them, which is what actually decides whether you can wait a round. */
+  const PREP_WINDOW = 3;
+  const RUN_LOOKBACK = 10;   // picks of history for "is this position running?"
+  const STARTERS = [["QB",1],["RB",2],["WR",2],["TE",1],["K",1],["DEF",1]];
+  const FLEX_N = 2, FLEX_OK = new Set(["RB","WR","TE"]);
+
+  // Which starting slots this roster still has open. Greedy: dedicated slots first, spares to FLEX.
+  // Good enough to read "what do I still need", which is the only question it's asked.
+  function openSlots(posList) {
+    const open = [];
+    for (const [ps, n] of STARTERS) {
+      const have = posList.filter((x) => x === ps).length;
+      if (have < n) open.push(...Array(n - have).fill(ps));
+    }
+    const spare = [...FLEX_OK].reduce((acc, ps) => {
+      const need = STARTERS.find(([p]) => p === ps)[1];
+      return acc + Math.max(0, posList.filter((x) => x === ps).length - need);
+    }, 0);
+    return { open, flexOpen: Math.max(0, FLEX_N - Math.min(spare, FLEX_N)) };
+  }
+
+  function paintPrep() {
+    const el = $("#prep");
+    if (!el) return;
+    const nextPick = sync.connected && sync.picksMade != null ? sync.picksMade + 1 : null;
+    const slot = sync.mySlot ?? draftSlot;
+    if (!sync.connected || !nextPick || !slot || sync.reversal) { el.hidden = true; return; }
+
+    const mine = myPicksFrom(nextPick, slot);
+    const myNext = mine[0];
+    if (!myNext) { el.hidden = true; return; }
+    const away = myNext - nextPick;
+    if (away > PREP_WINDOW) { el.hidden = true; return; }
+    el.hidden = false;
+
+    const byId = new Map(rows.map((p) => [p.id, p]));
+    const posOf = (pk) => byId.get(pk.player_id)?.pos ?? pk.metadata?.position ?? "?";
+
+    // --- your roster and what it still needs ---
+    const myPos = sync.picks.filter((p) => p.draft_slot === slot).map(posOf);
+    const { open, flexOpen } = openSlots(myPos);
+    const needSet = new Set(open);
+    if (flexOpen) for (const p of FLEX_OK) needSet.add(p);
+    const needList = [...new Set(open)];
+
+    // --- position run pressure over the recent window ---
+    const recent = sync.picks.slice(-RUN_LOOKBACK).map(posOf);
+    const runs = ["RB","WR","TE","QB"].map((ps) => ({ ps, n: recent.filter((x) => x === ps).length }))
+      .filter((r) => r.n > 0).sort((a, b) => b.n - a.n);
+
+    // --- candidates ---
+    // Ranked by Boris Chen (the board's own default sort; ADP rides alongside as the market's
+    // disagreeing opinion) across every position you still need, then capped and grouped.
+    //
+    // The cap is what makes this usable. Filtering only on "open starting slot" surfaces K and DEF
+    // in round 3 — technically an open slot, obviously not a round-3 decision — and a first cut of
+    // this panel did exactly that, printing 18 players across 6 blocks with a meaningless "1 left in
+    // tier 22" cliff on kickers. Ranking the pool as one list and taking the top few drops K/DEF on
+    // their own merits until they're genuinely the best thing left, with no round-number heuristic
+    // to tune or get wrong.
+    const MAX_CANDIDATES = 6, MAX_POS_BLOCKS = 3;
+    const bcRank = (p) => p.fftiers?.rank ?? Infinity;
+    const avail = rows.filter((p) => !taken.has(p.id));
+    const pool = avail.filter((p) => needSet.has(p.pos)).sort((a, b) => bcRank(a) - bcRank(b));
+    const byPos = {};
+    for (const p of pool) {
+      if (Object.keys(byPos).length >= MAX_POS_BLOCKS && !byPos[p.pos]) continue;
+      const seen = Object.values(byPos).reduce((n, d) => n + d.list.length, 0);
+      if (seen >= MAX_CANDIDATES) break;
+      (byPos[p.pos] ??= { list: [], topTier: null, leftInTier: null }).list.push(p);
+    }
+    for (const [ps, d] of Object.entries(byPos)) {
+      // Tier cliff: how many remain in the best tier still on the board at this position — the read
+      // that actually decides "can I wait a round". Players with no BC tier are excluded from the
+      // count rather than assumed into it.
+      // The best tier still on the board is the MINIMUM tier among the available, not the first one
+      // encountered walking the list — `avail` is in board-rank order, which is not tier order, so
+      // `.find()` here reported "2 left in tier 5" directly above a tier-2 player.
+      const atPos = avail.filter((p) => p.pos === ps);
+      const tiers = atPos.map((p) => p.fftiers?.tier).filter((t) => t != null);
+      d.topTier = tiers.length ? Math.min(...tiers) : null;
+      d.leftInTier = d.topTier == null ? null : tiers.filter((t) => t === d.topTier).length;
+    }
+
+    // What you already have beats a list of what you lack: early on "you need QB, WR, TE, K, DEF"
+    // is true of everyone and tells you nothing, while the roster you've built is the actual context
+    // for the next pick. The open slots still get named once the list is short enough to mean something.
+    const haveTxt = ["QB","RB","WR","TE","K","DEF"]
+      .map((ps) => { const n = myPos.filter((x) => x === ps).length; return n ? `${ps}${n > 1 ? "×" + n : ""}` : null; })
+      .filter(Boolean).join(" ") || "nothing yet";
+    const needTxt = needList.length <= 3
+      ? needList.join(", ") + (flexOpen ? ` + ${flexOpen} FLEX` : "")
+      : `${needList.length} starting slots + ${flexOpen} FLEX`;
+    const runTxt = runs.length
+      ? runs.map((r) => `${r.ps} ${r.n}`).join(" · ")
+      : "no clear run";
+
+    const head = away === 0
+      ? `<b class="prep-up">YOU'RE UP</b> <span class="faint">· pick #${myNext}</span>`
+      : `<b>on deck</b> <span class="faint">· #${myNext}, ${away} pick${away === 1 ? "" : "s"} away</span>`;
+
+    const blocks = Object.entries(byPos).map(([ps, d]) => {
+      const cliff = d.leftInTier == null ? `<span class="nodata">no tier</span>`
+        : d.leftInTier <= 2 ? `<span class="prep-cliff">${d.leftInTier} left in tier ${d.topTier} — cliff</span>`
+        : `<span class="faint">${d.leftInTier} left in tier ${d.topTier}</span>`;
+      const names = d.list.map((p) => {
+        const adp = p.adp?.half_ppr;
+        // Does his ADP say he even reaches your pick? Same half-round slack and the same three
+        // buckets the rail uses — no new precision is invented here.
+        const fate = adp == null ? "" : adp < myNext - ADP_SLACK ? `<span class="prep-gone">likely gone</span>`
+          : adp <= myNext + ADP_SLACK ? `<span class="prep-flip">coin flip</span>` : `<span class="prep-safe">should last</span>`;
+        // Tier per row, not just per position: "1 left in tier 2" above three names otherwise reads
+        // as if all three were in tier 2. Showing T2/T3/T3 makes the cliff visible instead of stated.
+        const t = p.fftiers?.tier;
+        return `<div class="prep-row"><span class="prep-nm">${esc(p.name)}</span>` +
+          `<span class="mono prep-t"${t != null && t === d.topTier ? ' data-top="1"' : ""}>${t == null ? "–" : "T" + t}</span>` +
+          `<span class="mono faint">${adp == null ? "no adp" : "adp " + adp}</span>${fate}</div>`;
+      }).join("");
+      return `<div class="prep-pos"><div class="prep-poshead"><b>${ps}</b> ${cliff}</div>${names}</div>`;
+    }).join("");
+
+    el.innerHTML = `<div class="prep-head">${head}</div>` +
+      `<div class="prep-need"><span class="faint">have:</span> ${esc(haveTxt)}` +
+      `<span class="faint"> · open:</span> ${esc(needTxt)}</div>` +
+      (blocks || `<div class="prep-empty">Starters full — this one's a best-available pick.</div>`) +
+      `<div class="prep-runs" title="Positions taken in the last ${RUN_LOOKBACK} picks. A run is the signal to pivot early rather than trust ADP.">` +
+      `<span class="faint">last ${RUN_LOOKBACK}:</span> ${runTxt}</div>`;
+  }
+
   /* ---------- live draft sync (Sleeper) ----------
      Paste a draft ID, hit connect, and the board marks players off by itself. This exists so that
      during a draft your attention goes to reading players, not to clicking a ✓ 150 times and
@@ -1172,9 +1314,16 @@
      asserted by always busting rather than by inspecting the response. */
   const SYNC_KEY = "hq-draft-2026-draftid";
   const POLL_MS = 10000, POLL_MAX_MS = 60000;
+  const REPLAY_AT = (() => {
+    const v = new URLSearchParams(location.search).get("at");
+    const n = v == null ? NaN : Number(v);
+    return Number.isInteger(n) && n >= 0 ? n : null;
+  })();
   const sync = {
     draftId: null, connected: false, status: null, picksMade: null, mySlot: null,
     reversal: 0, lastOk: null, err: null, timer: null, delay: POLL_MS, shape: null,
+    picks: [],   // full ordered pick feed — the prep panel reads roster shape and run pressure off it
+    replay: null,
   };
 
   const sleeperGet = async (path) => {
@@ -1216,6 +1365,15 @@
       el.title = `Retrying every ${Math.round(sync.delay / 1000)}s. The board is frozen at the last good fetch — treat the pick count as a floor, not a fact.`;
       return;
     }
+    if (sync.replay != null) {
+      el.classList.add("replay");
+      const np = (sync.picksMade ?? 0) + 1;
+      const ms = sync.mySlot ? myPicksFrom(np, sync.mySlot) : [];
+      el.textContent = `REPLAY @ pick #${np} · ${sync.picksMade}/${ROUNDS * TEAMS}`
+        + (ms.length ? (ms[0] === np ? " · YOU'RE UP" : ` · you in ${ms[0] - np}`) : "");
+      el.title = `Rehearsal mode: draft ${sync.draftId} truncated to its first ${sync.replay} picks via ?at=. Not live, and not polling. Drop ?at= from the URL to follow the real feed.`;
+      return;
+    }
     const done = sync.status === "complete" || sync.picksMade >= ROUNDS * TEAMS;
     const nextPick = (sync.picksMade ?? 0) + 1;
     const mine = sync.mySlot ? myPicksFrom(nextPick, sync.mySlot) : [];
@@ -1235,10 +1393,20 @@
   }
 
   async function pollOnce() {
-    const [meta, picks] = await Promise.all([
+    // eslint-disable-next-line prefer-const -- `picks` is reassigned by the REPLAY slice below
+    let [meta, picks] = await Promise.all([
       sleeperGet(`/draft/${sync.draftId}`),
       sleeperGet(`/draft/${sync.draftId}/picks`),
     ]);
+    // REPLAY: ?at=<pickNo> truncates a finished draft to its first N picks, so the board reads
+    // exactly as it did at that moment. Built for rehearsing draft day against a real pick sequence
+    // (and it's how the on-deck panel gets tested without burning a live mock). It is labelled
+    // REPLAY everywhere and freezes polling, because a practice board that could be mistaken for a
+    // live one is worse than no practice board.
+    if (REPLAY_AT != null) {
+      picks = picks.filter((p) => p.pick_no <= REPLAY_AT);
+      sync.replay = REPLAY_AT;
+    }
     sync.status = meta.status;
     sync.picksMade = picks.length;
     sync.mySlot = meta.draft_order?.[C.MY_USER_ID] ?? null;
@@ -1253,6 +1421,7 @@
       : wrongShape ? `⚠ ${t}tm/${rd}rd ${meta.type}: page assumes ${TEAMS}tm/${ROUNDS}rd snake`
       : null;
 
+    sync.picks = picks;
     liveTaken.clear(); livePickNo.clear();
     for (const p of picks) {
       if (!p.player_id) continue;
@@ -1267,8 +1436,9 @@
   function schedule() {
     clearTimeout(sync.timer);
     if (!sync.connected) return;
-    // Nothing more will change once it's over; stop hitting their origin.
-    if (sync.status === "complete") { paintSyncStatus(); return; }
+    // Nothing more will change once it's over (or when replaying a frozen slice); stop hitting
+    // their origin.
+    if (sync.status === "complete" || sync.replay != null) { paintSyncStatus(); return; }
     sync.timer = setTimeout(tick, sync.delay);
   }
 
@@ -1305,7 +1475,7 @@
 
   function disconnect() {
     sync.connected = false; sync.err = null; sync.status = null;
-    sync.picksMade = null; sync.mySlot = null; sync.shape = null;
+    sync.picksMade = null; sync.mySlot = null; sync.shape = null; sync.picks = [];
     clearTimeout(sync.timer);
     liveTaken.clear(); livePickNo.clear(); rebuildTaken();
     localStorage.removeItem(SYNC_KEY);

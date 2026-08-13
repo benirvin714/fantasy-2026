@@ -356,6 +356,42 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
 
 .tgt-livedot { color: var(--accent); font-size: 9px; vertical-align: middle; }
 
+/* ---- on-deck prep: appears in the rail when your pick is within 3 ----
+   Loud enough to catch your eye mid-scroll, quiet enough not to be wallpaper the rest of the draft
+   (it is hidden outright when you're more than 3 picks out). */
+.prep {
+  border: 1px solid var(--accent); border-radius: var(--radius);
+  background: linear-gradient(180deg, rgba(99,191,90,.07) 0%, rgba(99,191,90,.02) 100%);
+  margin: 0 12px 10px; padding: 9px 10px;
+  font-size: 12px;
+}
+.prep-head { font-size: 12px; margin-bottom: 5px; }
+.prep-up { color: var(--accent); letter-spacing: .06em; }
+.prep-need { font-size: 11.5px; color: var(--text); margin-bottom: 8px; font-family: var(--font-data); }
+.prep-pos { margin-bottom: 7px; }
+.prep-poshead {
+  display: flex; align-items: baseline; gap: 7px;
+  font-size: 11px; text-transform: uppercase; letter-spacing: .05em;
+  color: var(--dim); margin-bottom: 3px;
+}
+.prep-cliff { color: var(--warn); text-transform: none; letter-spacing: 0; font-size: 11px; }
+.prep-row {
+  display: flex; align-items: baseline; gap: 6px;
+  padding: 1px 0 1px 8px; font-size: 11.5px;
+}
+.prep-nm { flex: 1; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.prep-row .mono { font-size: 10.5px; }
+.prep-t { color: var(--faint); min-width: 22px; }
+.prep-t[data-top="1"] { color: var(--moss); font-weight: 600; }
+.prep-safe { color: var(--accent); font-size: 10px; }
+.prep-flip { color: var(--warn); font-size: 10px; }
+.prep-gone { color: var(--neg); font-size: 10px; }
+.prep-empty { color: var(--dim); font-size: 11.5px; padding: 2px 0 6px; }
+.prep-runs {
+  border-top: 1px solid var(--border); margin-top: 6px; padding-top: 6px;
+  font-family: var(--font-data); font-size: 10.5px; color: var(--dim);
+}
+
 /* value knobs — scarcity/replacement basis (the only knob; a ceiling tilt was never built) */
 .knobs { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
 .knob {

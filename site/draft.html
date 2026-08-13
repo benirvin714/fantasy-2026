@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap">
-  <link rel="stylesheet" href="style.css?v=35">
+  <link rel="stylesheet" href="style.css?v=37">
 </head>
 <body>
   <header>
@@ -106,6 +106,7 @@
           </label>
           <div class="tgt-clockline" id="tgt-clockline"></div>
         </div>
+        <div class="prep" id="prep" hidden></div>
         <div class="panel-body tgt-body" id="targets-body"></div>
       </aside>
     </div>
@@ -114,11 +115,13 @@
   <footer>
     Data: <span class="mono">data/site/draft-board.json</span> (Sleeper projections re-scored to HBGBs scoring;
     availability from 3-yr games + age + status). Fields without data say so — nothing is fabricated.
-    Drafted marks and your target list persist in this browser only (localStorage) and survive reloads.
-    "Picks away" counts from your drafted marks, so mark every pick as it happens.
+    Your manual marks and target list persist in this browser only (localStorage) and survive reloads.
+    Connect a draft ID and picks come from Sleeper instead — "picks away" then counts from the real
+    feed, and Sleeper's picks are never stored locally. Unconnected, it counts your own marks, so
+    mark every pick as it happens.
   </footer>
 
   <script src="config.js?v=6"></script>
-  <script src="draft.js?v=53"></script>
+  <script src="draft.js?v=59"></script>
 </body>
 </html>
