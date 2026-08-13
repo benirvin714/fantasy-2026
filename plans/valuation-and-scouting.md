@@ -411,7 +411,16 @@ of need, with the tier cliff behind them.
   `2 left in tier 5` directly above a tier-2 player. Each row also carries its own tier, because
   "1 left in tier 2" above three names otherwise reads as if all three were in tier 2.
 - **Survival per candidate** reuses §1.13's three buckets and the same half-round slack. No new
-  precision is invented.
+  precision is invented. **The question pivots when you're on the clock** (fixed 2026-08-13 after
+  catching it live): "does he last to #2" is meaningless at #2 — you can just take him — so at
+  `away === 0` the panel measures against your *next* pick and reads `now or never` / `coin flip #19`
+  / `back at #19`. Before the fix, sitting on the clock at pick #2, it called Ja'Marr Chase (ADP 3.7)
+  a "coin flip" when the real answer was that he cannot survive the 17-pick turn. §1.13's rail
+  already pivoted this way; the panel simply hadn't.
+- **Guaranteed to appear in a real draft**, which the mocks cannot demonstrate. Bots autopick your
+  turn, so a mock never stalls and ~10 picks land per 10s poll, stepping clean over the 4-pick
+  window (`away` = 3,2,1,0). A real draft *halts* on your clock — a 60s timer is 6+ polls at
+  `away === 0` before you act — so the window cannot be skipped. Verified live at pick #2.
 - **`have:` beats `need:`** early on. "You need QB, WR, TE, K, DEF" is true of everyone in round 3;
   the roster you've built is the actual context. Open slots get named once the list is short enough
   to mean something (≤3).

@@ -1201,6 +1201,7 @@
     const away = myNext - nextPick;
     if (away > PREP_WINDOW) { el.hidden = true; return; }
     el.hidden = false;
+    const onClockNow = away === 0;
 
     const byId = new Map(rows.map((p) => [p.id, p]));
     const posOf = (pk) => byId.get(pk.player_id)?.pos ?? pk.metadata?.position ?? "?";
@@ -1274,10 +1275,17 @@
         : `<span class="faint">${d.leftInTier} left in tier ${d.topTier}</span>`;
       const names = d.list.map((p) => {
         const adp = p.adp?.half_ppr;
-        // Does his ADP say he even reaches your pick? Same half-round slack and the same three
-        // buckets the rail uses — no new precision is invented here.
-        const fate = adp == null ? "" : adp < myNext - ADP_SLACK ? `<span class="prep-gone">likely gone</span>`
-          : adp <= myNext + ADP_SLACK ? `<span class="prep-flip">coin flip</span>` : `<span class="prep-safe">should last</span>`;
+        // Does his ADP say he reaches the pick that's actually in question? Same half-round slack and
+        // the same three buckets the rail uses — no new precision invented. The question SHIFTS when
+        // you're the one on the clock: "does he last to #2" is meaningless at #2 (just take him), and
+        // the live decision is the WHEEL — if I spend this pick elsewhere, is he back at my next one.
+        // §1.13's rail already pivots this way; the panel failing to do it called a player who cannot
+        // survive the turn a "coin flip" at the exact moment the call mattered most.
+        const at = onClockNow ? mine[1] : myNext;
+        const fate = adp == null || !at ? (onClockNow && !at ? `<span class="prep-gone">last pick</span>` : "")
+          : adp < at - ADP_SLACK ? `<span class="prep-gone">${onClockNow ? "now or never" : "likely gone"}</span>`
+          : adp <= at + ADP_SLACK ? `<span class="prep-flip">coin flip #${at}</span>`
+          : `<span class="prep-safe">${onClockNow ? "back at" : "lasts to"} #${at}</span>`;
         // Tier per row, not just per position: "1 left in tier 2" above three names otherwise reads
         // as if all three were in tier 2. Showing T2/T3/T3 makes the cliff visible instead of stated.
         const t = p.fftiers?.tier;
