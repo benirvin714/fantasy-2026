@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap">
-  <link rel="stylesheet" href="style.css?v=37">
+  <link rel="stylesheet" href="style.css?v=40">
 </head>
 <body>
   <header>
@@ -32,7 +32,7 @@
         <button id="lsync-btn" class="lsync-btn">connect</button>
         <span class="lsync-status" id="lsync-status" role="status">not connected · marking drafted by hand</span>
       </div>
-      <div class="filters" role="group" aria-label="Position filter">
+      <div class="filters" role="group" aria-label="Player filter">
         <button data-pos="ALL" aria-pressed="true">all</button>
         <button data-pos="QB" aria-pressed="false">QB</button>
         <button data-pos="RB" aria-pressed="false">RB</button>
@@ -40,6 +40,8 @@
         <button data-pos="TE" aria-pressed="false">TE</button>
         <button data-pos="K" aria-pressed="false">K</button>
         <button data-pos="DEF" aria-pressed="false">DEF</button>
+        <button data-pos="ROOK" aria-pressed="false"
+                title="First-year players only (years_exp = 0), across every position. Boris Chen doesn't rank rookies and none of them have spike-week data, so sort by ADP or draft $ here — the board says so when the filter is on.">rookies</button>
       </div>
       <div class="filters" role="group" aria-label="View">
         <button data-view="board" aria-pressed="true">value board</button>
@@ -107,6 +109,10 @@
           <div class="tgt-clockline" id="tgt-clockline"></div>
         </div>
         <div class="prep" id="prep" hidden></div>
+        <details class="roster" id="roster" open>
+          <summary class="roster-head">Roster <span class="roster-n" id="roster-n"></span></summary>
+          <div id="roster-body"></div>
+        </details>
         <div class="panel-body tgt-body" id="targets-body"></div>
       </aside>
     </div>
@@ -118,10 +124,11 @@
     Your manual marks and target list persist in this browser only (localStorage) and survive reloads.
     Connect a draft ID and picks come from Sleeper instead — "picks away" then counts from the real
     feed, and Sleeper's picks are never stored locally. Unconnected, it counts your own marks, so
-    mark every pick as it happens.
+    mark every pick as it happens. The Roster panel is live-feed only: a ✓ says a player is gone,
+    not that you were the one who took him.
   </footer>
 
   <script src="config.js?v=6"></script>
-  <script src="draft.js?v=60"></script>
+  <script src="draft.js?v=65"></script>
 </body>
 </html>

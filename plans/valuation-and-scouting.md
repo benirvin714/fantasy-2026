@@ -423,7 +423,9 @@ of need, with the tier cliff behind them.
   `away === 0` before you act — so the window cannot be skipped. Verified live at pick #2.
 - **`have:` beats `need:`** early on. "You need QB, WR, TE, K, DEF" is true of everyone in round 3;
   the roster you've built is the actual context. Open slots get named once the list is short enough
-  to mean something (≤3).
+  to mean something (≤3 positions), and are **counted, not deduped** — `RB, WR×2` rather than
+  `RB, WR`, and `6 starting slots` rather than 5 (corrected 2026-08-14: the count was of distinct
+  positions while calling them slots, which §1.17's grid immediately contradicted on screen).
 - **Run pressure**: positions taken in the last 10 picks, the pivot signal ADP can't give you.
 - **Hidden when it can't be honest**: more than 3 picks out, no slot, `reversal_round` set, or
   **disconnected** — without the feed there is no way to know which drafted players are *yours*, so
@@ -434,14 +436,88 @@ exactly as it did at that moment. Built for rehearsing against a real pick seque
 prep panel is testable without burning a live mock. Labelled `REPLAY` in the status chip and freezes
 polling — a practice board mistakable for a live one would be worse than none.
 
-Files: `paintPrep()` / `openSlots()` / `PREP_WINDOW` / `RUN_LOOKBACK` / `STARTERS` / `FLEX_N` and
-`REPLAY_AT` + the replay slice in `pollOnce()`, all `site/draft.js`; `.prep*` in `site/style.css`;
-`#prep` in `site/draft.html`.
+Files: `paintPrep()` / `openSlots()` / `PREP_WINDOW` / `RUN_LOOKBACK` and `REPLAY_AT` + the replay
+slice in `pollOnce()`, all `site/draft.js`; `.prep*` in `site/style.css`; `#prep` in
+`site/draft.html`. Roster shape (`LINEUP`, `assignLineup()`) moved to §1.17 and is now shared.
 
 **Phase 2 (not built)**: a Claude-written JSON the panel reads for judgment the arithmetic can't
 reach. The in-page question box was considered and **cut** — the page cannot call Claude, and the
 alternatives (an API key in a public frontend, or a poll-a-file loop that only works locally) both
 lose to just asking in chat, where `scripts/draft-live.mjs` supplies live state in 273ms.
+
+### 1.17 Roster panel — your team as the feed fills it — 2026-08-14
+
+A collapsible grid under the prep box showing the ten starting slots, five bench spots, and who's in
+them. It fills itself from the live pick feed; nothing here is entered by hand.
+
+- **Live-feed only, by construction.** A manual ✓ on the board records that *someone* took a player,
+  never that *you* did. So with no draft connected there is no roster to derive and the panel says so
+  outright instead of guessing from your marks. Connected but pre-start gets its own message: Sleeper
+  doesn't publish `draft_order` until the draft begins, and your seat comes with it.
+- **One source of truth for roster shape.** `LINEUP` (`QB RB RB WR WR TE FLEX FLEX K DEF`) + 5 bench
+  = 15, exactly the draft's rounds. `assignLineup()` walks your picks in order and gives each player
+  his dedicated slot if one is free, else FLEX, else the bench; dedicated-first makes the result
+  order-independent, so four RBs and two WRs read the same whichever order they arrived in. §1.16's
+  `openSlots()` is now **derived from that same call**, which is the point — "open: TE + 1 FLEX" three
+  inches up and the grid below it cannot drift apart. (Sharing it is what exposed the miscount fixed
+  in §1.16.)
+- **Off-board picks still render**, from Sleeper's own pick record, flagged with `*` and a footnote.
+  Two of the 150 picks in the 2026-08-14 test draft were kickers outside the board's 16-K pool. They
+  get name, position and team and explicitly **no bye week and no valuation**, because none was ever
+  computed for them — the alternative, dropping them, would leave a silent hole in your own roster.
+- **Bye stacks among starters** are called out (`bye stack: W7 ×2 · W13 ×3`). Five bench spots is not
+  cover for two starters off the same week, and it's only avoidable while you're still drafting.
+  Bench byes are deliberately not counted — that's not a problem.
+- **Anything past 15 is shown, never dropped.** It shouldn't happen in a 15-round draft; if it does,
+  the page's shape assumption is wrong and hiding the evidence is the worst available response.
+- **The rail budget.** With the prep box up, all four sections want height at once and the target
+  list — last in the flex column — was collapsing to a 16px sliver at 1440×1000. The roster yields
+  first (`:has(#prep:not([hidden]))` caps the grid at 26vh with internal scroll): it's context you
+  glance at, the shortlist is what you act on, and the prep box already prints the roster in one line.
+  Outside the prep window nothing is capped and all 15 rows show whole. `.tgt-body` gets a 116px
+  floor, and the rail itself scrolls as a last resort.
+- **Collapse survives repolls** because the `<details>` lives in the HTML and only its contents are
+  rewritten. Rebuilding the element would silently re-open it every 10 seconds.
+
+Verified against completed mock `1393658399429754880` (150 picks, seat 2) via replay mode: 15/15 with
+the exact slot-2 snake sequence `1.02 … 15.02`, correct greedy FLEX assignment, `bye stack: W7 ×2 ·
+W8 ×2 · W13 ×3`, and at `?at=121` the prep box's `open: K, DEF` matching the grid's two empty slots.
+
+Files: `paintRoster()` / `LINEUP` / `BENCH_N` / `assignLineup()` / `pickEntry()` in `site/draft.js`;
+`.roster*` / `.rsl*` in `site/style.css`; `#roster` in `site/draft.html`.
+
+### 1.18 Rookies filter — the last-pick flier view — 2026-08-14
+
+A `rookies` button at the right of the position group. It isn't a position, but it's the same
+"narrow the board to one slice" gesture, and the one time you want it — spending a 14th or 15th pick
+on a high-ceiling first-year player — you want it across every position at once. One predicate
+(`posMatch()`) drives the board, the tiers view and the search's "which control was hiding him"
+note, so they can't disagree. 20 rookies of 248, flagged off `years_exp === 0` at build time.
+
+**The filter alone would have been close to useless, and saying why is the substance of this
+section.** Rookies have two holes the rest of the board doesn't:
+
+- **No Boris Chen rank.** All 20. Since BC is the board's default sort and unranked players fall to
+  `Infinity`, the rookie view under the default sort is in *arbitrary order*. The board now says so,
+  and only while it's true — the warning is suppressed the moment you switch to ADP or draft $,
+  because advice about a sort you're not using is noise.
+- **No ceiling data.** All 20. Spike-week rate needs 10+ career games. So the `ceil` column — the
+  one column that exists to answer "high ceiling?" — is blank for exactly the players you'd open this
+  view to evaluate.
+
+The fix is to surface what the board *does* hold: **NFL draft capital**, already in
+`context.rookie_capital` from the DynastyProcess crosswalk and previously rendered nowhere. Every
+rookie now carries an `R1.03` badge (round.pick, with overall and source in the tooltip), shown
+wherever a rookie appears rather than only under the filter. It is labelled as evidence next to the
+scouting brief, explicitly **not** a projection — draft capital predicts opportunity, not production,
+and the board should not pretend otherwise.
+
+Verified at replay pick 130 with `hide drafted` + ADP sort: 15 rookies left, correctly ordered,
+every one badged, header note recounting to 15. Searching a non-rookie while the filter is on
+reports `Cleared rookies filter to show him.`; searching a rookie leaves it alone.
+
+Files: `ROOK` / `posMatch()` / `rookBadge()` / `rookieNote()` in `site/draft.js`; `.rbadge-rook` /
+`.rooknote` in `site/style.css`; the `data-pos="ROOK"` button in `site/draft.html`.
 
 ## 2. Challenge 2 — `scouting_brief` (public commentary)
 

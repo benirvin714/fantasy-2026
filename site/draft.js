@@ -347,6 +347,42 @@
   /* ---------- render helpers ---------- */
   const noData = '<span class="nodata">no data</span>';
   const badge = (txt, cls, title) => `<span class="rbadge ${cls}" title="${esc(title)}">${esc(txt)}</span>`;
+
+  /* NFL draft capital, rookies only. It's the only forward-looking signal this board carries for a
+     player with no NFL snaps: no Boris Chen rank exists for him, spike-week ceiling needs 10+ career
+     games, and the projection is built without history. Rendered wherever a rookie appears, not just
+     under the rookies filter — a first-year flier is worth spotting in the middle of the board too. */
+  const rookBadge = (p) => {
+    const rc = p.context?.rookie_capital;
+    if (!rc) return badge("rookie", "rbadge-rook",
+      "First-year player. No NFL draft capital on file, which usually means he went undrafted.");
+    return badge(`R${rc.round}.${String(rc.pick).padStart(2, "0")}`, "rbadge-rook",
+      `Rookie. ${rc.year} NFL draft, round ${rc.round} pick ${rc.pick} (${rc.overall} overall). ` +
+      `Draft capital is the nearest thing to a ceiling read the board has for him — there is no ` +
+      `spike-week data until he has 10+ NFL games. Source: ${rc.source}.`);
+  };
+
+  /* The rookies view has two holes the rest of the board doesn't, and both bear directly on the one
+     decision it exists for. State them at the top rather than leave a reader to infer meaning from
+     an empty column and an arbitrary sort order. */
+  function rookieNote(list) {
+    const noBC = list.filter((p) => !p.fftiers).length;
+    const noCeil = list.filter((p) => !p.ceiling).length;
+    // The sort warning is only shown while it's actually true — on a BC-derived sort in the board
+    // view. Leaving it up after you've switched to ADP would be advice about a sort you're not using.
+    const onBC = view === "board" && ["bc", "bcdiff", "bcgap"].includes(sort);
+    return `<div class="rooknote"><b>${list.length} rookie${list.length === 1 ? "" : "s"}.</b> ` +
+      (!onBC ? ""
+        : noBC === list.length
+        ? `Boris Chen ranks none of them, so <b>this sort leaves the view in arbitrary order</b> — sort by ADP or draft $ instead. `
+        : noBC ? `${noBC} carry no Boris Chen rank and sink to the bottom of this sort. ` : "") +
+      (noCeil === list.length
+        ? `The <b>ceil</b> column is empty for every one of them: spike-week rate needs 10+ NFL games and none have played any. `
+        : "") +
+      `The closest ceiling read here is <b>NFL draft capital</b> — the ` +
+      `<span class="rbadge rbadge-rook">R1.03</span> badge — read next to the scouting brief. ` +
+      `Both are evidence, neither is a projection.</div>`;
+  }
   // Per-tier color for Boris Chen's tiers (overall, 1..~23). It does three jobs: a full-row wash so
   // a tier reads as one block, a bold left band, and the pill in the BC cell.
   //
@@ -469,6 +505,7 @@
     const clTitle = cl ? `Spike-week rate: ${Math.round(cl.spike_week_rate * 100)}% of ${cl.sample_weeks} games at/above the ${p.pos} top-5 weekly line (${cl.boom_line} pts). Boom ~${cl.boom_pts}, floor ~${cl.floor_pts}${clr != null ? `; ${clr}× the board's ${p.pos} average` : ""}. Separate attribute — not in value.` : "no weekly ceiling data (rookie / <10 career games)";
     const badges = [
       showRec ? `<span class="recbadge ${recCls}" title="${esc(edgeTitle)}">${rec}${conf?.recConf ? ` <span class="confdots" title="rec-confidence ${CONF_LABEL[conf.recConf - 1]}">${CONF_DOTS[conf.recConf - 1]}</span>` : ""}</span>` : "",
+      p.rookie ? rookBadge(p) : "",
       ...p.flagged.map((f) => badge(f.slice(0, 3).toUpperCase(), "rbadge-risk", `${f} risk — see detail`)),
       p.unvetted ? badge("unvetted", "rbadge-unvetted", "Risk flags not yet researched — null, not clean") : "",
       p.scouting_brief?.prose ? `<span class="rbadge rbadge-scout${p.scouting_brief.override_flag ? " scout-override" : ""}" title="${esc((p.scouting_brief.override_flag ? "⚑ role/scheme delta — revisit projection. " : "") + firstSentence(p.scouting_brief.prose))}">${p.scouting_brief.override_flag ? "⚑ scout" : "scout"}</span>` : "",
@@ -725,9 +762,16 @@
     </div>`;
 
   /* ---------- views ---------- */
+  /* ROOKIES rides in the position group even though it isn't a position: it's the same "narrow the
+     board to one slice" gesture, and the one time you want it — spending a last pick on a first-year
+     flier — you want it across every position at once, not per-position. One predicate so the board,
+     the tiers view and the search's "which control was hiding him" note can't disagree. */
+  const ROOK = "ROOK";
+  const posMatch = (p) => pos === "ALL" || (pos === ROOK ? !!p.rookie : p.pos === pos);
+
   function visible() {
     let list = rows;
-    if (pos !== "ALL") list = list.filter((p) => p.pos === pos);
+    if (pos !== "ALL") list = list.filter(posMatch);
     if (hideDrafted) list = list.filter((p) => !taken.has(p.id));
     if (hideFlagged) list = list.filter((p) => !p.flagged.length);
     return list;
@@ -863,11 +907,12 @@
   function paint() {
     paintSyncStatus();
     paintPrep();
+    paintRoster();
     paintTargets();
     const list = visible();
     if (view === "board") {
       const sortLabel = { bc: "by Boris Chen", bcdiff: "by BC−ADP value", adp: "by ADP", draftval: "by draft $", edge: "by edge", bcgap: "by us-vs-consensus" }[sort] ?? "by Boris Chen";
-      $("#board-title").textContent = (pos === "ALL" ? "Value board" : `Value board — ${pos}`) + " · " + sortLabel;
+      $("#board-title").textContent = (pos === "ALL" ? "Value board" : `Value board — ${pos === ROOK ? "rookies" : pos}`) + " · " + sortLabel;
       const sortFns = {
         bc: (a, b) => (a.fftiers?.rank ?? Infinity) - (b.fftiers?.rank ?? Infinity),
         bcdiff: (a, b) => (b.bcDiff ?? -Infinity) - (a.bcDiff ?? -Infinity),   // biggest value (falls furthest past consensus) first
@@ -878,13 +923,15 @@
       };
       const sorted = [...list].sort(sortFns[sort] ?? sortFns.bc);
       const starts = tierStarts(sorted);
-      $("#board-body").innerHTML = headerHTML +
+      $("#board-body").innerHTML = (pos === ROOK ? rookieNote(list) : "") + headerHTML +
         sorted.map((p, i) => rowHTML(p, p.draftRank ?? "–", starts[i])).join("") +
         `<div class="boardfoot">${washOn() ? "<b>Row color + left band</b> = Boris Chen tier (a block of one color is one tier)" : "<b>Left band</b> = Boris Chen tier (the full-row wash is on the BC sort only, where tiers run contiguous)"} · <b>BC</b> = Boris Chen consensus rank (your primary board) · <b>BC−adp</b> = spots the market lets him fall past that consensus (<span class="name-value">+ = value</span> / <span class="name-reach">− = reach</span>) · <b>$val</b>: ≥$1 = auction price, &lt;$1 = proximity-to-rosterable score · <b>edge</b>: $-gap above $1, board-vs-ADP pick-gap (Np) below · <span class="name-value">TARGET</span>/<span class="name-reach">FADE</span> + confidence dots ●●●. Bench tier gets no TARGET — lean on <b>ceil</b> for upside · hover <b>bye</b> to see who on your target list shares that week. # = draft-value rank.</div>`;
     } else {
       $("#board-title").textContent = "Tiers — cliff edges (by draft $)";
-      const posList = pos === "ALL" ? ["RB", "WR", "QB", "TE", "K", "DEF"] : [pos];
-      $("#board-body").innerHTML = posList.map((ps) => {
+      // ROOK isn't a position, so it groups by the real ones across the already-filtered list;
+      // blocks with no rookies simply render empty.
+      const posList = pos === "ALL" || pos === ROOK ? ["RB", "WR", "QB", "TE", "K", "DEF"] : [pos];
+      $("#board-body").innerHTML = (pos === ROOK ? rookieNote(list) : "") + posList.map((ps) => {
         const tiers = tiersFor(list.filter((p) => p.pos === ps));
         // Note these are OUR draft-$ tiers; the row wash is still Boris Chen's tier, so within a
         // block the colors show how cleanly the two tierings agree. tierStarts() runs per block and
@@ -934,7 +981,9 @@
   });
   $("#draft-slot").addEventListener("change", (e) => {
     draftSlot = e.target.value ? +e.target.value : null;
-    saveKnobs(); paintTargets();
+    // Full repaint, not just the rail: the prep box and the roster grid are keyed off this slot too,
+    // and repainting only the rail left them a poll cycle (up to 10s) behind the seat you just set.
+    saveKnobs(); paint();
   });
   $("#clear-targets").addEventListener("click", () => {
     if (targets.size && confirm(`Clear all ${targets.size} targets?`)) { targets.clear(); saveTargets(); paint(); }
@@ -1050,7 +1099,11 @@
     const p = rows.find((x) => x.id === id);
     if (!p) return;
     const moved = [];
-    if (pos !== "ALL" && p.pos !== pos) { setGroup("data-pos", "ALL"); pos = "ALL"; moved.push("position filter"); }
+    // name the control BEFORE clearing it — reading `pos` after the reset always said "position"
+    if (pos !== "ALL" && !posMatch(p)) {
+      moved.push(pos === ROOK ? "rookies filter" : "position filter");
+      setGroup("data-pos", "ALL"); pos = "ALL";
+    }
     if (hideDrafted && taken.has(id)) { hideDrafted = false; $("#hide-drafted").setAttribute("aria-pressed", "false"); moved.push("hide-drafted"); }
     if (hideFlagged && p.flagged.length) { hideFlagged = false; $("#hide-flagged").setAttribute("aria-pressed", "false"); moved.push("hide-risk-flagged"); }
     expandedId = id;
@@ -1170,22 +1223,55 @@
      cliff behind them, which is what actually decides whether you can wait a round. */
   const PREP_WINDOW = 3;
   const RUN_LOOKBACK = 10;   // picks of history for "is this position running?"
-  const STARTERS = [["QB",1],["RB",2],["WR",2],["TE",1],["K",1],["DEF",1]];
-  const FLEX_N = 2, FLEX_OK = new Set(["RB","WR","TE"]);
 
-  // Which starting slots this roster still has open. Greedy: dedicated slots first, spares to FLEX.
-  // Good enough to read "what do I still need", which is the only question it's asked.
-  function openSlots(posList) {
-    const open = [];
-    for (const [ps, n] of STARTERS) {
-      const have = posList.filter((x) => x === ps).length;
-      if (have < n) open.push(...Array(n - have).fill(ps));
+  // The starting lineup in the order the roster panel prints it, plus bench depth. This is the one
+  // source of truth for roster shape: the prep panel's "what's still open" is DERIVED from the same
+  // assignment the roster grid renders, so the two can never contradict each other on screen.
+  // 10 starters + 5 bench = 15, which is exactly the draft's rounds. IR isn't draftable, so it
+  // isn't modelled here.
+  const LINEUP = ["QB","RB","RB","WR","WR","TE","FLEX","FLEX","K","DEF"];
+  const BENCH_N = 5;
+  const FLEX_OK = new Set(["RB","WR","TE"]);
+
+  // Greedy, walking the roster in pick order: a player takes his dedicated slot if one is free,
+  // else FLEX, else the bench. Dedicated-first is what makes the result order-independent — four
+  // RBs and two WRs read the same whichever order they arrived in.
+  function assignLineup(list) {
+    const slots = LINEUP.map((lab) => ({ lab, p: null }));
+    const bench = [], extra = [];
+    for (const pl of list) {
+      const s = slots.find((x) => x.lab === pl.pos && !x.p)
+        ?? (FLEX_OK.has(pl.pos) ? slots.find((x) => x.lab === "FLEX" && !x.p) : null);
+      if (s) s.p = pl;
+      else if (bench.length < BENCH_N) bench.push(pl);
+      else extra.push(pl);
     }
-    const spare = [...FLEX_OK].reduce((acc, ps) => {
-      const need = STARTERS.find(([p]) => p === ps)[1];
-      return acc + Math.max(0, posList.filter((x) => x === ps).length - need);
-    }, 0);
-    return { open, flexOpen: Math.max(0, FLEX_N - Math.min(spare, FLEX_N)) };
+    return { slots, bench, extra };
+  }
+
+  // Which starting slots this roster still has open, read straight off that assignment.
+  function openSlots(posList) {
+    const empty = assignLineup(posList.map((p) => ({ pos: p }))).slots.filter((s) => !s.p);
+    return {
+      open: empty.filter((s) => s.lab !== "FLEX").map((s) => s.lab),
+      flexOpen: empty.filter((s) => s.lab === "FLEX").length,
+    };
+  }
+
+  // One resolver for "who is this pick". The value board answers when it has him; a pick from
+  // outside its 248 players still renders off Sleeper's own pick record, flagged offBoard so
+  // nothing downstream claims a bye week or a valuation that was never computed for him.
+  function pickEntry(pk, byId) {
+    const b = byId.get(pk.player_id);
+    const round = pk.round ?? Math.ceil(pk.pick_no / TEAMS);
+    const at = `${round}.${String(pk.pick_no - (round - 1) * TEAMS).padStart(2, "0")}`;
+    if (b) return { name: b.name, pos: b.pos, team: b.team, bye: b.bye, no: pk.pick_no, at, offBoard: false };
+    const m = pk.metadata ?? {};
+    const nm = `${m.first_name ?? ""} ${m.last_name ?? ""}`.trim();
+    return {
+      name: nm || `#${pk.player_id}`, pos: m.position ?? "?", team: m.team || null,
+      bye: null, no: pk.pick_no, at, offBoard: true,
+    };
   }
 
   function paintPrep() {
@@ -1204,14 +1290,19 @@
     const onClockNow = away === 0;
 
     const byId = new Map(rows.map((p) => [p.id, p]));
-    const posOf = (pk) => byId.get(pk.player_id)?.pos ?? pk.metadata?.position ?? "?";
+    const posOf = (pk) => pickEntry(pk, byId).pos;
 
     // --- your roster and what it still needs ---
     const myPos = sync.picks.filter((p) => p.draft_slot === slot).map(posOf);
     const { open, flexOpen } = openSlots(myPos);
     const needSet = new Set(open);
     if (flexOpen) for (const p of FLEX_OK) needSet.add(p);
-    const needList = [...new Set(open)];
+    // Counted, not deduped. "5 starting slots" when the roster grid below shows six empty ones is
+    // the exact kind of on-screen disagreement that sharing assignLineup() is meant to rule out.
+    const needList = [...new Set(open)].map((ps) => {
+      const n = open.filter((x) => x === ps).length;
+      return n > 1 ? `${ps}×${n}` : ps;
+    });
 
     // --- position run pressure over the recent window ---
     const recent = sync.picks.slice(-RUN_LOOKBACK).map(posOf);
@@ -1260,7 +1351,7 @@
       .filter(Boolean).join(" ") || "nothing yet";
     const needTxt = needList.length <= 3
       ? needList.join(", ") + (flexOpen ? ` + ${flexOpen} FLEX` : "")
-      : `${needList.length} starting slots + ${flexOpen} FLEX`;
+      : `${open.length} starting slots + ${flexOpen} FLEX`;
     const runTxt = runs.length
       ? runs.map((r) => `${r.ps} ${r.n}`).join(" · ")
       : "no clear run";
@@ -1302,6 +1393,79 @@
       (blocks || `<div class="prep-empty">Starters full — this one's a best-available pick.</div>`) +
       `<div class="prep-runs" title="Positions taken in the last ${RUN_LOOKBACK} picks. A run is the signal to pivot early rather than trust ADP.">` +
       `<span class="faint">last ${RUN_LOOKBACK}:</span> ${runTxt}</div>`;
+  }
+
+  /* ---------- roster panel ----------
+     Your team as the draft fills it in, read off the live pick feed and nothing else. A manual ✓ on
+     the board records that SOMEONE took a player, never that you did, so with no draft connected
+     there is no roster to show — the panel says that outright rather than guessing from your marks.
+
+     Slot assignment comes from assignLineup() above, the same call the on-deck panel uses to work
+     out what's still open. That's the point of sharing it: "open: TE + 1 FLEX" three inches up and
+     the grid down here can't drift apart.
+
+     The markup is refreshed in place inside a <details> that lives in the HTML, so folding the
+     panel away survives every repoll — rebuilding the element would silently re-open it every
+     10 seconds. */
+  function paintRoster() {
+    const body = $("#roster-body"), count = $("#roster-n");
+    if (!body || !count) return;
+    const slot = sync.mySlot ?? draftSlot;
+
+    if (!sync.connected || !slot) {
+      count.textContent = "";
+      body.innerHTML = `<div class="roster-note">${sync.connected
+        ? "Connected, but Sleeper hasn't published draft_order yet — it lands when the draft starts, and your seat with it."
+        : "Fills itself once you connect a draft ID above. Your ✓ marks say a player is gone, not who took him, so there's nothing to build a roster from until then."}</div>`;
+      return;
+    }
+
+    const byId = new Map(rows.map((p) => [p.id, p]));
+    const mine = sync.picks.filter((p) => p.draft_slot === slot).map((p) => pickEntry(p, byId));
+    const { slots, bench, extra } = assignLineup(mine);
+    count.textContent = `${mine.length}/${LINEUP.length + BENCH_N}`;
+
+    // Bye stacks among STARTERS only. Five bench spots is not enough cover for two starters off in
+    // the same week, and it's a problem you can only avoid while you're still drafting.
+    const byes = {};
+    for (const s of slots) if (s.p?.bye != null) (byes[s.p.bye] ??= []).push(s.p.name);
+    const stacks = Object.entries(byes).filter(([, n]) => n.length > 1)
+      .sort((a, b) => Number(a[0]) - Number(b[0]));
+
+    const row = (lab, p, cls = "") => {
+      const k = cls ? ` ${cls}` : "";
+      if (!p) return `<div class="rsl${k}"><span class="rsl-lab">${lab}</span><span class="rsl-nm rsl-open">—</span></div>`;
+      const stacked = !cls && p.bye != null && byes[p.bye]?.length > 1;
+      const meta = [p.team ?? "FA", p.bye == null ? null : `b${p.bye}`].filter(Boolean).join(" ");
+      const title = p.offBoard
+        ? `${p.name} (${p.pos}) isn't among the 248 players on the value board, so there's no bye week or valuation for him here. Name, position and team come from Sleeper's own record of the pick.`
+        : `${p.name}, ${p.pos} ${p.team ?? "no team"}${p.bye == null ? ", no bye on file" : `, week ${p.bye} bye`}. Taken at pick ${p.no}.`;
+      return `<div class="rsl filled${k}" title="${esc(title)}"><span class="rsl-lab">${lab}</span>` +
+        `<span class="rsl-nm">${esc(p.name)}${p.offBoard ? '<span class="rsl-off">*</span>' : ""}</span>` +
+        `<span class="rsl-meta${stacked ? " rsl-clash" : ""}">${esc(meta)}</span>` +
+        `<span class="rsl-pick">${p.at}</span></div>`;
+    };
+
+    // Bench rows are labelled by position rather than a column of "BN" — what the bench is made of
+    // is the useful read. Anything past 15 is shown, never dropped: if it happens the draft isn't
+    // the shape this page assumes and hiding it would be the worst possible response.
+    const benchRows = Array.from({ length: Math.max(BENCH_N, bench.length) },
+      (_, i) => row(bench[i]?.pos ?? "BN", bench[i] ?? null, "rsl-bn")).join("");
+    const extraRows = extra.length
+      ? `<div class="rsl-div rsl-div-warn">past ${LINEUP.length + BENCH_N} — draft is not the shape this page assumes</div>`
+        + extra.map((p) => row(p.pos, p, "rsl-bn")).join("")
+      : "";
+
+    body.innerHTML =
+      `<div class="roster-grid">${slots.map((s) => row(s.lab, s.p)).join("")}` +
+      `<div class="rsl-div">bench</div>${benchRows}${extraRows}</div>` +
+      (stacks.length
+        ? `<div class="roster-byes" title="Two or more of your starters are off in the same week. With five bench spots that's a week you start someone you didn't plan to.">` +
+          `<span class="faint">bye stack:</span> ` +
+          stacks.map(([w, n]) => `<span class="rsl-clash">W${w} ×${n.length}</span>`).join(" · ") + `</div>`
+        : "") +
+      (mine.some((p) => p.offBoard)
+        ? `<div class="roster-note">* not on the value board — no bye or valuation for him here.</div>` : "");
   }
 
   /* ---------- live draft sync (Sleeper) ----------
