@@ -585,6 +585,37 @@ A quality audit of the 100-200 ADP range (the "informed and fluid" late rounds) 
 - **`thin_source` re-scout trigger.** `validate-scouting.mjs` flags an in-range brief (ADP 1-180) whose sources include no coach/beat type and whose `as_of` predates the bar's adoption date (`--beat-bar-since`, default 2026-08-11). It is the fourth re-scout reason after news / adp_drift / stale_backstop, **demoted below all three** in the drip so a hot news item is never starved, with **one drip slot per run reserved** (`--drip-thin`, default 1) so the sweep still makes steady automated progress. It self-terminates: one upgraded attempt advances `as_of` past the bar date and the player never re-triggers, even where beat coverage genuinely does not exist. The daily drip runs `--drip-rank 180` in the pre-draft window so the back half of the range is reachable.
 - **Path-to-role convention + QUALITY metric.** In-range prose leads with the trigger (whose snaps, what opens the role, what he becomes) rather than a bare committee label. `validate-scouting.mjs` prints a `QUALITY` line counting analyst-only briefs across ADP 1-200 so the upgrade is measurable, not just coverage %. Ran in order: the 100-200 band (77 briefs), then 50-100 (34), then the top 50, with `THIN_MIN_ADP` walked down from 100 to 1 and 0 dead sources across the whole sweep.
 
+### 2.8 Deep-scout: team-batched parallel re-scout (2026-08-14)
+
+The nightly drip (3 players, `--drip-rank 150`) keeps the board current for free but is deliberately
+slow. Draft week needs one bounded heavy pass that does not run on draft day and does not burn a
+Pro-plan budget. `/deep-scout` is that pass: `scripts/deep-scout-batches.mjs` reads the live queue
+and assigns it to N parallel research agents, `scripts/deep-scout-merge.mjs` writes the result.
+
+- **Batch axis is the NFL team, not a player count.** A backfield is one question with N answers
+  that have to agree. When first run the queue held four Cardinals RBs (Love #25, Allgeier #128,
+  Conner #172, Benson #192); four per-player agents would have paid for the same "Cardinals
+  backfield" search four times and could return four briefs that disagree on the goal-line work.
+  Empirically 15 of 24 queued teams had 2+ players, covering 41 of 50. Packing is LPT-balanced
+  with **teams never split across agents**, and the assembler prints the contested position groups
+  so the split is checkable before any agent spawns. Cost amortization (one agent boot instead of
+  N) is the secondary benefit, not the reason.
+- **Subagents exist to keep search text out of the main context.** Web results are bulky and
+  disposable; an agent absorbs them and returns ~150 words per player. Run inline, the same text
+  persists in context for every later turn. This is the actual Pro-plan saving.
+- **Exactly one writer.** Agents return JSON and are forbidden from touching
+  `data/draft-research.json`; N concurrent read-modify-writes keep one and silently drop the rest.
+  The merge script is the only writer, and it writes `scouting_brief` only.
+- **Three gates on merge.** (a) Schema/enum/date/URL-shape validation, rejecting rather than
+  writing, plus the §2.7 beat-first warning and an em-dash check. (b) **Group coherence**: two
+  players in the same team and position both returning `locked` is a contradiction, so the merge
+  refuses to write and names the group (`--force` to override deliberately). (c) The existing
+  `validate-scouting.mjs` network pass then fetches every new URL, which makes a fabricated link
+  fail mechanically. That backstop is why the research agents can run on a cheaper model.
+- **Run it once, late.** Running early re-derives what the drip would have done free. The
+  information that moves a brief lands in the preseason-week-3 and roster-cuts window, so the slot
+  is the two days before the draft; `draft-day-check` covers draft-morning breaking news.
+
 ---
 
 ## 3. Data-schema deltas (concrete)
