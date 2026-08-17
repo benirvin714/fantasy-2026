@@ -438,6 +438,49 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
 .roster-byes { font-family: var(--font-data); font-size: 10.5px; color: var(--dim); margin-top: 5px; }
 .roster-note { color: var(--faint); font-size: 11px; line-height: 1.45; margin-top: 4px; }
 
+/* ---------- offensive environment (rail, beneath Targets) ----------
+   32 rows in a 292px rail, so it ships collapsed and scrolls internally when opened. It shares
+   .roster-head with the Roster block: both are fold-away context under the shortlist, and giving
+   them the same affordance means one less thing to learn on draft day. */
+.teamenv { margin: 0 12px 10px; flex: 0 0 auto; }
+.teamenv-body { margin-top: 2px; }
+.tenv-grid {
+  border: 1px solid var(--border); border-radius: var(--radius);
+  background: rgba(255,255,255,.015); overflow: hidden auto; max-height: 34vh;
+}
+.tenv-row {
+  /* slack sits on the team column so the three numerics stay tight together on the right,
+     splitting the row into "who" and "how good" rather than stranding ppg mid-row */
+  display: grid; grid-template-columns: 22px 1fr 42px 32px 38px;
+  align-items: baseline; gap: 5px; padding: 2px 8px;
+  font-family: var(--font-data); font-size: 11px;
+}
+.tenv-row + .tenv-row { border-top: 1px solid rgba(34,48,31,.5); }
+.tenv-hd {
+  position: sticky; top: 0; z-index: 1;
+  background: var(--surface-2); border-bottom: 1px solid var(--border);
+  font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em;
+  color: var(--faint);
+}
+.tenv-rk { color: var(--faint); text-align: right; }
+.tenv-tm { color: var(--text); font-weight: 600; }
+.tenv-ppg { color: var(--dim); text-align: right; }
+.tenv-core, .tenv-pass { color: var(--faint); text-align: right; }
+.tenv-hd .tenv-rk, .tenv-hd .tenv-tm, .tenv-hd .tenv-ppg,
+.tenv-hd .tenv-core, .tenv-hd .tenv-pass { color: var(--faint); font-weight: 700; }
+/* the two signals disagreeing by 6+ spots is the read worth surfacing, so it gets the colour
+   rather than the raw rank: green = core outranks the offense, amber = the reverse */
+.tenv-rich .tenv-core { color: var(--accent); font-weight: 600; }
+.tenv-lean .tenv-core { color: var(--warn); font-weight: 600; }
+.tenv-note {
+  font-size: 10px; line-height: 1.45; color: var(--faint); margin-top: 5px;
+  font-family: var(--font-body);
+}
+.tenv-stale {
+  font-family: var(--font-data); font-size: 9px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: .06em; color: var(--warn);
+}
+
 /* value knobs — scarcity/replacement basis (the only knob; a ceiling tilt was never built) */
 .knobs { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
 .knob {

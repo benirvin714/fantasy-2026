@@ -519,6 +519,56 @@ reports `Cleared rookies filter to show him.`; searching a rookie leaves it alon
 Files: `ROOK` / `posMatch()` / `rookBadge()` / `rookieNote()` in `site/draft.js`; `.rbadge-rook` /
 `.rooknote` in `site/style.css`; the `data-pos="ROOK"` button in `site/draft.html`.
 
+### 1.19 Offensive environment - the team layer under Targets - 2026-08-17
+
+All 32 offenses ranked by **projected points scored**, rendered as a collapsible block beneath the
+target rail. Columns: rank, team, **ppg**, **core rank**, **pass share**. Built by
+`scripts/build-team-environment.mjs` into `data/site/team-environment.json`.
+
+**Three signals, deliberately not blended.** A single composite would hide the disagreement, and the
+disagreement is the whole reason the layer is worth rendering:
+
+1. **Points** - Mike Clay's ESPN draft-kit projection guide. Each team page carries a week-by-week
+   score projection whose footer is `Total <for> <against> <winprob>%`; the build fetches the PDF,
+   inflates its Flate streams, and reads that row. Parsing a third-party PDF is fragile by nature,
+   so the parse is **gated on 32 teams and a plausible point range (150-700)** and any failure falls
+   back to a committed snapshot (`data/raw/clay-team-projections.json`, refreshed on every good live
+   parse) with `sources.points.mode: "snapshot"` surfaced in the UI. It degrades to yesterday's
+   numbers, never to nulls, and says which it used.
+2. **Vegas** - season win total, hand-entered with source and date. Slow-moving, so a stale value
+   should be visible rather than silently refreshed.
+3. **Core** - Sleeper 2026 projections re-scored to HBGBs settings and summed over a **fixed starter
+   shape** (QB1 + RB1-2 + WR1-3 + TE1). The fixed shape is the point: summing every projected player
+   rewards a team merely for having more draftable bodies, which measures committee depth rather than
+   offensive quality.
+
+**Why the full player universe and not the board pool.** The first cut aggregated
+`data/site/draft-board.json`, which caps at the top ~200 by Sleeper search rank. Five teams then
+reported **QB 0** (ARI, CLE, ATL, NYJ, PIT) purely because their starter fell outside the draftable
+cutoff, which reads as "no quarterback" rather than "not worth drafting". The build hits
+`/v1/players/nfl` + `/v1/projections/nfl/regular/2026` directly instead.
+
+**The gap column is the read.** `gap = core_rank − rank`. Six or more spots either way gets colored:
+green where the fantasy core outranks the offense (the projections credit its skill players more than
+the team's total scoring supports - currently CHI, NE, JAX), amber where the offense outscores its
+core (those points are landing outside your six starting skill slots - LAR, BUF, BAL, SEA, PHI, NYJ).
+
+**Pass share is the format translation.** The 4-pt passing TD splits a passing score 4/6 between QB
+and receiver while a rushing TD hands one back the full six, so with 2 FLEX and only 5 bench spots,
+**concentration matters more than team total**. CIN is the clean example: 5th in real points, 3rd in
+fantasy core, and the most pass-tilted offense in the league at 75%.
+
+**Explicitly not a value input.** Nothing here touches draft-$, edge, or the confidence band. It is a
+context check you glance at before spending a pick. Wiring team scoring into player value would
+double-count the offense, which is already inside every player's projection.
+
+Verified against the live PDF (32/32 parsed, ARI cross-checked against the raw page: 305 for, 465
+against, 3.5 wins, NFL rank 31), both fetch paths exercised, and rendered at 1280px and 375px with
+header/row columns aligned and no horizontal overflow at either width.
+
+Files: `scripts/build-team-environment.mjs`; `loadTeamEnv()` in `site/draft.js`; `.teamenv` / `.tenv-*`
+in `site/style.css`; the `#teamenv` block in `site/draft.html`; `TEAM_ENV_JSON` in `site/config.js`.
+
 ## 2. Challenge 2 — `scouting_brief` (public commentary)
 
 ### 2.1 What it is

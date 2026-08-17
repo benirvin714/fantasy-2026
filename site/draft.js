@@ -1665,8 +1665,80 @@
   });
   $("#draft-id").addEventListener("keydown", (e) => { if (e.key === "Enter") $("#lsync-btn").click(); });
 
+  /* ---------- offensive environment (context rail, loaded once) ----------------------
+     All 32 offenses by projected points scored, next to how much of that scoring this
+     league's starter shape actually collects (core = QB1 + RB1-2 + WR1-3 + TE1, re-scored
+     to HBGBs settings). The two columns disagreeing is the useful part: a team whose core
+     rank sits well above its scoring rank has projections crediting its skill players more
+     than the offense's total output supports, and the reverse means the points are landing
+     somewhere your six starting skill slots don't collect.
+
+     Static context, so it loads once and never repaints - nothing here depends on draft
+     state. Deliberately NOT an input to draft-$ or edge: it's a check you glance at before
+     spending a pick, not part of the valuation. */
+  async function loadTeamEnv() {
+    const body = $("#teamenv-body"), count = $("#teamenv-n");
+    if (!body) return;
+
+    let env;
+    try {
+      const r = await fetch(C.TEAM_ENV_JSON, { cache: "no-store" });
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      env = await r.json();
+    } catch (e) {
+      body.innerHTML = `<div class="roster-note">Offensive environment unavailable (${esc(e.message)}). ` +
+        `Run <span class="mono">node scripts/build-team-environment.mjs</span> and publish - ` +
+        `nothing is shown rather than invented data.</div>`;
+      return;
+    }
+
+    const teams = env.teams ?? [];
+    if (count) count.textContent = teams.length ? `${teams.length} · ppg` : "";
+
+    // A gap this wide is worth a second look before drafting off the projection alone.
+    const GAP_FLAG = 6;
+    const rows = teams.map((t) => {
+      const gap = t.gap;
+      const flag = gap == null ? "" : gap <= -GAP_FLAG ? " tenv-rich" : gap >= GAP_FLAG ? " tenv-lean" : "";
+      const pass = t.pass_share == null ? "–" : `${Math.round(t.pass_share * 100)}%`;
+      const title = [
+        `${t.team}: ${t.pf} projected points (${t.ppg}/gm), #${t.rank} of ${teams.length}.`,
+        t.core_rank == null ? null : `Fantasy core ranks #${t.core_rank} in HBGBs scoring.`,
+        gap == null || Math.abs(gap) < GAP_FLAG ? null
+          : gap <= -GAP_FLAG
+            ? `Core outranks the offense by ${Math.abs(gap)} spots - the projections like its skill players more than the team's scoring supports.`
+            : `The offense outscores its core by ${gap} spots - those points aren't landing in your starting slots.`,
+        t.pass_share == null ? null : `${pass} of scrimmage yards through the air.`,
+        t.vegas_win_total == null ? null : `Vegas win total ${t.vegas_win_total}.`,
+        t.qb1 == null ? null : `Projected QB1: ${t.qb1}.`,
+      ].filter(Boolean).join(" ");
+
+      return `<div class="tenv-row${flag}" title="${esc(title)}">` +
+        `<span class="tenv-rk">${t.rank}</span>` +
+        `<span class="tenv-tm">${esc(t.team)}</span>` +
+        `<span class="tenv-ppg">${t.ppg}</span>` +
+        `<span class="tenv-core">${t.core_rank ?? "–"}</span>` +
+        `<span class="tenv-pass">${pass}</span></div>`;
+    }).join("");
+
+    const src = env.sources?.points;
+    const stale = src?.mode === "snapshot" ? ' <span class="tenv-stale">snapshot</span>' : "";
+    body.innerHTML =
+      `<div class="tenv-grid">` +
+        `<div class="tenv-row tenv-hd">` +
+          `<span class="tenv-rk">#</span><span class="tenv-tm">tm</span>` +
+          `<span class="tenv-ppg" title="Projected points scored per game">ppg</span>` +
+          `<span class="tenv-core" title="Rank of this offense's fantasy starter core in HBGBs scoring">core</span>` +
+          `<span class="tenv-pass" title="Share of projected scrimmage yards gained through the air. The 4-pt passing TD splits a passing score between QB and receiver; a rushing score hands one back the full six.">pass</span>` +
+        `</div>${rows}</div>` +
+      `<div class="tenv-note">Points: ${esc(src?.label ?? "unknown")}, ${esc(src?.as_of ?? "undated")}${stale}. ` +
+      `Core re-scored locally. Context only - not an input to draft-$ or edge.</div>`;
+  }
+
   /* ---------- boot ---------- */
   (async () => {
+    loadTeamEnv(); // independent of the board: renders (or reports) even if draft-board.json fails
+
     try {
       const r = await fetch(C.DRAFT_BOARD_JSON, { cache: "no-store" });
       if (!r.ok) throw new Error(`HTTP ${r.status}`);

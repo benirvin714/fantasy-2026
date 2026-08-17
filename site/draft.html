@@ -114,6 +114,10 @@
           <div id="roster-body"></div>
         </details>
         <div class="panel-body tgt-body" id="targets-body"></div>
+        <details class="teamenv" id="teamenv">
+          <summary class="roster-head">Offenses <span class="roster-n" id="teamenv-n"></span></summary>
+          <div class="teamenv-body" id="teamenv-body"></div>
+        </details>
       </aside>
     </div>
   </main>
@@ -121,6 +125,8 @@
   <footer>
     Data: <span class="mono">data/site/draft-board.json</span> (Sleeper projections re-scored to HBGBs scoring;
     availability from 3-yr games + age + status). Fields without data say so — nothing is fabricated.
+    The Offenses block reads <span class="mono">data/site/team-environment.json</span> and is context only:
+    team scoring is already inside every player's projection, so it never moves a value or an edge.
     Your manual marks and target list persist in this browser only (localStorage) and survive reloads.
     Connect a draft ID and picks come from Sleeper instead — "picks away" then counts from the real
     feed, and Sleeper's picks are never stored locally. Unconnected, it counts your own marks, so
@@ -128,7 +134,7 @@
     not that you were the one who took him.
   </footer>
 
-  <script src="config.js?v=6"></script>
-  <script src="draft.js?v=65"></script>
+  <script src="config.js?v=7"></script>
+  <script src="draft.js?v=66"></script>
 </body>
 </html>
