@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap">
-  <link rel="stylesheet" href="style.css?v=40">
+  <link rel="stylesheet" href="style.css?v=43">
 </head>
 <body>
   <header>
@@ -114,10 +114,18 @@
           <div id="roster-body"></div>
         </details>
         <div class="panel-body tgt-body" id="targets-body"></div>
-        <details class="teamenv" id="teamenv">
-          <summary class="roster-head">Offenses <span class="roster-n" id="teamenv-n"></span></summary>
-          <div class="teamenv-body" id="teamenv-body"></div>
-        </details>
+      </aside>
+
+      <!-- Offensive environment. A rail of its own on the left of the board, not a fold inside the
+           target list: it's the check you make BEFORE spending a pick, so it stays open and on
+           screen the whole time rather than being something you remember to expand. Ordered LAST in
+           the DOM on purpose - source order is the narrow-viewport reading order (targets, board,
+           offenses), and CSS `order` moves it to column 1 only once there's room for three. -->
+      <aside class="panel teamenv" id="teamenv" aria-label="Offensive environment">
+        <div class="panel-head">
+          <h2>Offenses <span class="tgt-count" id="teamenv-n"></span></h2>
+        </div>
+        <div class="teamenv-body" id="teamenv-body"></div>
       </aside>
     </div>
   </main>

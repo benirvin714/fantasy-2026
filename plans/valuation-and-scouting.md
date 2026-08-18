@@ -519,11 +519,29 @@ reports `Cleared rookies filter to show him.`; searching a rookie leaves it alon
 Files: `ROOK` / `posMatch()` / `rookBadge()` / `rookieNote()` in `site/draft.js`; `.rbadge-rook` /
 `.rooknote` in `site/style.css`; the `data-pos="ROOK"` button in `site/draft.html`.
 
-### 1.19 Offensive environment - the team layer under Targets - 2026-08-17
+### 1.19 Offensive environment - the team layer beside the board - 2026-08-17
 
-All 32 offenses ranked by **projected points scored**, rendered as a collapsible block beneath the
-target rail. Columns: rank, team, **ppg**, **core rank**, **pass share**. Built by
+All 32 offenses ranked by **projected points scored**, rendered as a **left-hand rail** beside the
+board. Columns: rank, team, **ppg**, **core rank**, **pass share**. Built by
 `scripts/build-team-environment.mjs` into `data/site/team-environment.json`.
+
+**Placement.** It first shipped as a `<details>` folded under the target list and that was
+backwards: the check you make *before* spending a pick was the one thing on the page you had to
+remember to open. It is now a peer `<aside class="panel">` with no toggle, in the first column of a
+three-column grid (offenses | board | targets), sticky under the toolbar and scrolling internally
+exactly as the target rail does.
+
+The breakpoint is measured, not chosen. Counting board rows whose `.dmain` children fall onto a
+second line: at a 837px board 229 of 248 rows wrapped and grew from 45px to 71px; at 937px, 21
+wrapped; at 997px, one did (Jeremiyah Love, the only row carrying four badges). Two decisions pull
+the required viewport from 1600 down to **1540**: the offenses rail is 216px rather than the target
+rail's 292 (five short columns, nothing wraps), and inside the three-column band the board's metric
+columns drop to the widest string each actually renders - measured with `min-width` forced to 0 -
+reclaiming 58px of padding while keeping the alignment those minimums exist to hold. Below 1540 the
+rail stacks under the board at rail width rather than squeezing it; a board showing 40% fewer
+players is the worse trade. Verified at 1920 (0 wrapped, rail still on screen after a 6000px
+scroll), 1540 (1 wrapped), 1440 (stacks, 0 wrapped) and 375px (no horizontal overflow, no cell
+clipped).
 
 **Three signals, deliberately not blended.** A single composite would hide the disagreement, and the
 disagreement is the whole reason the layer is worth rendering:
@@ -567,7 +585,8 @@ against, 3.5 wins, NFL rank 31), both fetch paths exercised, and rendered at 128
 header/row columns aligned and no horizontal overflow at either width.
 
 Files: `scripts/build-team-environment.mjs`; `loadTeamEnv()` in `site/draft.js`; `.teamenv` / `.tenv-*`
-in `site/style.css`; the `#teamenv` block in `site/draft.html`; `TEAM_ENV_JSON` in `site/config.js`.
+and the `@media (min-width: 1540px)` blocks in `site/style.css`; the `#teamenv` aside in
+`site/draft.html`; `TEAM_ENV_JSON` in `site/config.js`.
 
 ## 2. Challenge 2 — `scouting_brief` (public commentary)
 

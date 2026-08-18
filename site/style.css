@@ -301,7 +301,9 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
 /* ---------- Draft Day page ---------- */
 /* 1440 rather than the old 1100 because the target rail now sits beside the board; the board
    column itself still lands at ~1090px, so row density is unchanged. */
-.draft-main { display: block; max-width: 1440px; margin: 0 auto; padding: 16px 24px 40px; }
+/* wider than the rest of the site: this page carries two rails plus a 13-cell board, and at the
+   old 1440 cap the three-column layout could never have more than the bare minimum board. */
+.draft-main { display: block; max-width: 1800px; margin: 0 auto; padding: 16px 24px 40px; }
 .draft-toolbar {
   display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
   padding: 0 0 14px;
@@ -438,28 +440,33 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
 .roster-byes { font-family: var(--font-data); font-size: 10.5px; color: var(--dim); margin-top: 5px; }
 .roster-note { color: var(--faint); font-size: 11px; line-height: 1.45; margin-top: 4px; }
 
-/* ---------- offensive environment (rail, beneath Targets) ----------
-   32 rows in a 292px rail, so it ships collapsed and scrolls internally when opened. It shares
-   .roster-head with the Roster block: both are fold-away context under the shortlist, and giving
-   them the same affordance means one less thing to learn on draft day. */
-.teamenv { margin: 0 12px 10px; flex: 0 0 auto; }
-.teamenv-body { margin-top: 2px; }
+/* ---------- offensive environment (its own rail, left of the board) ----------
+   It used to be a <details> folded under the target list, which meant the one piece of pre-pick
+   context on the page was the one thing you had to remember to open. Now it's a peer panel with no
+   toggle at all: always expanded, sticky beside the board on wide viewports, scrolling internally
+   like the target rail. 216px rather than the rail's 292 because the grid is five short columns and
+   nothing in it wraps - the 76px saved is what lets the board keep all 13 of its cells on one line
+   at the three-column breakpoint (measured: the board needs ~840px before rows start wrapping). */
+.teamenv-body { min-height: 0; display: flex; flex-direction: column; padding: 8px 10px 10px; }
 .tenv-grid {
   border: 1px solid var(--border); border-radius: var(--radius);
   background: rgba(255,255,255,.015); overflow: hidden auto; max-height: 34vh;
 }
 .tenv-row {
   /* slack sits on the team column so the three numerics stay tight together on the right,
-     splitting the row into "who" and "how good" rather than stranding ppg mid-row */
-  display: grid; grid-template-columns: 22px 1fr 42px 32px 38px;
-  align-items: baseline; gap: 5px; padding: 2px 8px;
+     splitting the row into "who" and "how good" rather than stranding ppg mid-row. The fixed
+     columns are cut to what their widest string actually needs ("27.4", "32", "58%", and the
+     4-char uppercase headers) because the whole rail is 216px - every px handed to a numeric
+     column comes straight out of the team abbreviation. */
+  display: grid; grid-template-columns: 20px 1fr 34px 28px 30px;
+  align-items: baseline; gap: 4px; padding: 2px 7px;
   font-family: var(--font-data); font-size: 11px;
 }
 .tenv-row + .tenv-row { border-top: 1px solid rgba(34,48,31,.5); }
 .tenv-hd {
   position: sticky; top: 0; z-index: 1;
   background: var(--surface-2); border-bottom: 1px solid var(--border);
-  font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em;
+  font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .03em;
   color: var(--faint);
 }
 .tenv-rk { color: var(--faint); text-align: right; }
@@ -505,6 +512,9 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
    act on, and below a 250-row board nobody would ever scroll to it. */
 .draft-cols { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); }
 .draft-cols .targets { order: -1; }
+/* Stacked, the offenses panel is a reference table, not something you act on, so it goes last and
+   keeps a rail's width instead of stretching five numeric columns across the whole viewport. */
+.draft-cols .teamenv { order: 1; max-width: 340px; }
 @media (min-width: 1040px) {
   .draft-cols { grid-template-columns: minmax(0, 1fr) 292px; align-items: start; }
   /* on the wide layout the rail parks under the sticky toolbar and scrolls internally, so your
@@ -517,7 +527,7 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
     display: flex; flex-direction: column;
   }
 }
-.panel.targets .panel-head { padding: 10px 12px; }
+.panel.targets .panel-head, .panel.teamenv .panel-head { padding: 10px 12px; }
 .tgt-head { justify-content: space-between; }
 .tgt-count {
   font-family: var(--font-data); font-size: 11px; font-weight: 600;
@@ -577,6 +587,30 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
   .targets:has(#prep:not([hidden])) .roster-grid { max-height: 26vh; overflow-y: auto; }
   /* last-resort valve: if the sections still can't fit, the rail scrolls rather than clipping */
   .draft-cols .targets { overflow-y: auto; }
+}
+/* Three columns: offenses | board | targets. The gate is measured, not taste. Counting rows whose
+   .dmain children fall onto a second line, at 1440 (837px board) 229 of 248 rows wrapped and every
+   one grew from 45px to 71px; at 1540 (937px) 21 wrapped; at 1600 (997px) one did. A board that
+   shows 40% fewer players is a worse trade than a rail that stacks, so three columns only engage
+   once the board clears ~940px.
+   Two things bring that 1600 down to 1540. The offenses rail is 216px, not the target rail's 292,
+   because its five columns are short and none of them wrap. And inside this band the board's metric
+   columns drop to the widest string each actually renders (measured with min-width forced to 0:
+   "BC-adp" 47, "100.3" 39, "$0.98" 39, "-101p" 39, "vs BC" 35, "33%" 31, "bye" 22) - 58px of pure
+   padding, reclaimed without losing the column alignment those min-widths exist to hold. BC keeps
+   52 because its widest cell ("100 T14") already runs past it. Those trims can't live in this block:
+   the base `.drow .dadp` rules sit further down the file at the same specificity and would win on
+   source order, so they're in a second 1540 query next to the rules they override. */
+@media (min-width: 1540px) {
+  .draft-cols { grid-template-columns: 216px minmax(0, 1fr) 292px; }
+  .draft-cols .teamenv {
+    order: -1; max-width: none;
+    position: sticky; top: calc(var(--toolbar-h, 0px) + 8px);
+    max-height: calc(100vh - var(--toolbar-h, 0px) - 28px);
+    display: flex; flex-direction: column; overflow-y: auto;
+  }
+  /* fill the rail the same way the target list fills its own: grow into the space, scroll inside it */
+  .draft-cols .teamenv .tenv-grid { max-height: none; flex: 1 1 auto; min-height: 140px; }
 }
 .tgt-empty { padding: 10px 6px; font-size: 12px; color: var(--faint); line-height: 1.5; }
 .tgt-mark { color: var(--warn); }
@@ -757,6 +791,17 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
 .drow .dbye { font-size: 13px; min-width: 34px; text-align: right; color: var(--faint); }
 .dhead .dbc { font-weight: 600; }
 .dhead .dbc, .dhead .dbcdiff, .dhead .dadp, .dhead .dval, .dhead .dgap, .dhead .dbcgap, .dhead .dceil, .dhead .dbye { font-size: 11px; }
+/* Board columns tighten in the three-column band - see the .draft-cols 1540 query above for the
+   measurements. Same specificity as the rules right above, so this has to come after them. */
+@media (min-width: 1540px) {
+  .drow .dbcdiff { min-width: 47px; }
+  .drow .dadp    { min-width: 39px; }
+  .drow .dval    { min-width: 39px; }
+  .drow .dgap    { min-width: 39px; }
+  .drow .dbcgap  { min-width: 35px; }
+  .drow .dceil   { min-width: 31px; }
+  .drow .dbye    { min-width: 22px; }
+}
 .ceil-boom { color: var(--accent); }
 .ceil-steady { color: var(--faint); }
 .gap-value { color: var(--accent); }
