@@ -1,8 +1,19 @@
 {
   "note": "Players whose scouting_brief has been overtaken by evidence (news, ADP drift, calendar backstop) or, pre-draft, rests on thin analyst-only sourcing (thin_source). Written by validate-scouting.mjs; an entry clears when the brief's as_of advances past trigger_date. Persistent so a news trigger survives the events feed's 14-day age-out.",
-  "updated": "2026-08-23",
-  "open": 1,
+  "updated": "2026-08-24",
+  "open": 2,
   "entries": [
+    {
+      "id": "8154",
+      "name": "Brian Robinson",
+      "pos": "RB",
+      "adp": 169.9,
+      "rank": 150,
+      "reason": "adp_drift",
+      "trigger_date": "2026-08-24",
+      "detail": "ADP 136.9 -> 169.9 (+33) since 2026-08-11; threshold 27.4",
+      "first_seen": "2026-08-24"
+    },
     {
       "id": "12540",
       "name": "Chimere Dike",
@@ -10,7 +21,7 @@
       "adp": 657.8,
       "rank": 197,
       "reason": "adp_drift",
-      "trigger_date": "2026-08-23",
+      "trigger_date": "2026-08-24",
       "detail": "ADP 215 -> 657.8 (+442.8) since 2026-08-09; threshold 43.0",
       "first_seen": "2026-08-13"
     }
