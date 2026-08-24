@@ -239,7 +239,13 @@ tr.cutrow td { border: none; padding: 3px 8px 5px; }
 .wtarget {
   padding: 11px 0;
   border-bottom: 1px solid var(--border);
-  display: grid; gap: 4px;
+  /* `minmax(0, 1fr)` rather than the implicit column, and it is load-bearing. An implicit grid
+     column is `auto`, whose MINIMUM is min-content — so a single unbreakable child sets the width
+     of every row in the card. That is exactly what went wrong here: `.bid` kept `white-space:
+     nowrap` from when it held "$5", /waivers started writing a full sentence into it, and its
+     1285px min-content stretched .why/.wasset/.impact/.sub to match and put the whole page into
+     horizontal scroll. Capping the track at the container means no child can widen it again. */
+  display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px;
 }
 .wtarget:last-child { border-bottom: none; }
 .wtarget .row1 { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
@@ -252,9 +258,21 @@ tr.cutrow td { border: none; padding: 3px 8px 5px; }
   font-family: var(--font-data); font-size: 11px; color: var(--moss);
   border: 1px solid var(--border); border-radius: var(--radius); padding: 1px 6px;
 }
+/* A short bid ("$5", "Pass.") keeps the original right-aligned price chip on the name row, which is
+   the shape this was designed for and still the right one when the field holds a price. */
 .wtarget .bid {
   margin-left: auto; font-family: var(--font-data); font-size: 13px; color: var(--accent);
   white-space: nowrap;
+}
+/* A bid that is a sentence gets its own line and wraps like the prose it is. Right-aligning 167
+   characters into whatever gap is left on the name row was never going to read, and forcing it to
+   nowrap is what broke the card. */
+.wtarget .bid-long {
+  font-family: var(--font-data); font-size: 12.5px; line-height: 1.5;
+  color: var(--accent); min-width: 0; overflow-wrap: anywhere;
+}
+.wtarget .bid-long b {
+  font-family: var(--font-body); font-weight: 500; color: var(--dim);
 }
 .wtarget .why { font-size: 13px; color: var(--dim); }
 .wtarget .impact { font-size: 13px; color: var(--accent); }

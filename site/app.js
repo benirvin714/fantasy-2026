@@ -124,6 +124,11 @@
     const age = (Date.now() - new Date(d.generated).getTime()) / 864e5;
     const stale = age > 7 ? `<div class="stale-warn">This board is ${Math.floor(age)} days old — re-run /waivers for current suggestions.</div>` : "";
     const confDots = { high: "●●●", med: "●●○", low: "●○○" };
+    /* `bid` started life as a price ("$5") and /waivers now writes either that or a full
+       recommendation sentence into it. Only the price shape belongs in the right-aligned chip on
+       the name row; a sentence gets its own line below. 24 characters clears the longest real price
+       string ("$18 (frenzy price)") without letting prose through. */
+    const isChipBid = (b) => b != null && String(b).trim().length > 0 && String(b).length <= 24;
     const edgeCls = (e) => e === "value" ? "edge-value" : e === "overpay" ? "edge-over" : "edge-fair";
     $("#waivers-body").innerHTML = stale + d.targets.map((t) => `
       <div class="wtarget">
@@ -133,8 +138,9 @@
           <span class="pos">${esc(t.pos)} · ${esc(t.team)}</span>
           ${t.verdict ? `<span class="verdict verdict-${esc(t.verdict)}">${esc(t.verdict)}</span>` : ""}
           ${t.confidence ? `<span class="wconf conf-${esc(t.confidence)}" title="rec-confidence: ${esc(t.confidence)}${t.confidence_why ? " — " + esc(t.confidence_why) : ""}">${confDots[t.confidence] ?? ""}</span>` : ""}
-          <span class="bid">${esc(t.bid)}</span>
+          ${isChipBid(t.bid) ? `<span class="bid">${esc(t.bid)}</span>` : ""}
         </div>
+        ${t.bid && !isChipBid(t.bid) ? `<div class="bid-long"><b>bid:</b> ${esc(t.bid)}</div>` : ""}
         <div class="why">${esc(t.why)}</div>
         ${t.asset ? `<div class="wasset"><b>asset:</b> ${esc(t.asset)}${t.rate_basis ? ` <span class="faint">(${esc(t.rate_basis)})</span>` : ""}${t.edge ? ` · <b class="${edgeCls(t.edge)}">${esc(t.edge)}</b>` : ""}${t.worth ? ` · worth <b>${esc(t.worth)}</b>` : ""}</div>` : ""}
         ${t.my_team_impact ? `<div class="impact">↳ ${esc(t.my_team_impact)}</div>` : ""}
