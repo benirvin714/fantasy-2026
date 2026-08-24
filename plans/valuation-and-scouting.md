@@ -588,6 +588,95 @@ Files: `scripts/build-team-environment.mjs`; `loadTeamEnv()` in `site/draft.js`;
 and the `@media (min-width: 1540px)` blocks in `site/style.css`; the `#teamenv` aside in
 `site/draft.html`; `TEAM_ENV_JSON` in `site/config.js`.
 
+### 1.20 Roster room - the other nine teams, after the draft - 2026-08-23
+
+The third page (`site/rosters.html`), between in-season HQ and draft day, and the first one that is
+about **rosters other than mine**. The draft board answers "who should I take"; this answers "what
+do these ten teams now look like, and what can move between them". It is a post-draft tool by
+construction: the build exits non-zero unless all ten rosters have players, because ten empty
+rosters would render ten identical "0 points, weak everywhere" cards, and a card that says nothing
+still reads like analysis.
+
+**Strength is a recomputed lineup, not a ranking.** Every rostered player is priced with the same
+league-scored projection the board runs on (Sleeper's 2026 stat line through this league's exact
+`scoring_settings`), then each team gets its optimal `QB/RB/RB/WR/WR/TE/FLEX/FLEX/K/DEF`. Greedy is
+provably optimal here because slot eligibility **nests**: any legal lineup must carry two RBs, so
+taking the best two can never lose, and the two FLEX then take the best of everything remaining.
+That is not a convenience - it is the property that makes every marginal-gain number below a
+comparison of true optima rather than of two greedy approximations.
+
+**Weakness is measured per slot, not per position.** "Your RB2 is 9th of 10 at that slot" is a
+thing you can act on; "7th in RB points" is not. Both are computed and both are shown, but the slot
+table is what the roster column renders. **K and DEF are reported and never graded** - they are
+streaming positions in this format, and letting a K rank read as a strength would be the single
+easiest way to make the page lie.
+
+**The surplus definition is what generates trades.** A bench player's `starts on N/9` is measured by
+actually inserting him into each of the other nine rosters and recomputing that team's optimum. In a
+league with **five bench spots and two FLEX**, a player who improves someone else's lineup while
+sitting on yours is the definition of a tradeable asset, and this is the direct measurement of it
+rather than a proxy.
+
+**Proposals ship only where both optimal lineups rise.** Exhaustive over 1-for-1 and 2-for-1 from my
+roster against each other team (~1,600 candidate packages per partner, each costing two lineup
+recomputations). Thresholds: +5 season points to each side for a 1-for-1; +8 to me and +5 to them
+for a 2-for-1, which additionally requires that **they take on more raw projected points than they
+give** - quantity for quality, which is the league doctrine (`league-profile.md`) made literal,
+because with two FLEX and five bench spots the freed slot is real. Deduped on the player coming back,
+capped at four, because ten variants of "get McBride" is a wall rather than a set of options.
+One-sided wins are never shown; they are the fastest way to make a trade page worthless.
+
+**The complementarity read is where the first attempt was wrong, and the fix is the interesting
+part.** Most post-draft roster pairs have no deal that clears a two-sided bar, and "no proposals" is
+the least useful thing this page could print - so each partner also gets the raw material. The
+obvious measure is what a player would add to the other lineup, and it is useless: it just ranks him
+by how good he is. Jonathan Taylor "fits" all nine teams. The signal is the **difference** -
+`net = what he adds over there - what he costs over here` - positive only where he is worth more on
+their roster than mine. That is the entire basis of a trade, and it is why these two lists are
+exactly the candidate pool the 1-for-1 search draws from: a deal needs a positive-net player going
+each way.
+
+A second-order result fell out of that and is now surfaced rather than hidden. **Net collapses to a
+constant** for every player who slots into the same hole, because both legs are measured against the
+same replacement level - the gap is a property of the two rosters, not of the player. Five names at
+an identical `+14.0` is not a bug, it is the answer, so the list sorts by net and then by **cost to
+the side giving him up, cheapest first**, and the note says it out loud: *"they all fill the same
+slot over there, so the one to actually send is the cheapest, Bhayshul Tuten."*
+
+**Owner tendencies are parsed, not copied.** `league-tendencies.md` stays the one home for the
+six-season dossiers; the build reads the `### <owner> (roster N)` headings and the `- **Field:**`
+bullets straight out of it, and **fails the build** rather than shipping nine owners out of ten if
+that shape ever changes. Trade counts are independently recomputed from
+`data/raw/transactions-2020..2025.json` (22 completed trades, reproducing the dossier numbers
+exactly) and drive a five-band **appetite** chip - `hub / active / reachable / cold / dead` - so the
+page never offers a careful deal to an owner who has made zero trades in six seasons.
+
+**Confirmation that the machinery works.** The trade search independently rediscovered a dossier
+trait it never reads as an input: bwalsh89 is the league's only habitual backup-QB drafter, and the
+top proposal against him is my RB surplus (Bhayshul Tuten, costs me nothing) for his second QB
+(Trevor Lawrence, costs him nothing) - a free roll on both sides, found from projections and lineup
+arithmetic alone, then corroborated by six seasons of draft history sitting in the next panel.
+
+**Verified** by DOM measurement (screenshots do not composite in this environment): 150/150 rostered
+players priced - the two outside the board's top-200 pool, Tank Dell and Jordan James, fetched and
+re-scored the same way rather than dropped; 10 league rows, 16 roster rows, 6 position bars, method
+list rendering all 9 basis fields; both empty paths exercised (StoneBone69 - no proposal and no
+surplus mismatch in either direction; Sladsous - `dead` appetite); dossier markdown rendering bold
+with no raw `**` and no double-escaped entities; sticky roster column holding at `top: 12px` through
+a 900px scroll at 1600px; and no horizontal overflow at 1600, 1280 or 375. The league table was the
+one thing that genuinely did not fit a phone - measured at **397px inside a 351px container** - so
+under 900px it drops the strength/hole columns, halves cell padding and trims the appetite chip to
+its band word, landing at **323px**.
+
+**Deliberately not built.** No Claude-written narrative layer. The summary paragraph is assembled
+from numbers this script computed, clause by clause, and says "nothing sits in the bottom three,
+which is its own problem" when that is the case rather than reaching for colour. A prose layer
+would be the natural Phase 2 (same shape as the on-deck panel's, §1.16) and it is not here.
+
+Files: `scripts/build-roster-room.mjs` -> `data/site/roster-room.json`; `site/rosters.html`;
+`site/rosters.js`; the `.rr-*` block at the tail of `site/style.css`; `ROSTER_ROOM_JSON` in
+`site/config.js`; the third nav chip in all three pages.
+
 ## 2. Challenge 2 — `scouting_brief` (public commentary)
 
 ### 2.1 What it is

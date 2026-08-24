@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HBGBs Roster Room</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230b0f0c'/%3E%3Crect x='6' y='6' width='20' height='20' fill='%2363bf5a'/%3E%3Crect x='12' y='12' width='8' height='8' fill='%230b0f0c'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap">
+  <link rel="stylesheet" href="style.css?v=44">
+</head>
+<body>
+  <header>
+    <h1>THE HBGBS <span class="hq">/ ROSTER ROOM</span></h1>
+    <nav class="chips" aria-label="Pages">
+      <a class="chip navlink" href="index.html">in-season HQ</a>
+      <span class="chip navlink active" aria-current="page">roster room</span>
+      <a class="chip navlink" href="draft.html">draft day</a>
+    </nav>
+    <div class="spacer"></div>
+    <span class="chip" id="rr-meta">loading…</span>
+    <span class="readonly-note">read-only · every number is a recomputed lineup, never a Sleeper write</span>
+  </header>
+
+  <main class="rr-main">
+    <div class="rr-err" id="rr-err" hidden></div>
+
+    <!-- The league at a glance. Sits above the team detail rather than beside it because the
+         comparison is the context for everything below: a weakness only means something against
+         the other nine. Click a row to open that team. -->
+    <section class="panel rr-league" aria-labelledby="rr-league-h">
+      <div class="panel-head">
+        <h2 id="rr-league-h">The league</h2>
+        <span class="meta" id="rr-league-meta"></span>
+      </div>
+      <div class="panel-body" id="rr-league-body"><div class="loading">Loading rosters…</div></div>
+    </section>
+
+    <div class="rr-cols">
+      <!-- Left: the roster itself, as the league's slot shape actually uses it. -->
+      <section class="panel rr-roster" aria-labelledby="rr-roster-h">
+        <div class="panel-head">
+          <h2 id="rr-roster-h">Roster</h2>
+          <span class="meta" id="rr-roster-meta"></span>
+        </div>
+        <div class="panel-body" id="rr-roster-body"><div class="loading">Select a team.</div></div>
+      </section>
+
+      <!-- Right: everything that is a read rather than a fact. -->
+      <div class="rr-analysis">
+        <section class="panel panel-featured" aria-labelledby="rr-sum-h">
+          <div class="panel-head"><h2 id="rr-sum-h">Summary</h2><span class="meta" id="rr-sum-meta"></span></div>
+          <div class="panel-body" id="rr-sum-body"><div class="loading">Select a team.</div></div>
+        </section>
+
+        <section class="panel" aria-labelledby="rr-shape-h">
+          <div class="panel-head"><h2 id="rr-shape-h">Strengths &amp; weaknesses</h2>
+            <span class="meta">starting points by position, vs the league median</span></div>
+          <div class="panel-body" id="rr-shape-body"></div>
+        </section>
+
+        <section class="panel" aria-labelledby="rr-risk-h">
+          <div class="panel-head"><h2 id="rr-risk-h">Risks</h2>
+            <span class="meta">what the season total can't show</span></div>
+          <div class="panel-body" id="rr-risk-body"></div>
+        </section>
+
+        <section class="panel" aria-labelledby="rr-tend-h">
+          <div class="panel-head"><h2 id="rr-tend-h">Owner tendencies</h2>
+            <span class="meta">six seasons · league-tendencies.md</span></div>
+          <div class="panel-body" id="rr-tend-body"></div>
+        </section>
+
+        <section class="panel" aria-labelledby="rr-trade-h">
+          <div class="panel-head"><h2 id="rr-trade-h">Trade</h2>
+            <span class="meta" id="rr-trade-meta"></span></div>
+          <div class="panel-body" id="rr-trade-body"></div>
+        </section>
+      </div>
+    </div>
+
+    <details class="rr-method">
+      <summary>How every number on this page is derived</summary>
+      <div id="rr-method-body"></div>
+    </details>
+  </main>
+
+  <footer>
+    Built by <code>scripts/build-roster-room.mjs</code> from the ten live Sleeper rosters, priced with the
+    same league-scored projections the draft board uses. Strength is a recomputed optimal lineup, not a
+    ranking; trade proposals ship only where <em>both</em> lineups rise. Owner tendencies come from
+    <code>league-tendencies.md</code> and six seasons of raw transactions. Nothing here is written by the
+    page — it renders published JSON and shows an explicit error when that JSON is missing.
+  </footer>
+
+  <script src="config.js?v=8"></script>
+  <script src="rosters.js?v=1"></script>
+</body>
+</html>

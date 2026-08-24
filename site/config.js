@@ -12,5 +12,6 @@ window.HQ_CONFIG = {
   BRIEF_JSON: "/data/site/latest-brief.json",
   EVENTS_JSON: "/data/site/nfl-events.json",
   DRAFT_BOARD_JSON: "/data/site/draft-board.json",
+  ROSTER_ROOM_JSON: "/data/site/roster-room.json",
   TEAM_ENV_JSON: "/data/site/team-environment.json",
 };
