@@ -9,9 +9,20 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap">
   <link rel="stylesheet" href="style.css?v=47">
-  <link rel="stylesheet" href="backdrop.css?v=1">
+  <link rel="stylesheet" href="backdrop.css?v=2">
+  <script>/* ?bg=none disables the backdrop for this visit - see backdrop.css */
+    if (new URLSearchParams(location.search).get("bg") === "none")
+      document.documentElement.setAttribute("data-backdrop", "none");</script>
 </head>
 <body>
+  <!-- Ambient backdrop. Static markup rather than injected by script: with one treatment there is
+       nothing to switch, so a JS file would be a request and a paint delay for no behaviour. It is
+       aria-hidden because it is pure decoration and has no business in the accessibility tree. -->
+  <div class="bd" aria-hidden="true">
+    <div class="bd-turf"></div>
+    <div class="bd-lights"></div>
+    <div class="bd-vignette"></div>
+  </div>
   <header>
     <h1>THE HBGBS <span class="hq">/ HQ</span></h1>
     <nav class="chips" aria-label="Pages">
@@ -88,6 +99,5 @@
 
   <script src="config.js?v=8"></script>
   <script src="app.js?v=8"></script>
-  <script src="backdrop.js?v=1"></script>
 </body>
 </html>
