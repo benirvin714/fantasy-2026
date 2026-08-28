@@ -518,10 +518,21 @@
     const tierStyle = tc
       ? ` style="${washOn() ? `--tier-wash:${tc.wash};--tier-hover:${tc.hover};` : ""}--tier-stripe:${tc.stripe};--tier-edge:${tc.edge}"`
       : "";
+    /* These two are glyph-only buttons, so their visible content ("✓", "☆", or nothing at all when a
+       player isn't drafted) gives a screen reader no name to read. `title` is only a last-resort
+       fallback in the accessible-name spec and support for it is inconsistent, so each carries an
+       explicit aria-label. The label names the PLAYER rather than just the action: 248 buttons all
+       announcing "Mark drafted" is a list you can't navigate, which is the actual failure mode here
+       rather than the missing name in the abstract. `title` stays as-is — it's the mouse tooltip and
+       it's already saying the right thing. */
+    const takeLabel = isLive
+      ? `${p.name}, drafted at pick ${livePickNo.get(p.id) ?? "unknown"} from the live feed`
+      : isTaken ? `Mark ${p.name} available` : `Mark ${p.name} drafted`;
+    const starLabel = isTgt ? `Remove ${p.name} from target list` : `Add ${p.name} to target list`;
     return `
     <div class="drow ${isTaken ? "taken" : ""}${tierStart ? " tier-start" : ""}" data-id="${p.id}"${tierStyle}>
-      <button class="take${isLive ? " take-live" : ""}" data-act="take" aria-pressed="${isTaken}" ${isLive ? 'aria-disabled="true" ' : ""}title="${isLive ? `Drafted at pick #${esc(livePickNo.get(p.id) ?? "?")} — from the live Sleeper feed, so this can't be un-marked here` : isTaken ? "Mark available" : "Mark drafted"}">${isTaken ? "✓" : ""}</button>
-      <button class="star${isTgt ? " on" : ""}" data-act="star" aria-pressed="${isTgt}" title="${isTgt ? "Remove from target list" : "Add to target list"}">${isTgt ? "★" : "☆"}</button>
+      <button class="take${isLive ? " take-live" : ""}" data-act="take" aria-pressed="${isTaken}" aria-label="${esc(takeLabel)}" ${isLive ? 'aria-disabled="true" ' : ""}title="${isLive ? `Drafted at pick #${esc(livePickNo.get(p.id) ?? "?")} — from the live Sleeper feed, so this can't be un-marked here` : isTaken ? "Mark available" : "Mark drafted"}">${isTaken ? "✓" : ""}</button>
+      <button class="star${isTgt ? " on" : ""}" data-act="star" aria-pressed="${isTgt}" aria-label="${esc(starLabel)}" title="${isTgt ? "Remove from target list" : "Add to target list"}">${isTgt ? "★" : "☆"}</button>
       <button class="dmain" data-act="expand" aria-expanded="${isOpen}">
         <span class="dr">${rankLabel}</span>
         <span class="dname ${nameCls}">${esc(p.name)}</span>
