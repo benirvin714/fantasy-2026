@@ -100,14 +100,16 @@
     // the only honest comparison is each position against the same position elsewhere.
     const rows = t.by_pos;
     const span = Math.max(60, ...rows.map((r) => Math.abs(r.vs_median)));
-    $("#rr-shape-body").innerHTML = `<div class="rr-shape">${rows.map((r) => {
+    // Bars sweep out once, on the first team you open. This panel re-renders on every click in the
+    // league table, and re-animating there would make flicking between teams feel like a slideshow.
+    $("#rr-shape-body").innerHTML = `<div class="rr-shape${shapePainted ? "" : " bars-in"}">${rows.map((r, i) => {
       const w = Math.min(50, (Math.abs(r.vs_median) / span) * 50);
       const streamed = r.pos === "K" || r.pos === "DEF";
       return `<div class="rr-srow${streamed ? " rr-stream" : ""}">
         <span class="rr-spos">${esc(r.pos)}</span>
         <span class="rr-sbar" aria-hidden="true">
           <span class="rr-smid"></span>
-          <span class="rr-sfill ${r.vs_median >= 0 ? "up" : "down"}" style="${r.vs_median >= 0 ? "left:50%" : `right:50%`};width:${w}%"></span>
+          <span class="rr-sfill ${r.vs_median >= 0 ? "up" : "down"}" style="--i:${i};${r.vs_median >= 0 ? "left:50%" : `right:50%`};width:${w}%"></span>
         </span>
         <span class="num rr-spts">${num(r.pts)}</span>
         <span class="num rr-svs ${signCls(r.vs_median)}">${sign(r.vs_median)}</span>
@@ -117,7 +119,9 @@
     }).join("")}</div>
     <p class="rr-note">K and DEF are shown but never graded — they're streaming positions in this format, and a
       rank at either says nothing about the roster.</p>`;
+    shapePainted = true;
   }
+  let shapePainted = false;
 
   function paintRisks(t) {
     const r = t.risks, out = [];

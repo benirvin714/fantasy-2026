@@ -677,6 +677,97 @@ Files: `scripts/build-roster-room.mjs` -> `data/site/roster-room.json`; `site/ro
 `site/rosters.js`; the `.rr-*` block at the tail of `site/style.css`; `ROSTER_ROOM_JSON` in
 `site/config.js`; the third nav chip in all three pages.
 
+### 1.21 Ambient backdrop, data-viz motion, and two design scales - 2026-08-28
+
+A visual pass across all three pages. Structure, IA and every number were frozen throughout; nothing
+here moves a box or changes a value.
+
+**The backdrop, and the constraint that shaped it.** Football read through the existing palette
+rather than photographed: mown turf stripes creeping sideways on a 90s loop, two offset floodlight
+blooms in warm white, and a crush that keeps the middle of the screen flat. Pure CSS, no asset, no
+decode cost, no extra request.
+
+The governing rule is that **panels stay fully opaque**, so no body text ever sits over any of it and
+WCAG AA holds by construction rather than by sampling frames. That makes the backdrop visible only in
+the page gutters, which turns out to self-regulate in a way worth recording: content caps at 1440px on
+in-season HQ, 1560 on the roster room and 1800 on draft day, so against a 1920 display the backdrop
+gets roughly **232px a side, then 172px, then 52px**. Widest where you browse, almost nothing where
+you work. Those max-widths were set for unrelated reasons and the behaviour falls out of them for
+free, so they were left alone.
+
+**The mistake worth keeping in the record.** The first version used a conventional vignette: dark at
+the edges, bright in the middle. That is backwards here. The middle is permanently hidden behind
+opaque panels and the gutters are the only part anyone ever sees, so it was hiding the treatment and
+decorating the one region nobody can look at. On screen it read as a faint smear in the top-left
+corner with the right and bottom crushed to black. Inverted: the centre column is crushed to flat
+ground, the gutters carry the turf and the light, and the stops are placed off the page's own
+geometry (the crush covers the middle ~68% and releases either side). Turf contrast went from
+.050/.012 to .115/.030 and the floodlights roughly doubled, because the treatment now has to read in
+a 170-230px strip rather than across a whole screen.
+
+This is also the clearest argument in the project so far for looking at a thing rather than measuring
+it. Every DOM check passed on the broken version - correct geometry, correct z-index, no overflow -
+because the defect was entirely a question of where the light was.
+
+**Escape hatch.** `?bg=none` on any page turns the backdrop off for that visit, via three inline
+lines rather than a script file. This is a tool used live during a draft, and "turn the decoration
+off without waiting for a deploy" is worth two lines.
+
+**Data-viz motion.** The standings PF bars and the roster room's diverging position bars sweep out
+from their baseline once, on first paint. Three constraints, all deliberate:
+
+- `transform: scaleX()`, never `width`. Bars keep their computed width so the final state is exact
+  and layout never moves. Animating width forces a layout on every frame of every bar.
+- **Once.** Both panels re-render on ordinary interaction - the standings on every refresh, the shape
+  panel on every team you click - and a bar that re-animates each time turns a comparison tool into a
+  slot machine. The renderers add a `bars-in` class the first time only, and `animation` rather than
+  `transition` means it cannot re-fire on a repaint.
+- **Staggered 28ms**, so ten bars read as one gesture rather than ten events. That is what keeps it
+  inside "animate one or two things per view": it is one reveal, not ten.
+
+Per-direction `transform-origin` matters on the diverging bars - surplus grows right from the midline
+(origin left), deficit grows left (origin right). Under `prefers-reduced-motion` the bars render
+complete and static, verified empirically rather than assumed: `style.css`'s global
+`* { animation: none !important }` sits *above* these rules in source order, so the live test was
+whether `!important` still wins. It does.
+
+**Two scales replacing eleven one-off values.** Auditing the stylesheet against the design foundation
+turned up something more useful than a palette question. The foundation was written *from this site*
+(Decisions-Log 2026-07-17), so a refresh that respects it cannot legitimately change much about colour
+or type - the site is the reference implementation. What had drifted is the system underneath:
+
+- **Radius**: four values in use (2, 3, 6, 999px) against one token. `999px` is a pill, which
+  Anti-Patterns.md names outright, and it was on three elements including one the CSS calls "tier
+  pill". Collapsing everything to 6px would be wrong too - 6px on a 16px-tall badge reads as a
+  lozenge - so small elements got a deliberate step, `--radius-sm: 3px`. Rendered radii across the
+  draft board went from `{2, 3, 6, 999}` to `{3, 6}`, nothing above 12px.
+- **Elevation**: eight distinct `box-shadow` declarations, five bespoke one-offs beside the two
+  tokens that already existed. Depth is for hierarchy, so the number of steps should equal the number
+  of levels that exist: a resting control, a card, and the one featured panel per page. Now
+  `--elev-1/2/3` plus `--elev-raise` for the hover lift. The header's `0 1px 0` is deliberately left
+  alone - it is a hairline standing in for a border, not elevation.
+
+Both touch only radius and shadow, so no box changes size and none of the measured constants (the
+1540px gate, the seven board column trims from §1.19) are affected.
+
+**Known and not done.** Two system problems remain and both *do* move boxes, so they need a
+re-derivation pass behind them: **13 distinct font sizes** including 9.5/10.5/11.5/12.5px half-steps,
+and **14 of 24 spacing values off the 4pt grid**. A looping-video backdrop was prototyped alongside
+the CSS one and dropped without being seen: ComfyUI's standalone Python has lost torch
+(`ModuleNotFoundError: No module named 'torch'`), so the asset could never be generated. The video
+plumbing - `preload="none"`, muted, playsinline, paused on hidden tab and off-screen - is recoverable
+from the `design/backdrop-prototype` history if that is ever revisited.
+
+**Verified**: all three pages render with the backdrop present and no switcher, 0 failed requests, no
+horizontal overflow; `?bg=none` sets the attribute and hides every layer; standings first paint
+carries `bars-in` with delays 0/28/56/84ms and reports `animation: none` after a refresh; the roster
+room does the same and does not re-animate when switching teams; draft board still renders all 249
+rows and 33 offense rows.
+
+Files: `site/backdrop.css`; the `.bd` markup and the `?bg` hatch in all three pages; the data-viz
+motion block and the `--radius-sm` / `--elev-*` tokens at the tail of `site/style.css`; `bars-in` in
+`site/app.js` and `site/rosters.js`.
+
 ## 2. Challenge 2 — `scouting_brief` (public commentary)
 
 ### 2.1 What it is

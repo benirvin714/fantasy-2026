@@ -1,0 +1,79 @@
+/* ===================================================================== ambient backdrop
+   Football read through the existing palette rather than photographed: mown turf stripes, a
+   floodlight bloom raking in from above, and a crush that keeps the middle of the screen flat.
+   Pure CSS, no asset, no decode cost, no extra request.
+
+   Kept in its own stylesheet rather than folded into style.css so it stays one file to remove, and
+   so it can't create a specificity accident in the file holding the measured layout constants.
+
+   THE GOVERNING CONSTRAINT: panels stay fully opaque. No body text ever sits over any of this, so
+   WCAG AA holds by construction rather than by sampling. The backdrop is therefore only ever
+   visible in the page gutters - about 232px a side on in-season HQ at 1920, 172px on the roster
+   room, 52px on draft day. Widest where you browse, almost nothing where you work. That falls out
+   of max-widths set for unrelated reasons and it is the right behaviour, so it is left alone.
+
+   Everything animated here is transform/opacity only. Nothing animates width, height, top or left. */
+
+/* The layer sits at z-index 0 and the real page is lifted to 1. Using z-index:-1 instead would put
+   it behind body's own background, which paints the radial gradient straight over the top of it. */
+.bd {
+  position: fixed; inset: 0; z-index: 0;
+  overflow: hidden; pointer-events: none;
+  background: var(--bg);
+}
+body > header, body > main, body > footer { position: relative; z-index: 1; }
+
+/* Escape hatch: ?bg=none on any page turns the backdrop off for that visit. This is a tool used
+   live during a draft, and "turn the decoration off without waiting for a deploy" is worth the two
+   lines it costs. */
+:root[data-backdrop="none"] .bd > * { display: none; }
+
+.bd-turf {
+  position: absolute; inset: -10%;
+  background: repeating-linear-gradient(
+    98deg,
+    rgba(120, 200, 108, .115) 0 74px,
+    rgba(120, 200, 108, .030) 74px 148px);
+  /* the stripe field creeps sideways by exactly one stripe pair, so the loop is seamless */
+  animation: bd-mow 90s linear infinite;
+}
+
+/* Two floodlights raking in from above the top corners, offset in phase so the bloom never pulses
+   symmetrically. Warm white against the green so it reads as stadium light rather than as more
+   accent colour. Placed at the corners because the corners are what the gutters expose. */
+.bd-lights {
+  position: absolute; inset: -20%;
+  background:
+    radial-gradient(46vw 58vh at 8% -8%, rgba(226, 238, 212, .16), transparent 70%),
+    radial-gradient(42vw 52vh at 94% -12%, rgba(226, 238, 212, .12), transparent 68%);
+  animation: bd-haze 34s ease-in-out infinite alternate;
+}
+
+/* NOT a conventional vignette, and the inversion is the whole point. A normal vignette darkens the
+   edges and keeps the middle bright. Here the middle is permanently hidden behind opaque panels and
+   the edges are the only part anyone ever sees, so darkening the edges would hide the treatment and
+   decorate the one region nobody can look at. This crushes the CENTRE column to flat ground instead,
+   so panels always sit on near-black, and lets the gutters carry the turf and the light.
+   The stops come off the page's own geometry: content caps at 1440-1800px inside a 1920 viewport,
+   so the crush covers the middle ~68% and releases either side of it. */
+.bd-vignette {
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(90deg,
+      rgba(11, 15, 12, .10) 0%, rgba(11, 15, 12, .62) 15%,
+      rgba(11, 15, 12, .90) 34%, rgba(11, 15, 12, .90) 66%,
+      rgba(11, 15, 12, .62) 85%, rgba(11, 15, 12, .10) 100%),
+    /* and a floor-to-ceiling fade so the light reads as arriving from above */
+    linear-gradient(180deg, transparent 0%, rgba(11, 15, 12, .30) 62%, rgba(11, 15, 12, .72) 100%);
+}
+
+@keyframes bd-mow  { from { transform: translate3d(0, 0, 0); } to { transform: translate3d(148px, 0, 0); } }
+@keyframes bd-haze { from { transform: translate3d(0, 0, 0) scale(1); opacity: .85; }
+                     to   { transform: translate3d(2.2vw, 1vh, 0) scale(1.06); opacity: 1; } }
+
+/* Motion is decoration here, so under reduced-motion it stops dead rather than slowing down.
+   style.css already kills animation globally with !important; this is stated locally too so the
+   rule survives if that block is ever narrowed. */
+@media (prefers-reduced-motion: reduce) {
+  .bd-turf, .bd-lights { animation: none !important; }
+}
