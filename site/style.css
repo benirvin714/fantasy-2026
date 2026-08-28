@@ -1276,3 +1276,35 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
   .rr-scnt { display: none; }
   .rr-lrow { min-height: 44px; }
 }
+
+/* ==================================================== data-viz motion (bars grow in on first paint)
+   The only motion in the interface itself: the standings PF bars and the roster room's diverging
+   position bars sweep out from their baseline once, when the panel first renders.
+
+   Three constraints shape this and all three are deliberate.
+
+   1. `transform: scaleX()`, never `width`. The bars keep their computed width so the final state is
+      exact and layout never moves; only the transform animates, which stays off the layout and paint
+      path. Animating width here would force a layout on every frame of every bar.
+   2. Once, on first paint. Both panels re-render on ordinary interaction - the standings on every
+      refresh, the roster room on every team you click - and a bar that re-animates each time turns a
+      comparison tool into a slot machine. The `bars-in` class is added by the renderer the first time
+      only, and `animation` (not `transition`) means it cannot re-fire on a repaint.
+   3. Staggered 28ms apart so the group reads as one gesture rather than ten separate events. That
+      keeps it inside the "animate one or two things per view" bar: it is one reveal, not ten.
+
+   Under prefers-reduced-motion, style.css's global `animation: none !important` above already applies,
+   so every bar is at full width immediately and the data is readable with no motion at all. That is
+   the correct degradation for a chart - the numbers are the point, the sweep is not. */
+@keyframes bar-in { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+.bars-in .pf-bar,
+.bars-in .rr-sfill {
+  /* ease-out: fast off the mark, settling into place. `both` holds the end state after it runs. */
+  animation: bar-in 460ms cubic-bezier(.22, .61, .36, 1) both;
+  animation-delay: calc(var(--i, 0) * 28ms);
+}
+.bars-in .pf-bar     { transform-origin: left center; }
+.bars-in .rr-sfill.up   { transform-origin: left center; }
+/* the deficit bars are anchored at the midline and grow leftwards, so they sweep from their right edge */
+.bars-in .rr-sfill.down { transform-origin: right center; }

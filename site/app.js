@@ -71,15 +71,19 @@
       bodyHTML += `<tr${cls ? ` class="${cls}"` : ""}>
         <td>${esc(r.owner)}</td>
         <td class="num">${r.w}</td><td class="num">${r.l}</td>
-        <td class="num pf-cell"><span class="pf-bar" style="width:${(frac(r.pf) * 100).toFixed(1)}%"></span><span class="pf-val">${r.pf.toFixed(1)}</span></td>
+        <td class="num pf-cell"><span class="pf-bar" style="--i:${i};width:${(frac(r.pf) * 100).toFixed(1)}%"></span><span class="pf-val">${r.pf.toFixed(1)}</span></td>
         <td class="num ${/L$/.test(r.streak) ? "streak-l" : "streak-w"}">${esc(r.streak)}</td>
       </tr>`;
     });
 
-    $("#standings-body").innerHTML = `<table aria-label="Standings — top ${playoffCut} make the playoffs">
+    // The bars sweep out once, the first time the panel renders. Hitting refresh re-renders this
+    // table, and a chart that re-animates every time you look at it is noise rather than feedback.
+    $("#standings-body").innerHTML = `<table class="${standingsPainted ? "" : "bars-in"}" aria-label="Standings — top ${playoffCut} make the playoffs">
       <thead><tr><th>Team</th><th class="num">W</th><th class="num">L</th><th class="num">PF</th><th class="num">Strk</th></tr></thead>
       <tbody>${bodyHTML}</tbody></table>`;
+    standingsPainted = true;
   }
+  let standingsPainted = false;
 
   /* ---------- NFL updates (published by the daily nfl-events routine) ---------- */
   let events = [], evFilter = "all";
