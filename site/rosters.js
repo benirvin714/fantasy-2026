@@ -69,7 +69,7 @@
       body += `<tr class="rr-lrow${t.is_me ? " me" : ""}${t.roster_id === sel ? " on" : ""}"
           data-rid="${t.roster_id}" tabindex="0" role="button" aria-expanded="${isOpen}">
           <td class="num rr-rk">${i + 1}</td>
-          <td class="rr-own"><span class="rr-caret" aria-hidden="true">${isOpen ? "▾" : "▸"}</span> ${esc(t.owner)}${
+          <td class="rr-own"><span class="rr-caret" aria-hidden="true">${isOpen ? "▼" : "▶"}</span> ${esc(t.owner)}${
             t.is_me ? ` <span class="rr-you">you</span>` : ""}</td>
           ${rec(t)}
           <td class="num pf-cell"><span class="pf-bar" style="width:${(frac(t.starter_pts) * 100).toFixed(1)}%"></span><span class="pf-val">${num(t.starter_pts)}</span></td>

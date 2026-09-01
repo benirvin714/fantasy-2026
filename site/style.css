@@ -1341,7 +1341,9 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
    they override - which is the half of that rule that actually matters. */
 
 /* ---------- the row you opened ---------- */
-.rr-caret { color: var(--faint); font-size: 10px; display: inline-block; width: 9px; }
+/* The full-size triangles (U+25B6 / U+25BC) rather than the "small" ones: Manrope draws U+25B8 with
+   so little ink that at 10px it reads as a hyphen. */
+.rr-caret { color: var(--faint); font-size: 8px; display: inline-block; width: 11px; vertical-align: 1px; }
 .rr-lrow.on .rr-caret { color: var(--accent); }
 .rr-strk { margin-left: 5px; font-size: 10px; }
 
@@ -1358,7 +1360,10 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
   padding: 6px 2px; border-bottom: 1px solid var(--border); font-size: 12px;
 }
 .rr-exphead b { font-size: 13px; }
-.rr-exprow .rr-rtab { margin-top: 2px; }
+/* Capped rather than full-bleed. The roster table is five short columns and was designed for a
+   400px panel; stretched across a 1400px league table it puts 600px of nothing between a name and
+   its projection, which is a long horizontal scan for no information. */
+.rr-exprow .rr-rtab { margin-top: 2px; max-width: 880px; }
 
 /* ---------- a player's name, as a control ---------- */
 /* It has to still read as the name it replaced - a roster table where every row is a visible button
