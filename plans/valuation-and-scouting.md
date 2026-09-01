@@ -768,6 +768,70 @@ Files: `site/backdrop.css`; the `.bd` markup and the `?bg` hatch in all three pa
 motion block and the `--radius-sm` / `--elev-*` tokens at the tail of `site/style.css`; `bars-in` in
 `site/app.js` and `site/rosters.js`.
 
+### 1.22 Three panels move: standings, roster, and the player dossier - 2026-09-01
+
+A reshuffle rather than a feature. Three things were in the wrong place and the fourth thing
+(per-player news) had no place at all.
+
+**Standings left the front page.** They sat in the featured slot on in-season HQ as a five-column
+table of their own. The problem is that a standing is uninteresting exactly when you look at it
+most: for the whole preseason it reads `0-0 · 0.0` ten times, and even in-season a bare W-L next to
+nine other W-Ls is a scoreboard, not a decision input. They now live in the roster room's league
+table, where wins and points-for sit beside the projected optimal lineup and the position strengths
+- which is the comparison that makes a record mean something.
+
+The table **sorts on the standings** (wins, then points for - the key Sleeper seeds playoffs on) and
+falls back to the projection when nobody has played, saying which in the panel meta rather than
+presenting an arbitrary order as a standing. The playoff cut line is drawn only once somebody has
+played: ten 0-0 teams have no top six, and a line implying otherwise is a fabricated result. The
+fetch is live on every page load with a cache-busting param (Sleeper's Cloudflare layer serves
+stale, see CLAUDE.md), and a failed fetch degrades to the projection order with the failure named
+in the panel, never to a blank column that reads as zero.
+
+**The roster table left the roster room** for that same featured slot on HQ, showing my team. That
+is the object every other panel on that page is about - the waiver board's drops, the brief's so-what
+lines, the events feed's injuries all resolve against it - and it is the thing that is true every
+day rather than once a week. It is now `site/roster-table.js`, shared verbatim by both pages, so the
+slot ranks and the `starts on N/9` bench read can't drift between them.
+
+**A team's roster opens inside the row you clicked.** The roster room lost its left column and the
+league table gained expandable rows; the analysis panels below still follow the selection, so
+clicking a row both opens the lineup in place and loads that team's scouting card. One row open at a
+time, and clicking the open row closes it while keeping the team selected - collapsing a table is a
+request for less table, not a request to stop scouting. Physically nesting the roster under its own
+row is the point: with a detached panel, opening a second team can leave you reading one team's
+lineup under another team's name.
+
+**Player names became controls.** Clicking any name - in either roster table, or in a trade proposal
+chip - opens a dossier: the dated events that name that player, the scouting brief with its sources
+and role/scheme grades, the ADP commentary, the availability read. All of it already existed and
+none of it was reachable from a name. `scripts/build-player-news.mjs` joins the three published
+feeds at build time (roster room for who is rostered, draft board for the brief and the price, the
+events feed for what changed) into one 296KB file, fetched lazily on the first click rather than on
+page load. Events are matched to players by the `players[]` tags the feed already carries,
+normalised for case and generational suffixes, and every unmatched name is **printed by the build**
+rather than dropped in silence - 23 of 49 event names on the first run belonged to players nobody
+rosters, which is the expected shape for a feed that covers the whole NFL.
+
+Coverage on the first build: 151 rostered players, 128 with a scouting brief, 26 with an event in
+the current feed, 2 off the draft board entirely. Every one of those gaps renders as a stated
+absence with the feed date attached, and the two reasons for a missing brief are told apart - a
+kicker has none by design, a wide receiver has none because the research pass thins out down the
+board. The dialog also checks its own age: two of its three inputs move on a schedule while it is
+built on demand, so past two days it says so instead of presenting an old "Latest" as current.
+
+Files: `scripts/build-player-news.mjs` -> `data/site/player-news.json`; `site/player-news.js` (the
+dialog + a single delegated `[data-pid]` listener, so markup rendered later still works);
+`site/roster-table.js`; the league table, standings fetch and expansion state in `site/rosters.js`;
+`renderMyRoster` in `site/app.js`; the `.rr-exp*` / `.pn-*` block at the tail of `site/style.css`.
+
+**Two CSS notes for whoever touches this next.** The mobile column hiding in the roster-room block
+is now by class (`.rr-c-sw`, `.rr-c-vs`, `.rr-c-tr`) instead of `nth-child`: the column order changed
+in this very pass, and a positional selector would have quietly started hiding the wrong pair. And
+`.rr-lrow { min-height: 44px }` was doing nothing at all - a table-row box ignores `min-height` - so
+the phone touch target for what is now the page's primary control came from cell padding instead,
+measured at 43px against a 35px row before.
+
 ## 2. Challenge 2 — `scouting_brief` (public commentary)
 
 ### 2.1 What it is

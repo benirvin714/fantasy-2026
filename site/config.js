@@ -13,5 +13,7 @@ window.HQ_CONFIG = {
   EVENTS_JSON: "/data/site/nfl-events.json",
   DRAFT_BOARD_JSON: "/data/site/draft-board.json",
   ROSTER_ROOM_JSON: "/data/site/roster-room.json",
+  // Per-player dossiers, fetched lazily the first time somebody clicks a name (see player-news.js)
+  PLAYER_NEWS_JSON: "/data/site/player-news.json",
   TEAM_ENV_JSON: "/data/site/team-environment.json",
 };

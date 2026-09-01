@@ -118,8 +118,8 @@ section.panel, aside.panel {
   border-radius: var(--radius);
   box-shadow: var(--elev-2);
 }
-/* featured panel: standings, made prominent at the top of the right column.
-   .panel.panel-featured (0,2,0) must outspecify section.panel (0,1,1) so the
+/* featured panel: whatever leads its column - my roster on in-season HQ, the summary in the roster
+   room. .panel.panel-featured (0,2,0) must outspecify section.panel (0,1,1) so the
    border/shadow shorthands there don't win. */
 .panel.panel-featured {
   border-top: 2px solid var(--accent);
@@ -1093,12 +1093,22 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
 .rr-main { display: block; max-width: 1560px; margin: 0 auto; padding: 16px 24px 40px; }
 .rr-main > * + * { margin-top: 16px; }
 
-/* two columns: the roster on the left as a fixed reference, the reads on the right.
-   The roster column is width-capped rather than fractional because it renders exactly 16 rows of
-   known content - handing it a share of the viewport just stretches five short columns. */
-.rr-cols { display: grid; gap: 16px; grid-template-columns: minmax(0, 400px) minmax(0, 1fr); align-items: start; }
+/* Two columns of reads. The roster itself is no longer one of them - it opens inside the league
+   table now, where the row you clicked is - so this split is by how wide the content wants to be:
+   a paragraph, ten bars and a risk list on the left, the dossier prose and the trade search on the
+   right. 5/7 rather than even, because the trade panel carries a two-column list inside it. */
+.rr-cols { display: grid; gap: 16px; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); align-items: start; }
 .rr-analysis { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
-.rr-roster { position: sticky; top: 12px; }
+
+/* Names which team every panel below is about. Without it the analysis is nine panels of unlabelled
+   numbers once the league table has scrolled off the top. */
+.rr-selbar { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; padding: 2px 4px; }
+.rr-selkey {
+  font-family: var(--font-data); font-size: 10px; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--faint);
+}
+.rr-selbar h2 { margin: 0; font-size: 17px; letter-spacing: -.01em; }
+.rr-selbar .faint { font-size: 12px; }
 
 /* ---------- the league table ---------- */
 .rr-ltab td { font-size: 13px; }
@@ -1265,44 +1275,45 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
 }
 .rr-meth dd { margin: 2px 0 0; color: var(--dim); line-height: 1.55; }
 
-/* Stack below the two-column threshold. The roster stops being sticky first - a sticky block in a
-   single column pins content the reader is trying to scroll past. */
 @media (max-width: 1100px) {
   .rr-cols { grid-template-columns: minmax(0, 1fr); }
-  .rr-roster { position: static; max-width: 520px; }
 }
 @media (max-width: 900px) {
   .rr-main { padding: 12px 12px 32px; }
   .rr-fitcols { grid-template-columns: minmax(0, 1fr); }
-  .rr-roster { max-width: none; }
-  /* The league table is the one thing here that genuinely does not fit a phone. Measured at a
-     351px container it rendered 397px wide, so it gives back the 46px in three places rather than
-     scrolling sideways: the two columns a phone can read off the card below (strength/hole) go,
-     cell padding halves, and the appetite chip drops its trade count and keeps the band word -
-     which is the half that changes what you do. The count survives in the tooltip and on the card. */
-  .rr-ltab th:nth-child(5), .rr-ltab td:nth-child(5),
-  .rr-ltab th:nth-child(6), .rr-ltab td:nth-child(6) { display: none; }
+  /* The league table is the one thing here that genuinely does not fit a phone, and it now carries
+     four more columns than when that was first measured. It gives the width back rather than
+     scrolling sideways: everything a phone can read off the card below goes (strength, hole,
+     vs-median, trade appetite), cell padding halves, and what survives is the order, the name, the
+     record and the two point totals. Hidden by class, not nth-child - the column order has already
+     changed once and a positional selector would have quietly started hiding the wrong pair. */
+  .rr-c-sw, .rr-c-vs, .rr-c-tr { display: none; }
   .rr-ltab th, .rr-ltab td { padding-left: 4px; padding-right: 4px; }
   .rr-appn { display: none; }
   .rr-app { font-size: 10px; padding: 1px 4px; }
   .rr-srow { grid-template-columns: 30px minmax(60px, 1fr) 44px 42px 32px; }
   .rr-scnt { display: none; }
-  .rr-lrow { min-height: 44px; }
+  /* These rows are now the page's main control - clicking one opens a roster - so they have to be a
+     real touch target. `min-height` on a <tr> was the previous attempt and does nothing: a
+     table-row box ignores it. Vertical padding on the cells is what actually grows the row. */
+  .rr-lrow td { padding-top: 11px; padding-bottom: 11px; }
 }
 
 /* ==================================================== data-viz motion (bars grow in on first paint)
-   The only motion in the interface itself: the standings PF bars and the roster room's diverging
-   position bars sweep out from their baseline once, when the panel first renders.
+   The only motion in the interface itself: the roster room's two charts - the league table's
+   projected-points bars and the diverging position bars - sweep out from their baseline once, when
+   the panel first renders.
 
    Three constraints shape this and all three are deliberate.
 
    1. `transform: scaleX()`, never `width`. The bars keep their computed width so the final state is
       exact and layout never moves; only the transform animates, which stays off the layout and paint
       path. Animating width here would force a layout on every frame of every bar.
-   2. Once, on first paint. Both panels re-render on ordinary interaction - the standings on every
-      refresh, the roster room on every team you click - and a bar that re-animates each time turns a
-      comparison tool into a slot machine. The `bars-in` class is added by the renderer the first time
-      only, and `animation` (not `transition`) means it cannot re-fire on a repaint.
+   2. Once, on first paint. Both panels re-render on ordinary interaction - the league table on every
+      row you open and again when the standings land, the position bars on every team you click - and
+      a bar that re-animates each time turns a comparison tool into a slot machine. The `bars-in`
+      class is added by the renderer the first time only, and `animation` (not `transition`) means it
+      cannot re-fire on a repaint.
    3. Staggered 28ms apart so the group reads as one gesture rather than ten separate events. That
       keeps it inside the "animate one or two things per view" bar: it is one reveal, not ten.
 
@@ -1321,3 +1332,112 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
 .bars-in .rr-sfill.up   { transform-origin: left center; }
 /* the deficit bars are anchored at the midline and grow leftwards, so they sweep from their right edge */
 .bars-in .rr-sfill.down { transform-origin: right center; }
+
+/* ============================================ expandable league rows + the player dossier dialog
+   Appended at the end for the same reason the roster-room block above was: every selector here is
+   `.rr-exp*`, `.rr-caret`, `.rr-strk`, `.pn-*` or `dialog`, none of which appears anywhere earlier,
+   so the source-order-beats-equal-specificity trap that has bitten this file twice cannot fire. The
+   two media queries that override rules in this block sit at the bottom of it, below the base rules
+   they override - which is the half of that rule that actually matters. */
+
+/* ---------- the row you opened ---------- */
+.rr-caret { color: var(--faint); font-size: 10px; display: inline-block; width: 9px; }
+.rr-lrow.on .rr-caret { color: var(--accent); }
+.rr-strk { margin-left: 5px; font-size: 10px; }
+
+/* The expanded roster is a table inside a table cell, which is the one place that shape is right:
+   it keeps the roster physically attached to the row it belongs to, so opening a second team can
+   never leave you reading one team's lineup under another team's name. */
+.rr-exprow > td { padding: 0 8px 12px; background: rgba(99,191,90,.04); border-bottom: 1px solid var(--border); }
+.rr-exp {
+  border: 1px solid var(--border); border-top: none; border-radius: 0 0 var(--radius) var(--radius);
+  background: var(--surface); padding: 4px 10px 8px;
+}
+.rr-exphead {
+  display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
+  padding: 6px 2px; border-bottom: 1px solid var(--border); font-size: 12px;
+}
+.rr-exphead b { font-size: 13px; }
+.rr-exprow .rr-rtab { margin-top: 2px; }
+
+/* ---------- a player's name, as a control ---------- */
+/* It has to still read as the name it replaced - a roster table where every row is a visible button
+   is a wall of chrome - so the affordance is a dotted underline that fills in on hover. */
+.pn-link {
+  font: inherit; font-weight: 600; color: var(--text); background: none; border: 0; padding: 0;
+  cursor: pointer; text-align: left; border-bottom: 1px dotted var(--border);
+}
+.pn-link:hover { color: var(--accent); border-bottom-color: var(--accent); }
+.pn-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
+.pn-strong { font-weight: 600; }
+
+/* ---------- the dossier ---------- */
+/* A native <dialog> rather than a div: Escape, the focus trap and inertness of the page behind come
+   from the element, not from code I would have to keep correct. */
+.pn-dlg {
+  width: min(680px, calc(100vw - 24px)); max-height: min(84vh, 860px); padding: 0;
+  background: var(--surface); color: var(--text);
+  border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+.pn-dlg::backdrop { background: rgba(4, 7, 4, .72); }
+.pn-head {
+  display: flex; align-items: flex-start; gap: 12px; padding: 12px 14px;
+  border-bottom: 1px solid var(--border); background: var(--grad-panel);
+}
+.pn-id { min-width: 0; flex: 1; }
+.pn-head h2 { margin: 0; font-size: 18px; letter-spacing: -.01em; }
+.pn-sub { display: block; margin-top: 2px; font-family: var(--font-data); font-size: 11px; color: var(--dim); }
+.pn-owner {
+  margin-left: 6px; padding: 0 5px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+  color: var(--faint);
+}
+.pn-close {
+  font: inherit; font-size: 14px; line-height: 1; color: var(--dim); background: none;
+  border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 5px 8px; cursor: pointer;
+}
+.pn-close:hover { color: var(--neg); border-color: var(--neg); }
+.pn-body { padding: 12px 14px 16px; overflow-y: auto; max-height: calc(min(84vh, 860px) - 62px); }
+
+.pn-facts { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.pn-fact {
+  font-family: var(--font-data); font-size: 11px; color: var(--dim);
+  border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 3px 7px;
+}
+.pn-fact b { color: var(--text); font-size: 12px; }
+.pn-inj { color: var(--neg); border-color: rgba(208,106,92,.5); text-transform: uppercase; }
+
+.pn-sec { margin-top: 14px; }
+.pn-sec:first-child { margin-top: 0; }
+.pn-sec h3 {
+  margin: 0 0 6px; font-family: var(--font-data); font-size: 11px; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--moss); font-weight: 600;
+}
+.pn-sec h3 .faint { text-transform: none; letter-spacing: 0; font-weight: 400; margin-left: 6px; }
+.pn-prose { margin: 0; font-size: 13px; line-height: 1.65; color: var(--dim); }
+.pn-rationale { margin: 8px 0 0; font-size: 12.5px; line-height: 1.55; color: var(--faint); }
+.pn-rationale b { color: var(--dim); }
+.pn-list { margin: 0; padding-left: 18px; font-size: 12.5px; color: var(--dim); line-height: 1.6; }
+.pn-chips { display: flex; gap: 6px; margin-bottom: 7px; flex-wrap: wrap; }
+.pn-chip {
+  font-family: var(--font-data); font-size: 10px; letter-spacing: .05em;
+  border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 1px 5px; color: var(--dim);
+}
+.pn-role-locked, .pn-fit-plus { color: var(--accent); border-color: var(--accent); }
+.pn-role-contested, .pn-fit-neutral { color: var(--warn); border-color: rgba(201,180,88,.5); }
+.pn-role-committee, .pn-fit-minus { color: var(--neg); border-color: rgba(208,106,92,.5); }
+.pn-srcs { margin-top: 8px; font-size: 11.5px; line-height: 1.8; }
+.pn-events li { padding: 9px 0; }
+.pn-events .detail { line-height: 1.6; }
+.pn-foot {
+  margin-top: 16px; padding-top: 9px; border-top: 1px solid var(--border);
+  font-size: 11px; color: var(--faint); line-height: 1.5;
+}
+
+@media (max-width: 900px) {
+  .rr-exprow > td { padding: 0 2px 10px; }
+  .rr-exp { padding: 2px 6px 6px; }
+  .pn-dlg { width: 100vw; max-width: 100vw; max-height: 92vh; border-radius: 0; }
+  .pn-body { max-height: calc(92vh - 62px); }
+  .pn-close { min-height: 44px; min-width: 44px; }
+}

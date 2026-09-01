@@ -1,6 +1,7 @@
 /* HBGBs HQ — read-only dashboard.
-   Live data: Sleeper public API (standings, season state). Local data: JSON published by the
-   daily NFL-events routine, /waivers, and /brief.
+   Live data: Sleeper public API (season state, league identity). Local data: JSON published by the
+   daily NFL-events routine, /waivers, /brief, and the roster-room build.
+   The standings table used to live here; it moved to the roster room, where it sorts all ten teams.
    Rule: never fabricate — every panel shows an explicit error state when its source is unreachable. */
 (() => {
   const C = window.HQ_CONFIG;
@@ -36,54 +37,35 @@
     $("#state-chip").classList.add("live");
   }
 
-  /* ---------- standings (live) ---------- */
+  /* ---------- league chip (live) ---------- */
   async function renderLeague() {
-    $("#standings-body").innerHTML = skel(6);
-    const [league, rosters, users] = await Promise.all([
-      fetchJSON(`${C.API}/league/${C.LEAGUE_ID}`),
-      fetchJSON(`${C.API}/league/${C.LEAGUE_ID}/rosters`),
-      fetchJSON(`${C.API}/league/${C.LEAGUE_ID}/users`),
-    ]);
+    const league = await fetchJSON(`${C.API}/league/${C.LEAGUE_ID}?cb=${Date.now()}`);
     $("#league-chip").textContent = `${league.name} · ${league.season} (${league.status})`;
-    const nameOf = {};
-    for (const u of users) nameOf[u.user_id] = u.display_name;
-
-    const rows = rosters
-      .map((r) => ({
-        owner: nameOf[r.owner_id] ?? r.owner_id, me: r.roster_id === C.MY_ROSTER_ID,
-        w: r.settings.wins, l: r.settings.losses,
-        pf: r.settings.fpts + (r.settings.fpts_decimal ?? 0) / 100,
-        streak: r.metadata?.streak ?? "",
-      }))
-      .sort((a, b) => b.w - a.w || b.pf - a.pf);
-
-    const maxPf = Math.max(...rows.map((r) => r.pf));
-    const minPf = Math.min(...rows.map((r) => r.pf));
-    const frac = (pf) => maxPf === minPf ? 1 : 0.12 + 0.88 * ((pf - minPf) / (maxPf - minPf));
-    const playoffCut = C.PLAYOFF_TEAMS ?? 6;
-
-    let bodyHTML = "";
-    rows.forEach((r, i) => {
-      if (i === playoffCut && rows.length > playoffCut) {
-        bodyHTML += `<tr class="cutrow"><td colspan="5"><div class="cutlabel">playoff line · top ${playoffCut}</div></td></tr>`;
-      }
-      const cls = [r.me ? "me" : "", i === playoffCut ? "cut" : ""].filter(Boolean).join(" ");
-      bodyHTML += `<tr${cls ? ` class="${cls}"` : ""}>
-        <td>${esc(r.owner)}</td>
-        <td class="num">${r.w}</td><td class="num">${r.l}</td>
-        <td class="num pf-cell"><span class="pf-bar" style="--i:${i};width:${(frac(r.pf) * 100).toFixed(1)}%"></span><span class="pf-val">${r.pf.toFixed(1)}</span></td>
-        <td class="num ${/L$/.test(r.streak) ? "streak-l" : "streak-w"}">${esc(r.streak)}</td>
-      </tr>`;
-    });
-
-    // The bars sweep out once, the first time the panel renders. Hitting refresh re-renders this
-    // table, and a chart that re-animates every time you look at it is noise rather than feedback.
-    $("#standings-body").innerHTML = `<table class="${standingsPainted ? "" : "bars-in"}" aria-label="Standings — top ${playoffCut} make the playoffs">
-      <thead><tr><th>Team</th><th class="num">W</th><th class="num">L</th><th class="num">PF</th><th class="num">Strk</th></tr></thead>
-      <tbody>${bodyHTML}</tbody></table>`;
-    standingsPainted = true;
   }
-  let standingsPainted = false;
+
+  /* ---------- my roster (published by scripts/build-roster-room.mjs) ----------
+     The standings used to live in this slot. They moved to the roster room, where they sort all ten
+     teams; what belongs on the front page is the lineup, because that is the object every other
+     panel here is about. The table itself is site/roster-table.js, shared with the roster room, so
+     the slot ranks and the "would start on N of 9" bench read are identical in both places. */
+  async function renderMyRoster() {
+    $("#myroster-body").innerHTML = skel(8);
+    let d;
+    try { d = await fetchJSON(C.ROSTER_ROOM_JSON); }
+    catch {
+      return err("#myroster-body",
+        "No published roster room. Run <code>node scripts/build-roster-room.mjs</code> — it writes data/site/roster-room.json. It refuses to run until every roster has players, so before a draft this panel is empty by design.");
+    }
+    const t = d.teams.find((x) => x.is_me) ?? d.teams.find((x) => x.roster_id === C.MY_ROSTER_ID);
+    if (!t) return err("#myroster-body", `Roster ${C.MY_ROSTER_ID} isn't in the published room — check MY_ROSTER_ID in config.js.`);
+
+    $("#myroster-meta").textContent = `${window.HBGB_RosterTable.meta(t)} · ${t.starter_rank} of ${d.teams.length} by projection`;
+    $("#myroster-body").innerHTML =
+      staleBanner(d.generated, "This roster", 3) +
+      window.HBGB_RosterTable.html(t) +
+      `<p class="rr-note">Click any name for the latest published on that player. Every other team is in the
+        <a href="rosters.html">roster room</a>, with the standings and the trade search.</p>`;
+  }
 
   /* ---------- NFL updates (published by the daily nfl-events routine) ---------- */
   let events = [], evFilter = "all";
@@ -180,9 +162,9 @@
     renderNFLUpdates();
     renderWaivers();
     renderBrief();
+    renderMyRoster();
     renderState().catch(() => { $("#state-chip").textContent = "Sleeper unreachable"; });
-    renderLeague().catch((e) =>
-      err("#standings-body", `Sleeper API unreachable (${esc(e.message)}). Standings unavailable — nothing is shown rather than stale data.`));
+    renderLeague().catch(() => { $("#league-chip").textContent = "league unreachable"; });
     stampAsOf();
   }
   const btn = $("#refresh-btn");

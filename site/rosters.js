@@ -1,7 +1,8 @@
 /* Roster room — the ten teams as scouting objects.
-   Renders data/site/roster-room.json, published by scripts/build-roster-room.mjs. Same rule as
-   every other page here: no analysis is generated in the browser, and a missing feed produces a
-   stated error rather than a blank panel that reads as "nothing to report". */
+   Renders data/site/roster-room.json, published by scripts/build-roster-room.mjs, joined with the
+   live standings from Sleeper. Same rule as every other page here: no analysis is generated in the
+   browser, and a missing feed produces a stated error rather than a blank panel that reads as
+   "nothing to report". */
 (() => {
   const C = window.HQ_CONFIG;
   const $ = (s) => document.querySelector(s);
@@ -16,81 +17,118 @@
   // deliberately gets no colour at all so the extremes stay legible.
   const rankCls = (r) => r <= 3 ? "rr-r-good" : r >= 8 ? "rr-r-bad" : "rr-r-mid";
 
-  let DATA = null, sel = null;
+  // `openRid` not `open`: a module-scope `open` shadows window.open for the whole IIFE.
+  let DATA = null, sel = null, openRid = null;
+  /* Standings arrive separately and may not arrive at all. `state` is the honest three-way: we
+     haven't asked yet, we asked and Sleeper answered, we asked and it didn't. Each one changes what
+     the table is sorted by, and the panel says which. */
+  let STAND = null, standState = "pending", standErr = "";
+  let leaguePainted = false;
+
+  const played = () => !!STAND && [...STAND.values()].some((s) => s.w + s.l + s.t > 0);
 
   /* ----------------------------------------------------------------- the league table */
+  function order(a, b) {
+    // Wins, then points for — the same key Sleeper seeds playoffs on. Before anyone has played,
+    // that key is a ten-way tie, so the projection breaks it and the panel meta says so out loud
+    // rather than presenting an arbitrary order as a standing.
+    if (played()) {
+      const x = STAND.get(a.roster_id), y = STAND.get(b.roster_id);
+      return y.w - x.w || y.pf - x.pf || a.starter_rank - b.starter_rank;
+    }
+    return a.starter_rank - b.starter_rank;
+  }
+
   function paintLeague() {
-    const teams = [...DATA.teams].sort((a, b) => a.starter_rank - b.starter_rank);
+    const teams = [...DATA.teams].sort(order);
     const max = Math.max(...teams.map((t) => t.starter_pts));
     const min = Math.min(...teams.map((t) => t.starter_pts));
     // Bar width is scaled across the observed range, not from zero: every team fields ten starters,
     // so the interesting variance is the last few percent and a zero-based bar hides all of it.
     const frac = (p) => max === min ? 1 : 0.08 + 0.92 * ((p - min) / (max - min));
+    const live = standState === "ok";
+    const COLS = 9;
+    const cut = C.PLAYOFF_TEAMS ?? 6;
 
-    $("#rr-league-body").innerHTML = `<table class="rr-ltab" aria-label="Every team by projected starting points">
-      <thead><tr>
-        <th class="num">#</th><th>Team</th><th class="num">Starters</th>
-        <th class="num" title="Projected starting points minus the league median">vs med</th>
-        <th>Strength</th><th>Hole</th>
-        <th title="Completed trades 2020-2025, from the raw Sleeper archive">Trades</th>
-      </tr></thead>
-      <tbody>${teams.map((t) => {
-        const s = t.strengths[0], w = t.weaknesses[0];
-        return `<tr class="rr-lrow${t.is_me ? " me" : ""}${t.roster_id === sel ? " on" : ""}" data-rid="${t.roster_id}" tabindex="0" role="button" aria-pressed="${t.roster_id === sel}">
-          <td class="num rr-rk">${t.starter_rank}</td>
-          <td class="rr-own">${esc(t.owner)}${t.is_me ? ` <span class="rr-you">you</span>` : ""}</td>
+    const rec = (t) => {
+      if (!live) return `<td class="num rr-c-rec faint">—</td><td class="num rr-c-pf faint">—</td>`;
+      const s = STAND.get(t.roster_id);
+      return `<td class="num rr-c-rec">${s.w}-${s.l}${s.t ? `-${s.t}` : ""}${
+        s.streak ? `<span class="rr-strk ${/L$/.test(s.streak) ? "streak-l" : "streak-w"}">${esc(s.streak)}</span>` : ""}</td>
+        <td class="num rr-c-pf pf-cell"><span class="pf-val">${s.pf.toFixed(1)}</span></td>`;
+    };
+
+    let body = "";
+    teams.forEach((t, i) => {
+      // The playoff line is only drawn once it means something. Ten 0-0 teams have no top six.
+      if (live && played() && i === cut && teams.length > cut) {
+        body += `<tr class="cutrow"><td colspan="${COLS}"><div class="cutlabel">playoff line · top ${cut}</div></td></tr>`;
+      }
+      const s = t.strengths[0], w = t.weaknesses[0];
+      const isOpen = openRid === t.roster_id;
+      body += `<tr class="rr-lrow${t.is_me ? " me" : ""}${t.roster_id === sel ? " on" : ""}"
+          data-rid="${t.roster_id}" tabindex="0" role="button" aria-expanded="${isOpen}">
+          <td class="num rr-rk">${i + 1}</td>
+          <td class="rr-own"><span class="rr-caret" aria-hidden="true">${isOpen ? "▾" : "▸"}</span> ${esc(t.owner)}${
+            t.is_me ? ` <span class="rr-you">you</span>` : ""}</td>
+          ${rec(t)}
           <td class="num pf-cell"><span class="pf-bar" style="width:${(frac(t.starter_pts) * 100).toFixed(1)}%"></span><span class="pf-val">${num(t.starter_pts)}</span></td>
-          <td class="num ${signCls(t.vs_league_median)}">${sign(t.vs_league_median)}</td>
-          <td class="rr-sw">${s ? `<span class="rr-pos">${esc(s.pos)}</span> <span class="faint">${ORD(s.rank)}</span>` : `<span class="faint">none</span>`}</td>
-          <td class="rr-sw">${w ? `<span class="rr-neg">${esc(w.pos)}</span> <span class="faint">${ORD(w.rank)}</span>` : `<span class="faint">none</span>`}</td>
-          <td><span class="rr-app rr-app-${esc(t.tendencies.appetite.band)}" title="${esc(t.tendencies.appetite.note)}">${esc(t.tendencies.appetite.band)}<span class="rr-appn"> · ${t.tendencies.appetite.n}</span></span></td>
+          <td class="num rr-c-vs ${signCls(t.vs_league_median)}">${sign(t.vs_league_median)}</td>
+          <td class="rr-sw rr-c-sw">${s ? `<span class="rr-pos">${esc(s.pos)}</span> <span class="faint">${ORD(s.rank)}</span>` : `<span class="faint">none</span>`}</td>
+          <td class="rr-sw rr-c-sw">${w ? `<span class="rr-neg">${esc(w.pos)}</span> <span class="faint">${ORD(w.rank)}</span>` : `<span class="faint">none</span>`}</td>
+          <td class="rr-c-tr"><span class="rr-app rr-app-${esc(t.tendencies.appetite.band)}" title="${esc(t.tendencies.appetite.note)}">${esc(t.tendencies.appetite.band)}<span class="rr-appn"> · ${t.tendencies.appetite.n}</span></span></td>
         </tr>`;
-      }).join("")}</tbody></table>`;
+      if (isOpen) {
+        body += `<tr class="rr-exprow"><td colspan="${COLS}">
+          <div class="rr-exp">
+            <div class="rr-exphead">
+              <b>${esc(t.owner)}</b><span class="faint">${esc(window.HBGB_RosterTable.meta(t))}</span>
+              <span class="faint">click any name for the latest published on that player</span>
+            </div>
+            ${window.HBGB_RosterTable.html(t)}
+          </div></td></tr>`;
+      }
+    });
+
+    // Bars sweep out once, on first paint. The table re-renders on every row you open and when the
+    // standings land, and a chart that re-animates each time is a slot machine, not a comparison.
+    $("#rr-league-body").innerHTML = `<table class="rr-ltab${leaguePainted ? "" : " bars-in"}" aria-label="Every team${live && played() ? ", by standings" : ", by projected starting points"}">
+      <thead><tr>
+        <th class="num" title="${live && played() ? "Standings position — wins, then points for" : "Ordered by projected starting points; nobody has played yet"}">#</th>
+        <th>Team</th>
+        <th class="num rr-c-rec" title="Live from Sleeper">Rec</th>
+        <th class="num rr-c-pf" title="Points scored so far, live from Sleeper">PF</th>
+        <th class="num" title="Projected points from an optimal lineup under this league's slot shape">Proj</th>
+        <th class="num rr-c-vs" title="Projected starting points minus the league median">vs med</th>
+        <th class="rr-c-sw">Strength</th><th class="rr-c-sw">Hole</th>
+        <th class="rr-c-tr" title="Completed trades 2020-2025, from the raw Sleeper archive">Trades</th>
+      </tr></thead>
+      <tbody>${body}</tbody></table>`;
+    leaguePainted = true;
 
     $("#rr-league-body").querySelectorAll(".rr-lrow").forEach((row) => {
-      const go = () => select(+row.dataset.rid);
+      const go = () => select(+row.dataset.rid, { toggle: true });
       row.addEventListener("click", go);
       row.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } });
     });
   }
 
-  /* ------------------------------------------------------------------------ the roster */
-  function paintRoster(t) {
-    const line = (s) => {
-      const p = s.player;
-      if (!p) return `<tr><td class="rr-slot">${esc(s.slot)}</td><td colspan="4" class="faint">empty</td></tr>`;
-      return `<tr>
-        <td class="rr-slot">${esc(s.slot)}</td>
-        <td class="rr-nm">${esc(p.name)}${p.injury ? ` <span class="rr-inj" title="Sleeper injury designation">${esc(p.injury)}</span>` : ""}</td>
-        <td class="rr-pt">${esc(p.pos)}<span class="faint"> ${esc(p.team ?? "—")}</span></td>
-        <td class="num">${num(p.pts, 1)}</td>
-        <td class="num rr-slotrk ${rankCls(s.rank)}" title="Rank of this slot against the other nine teams · ${sign(s.vs_median, 1)} vs the slot median">${s.rank}<span class="rr-vs ${signCls(s.vs_median)}">${sign(s.vs_median)}</span></td>
-      </tr>`;
-    };
-
-    const bench = t.bench.map((p) => `<tr>
-      <td class="rr-slot rr-bn">BN</td>
-      <td class="rr-nm">${esc(p.name)}</td>
-      <td class="rr-pt">${esc(p.pos)}<span class="faint"> ${esc(p.team ?? "—")}</span></td>
-      <td class="num">${num(p.pts, 1)}</td>
-      <td class="num rr-starts ${p.starts_on >= 4 ? "rr-r-good" : p.starts_on === 0 ? "rr-r-bad" : "rr-r-mid"}"
-          title="Would start on ${p.starts_on} of the other nine teams, measured by recomputing each of their optimal lineups with him inserted. Best single gain: ${sign(p.best_gain, 1)} points.">${p.starts_on}/9</td>
-    </tr>`).join("");
-
-    $("#rr-roster-meta").textContent = `${t.starter_pts.toFixed(0)} starting · ${t.bench_pts.toFixed(0)} on the bench`;
-    $("#rr-roster-body").innerHTML = `<table class="rr-rtab" aria-label="${esc(t.owner)} roster">
-        <thead><tr><th>Slot</th><th>Player</th><th>Pos</th><th class="num">Proj</th>
-          <th class="num" title="Starters: this slot's rank against the other nine teams. Bench: how many of the other nine he would start for.">Rk</th></tr></thead>
-        <tbody>${t.slots.map(line).join("")}
-          <tr class="rr-div"><td colspan="5"><div class="cutlabel">bench · 5 spots, and that is the whole margin</div></td></tr>
-          ${bench}</tbody></table>
-      ${t.unpriced.length ? `<div class="rr-unpriced">Unpriced and excluded from every total here: ${
-        t.unpriced.map((u) => esc(u.name)).join(", ")}. No 2026 projection — counted as zero would fake a weakness.</div>` : ""}`;
+  function paintLeagueMeta() {
+    const base = `${DATA.teams.length} teams · median ${DATA.coverage.league_median_starters} projected starting points`;
+    const el = $("#rr-league-meta");
+    if (standState === "pending") { el.textContent = `${base} · loading standings…`; return; }
+    if (standState === "err") {
+      el.innerHTML = `${esc(base)} · <span class="rr-neg">standings unavailable (${esc(standErr)})</span> — ordered by projection`;
+      return;
+    }
+    el.textContent = played()
+      ? `${base} · ordered by standings`
+      : `${base} · every record is 0-0, so the order is the projection until week 1`;
   }
 
   /* --------------------------------------------------------------- summary + shape + risk */
   function paintSummary(t) {
-    $("#rr-sum-meta").textContent = `${ORD(t.starter_rank)} of 10${t.draft_slot ? ` · drafted from slot ${t.draft_slot}` : ""}`;
+    $("#rr-sum-meta").textContent = `${ORD(t.starter_rank)} of 10 by projection${t.draft_slot ? ` · drafted from slot ${t.draft_slot}` : ""}`;
     $("#rr-sum-body").innerHTML = `<p class="rr-summary">${esc(t.summary)}</p>`;
   }
 
@@ -181,7 +219,7 @@
       ? `${ps.length} deal${ps.length === 1 ? "" : "s"} where both lineups rise`
       : "no deal clears the two-sided bar";
 
-    const chip = (p) => `<span class="rr-pl"><b>${esc(p.name)}</b> <span class="faint">${esc(p.pos)}${p.team ? " " + esc(p.team) : ""}</span> <span class="mono">${num(p.pts, 0)}</span></span>`;
+    const chip = (p) => `<span class="rr-pl">${window.HBGB_PlayerNews.link(p, "pn-strong")} <span class="faint">${esc(p.pos)}${p.team ? " " + esc(p.team) : ""}</span> <span class="mono">${num(p.pts, 0)}</span></span>`;
 
     const deals = ps.length ? ps.map((p) => `
       <div class="rr-deal">
@@ -227,14 +265,24 @@
   }
 
   /* ------------------------------------------------------------------------------ select */
-  function select(rid) {
-    sel = rid;
+  function select(rid, opts = {}) {
     const t = DATA.teams.find((x) => x.roster_id === rid);
     if (!t) return;
-    $("#rr-roster-h").textContent = `${t.owner}${t.is_me ? " — you" : ""}`;
+    // Clicking the row that is already open closes it. The analysis panels keep showing that team:
+    // collapsing the roster is a request for less table, not a request to stop scouting them.
+    openRid = opts.toggle && openRid === rid ? null : rid;
+    sel = rid;
+    $("#rr-analysis-h").textContent = `${t.owner}${t.is_me ? " — you" : ""}`;
     paintLeague();
-    paintRoster(t); paintSummary(t); paintShape(t); paintRisks(t); paintTendencies(t); paintTrade(t);
+    paintSummary(t); paintShape(t); paintRisks(t); paintTendencies(t); paintTrade(t);
     history.replaceState(null, "", `?team=${rid}`);
+    if (openRid === rid && opts.scroll !== false) {
+      const row = $(`.rr-lrow[data-rid="${rid}"]`);
+      // "nearest" so a row already in view doesn't move at all; the smooth scroll is skipped
+      // entirely under reduced motion, where CSS can't reach a scrollIntoView option.
+      const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (row) row.scrollIntoView({ block: "nearest", behavior: still ? "auto" : "smooth" });
+    }
   }
 
   function paintMethod() {
@@ -244,9 +292,36 @@
       <dt>coverage</dt><dd>${DATA.coverage.priced} of ${DATA.coverage.rostered} rostered players priced${
         DATA.coverage.off_board_priced ? ` (${DATA.coverage.off_board_priced} of them from outside the draft board's top-200 pool, fetched and re-scored the same way)` : ""}.
         League median starting total ${DATA.coverage.league_median_starters}.</dd>
+      <dt>standings</dt><dd>Wins and points for come live from the Sleeper API on every page load, not from the
+        published file — they move weekly and the room is rebuilt on demand. The table sorts on them once
+        anybody has played; before that it sorts on the projection and says so.</dd>
       <dt>trade archive</dt><dd>${DATA.trade_history.total} completed trades, ${esc(DATA.trade_history.seasons)}: ${
         Object.entries(DATA.trade_history.by_year).map(([y, n]) => `${y} ${n}`).join(" · ")}.</dd>
     </dl>`;
+  }
+
+  /* --------------------------------------------------------------------------- standings */
+  async function loadStandings() {
+    try {
+      // Sleeper sits behind Cloudflare with stale-while-revalidate, so every read of a moving
+      // endpoint carries a unique param. See CLAUDE.md — this has bitten the draft tooling before.
+      const r = await fetch(`${C.API}/league/${C.LEAGUE_ID}/rosters?cb=${Date.now()}`, { cache: "no-store" });
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      const rows = await r.json();
+      STAND = new Map(rows.map((x) => [x.roster_id, {
+        w: x.settings.wins ?? 0, l: x.settings.losses ?? 0, t: x.settings.ties ?? 0,
+        pf: (x.settings.fpts ?? 0) + (x.settings.fpts_decimal ?? 0) / 100,
+        streak: x.metadata?.streak ?? "",
+      }]));
+      // A roster missing from the response would sort as undefined and throw in order(); better to
+      // fall back to the projection than to half-apply a standing.
+      if (DATA.teams.some((t) => !STAND.has(t.roster_id))) throw new Error("roster ids don't line up");
+      standState = "ok";
+    } catch (e) {
+      STAND = null; standState = "err"; standErr = e.message;
+    }
+    paintLeagueMeta();
+    if (DATA) paintLeague();
   }
 
   /* -------------------------------------------------------------------------------- boot */
@@ -257,13 +332,12 @@
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
       d = await r.json();
     } catch (e) {
-      const err = $("#rr-err");
-      err.hidden = false;
-      err.innerHTML = `<div class="panel-error" role="alert">No published roster room (${esc(e.message)}).
+      const el = $("#rr-err");
+      el.hidden = false;
+      el.innerHTML = `<div class="panel-error" role="alert">No published roster room (${esc(e.message)}).
         Run <code>node scripts/build-roster-room.mjs</code> — it writes <code>data/site/roster-room.json</code>.
         The build refuses to run until every roster has players, so before the draft this page is empty by design.</div>`;
       $("#rr-league-body").innerHTML = "";
-      $("#rr-roster-body").innerHTML = "";
       $("#rr-sum-body").innerHTML = "";
       $("#rr-meta").textContent = "unavailable";
       return;
@@ -273,8 +347,7 @@
     const age = (Date.now() - new Date(d.generated).getTime()) / 864e5;
     $("#rr-meta").textContent = `${d.league.name} · ${d.league.season} · built ${d.generated}`;
     $("#rr-meta").classList.add("live");
-    $("#rr-league-meta").textContent =
-      `${d.teams.length} teams · median ${d.coverage.league_median_starters} starting points · ${d.coverage.priced}/${d.coverage.rostered} priced`;
+    paintLeagueMeta();
     if (age > 3) {
       $("#rr-err").hidden = false;
       $("#rr-err").innerHTML = `<div class="stale-warn">This room was built ${Math.floor(age)} days ago.
@@ -284,6 +357,8 @@
     paintMethod();
     const want = +new URLSearchParams(location.search).get("team");
     const mine = d.teams.find((t) => t.is_me);
-    select(d.teams.some((t) => t.roster_id === want) ? want : (mine ? mine.roster_id : d.teams[0].roster_id));
+    select(d.teams.some((t) => t.roster_id === want) ? want : (mine ? mine.roster_id : d.teams[0].roster_id),
+      { scroll: false });
+    loadStandings();
   })();
 })();

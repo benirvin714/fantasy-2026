@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap">
-  <link rel="stylesheet" href="style.css?v=47">
+  <link rel="stylesheet" href="style.css?v=48">
   <link rel="stylesheet" href="backdrop.css?v=2">
   <script>/* ?bg=none disables the backdrop for this visit - see backdrop.css */
     if (new URLSearchParams(location.search).get("bg") === "none")
@@ -68,9 +68,15 @@
     </div>
 
     <div class="col">
-      <section class="panel panel-featured" aria-labelledby="standings-h">
-        <div class="panel-head"><h2 id="standings-h">Standings</h2><span class="meta">top 6 make the playoffs</span></div>
-        <div class="panel-body" id="standings-body"><div class="loading">Loading standings…</div></div>
+      <!-- My roster, in this league's slot shape. It replaced the standings table here: a 0-0
+           standing tells you nothing for months, whereas the lineup is the thing you act on every
+           week. The standings moved to the roster room, where they sort the whole league. -->
+      <section class="panel panel-featured" aria-labelledby="myroster-h">
+        <div class="panel-head">
+          <h2 id="myroster-h">My roster</h2>
+          <span class="meta" id="myroster-meta"></span>
+        </div>
+        <div class="panel-body" id="myroster-body"><div class="loading">Loading roster…</div></div>
       </section>
 
       <section class="panel" aria-labelledby="waivers-h">
@@ -92,12 +98,16 @@
   </main>
 
   <footer>
-    Live data: Sleeper public API (read-only). NFL updates: published by the daily events routine.
-    Waiver board &amp; brief: published by the /waivers and /brief commands — this page never generates
-    analysis on its own, and shows explicit errors instead of stale or invented data.
+    Live data: Sleeper public API (read-only). My roster: published by <code>scripts/build-roster-room.mjs</code>,
+    with per-player dossiers from <code>scripts/build-player-news.mjs</code> — click any name. NFL updates:
+    published by the daily events routine. Waiver board &amp; brief: published by the /waivers and /brief
+    commands — this page never generates analysis on its own, and shows explicit errors instead of stale or
+    invented data.
   </footer>
 
-  <script src="config.js?v=8"></script>
-  <script src="app.js?v=8"></script>
+  <script src="config.js?v=9"></script>
+  <script src="player-news.js?v=1"></script>
+  <script src="roster-table.js?v=1"></script>
+  <script src="app.js?v=9"></script>
 </body>
 </html>
