@@ -63,9 +63,7 @@ The draft board runs a **3-layer valuation model** (asset → scarcity → aucti
 3. **Roster room, narrative layer (optional)**: §1.20 ships with a summary assembled from its own numbers and no Claude-written prose. The natural Phase 2 is the same shape as the on-deck panel's — a published JSON the page reads for the judgment arithmetic can't reach (how a specific owner will *react* to an offer, whether a projection gap is a real disagreement or noise). The page must never go dark without it.
 4. **Optional**: what's left of `context.*` on the player object - **contract year** and **playoff SOS** - is still `null` and rendered nowhere. Either fill it or drop the field. The other two are covered elsewhere now and don't need this field: rookie draft capital renders as the `R1.03` badge (§1.18), and **win total** ships per-team in the offensive-environment layer (§1.19).
 
-5. **Decide who rebuilds `player-news.json`** (2026-09-01): it joins three feeds, two of which move on a schedule (`nfl-events.json` twice daily, `draft-board.json` daily) while the dossier file is built on demand. The natural home is the `nfl-daily-events` routine, alongside `roster-room.json` - which has the same problem and is also manual. Left alone deliberately: changing a scheduled task is a standing-configuration change, not part of the panel work. Until then the dialog shows its own age past two days and names the rebuild command.
-
-**Done, removed from this list:** the 2026 league renewal (league `1386608052991447040`, verified 2026-07-22; `CLAUDE.md`, `site/config.js`, `scripts/fetch-league-data.ps1` and `data/raw/` all carry it) and the scouting sweep (complete over the skill pool).
+**Done, removed from this list:** wiring `roster-room.json`, `player-news.json` and `/waivers` into the twice-daily routine (2026-09-01, see Key files below), the 2026 league renewal (league `1386608052991447040`, verified 2026-07-22; `CLAUDE.md`, `site/config.js`, `scripts/fetch-league-data.ps1` and `data/raw/` all carry it) and the scouting sweep (complete over the skill pool).
 
 ## Key files & tunables
 
@@ -76,7 +74,7 @@ The draft board runs a **3-layer valuation model** (asset → scarcity → aucti
 - **`scripts/build-player-news.mjs`** — joins `roster-room.json` + `draft-board.json` + `nfl-events.json` into `data/site/player-news.json`, one dossier per rostered player. Offline, no network. Prints its coverage and every unmatched event name. `npm run build:player-news`.
 - **`site/player-news.js` / `site/roster-table.js`** — the click-a-name dialog (one delegated `[data-pid]` listener, lazy fetch) and the roster table shared by in-season HQ and the roster room.
 - **`plans/valuation-and-scouting.md`** — design of record (§1 valuation is current; §2 scouting; §1.8 low-tier).
-- **`~/.claude/scheduled-tasks/nfl-daily-events/SKILL.md`** — the twice-daily (4:05am/4:05pm CT) news + board-refresh + re-scout-drip routine (outside the repo). Doubled from once daily on 2026-08-11 for the pre-draft run-up.
+- **`~/.claude/scheduled-tasks/nfl-daily-events/SKILL.md`** — the twice-daily (4:05am/4:05pm CT) routine (outside the repo). Doubled from once daily on 2026-08-11 for the pre-draft run-up. **As of 2026-09-01 it is the full dashboard refresh, eleven steps**: news scan -> validate -> draft board + re-scout queue -> drip up to 3 briefs -> **roster room -> player dossiers** (step 8, in that order, since the dossiers join what the other two write) -> **`/waivers`** (step 9, gated on `node scripts/nfl-state.mjs` printing IN-SEASON) -> publish -> summary. Its pre-draft weighting and the "Ben drafts 2026-08-23" line were replaced with in-season weighting in the same pass. **Known duplication**: the standalone `nfl-waivers` task still runs at 07:15 daily, so `waivers.json` is now written up to three times a day and the last run wins. Retire one of the two when it starts to grate.
 
 ## Watch-outs
 

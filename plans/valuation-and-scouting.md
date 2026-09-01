@@ -825,6 +825,27 @@ dialog + a single delegated `[data-pid]` listener, so markup rendered later stil
 `site/roster-table.js`; the league table, standings fetch and expansion state in `site/rosters.js`;
 `renderMyRoster` in `site/app.js`; the `.rr-exp*` / `.pn-*` block at the tail of `site/style.css`.
 
+**Follow-ups the same day.** Two things the DOM measurements passed and looking at the page did not.
+The expanded roster stretched to the full 1400px league table with 600px of nothing between a name
+and its projection, and the disclosure caret used U+25B8/U+25BE, which Manrope draws with so little
+ink it reads as a hyphen at 10px. The caret went to the full-size U+25B6/U+25BC at 8px. The roster
+went to **two columns, starters left and bench right** - `roster-table.js` takes a `{split: true}`
+option rather than deciding by media query, because the constraint is the container and the two
+callers know their own width: the roster room's expanded row spans the league table, HQ's panel is
+about 560px and would only squeeze both halves. In the split the bench drops its slot column (every
+row said BN) and both columns get a caption, held to one line by a `min-height` so the two tables'
+header rows land on the same line at any width. Under 900px it stacks back to one column, and HQ
+renders the original stacked table unchanged.
+
+**Then the schedule.** `roster-room.json` and `player-news.json` were both built on demand while
+their inputs moved twice a day, which is exactly the staleness the dialog's own age check was there
+to confess. Both now run in the `nfl-daily-events` routine as step 8, in that order (the dossiers
+join what the other two write), followed by `/waivers` as step 9 behind a `node
+scripts/nfl-state.mjs` season gate. The routine went from six steps of news-and-board to the full
+dashboard refresh, and its expired pre-draft weighting was replaced with in-season weighting in the
+same pass. One known duplication left standing: the separate `nfl-waivers` task at 07:15 still runs,
+so `waivers.json` is written up to three times a day and the newest wins.
+
 **Two CSS notes for whoever touches this next.** The mobile column hiding in the roster-room block
 is now by class (`.rr-c-sw`, `.rr-c-vs`, `.rr-c-tr`) instead of `nth-child`: the column order changed
 in this very pass, and a positional selector would have quietly started hiding the wrong pair. And

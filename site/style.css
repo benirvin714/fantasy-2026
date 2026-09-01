@@ -1360,10 +1360,23 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
   padding: 6px 2px; border-bottom: 1px solid var(--border); font-size: 12px;
 }
 .rr-exphead b { font-size: 13px; }
-/* Capped rather than full-bleed. The roster table is five short columns and was designed for a
-   400px panel; stretched across a 1400px league table it puts 600px of nothing between a name and
-   its projection, which is a long horizontal scan for no information. */
-.rr-exprow .rr-rtab { margin-top: 2px; max-width: 880px; }
+/* Starters left, bench right. The expanded row spans the whole league table, and a single 16-row
+   list down one side of a 1400px card is mostly empty card. Two columns of equal share rather than
+   content-sized: the bench has five rows to the starters' ten, so sizing to content would leave the
+   short column stranded against the long one instead of squaring the block off. */
+.rr-rwrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 4px 28px; align-items: start; }
+.rr-rcol { min-width: 0; }
+/* min-height, not just padding: the two captions have to leave their tables' header rows on the
+   same line, and a caption that wraps at a middling width would otherwise push one column down. */
+.rr-rcap {
+  padding: 7px 2px 4px; min-height: 30px; font-family: var(--font-data); font-size: 11px;
+  letter-spacing: .06em; text-transform: uppercase; color: var(--moss);
+}
+.rr-rcap .faint { text-transform: none; letter-spacing: 0; margin-left: 6px; }
+/* The bench table's own header row would otherwise sit a row higher than the starters' - it has one
+   fewer column and no `Slot` cell to set the height - so both get the same top border to line up on. */
+.rr-rwrap .rr-rtab { margin-top: 0; }
+.rr-exprow .rr-rtab { margin-top: 2px; }
 
 /* ---------- a player's name, as a control ---------- */
 /* It has to still read as the name it replaced - a roster table where every row is a visible button
@@ -1442,6 +1455,10 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
 @media (max-width: 900px) {
   .rr-exprow > td { padding: 0 2px 10px; }
   .rr-exp { padding: 2px 6px 6px; }
+  /* Below this the two columns stop being two columns. 320px each is under the width the roster
+     table needs for a name plus four numbers, and the result is two squeezed lists rather than one
+     readable one. */
+  .rr-rwrap { grid-template-columns: minmax(0, 1fr); gap: 0; }
   .pn-dlg { width: 100vw; max-width: 100vw; max-height: 92vh; border-radius: 0; }
   .pn-body { max-height: calc(92vh - 62px); }
   .pn-close { min-height: 44px; min-width: 44px; }

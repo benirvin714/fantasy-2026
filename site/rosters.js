@@ -85,7 +85,7 @@
               <b>${esc(t.owner)}</b><span class="faint">${esc(window.HBGB_RosterTable.meta(t))}</span>
               <span class="faint">click any name for the latest published on that player</span>
             </div>
-            ${window.HBGB_RosterTable.html(t)}
+            ${window.HBGB_RosterTable.html(t, { split: true })}
           </div></td></tr>`;
       }
     });
