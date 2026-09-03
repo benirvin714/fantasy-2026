@@ -853,6 +853,87 @@ in this very pass, and a positional selector would have quietly started hiding t
 the phone touch target for what is now the page's primary control came from cell padding instead,
 measured at 43px against a 35px row before.
 
+### 1.23 Draft Aid - the phone board on its own host - 2026-09-03
+
+**What it is.** A second, much smaller draft tool at **https://draft.irvinfamily.com**, built for a
+phone in a draft room rather than a laptop on a desk. It is a tiered board and nothing else: Boris
+Chen's half-PPR tiers, tap a name to cross him off, paste a Sleeper draft ID and the picks strike
+themselves off every 10 seconds. Files: `site/aid/{index.html,aid.css,aid.js}` plus
+`scripts/build-draft-aid.mjs` -> `data/site/draft-aid.json`.
+
+**Why it is not another page on `hbgbs-hq`.** `site/draft.html` is the real analytical board -
+draft-$, edge, scarcity knobs, the target rail, the on-deck prep panel, the offense rail. Three
+columns of it need a 1540px viewport. Squeezing that onto 393px would mean either hiding most of it
+behind disclosure or shrinking it below the point where the numbers are readable, and it would drag
+the desktop layout around every time the phone layout needed something. Two tools, two hosts, one
+repo: the aid is a *reading* surface for when you are standing up, the board stays the *thinking*
+surface for when you are sitting down. They share the tier data and nothing else, which is what
+keeps them from disagreeing about a tier.
+
+**The origin.** Ben pointed at `jayzheng.com/ff/`, a Boris Chen tier board with click-to-cross-off,
+and asked for it on his own domain with live Sleeper sync. That site's own code was not copied and
+is not vendored here - its rankings are a static snapshot compiled into a React bundle, so copying
+it would have shipped frozen tiers as well as somebody else's source. What was taken is the *shape*
+of the thing: tier bands, position views, cross a name off with one tap. The tiers come from the
+same public upstream that site credits, `fftiers` (github.com/borisachen/fftiers), which this repo
+was already fetching for the desktop board.
+
+**Data.** `draft-aid.json` is derived from `draft-board.json`, not fetched separately, so the two
+boards cannot drift apart on tiers. It carries eight fields per player - Sleeper id, name, position,
+team, bye, Boris Chen rank and tier, ADP - and comes out at **21KB against the board's 797KB**. That
+ratio is the whole reason the file exists: draft day is exactly when you are on cell service in
+somebody's basement. A player earns a row if he has either a Boris Chen rank or an ADP; ranked
+players sort in consensus order, the ADP-only tail after them.
+
+**The join is on Sleeper id, not name.** Every row carries `ids.sleeper` from the board, and Sleeper's
+pick feed returns `player_id`, so a pick strikes the right row with no name normalisation in the
+path. Defenses work because both sides key them by team abbreviation (`HOU`, `DEN`).
+
+**Two sets, deliberately.** `manual` (you tapped him) persists to localStorage, is undoable and is
+what `reset` clears. `live` (Sleeper says he is gone) is never persisted and never undoable. The
+union is what gets struck through. Keeping them apart is what makes `reset` safe mid-draft - it
+wipes your own marks and the next poll repaints Sleeper's, instead of blanking the board until
+somebody makes a pick. Tapping a live-taken player is a no-op for the same reason: a local un-mark
+of a real pick is just a way to draft somebody who is already rostered.
+
+**Polling.** 10s, the cadence asked for, backing off by doubling to a 60s ceiling while the origin
+is failing and dropping straight back to 10s on the first good read. It stops entirely on
+`status == "complete"`. A failing sync never wipes the last good picture; it says it is stale and
+reports how old the last good read was, because a frozen board that admits it beats an empty one
+that says nothing. Every request carries a unique cache-busting param - Sleeper sits behind
+Cloudflare with `stale-while-revalidate=300` and **will** hand back a pick list minutes old, which
+this repo measured on its own draft (41 picks vs 65 on the same endpoint).
+
+**Phone specifics, in one list because they are all small and all load-bearing.** `viewport-fit=cover`
+plus `env(safe-area-inset-*)` padding, so the header paints under the Dynamic Island without putting
+anything under it. A 16px floor on every text input - below that iOS zooms the viewport on focus and
+you spend the next pick pinching back out. `touch-action: manipulation` to kill the double-tap-zoom
+delay, which on a tap-to-cross-off board is the entire interaction. 46px rows against the 44px
+target floor. A **screen wake lock** while a draft is connected, because a phone that sleeps between
+picks is the single most annoying thing about drafting on one; it is re-requested on
+`visibilitychange`, which also forces an immediate poll rather than waiting out a timer iOS froze
+while the tab was backgrounded.
+
+**Two list modes.** The All tab groups into tier cards - the band, not the row, is the unit you read,
+which is Boris Chen's whole idea. A position tab or a search does not: filtering to one position
+leaves most tiers holding a single player, and a card header above each one was measured at roughly
+half the vertical space for no information. Those render flat, with a tier chip and a coloured left
+stripe per row, which fit 11 TEs on screen where the grouped version fit 5.
+
+**Hosting.** Its own Pages project `hbgbs-draft` from this same repo, build command copying only
+`site/aid/*` and `data/site/draft-aid.json` into `dist` - the strategy docs, the league dossiers and
+the 797KB desktop board are not served on this host. Gated by its own Access app
+(`8f4eca24-d8de-4339-a97b-81d830c36636`, 730h session) covering `draft.irvinfamily.com`,
+`hbgbs-draft.pages.dev` and `*.hbgbs-draft.pages.dev`. The gate was created **before** the DNS record,
+per the correction in `..\hosting-plan.md`: Access accepts a hostname that does not resolve yet, so
+gating first means there is never an ungated window.
+
+**A caveat worth keeping in front of whoever reads this next.** The 2026 HBGBs draft is **complete** -
+150 picks, league `in_season`. This tool was verified against that finished draft (it read all 150
+picks, struck 148 of its 248 rows, and correctly stopped polling on `status == "complete"`), but it
+has no live HBGBs draft to sync with this season. Its first real use is a 2027 draft or another
+league's.
+
 ## 2. Challenge 2 — `scouting_brief` (public commentary)
 
 ### 2.1 What it is

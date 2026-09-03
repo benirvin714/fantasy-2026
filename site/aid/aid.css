@@ -1,0 +1,342 @@
+/* Draft Aid — phone-first tiered board.
+ *
+ * Sized for an iPhone 14 Pro held in portrait: 393 x 852 CSS px, with a 59px Dynamic Island inset
+ * at the top and a 34px home-indicator inset at the bottom. The layout is a sticky control stack
+ * (header, search, position tabs, action bar) over one scrolling column, so the only thing that
+ * ever moves under your thumb is the player list.
+ *
+ * Everything below assumes light mode. The source board is a light-on-white cheat sheet and a
+ * draft room is usually a bright room; a dark variant would be a second design to keep honest for
+ * no gain, so this one commits.
+ */
+
+:root {
+  --ink: #16181a;
+  --ink-2: #5b6167;
+  --ink-3: #8b9299;
+  --bg: #f2f4f3;
+  --card: #ffffff;
+  --line: #e2e6e4;
+  --line-2: #cfd5d2;
+  --accent: #2f7d32;
+  --accent-ink: #ffffff;
+  --bad: #b3261e;
+
+  /* Safe areas, defaulting to 0 on anything that is not a notched phone. */
+  --sa-top: env(safe-area-inset-top, 0px);
+  --sa-bot: env(safe-area-inset-bottom, 0px);
+  --sa-l: env(safe-area-inset-left, 0px);
+  --sa-r: env(safe-area-inset-right, 0px);
+}
+
+* { box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;   /* iOS otherwise inflates text when you rotate */
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 400 15px/1.35 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, system-ui, sans-serif;
+  /* Kills the double-tap-to-zoom delay, which on a tap-to-cross-off board is the whole interaction. */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+}
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+/* ---------- header stack ------------------------------------------------------------------- */
+
+.hdr {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--card);
+  border-bottom: 1px solid var(--line-2);
+  padding: calc(var(--sa-top) + 8px) calc(var(--sa-r) + 12px) 0 calc(var(--sa-l) + 12px);
+  /* The header is the one surface that sits under the Island, so it gets the blur treatment that
+     makes scrolled content read as passing behind it rather than colliding with it. */
+  backdrop-filter: saturate(1.4) blur(12px);
+  -webkit-backdrop-filter: saturate(1.4) blur(12px);
+}
+
+.hdr-row { display: flex; align-items: center; gap: 10px; }
+
+.hdr h1 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  flex: 1;
+}
+
+/* ---------- live-sync pill + panel --------------------------------------------------------- */
+
+.sync-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  min-height: 34px; padding: 0 11px;
+  border: 1px solid var(--line-2); border-radius: 999px;
+  background: #fbfcfb; color: var(--ink-2);
+  font: 600 13px/1 inherit;
+  cursor: pointer;
+}
+.sync-pill .dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--ink-3);
+  flex: none;
+}
+.sync-pill.live { border-color: #b7dcb9; background: #eef7ee; color: #1f5c22; }
+.sync-pill.live .dot { background: var(--accent); animation: pulse 2s ease-in-out infinite; }
+.sync-pill.bad { border-color: #eec4c1; background: #fdf1f0; color: var(--bad); }
+.sync-pill.bad .dot { background: var(--bad); }
+.sync-pill.done { border-color: var(--line-2); background: #f4f5f4; }
+.sync-pill.done .dot { background: var(--ink-2); }
+
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+@media (prefers-reduced-motion: reduce) { .sync-pill.live .dot { animation: none; } }
+
+.sync-panel { padding: 10px 0 2px; border-top: 1px solid var(--line); margin-top: 8px; }
+.sync-input { display: flex; gap: 8px; }
+.sync-input input {
+  flex: 1; min-width: 0;
+  min-height: 44px; padding: 0 12px;
+  border: 1px solid var(--line-2); border-radius: 10px;
+  background: #fff; color: var(--ink);
+  font: 400 16px/1 inherit;   /* 16px floor: below it iOS zooms the page on focus */
+}
+.sync-input input:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+
+.btn-primary {
+  min-height: 44px; padding: 0 16px;
+  border: 0; border-radius: 10px;
+  background: var(--accent); color: var(--accent-ink);
+  font: 600 15px/1 inherit;
+  cursor: pointer;
+}
+.btn-primary.on { background: #6b7280; }
+
+.sync-note { margin: 8px 0 4px; font-size: 12px; line-height: 1.4; color: var(--ink-2); }
+.sync-note code { font: 500 11.5px/1 ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--ink); }
+.sync-note.bad { color: var(--bad); }
+
+/* ---------- search ------------------------------------------------------------------------- */
+
+.tools { padding: 8px 0; }
+.srch { position: relative; display: flex; align-items: center; }
+.srch-ico {
+  position: absolute; left: 11px;
+  font-size: 17px; color: var(--ink-3); pointer-events: none;
+}
+.srch input {
+  width: 100%;
+  min-height: 40px; padding: 0 38px;
+  border: 1px solid var(--line-2); border-radius: 10px;
+  background: #f7f8f7; color: var(--ink);
+  font: 400 16px/1 inherit;
+  -webkit-appearance: none; appearance: none;
+}
+.srch input::-webkit-search-decoration,
+.srch input::-webkit-search-cancel-button { -webkit-appearance: none; }
+.srch input:focus { outline: 2px solid var(--accent); outline-offset: -1px; background: #fff; }
+.srch-x {
+  position: absolute; right: 4px;
+  width: 34px; height: 34px;
+  border: 0; border-radius: 50%; background: transparent;
+  color: var(--ink-2); font-size: 21px; line-height: 1; cursor: pointer;
+}
+
+/* ---------- position tabs ------------------------------------------------------------------ */
+
+.tabs {
+  display: flex; gap: 4px;
+  overflow-x: auto;
+  /* Bleeds to the physical screen edges so the row can scroll past them rather than looking clipped. */
+  margin: 0 calc(-1 * (var(--sa-r) + 12px)) 0 calc(-1 * (var(--sa-l) + 12px));
+  padding: 0 calc(var(--sa-r) + 12px) 8px calc(var(--sa-l) + 12px);
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.tabs::-webkit-scrollbar { display: none; }
+.tabs button {
+  flex: none;
+  min-height: 34px; padding: 0 14px;
+  border: 1px solid var(--line-2); border-radius: 999px;
+  background: #fff; color: var(--ink-2);
+  font: 600 14px/1 inherit;
+  cursor: pointer;
+}
+.tabs button[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
+
+/* ---------- action bar --------------------------------------------------------------------- */
+
+.bar {
+  display: flex; align-items: center; gap: 8px;
+  padding: 0 0 8px;
+}
+.toggle, .ghost {
+  min-height: 32px; padding: 0 10px;
+  border: 1px solid var(--line-2); border-radius: 8px;
+  background: #fff; color: var(--ink-2);
+  font: 600 13px/1 inherit;
+  cursor: pointer;
+}
+.toggle[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
+.ghost:disabled { opacity: 0.4; }
+.bar-count { flex: 1; font-size: 12px; color: var(--ink-3); text-align: right; }
+
+/* ---------- the list ----------------------------------------------------------------------- */
+
+.list {
+  padding: 8px calc(var(--sa-r) + 10px) calc(var(--sa-bot) + 8px) calc(var(--sa-l) + 10px);
+}
+
+.tier {
+  margin: 0 0 10px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.tier-head {
+  display: flex; align-items: baseline; gap: 8px;
+  padding: 7px 12px;
+  font: 700 12px/1.2 inherit;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #253026;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+.tier-head .n {
+  margin-left: auto;
+  font-weight: 600; letter-spacing: 0; text-transform: none;
+  color: var(--ink-2);
+}
+
+/* Tier bands. Boris Chen's whole idea is that players inside a tier are interchangeable, so the
+   band, not the row, is the unit you read. Six hues cycling means neighbouring tiers never share
+   a colour, which is the only job the colour has to do. */
+.tier[data-band="0"] .tier-head { background: #dff0dd; }
+.tier[data-band="1"] .tier-head { background: #dceaf5; }
+.tier[data-band="2"] .tier-head { background: #f7ecd6; }
+.tier[data-band="3"] .tier-head { background: #e9e2f3; }
+.tier[data-band="4"] .tier-head { background: #d9efee; }
+.tier[data-band="5"] .tier-head { background: #f6e0e2; }
+.tier[data-band="x"] .tier-head { background: #eef0ef; color: var(--ink-2); }
+
+.row {
+  display: flex; align-items: center; gap: 9px;
+  width: 100%;
+  min-height: 46px;            /* comfortably over the 44px tap-target floor */
+  padding: 6px 12px;
+  border: 0;
+  border-top: 1px solid var(--line);
+  background: var(--card);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.tier .row:first-of-type { border-top: 0; }
+.row:active { background: #eef1ef; }
+.row:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+.row .rk {
+  flex: none; width: 26px;
+  font: 500 12px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+  color: var(--ink-3);
+  text-align: right;
+}
+
+/* Flat rows (position tabs, search results) carry their tier themselves: a chip for the number and
+   a stripe down the left edge for the colour, so a run of same-tier players still reads as a block
+   without a card header announcing it. */
+.row .tchip {
+  flex: none; width: 26px;
+  font: 700 11px/1 inherit;
+  color: #3c4247;
+  text-align: center;
+}
+.row[data-band] { box-shadow: inset 3px 0 0 var(--band, transparent); }
+.row[data-band="0"] { --band: #86bd83; }
+.row[data-band="1"] { --band: #7fa8cc; }
+.row[data-band="2"] { --band: #d8b56f; }
+.row[data-band="3"] { --band: #a795cd; }
+.row[data-band="4"] { --band: #74c0bd; }
+.row[data-band="5"] { --band: #d99196; }
+.row[data-band="x"] { --band: #c8cecb; }
+.row.gone .tchip { color: var(--ink-3); }
+.row.gone[data-band] { box-shadow: inset 3px 0 0 #dfe3e1; }
+.row .pos {
+  flex: none; min-width: 34px;
+  padding: 3px 5px;
+  border-radius: 5px;
+  font: 700 11px/1 inherit;
+  text-align: center;
+  color: #fff;
+}
+.pos-QB { background: #b5566d; }
+.pos-RB { background: #3f8f5c; }
+.pos-WR { background: #3d6fb0; }
+.pos-TE { background: #c07d3a; }
+.pos-K  { background: #7a7f85; }
+.pos-DEF { background: #6a5c9e; }
+
+.row .nm { flex: 1; min-width: 0; font-size: 15.5px; font-weight: 500; letter-spacing: -0.01em; }
+.row .nm .who { display: block; }
+.row .nm .sub {
+  display: block;
+  font: 400 11.5px/1.3 inherit;
+  color: var(--ink-3);
+}
+.row .adp {
+  flex: none;
+  font: 500 12px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+  color: var(--ink-3);
+}
+
+/* Drafted. Struck through and faded rather than removed, because who has already gone is half of
+   what you read a tier for. `hide drafted` is there for when you would rather it were not. */
+/* The strike lands on the name only. text-decoration is painted by the element that declares it and
+   a descendant cannot cancel it, so striking `.nm` would drag the team/bye line through too. */
+.row.gone { background: #fafbfa; }
+.row.gone .nm { color: var(--ink-3); }
+.row.gone .who, .row.gone .rk { text-decoration: line-through; }
+.row.gone .rk, .row.gone .adp { color: var(--ink-3); }
+.row.gone .pos { opacity: 0.35; }
+.row .by {
+  flex: none;
+  font: 600 10px/1 inherit;
+  letter-spacing: 0.03em;
+  color: var(--accent);
+  text-transform: uppercase;
+}
+
+.loading, .empty { padding: 28px 12px; text-align: center; color: var(--ink-3); font-size: 14px; }
+.err { padding: 16px 12px; color: var(--bad); font-size: 14px; }
+
+/* ---------- footer ------------------------------------------------------------------------- */
+
+.ftr {
+  padding: 4px calc(var(--sa-r) + 14px) calc(var(--sa-bot) + 22px) calc(var(--sa-l) + 14px);
+  color: var(--ink-3);
+  font-size: 11.5px;
+  line-height: 1.45;
+}
+.ftr p { margin: 0 0 6px; }
+
+/* ---------- wider screens ------------------------------------------------------------------
+   The phone is the target, but the same page opened on a laptop should not be a 393px ribbon in
+   the middle of nothing. Two columns of tiers from 720px, capped so lines stay readable. */
+@media (min-width: 720px) {
+  .hdr, .list, .ftr { max-width: 1100px; margin-inline: auto; }
+  .list { columns: 2; column-gap: 12px; }
+  .tier { break-inside: avoid; }
+}
