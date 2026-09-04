@@ -17,9 +17,9 @@
   const K_MANUAL = "draft-aid-manual";
   const K_DRAFTID = "draft-aid-draftid";
   const K_HIDE = "draft-aid-hide-drafted";
+  const K_FMT = "draft-aid-format";
   const POLL_MS = 10000;        // the cadence asked for: every 10s once a draft is connected
   const POLL_MAX_MS = 60000;    // ...backing off to this while the origin is failing
-  const ADP_SENTINEL = 300;     // above this the board's ADP is a "never drafted" placeholder
 
   const $ = (sel) => document.querySelector(sel);
   const el = {
@@ -31,6 +31,8 @@
     undo: $("#undo"),
     reset: $("#reset"),
     count: $("#bar-count"),
+    scoring: $("#scoring"),
+    scoringNote: $("#scoring-note"),
     pill: $("#sync-pill"),
     pillDot: $("#sync-dot"),
     pillLabel: $("#sync-label"),
@@ -43,8 +45,9 @@
 
   // ---------- state -------------------------------------------------------------------------
 
-  let players = [];
+  let players = [];        // sorted for the CURRENT format; re-sorted whenever the format changes
   let meta = null;
+  let fmt = localStorage.getItem(K_FMT) || "half";
   let pos = "ALL";
   let query = "";
   let hideDrafted = localStorage.getItem(K_HIDE) === "1";
@@ -56,6 +59,8 @@
   const sync = {
     id: null, on: false, status: null, picks: 0, lastPick: null,
     err: null, lastOk: null, delay: POLL_MS, timer: null, wakeLock: null,
+    shaped: false,      // has this connection's scoring/roster shape been read yet
+    superflex: false,
   };
 
   function readManual() {
@@ -67,6 +72,45 @@
   }
 
   const isGone = (p) => manual.has(p.id) || live.has(p.id);
+
+  // ---------- scoring format ------------------------------------------------------------------
+
+  // Each player carries {r, tr, a} per format under `f`. Everything downstream reads through here,
+  // so switching format is a re-sort and a repaint rather than a second data file.
+  const F = (p) => p.f?.[fmt] ?? {};
+
+  /* Ranked players in consensus order, then the ADP-only tail cheapest first. Re-run on every
+     format change: Ja'Marr Chase is WR1 overall in PPR and third in standard, and a board that
+     kept one order across all three would be quietly wrong in two of them. */
+  function sortForFormat() {
+    players.sort((x, y) => {
+      const a = F(x), b = F(y);
+      if (a.r != null && b.r != null) return a.r - b.r;
+      if (a.r != null) return -1;
+      if (b.r != null) return 1;
+      return (a.a ?? 9999) - (b.a ?? 9999);
+    });
+  }
+
+  function setFormat(next, reason) {
+    if (!next || !meta?.formats?.[next] || next === fmt) {
+      if (reason) paintScoring(reason);
+      return;
+    }
+    fmt = next;
+    try { localStorage.setItem(K_FMT, fmt); } catch { /* private mode */ }
+    sortForFormat();
+    paintScoring(reason);
+    paintList();
+  }
+
+  function paintScoring(reason) {
+    for (const b of el.scoring.querySelectorAll("button")) {
+      b.setAttribute("aria-pressed", String(b.dataset.fmt === fmt));
+    }
+    el.scoringNote.textContent = reason ?? "";
+    el.scoringNote.hidden = !reason;
+  }
 
   // ---------- rendering ---------------------------------------------------------------------
 
@@ -80,13 +124,14 @@
   function rowHtml(p, flat) {
     const gone = isGone(p);
     const pickNo = live.get(p.id);
+    const f = F(p);
     const sub = [p.t || "FA", p.b ? `bye ${p.b}` : null].filter(Boolean).join(" · ");
-    const adp = p.a != null && p.a < ADP_SENTINEL ? `${p.a.toFixed(1)}` : "";
+    const adp = f.a != null ? `${f.a.toFixed(1)}` : "";
     const lead = flat
-      ? `<span class="tchip">${p.tr != null ? `T${p.tr}` : "–"}</span>`
-      : `<span class="rk">${p.r ?? ""}</span>`;
+      ? `<span class="tchip">${f.tr != null ? `T${f.tr}` : "–"}</span>`
+      : `<span class="rk">${f.r ?? ""}</span>`;
     return `<button class="row${gone ? " gone" : ""}" data-id="${p.id}"
-        aria-pressed="${gone}"${flat ? ` data-band="${bandOf(p.tr)}"` : ""}>
+        aria-pressed="${gone}"${flat ? ` data-band="${bandOf(f.tr)}"` : ""}>
       ${lead}
       <span class="pos pos-${p.p}">${posLabel(p.p)}</span>
       <span class="nm"><span class="who">${esc(p.n)}</span><span class="sub">${sub}</span></span>
@@ -131,7 +176,7 @@
     const groups = [];
     let cur = null;
     for (const p of rows) {
-      const key = p.tr ?? "x";
+      const key = F(p).tr ?? "x";
       if (!cur || cur.key !== key) { cur = { key, items: [] }; groups.push(cur); }
       cur.items.push(p);
     }
@@ -170,6 +215,31 @@
     return r.json();
   }
 
+  /* The draft object states its own scoring and roster shape, so the board configures itself from
+     the thing you connected instead of trusting you to have remembered which league this is. Only
+     acted on once per connection — re-applying it every 10s would fight you if you deliberately
+     switched formats mid-draft to peek at another set of tiers. */
+  const SCORING_MAP = { std: "std", standard: "std", half_ppr: "half", ppr: "ppr" };
+  function applyDraftShape(info) {
+    if (sync.shaped) return;
+    sync.shaped = true;
+
+    const detected = SCORING_MAP[String(info?.metadata?.scoring_type ?? "").toLowerCase()];
+    const s = info?.settings ?? {};
+    // Superflex shows up either as an explicit slot or as a second starting QB.
+    const superflex = (s.slots_super_flex ?? 0) > 0 || (s.slots_qb ?? 0) >= 2;
+    sync.superflex = superflex;
+
+    const bits = [];
+    if (detected && detected !== fmt) bits.push(`switched to ${meta?.formats?.[detected]?.label ?? detected} — the draft says so`);
+    else if (detected) bits.push(`${meta?.formats?.[detected]?.label ?? detected}, matching the draft`);
+    else bits.push("draft did not state a scoring type — format left as you set it");
+    if (superflex) bits.push("⚠ superflex/2QB: these are 1QB tiers, so QBs rank far too low here");
+
+    if (detected) setFormat(detected, bits.join(" · "));
+    else paintScoring(bits.join(" · "));
+  }
+
   async function pollOnce() {
     const [info, picks] = await Promise.all([
       sleeperGet(`/draft/${sync.id}`),
@@ -177,6 +247,7 @@
     ]);
     sync.status = info?.status ?? null;
     sync.picks = picks.length;
+    applyDraftShape(info);
 
     live.clear();
     for (const p of picks) if (p.player_id) live.set(String(p.player_id), p.pick_no);
@@ -216,6 +287,7 @@
 
   async function connect(id) {
     sync.id = id; sync.on = true; sync.err = null; sync.delay = POLL_MS;
+    sync.shaped = false; sync.superflex = false;
     el.pillLabel.textContent = "connecting…";
     try {
       await pollOnce();
@@ -233,10 +305,14 @@
   function disconnect() {
     sync.on = false; sync.err = null; sync.status = null;
     sync.picks = 0; sync.lastPick = null; sync.id = null;
+    sync.shaped = false; sync.superflex = false;
     clearTimeout(sync.timer);
     live.clear();
     releaseWakeLock();
     try { localStorage.removeItem(K_DRAFTID); } catch { /* private mode */ }
+    // The format stays where the draft put it — you are usually disconnecting from the draft you
+    // are still in, and silently reverting the tiers under you would be worse than leaving them.
+    paintScoring(null);
     paintList(); paintSync();
   }
 
@@ -313,6 +389,14 @@
     }
     saveManual();
     paintList();
+  });
+
+  el.scoring.addEventListener("click", (e) => {
+    const b = e.target.closest("button[data-fmt]");
+    if (!b) return;
+    // A hand-picked format after connecting is a deliberate override, so say which it is rather
+    // than leaving the earlier "matching the draft" note standing over a board it no longer describes.
+    setFormat(b.dataset.fmt, sync.on ? "set by hand — no longer following the draft's scoring" : null);
   });
 
   el.tabs.addEventListener("click", (e) => {
@@ -399,9 +483,18 @@
       return;
     }
 
-    el.ftrSrc.textContent = `${meta.counts.total} players · tiers from ${meta.tiers.source || "fftiers"}`
-      + `, updated ${meta.tiers.updated || "unknown"} · ADP: ${meta.adp}.`;
+    if (!meta.formats?.[fmt]) fmt = meta.default_format || "half";
+    for (const b of el.scoring.querySelectorAll("button[data-fmt]")) {
+      const f = meta.formats[b.dataset.fmt];
+      if (f) b.textContent = f.label.replace("Standard", "Std");
+      else b.hidden = true;                       // a format the build could not produce is not offered
+    }
+    sortForFormat();
 
+    el.ftrSrc.textContent = `${meta.players.length} players, ${meta.season} · tiers: ${meta.tiers_source}`
+      + ` (built ${meta.generated}) · ADP: ${meta.adp_source}.`;
+
+    paintScoring(null);
     paintList();
     paintSync();
 

@@ -853,86 +853,98 @@ in this very pass, and a positional selector would have quietly started hiding t
 the phone touch target for what is now the page's primary control came from cell padding instead,
 measured at 43px against a 35px row before.
 
-### 1.23 Draft Aid - the phone board on its own host - 2026-09-03
+### 1.23 Draft Aid - a phone board for any Sleeper draft - 2026-09-03
 
-**What it is.** A second, much smaller draft tool at **https://draft.irvinfamily.com**, built for a
-phone in a draft room rather than a laptop on a desk. It is a tiered board and nothing else: Boris
-Chen's half-PPR tiers, tap a name to cross him off, paste a Sleeper draft ID and the picks strike
-themselves off every 10 seconds. Files: `site/aid/{index.html,aid.css,aid.js}` plus
+**What it is.** A separate, much smaller draft tool at **https://draft.irvinfamily.com**, built for
+a phone in a draft room. Boris Chen tiers, tap a name to cross him off, paste a Sleeper draft ID and
+the picks strike themselves off every 10 seconds. Files: `site/aid/{index.html,aid.css,aid.js}` plus
 `scripts/build-draft-aid.mjs` -> `data/site/draft-aid.json`.
 
-**Why it is not another page on `hbgbs-hq`.** `site/draft.html` is the real analytical board -
-draft-$, edge, scarcity knobs, the target rail, the on-deck prep panel, the offense rail. Three
-columns of it need a 1540px viewport. Squeezing that onto 393px would mean either hiding most of it
-behind disclosure or shrinking it below the point where the numbers are readable, and it would drag
-the desktop layout around every time the phone layout needed something. Two tools, two hosts, one
-repo: the aid is a *reading* surface for when you are standing up, the board stays the *thinking*
-surface for when you are sitting down. They share the tier data and nothing else, which is what
-keeps them from disagreeing about a tier.
+**It is not an HBGBs tool, and that is the whole design constraint.** It lives in this repo because
+this is where the fftiers plumbing and the deploy pipeline already were, but it is for *whatever
+draft Ben is in* - a different league, not the HBGBs. Nothing about this league's half-PPR scoring,
+248-player pool, roster shape or league id reaches it. Concretely:
+
+- It builds **straight from Sleeper + fftiers**, not from `draft-board.json`. An earlier cut derived
+  it from the board and inherited the HBGBs player pool and half-PPR-only tiers along with it. That
+  was wrong for the actual use and is why the build was rewritten the same day.
+- It carries **all three scoring formats** - standard, half-PPR, PPR - with per-format rank, tier and
+  ADP on every player. Ordering is re-sorted on the client when the format changes, because the
+  answer genuinely differs: Ja'Marr Chase is the overall 1 in PPR and 2 in standard.
+- ADP is **format-matched** too, from Sleeper's own `adp_std` / `adp_half_ppr` / `adp_ppr`.
+- `site/config.js` is not loaded. The page has no league id in it.
+
+**The board configures itself from the draft you connect.** Sleeper's draft object states its own
+`metadata.scoring_type`, so on connect the format switches to match and says so in a line under the
+toggle. Picking a format by hand afterwards is honoured and the note changes to say you have taken
+over. `settings.slots_super_flex > 0` (or two starting QBs) raises a warning that these are 1QB
+tiers and the quarterbacks belong far higher - fftiers publishes no superflex file, so warning is
+the only honest move available. Disconnecting deliberately does *not* revert the format: you are
+usually disconnecting from the draft you are still in.
 
 **The origin.** Ben pointed at `jayzheng.com/ff/`, a Boris Chen tier board with click-to-cross-off,
-and asked for it on his own domain with live Sleeper sync. That site's own code was not copied and
-is not vendored here - its rankings are a static snapshot compiled into a React bundle, so copying
-it would have shipped frozen tiers as well as somebody else's source. What was taken is the *shape*
-of the thing: tier bands, position views, cross a name off with one tap. The tiers come from the
-same public upstream that site credits, `fftiers` (github.com/borisachen/fftiers), which this repo
-was already fetching for the desktop board.
+and asked for it on his own domain with live Sleeper sync. That site's code was not copied and is
+not vendored here - its rankings are a static snapshot compiled into a React bundle, so copying it
+would have shipped frozen tiers as well as somebody else's source. What was taken is the *shape*:
+tier bands, position views, cross a name off with one tap, and the three-way scoring toggle. The
+tiers come from the same public upstream that site credits, `fftiers`
+(github.com/borisachen/fftiers).
 
-**Data.** `draft-aid.json` is derived from `draft-board.json`, not fetched separately, so the two
-boards cannot drift apart on tiers. It carries eight fields per player - Sleeper id, name, position,
-team, bye, Boris Chen rank and tier, ADP - and comes out at **21KB against the board's 797KB**. That
-ratio is the whole reason the file exists: draft day is exactly when you are on cell service in
-somebody's basement. A player earns a row if he has either a Boris Chen rank or an ADP; ranked
-players sort in consensus order, the ADP-only tail after them.
+**Pool and payload.** A player earns a row if he is tiered in any format, or if any format's ADP puts
+him inside 300 - the deepest sane draft is 16 rounds x 14 teams = 224 picks, so 300 leaves a wide
+flier margin. That is **494 players at 61KB**, against the 2,617 players and 250KB you get from
+Sleeper's full ADP list, most of whom are never picked in any league. Draft day is exactly when you
+are on cell service in somebody's basement. Deep ADPs that survived on another format's number are
+stripped rather than printed, so the page never shows "698.8" as if it meant something.
 
-**The join is on Sleeper id, not name.** Every row carries `ids.sleeper` from the board, and Sleeper's
-pick feed returns `player_id`, so a pick strikes the right row with no name normalisation in the
-path. Defenses work because both sides key them by team abbreviation (`HOU`, `DEN`).
+**The join is on Sleeper id, not name.** fftiers publishes display names, so the build matches them
+to Sleeper's player list once (normalising punctuation, generational suffixes and case) and stores
+the Sleeper id. From then on a pick from the feed strikes the right row with no name matching in the
+live path. Defenses work because fftiers' `DST` is mapped to Sleeper's `DEF` and both key by team.
+Current match rate: **200/200 in all three formats, zero unmatched.** Sleeper's duplicate names are
+resolved by `search_rank`, which picks the player a redraft tier list is actually talking about.
 
 **Two sets, deliberately.** `manual` (you tapped him) persists to localStorage, is undoable and is
 what `reset` clears. `live` (Sleeper says he is gone) is never persisted and never undoable. The
-union is what gets struck through. Keeping them apart is what makes `reset` safe mid-draft - it
-wipes your own marks and the next poll repaints Sleeper's, instead of blanking the board until
-somebody makes a pick. Tapping a live-taken player is a no-op for the same reason: a local un-mark
-of a real pick is just a way to draft somebody who is already rostered.
+union is struck through. Keeping them apart is what makes `reset` safe mid-draft - it wipes your own
+marks and the next poll repaints Sleeper's, instead of blanking the board until somebody picks.
+Tapping a live-taken player is a no-op for the same reason.
 
-**Polling.** 10s, the cadence asked for, backing off by doubling to a 60s ceiling while the origin
-is failing and dropping straight back to 10s on the first good read. It stops entirely on
-`status == "complete"`. A failing sync never wipes the last good picture; it says it is stale and
-reports how old the last good read was, because a frozen board that admits it beats an empty one
-that says nothing. Every request carries a unique cache-busting param - Sleeper sits behind
-Cloudflare with `stale-while-revalidate=300` and **will** hand back a pick list minutes old, which
-this repo measured on its own draft (41 picks vs 65 on the same endpoint).
+**Polling.** 10s, the cadence asked for, doubling to a 60s ceiling while the origin is failing and
+dropping straight back to 10s on the first good read. It stops entirely on `status == "complete"`.
+A failing sync never wipes the last good picture; it says it is stale and how old the last good read
+was, because a frozen board that admits it beats an empty one that says nothing. Every request
+carries a unique cache-busting param - Sleeper sits behind Cloudflare with
+`stale-while-revalidate=300` and **will** hand back a pick list minutes old, which this repo measured
+on its own draft (41 picks vs 65 on the same endpoint).
 
 **Phone specifics, in one list because they are all small and all load-bearing.** `viewport-fit=cover`
 plus `env(safe-area-inset-*)` padding, so the header paints under the Dynamic Island without putting
 anything under it. A 16px floor on every text input - below that iOS zooms the viewport on focus and
 you spend the next pick pinching back out. `touch-action: manipulation` to kill the double-tap-zoom
-delay, which on a tap-to-cross-off board is the entire interaction. 46px rows against the 44px
-target floor. A **screen wake lock** while a draft is connected, because a phone that sleeps between
-picks is the single most annoying thing about drafting on one; it is re-requested on
-`visibilitychange`, which also forces an immediate poll rather than waiting out a timer iOS froze
-while the tab was backgrounded.
+delay, which on a tap-to-cross-off board is the entire interaction. 46px rows against the 44px target
+floor. A **screen wake lock** while a draft is connected, because a phone that sleeps between picks
+is the single most annoying thing about drafting on one; it is re-requested on `visibilitychange`,
+which also forces an immediate poll rather than waiting out a timer iOS froze while backgrounded.
 
 **Two list modes.** The All tab groups into tier cards - the band, not the row, is the unit you read,
 which is Boris Chen's whole idea. A position tab or a search does not: filtering to one position
-leaves most tiers holding a single player, and a card header above each one was measured at roughly
-half the vertical space for no information. Those render flat, with a tier chip and a coloured left
-stripe per row, which fit 11 TEs on screen where the grouped version fit 5.
+leaves most tiers holding a single player, and a card header above each was measured at roughly half
+the vertical space for no information. Those render flat, with a tier chip and a coloured left stripe
+per row, which fit 11 TEs on screen where the grouped version fit 5.
 
 **Hosting.** Its own Pages project `hbgbs-draft` from this same repo, build command copying only
 `site/aid/*` and `data/site/draft-aid.json` into `dist` - the strategy docs, the league dossiers and
 the 797KB desktop board are not served on this host. Gated by its own Access app
 (`8f4eca24-d8de-4339-a97b-81d830c36636`, 730h session) covering `draft.irvinfamily.com`,
-`hbgbs-draft.pages.dev` and `*.hbgbs-draft.pages.dev`. The gate was created **before** the DNS record,
-per the correction in `..\hosting-plan.md`: Access accepts a hostname that does not resolve yet, so
-gating first means there is never an ungated window.
+`hbgbs-draft.pages.dev` and `*.hbgbs-draft.pages.dev`. The gate was created **before** the DNS
+record, per the correction in the hosting plan.
 
-**A caveat worth keeping in front of whoever reads this next.** The 2026 HBGBs draft is **complete** -
-150 picks, league `in_season`. This tool was verified against that finished draft (it read all 150
-picks, struck 148 of its 248 rows, and correctly stopped polling on `status == "complete"`), but it
-has no live HBGBs draft to sync with this season. Its first real use is a 2027 draft or another
-league's.
+**Known limits.** No superflex/2QB tiers exist upstream, so those leagues get a warning rather than a
+fix. Standard-scoring ADP is thin (Sleeper publishes ~300 non-sentinel values against 2,000+ for
+PPR), so the standard tail runs out sooner - it shows nothing rather than borrowing another format's
+number. And the tiers are a **weekly** fftiers file, not a draft-day snapshot; it is the same file
+the desktop board has used all along, but the numbers move week to week.
 
 ## 2. Challenge 2 — `scouting_brief` (public commentary)
 

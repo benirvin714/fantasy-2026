@@ -16,7 +16,7 @@
   <title>Draft Aid</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232f7d32'/%3E%3Cpath d='M9 16.5l4.5 4.5L23 11.5' stroke='%23fff' stroke-width='3.2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
   <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%232f7d32'/%3E%3Cpath d='M9 16.5l4.5 4.5L23 11.5' stroke='%23fff' stroke-width='3.2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="aid.css?v=1">
+  <link rel="stylesheet" href="aid.css?v=2">
 </head>
 <body>
 
@@ -55,6 +55,17 @@
     </div>
   </div>
 
+  <!-- Scoring. Set once before a draft, and overwritten automatically the moment you connect one:
+       Sleeper's draft object states its own scoring_type, so the board configures itself rather
+       than trusting you to have remembered which league you are in. -->
+  <div class="scoring" id="scoring" role="group" aria-label="Scoring format">
+    <span class="scoring-lab">scoring</span>
+    <button data-fmt="std" aria-pressed="false">Std</button>
+    <button data-fmt="half" aria-pressed="true">0.5 PPR</button>
+    <button data-fmt="ppr" aria-pressed="false">PPR</button>
+    <span class="scoring-note" id="scoring-note"></span>
+  </div>
+
   <nav class="tabs" id="tabs" aria-label="Position">
     <button data-pos="ALL" aria-pressed="true">All</button>
     <button data-pos="QB" aria-pressed="false">QB</button>
@@ -80,9 +91,12 @@
 <footer class="ftr">
   <p id="ftr-src">…</p>
   <p>Tap a name to cross him off. Marks live in this browser only. Connect a draft and Sleeper's
-     picks strike themselves — those aren't stored, so a reset never fights the live feed.</p>
+     picks strike themselves — those aren't stored, so a reset never fights the live feed, and
+     the scoring format switches itself to match the draft you connected.</p>
+  <p>Tiers are for one-quarterback leagues. In superflex or 2QB the quarterbacks belong far higher
+     than any tier here puts them — the board says so when it sees those slots.</p>
 </footer>
 
-<script src="aid.js?v=1"></script>
+<script src="aid.js?v=2"></script>
 </body>
 </html>
