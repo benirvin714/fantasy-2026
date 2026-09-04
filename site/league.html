@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Other league — live</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230b0f0c'/%3E%3Crect x='6' y='6' width='20' height='20' fill='%2363bf5a'/%3E%3Crect x='12' y='12' width='8' height='8' fill='%230b0f0c'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap">
+  <link rel="stylesheet" href="style.css?v=51">
+  <link rel="stylesheet" href="backdrop.css?v=2">
+  <script>/* ?bg=none disables the backdrop for this visit - see backdrop.css */
+    if (new URLSearchParams(location.search).get("bg") === "none")
+      document.documentElement.setAttribute("data-backdrop", "none");</script>
+</head>
+<body>
+  <div class="bd" aria-hidden="true">
+    <div class="bd-turf"></div>
+    <div class="bd-lights"></div>
+    <div class="bd-vignette"></div>
+  </div>
+  <header>
+    <h1 id="ol-title">OTHER LEAGUE <span class="hq">/ LIVE</span></h1>
+    <nav class="chips" aria-label="Pages">
+      <a class="chip navlink" href="index.html">in-season HQ</a>
+      <a class="chip navlink" href="rosters.html">roster room</a>
+      <a class="chip navlink" href="draft.html">draft day</a>
+      <span class="chip navlink active" aria-current="page">other league</span>
+    </nav>
+    <div class="chips">
+      <span class="chip" id="ol-state">not connected</span>
+      <span class="chip" id="ol-fmtchip" hidden></span>
+    </div>
+    <div class="spacer"></div>
+    <div class="header-right">
+      <span class="asof" id="ol-asof"></span>
+      <button id="ol-refresh" class="refresh-btn" aria-label="Refresh live data" title="Re-read this league from Sleeper">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 12a9 9 0 1 1-2.64-6.36M21 3v6h-6"/>
+        </svg>
+      </button>
+    </div>
+    <span class="readonly-note">read-only · live from Sleeper · <b>not the HBGBs</b> — no board, waiver price or owner dossier from the other pages applies here</span>
+  </header>
+
+  <main class="ol-main">
+    <!-- The whole page hangs off this one input. Nothing is hard-coded to a league id, so the same
+         tab serves whatever league you are in next year without a code change. -->
+    <div class="livesync ol-bar">
+      <label class="lsync-lab" for="ol-id">league id</label>
+      <input class="lsync-in" id="ol-id" type="text" inputmode="numeric" autocomplete="off"
+             placeholder="paste the league id or its Sleeper URL" size="34">
+      <button class="lsync-btn" id="ol-btn" type="button">connect</button>
+      <span class="lsync-status idle" id="ol-status">not connected</span>
+    </div>
+
+    <div class="panel-error" id="ol-err" role="alert" hidden></div>
+
+    <section class="panel" id="ol-fmt-panel" aria-labelledby="ol-fmt-h" hidden>
+      <div class="panel-head">
+        <h2 id="ol-fmt-h">Format — and how it differs from the HBGBs</h2>
+        <span class="meta" id="ol-fmt-meta"></span>
+      </div>
+      <div class="panel-body" id="ol-fmt-body"></div>
+    </section>
+
+    <section class="panel panel-featured" id="ol-league-panel" aria-labelledby="ol-league-h" hidden>
+      <div class="panel-head">
+        <h2 id="ol-league-h">The league</h2>
+        <span class="meta" id="ol-league-meta"></span>
+      </div>
+      <div class="panel-body" id="ol-league-body"></div>
+    </section>
+
+    <section class="panel" id="ol-mu-panel" aria-labelledby="ol-mu-h" hidden>
+      <div class="panel-head">
+        <h2 id="ol-mu-h">This week</h2>
+        <span class="meta" id="ol-mu-meta"></span>
+      </div>
+      <div class="panel-body" id="ol-mu-body"></div>
+    </section>
+
+    <section class="panel" id="ol-draft-panel" aria-labelledby="ol-draft-h" hidden>
+      <div class="panel-head">
+        <h2 id="ol-draft-h">Draft results</h2>
+        <span class="meta" id="ol-draft-meta"></span>
+      </div>
+      <div class="panel-body" id="ol-draft-body"></div>
+    </section>
+
+    <div class="ol-empty" id="ol-empty">
+      <p>Paste a Sleeper <b>league id</b> above and hit connect. The id is the long number in the
+        league's Sleeper URL — <code>sleeper.com/leagues/<b>1234567890123456789</b>/team</code> — and
+        pasting the whole URL works too.</p>
+      <p>It is remembered in this browser, so the tab opens on the same league next time.
+        <code>?league=&lt;id&gt;</code> in the address bar overrides it for one visit.</p>
+    </div>
+  </main>
+
+  <footer>
+    Everything on this page is read live from the Sleeper public API for the league you connect, and
+    is scored and shaped by <b>that league's own settings</b>. This project's valuation, FAAB pricing,
+    trade search and owner dossiers are built for the HBGBs and are deliberately not applied here.
+    Nothing is ever written back to Sleeper.
+  </footer>
+
+  <script src="config.js?v=10"></script>
+  <script src="league.js?v=2"></script>
+</body>
+</html>

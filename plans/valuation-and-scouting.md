@@ -946,6 +946,84 @@ PPR), so the standard tail runs out sooner - it shows nothing rather than borrow
 number. And the tiers are a **weekly** fftiers file, not a draft-day snapshot; it is the same file
 the desktop board has used all along, but the numbers move week to week.
 
+### 1.24 The fourth tab - another Sleeper league, live, on demand - 2026-09-04
+
+**What it is.** A fourth page, `site/league.html` + `site/league.js`, reached from an **other league**
+chip in the nav of all four pages. Paste any Sleeper league id (or its URL - the id is pulled out of
+whatever you paste) and the page renders that league from Sleeper's public API: its format, its
+standings, any team's roster in its own slot shape, this week's pairings, and the full draft board.
+Three sources pick the league, in order: `?league=<id>` for one visit, then whatever this browser
+last connected to, then `OTHER_LEAGUE_ID` in `config.js` (currently `1401363352046825472`, the league
+Ben drafted on 2026-09-03 - **The Panther Pit**, 12 teams, 15-round snake, complete; Ben is roster 1).
+That entry is a **default, not a binding** - it exists so the tab opens on
+the right league on a device that has never seen it, and any pasted id beats it. Disconnect writes a
+`"none"` sentinel rather than clearing the key, because a cleared key falls straight through to the
+config default and silently reconnects you to the league you just dismissed.
+
+**Why it computes nothing.** Ben finished a draft in a second league and asked for a tab to switch to
+it. The obvious-looking implementation - repoint `LEAGUE_ID` and let the existing panels follow - is
+the one thing this project must not do. (`OTHER_LEAGUE_ID` next to it is not that: it names the league
+a page that *computes nothing* starts on, and moves nothing else.) Every other page renders JSON built *for
+the HBGBs*: `draft-board.json` is projections re-scored in HBGBs settings, `roster-room.json` is
+optimal lineups under the HBGBs slot shape keyed to its ten roster ids, `faab-market.json` is six
+seasons of HBGBs bidding, the owner dossiers are HBGBs owners. Re-pointing those at another league
+produces numbers that *look* like analysis and are not - the exact failure mode hard rule 2 in
+`CLAUDE.md` exists to prevent. So this page reads no local JSON, publishes none, and runs no
+valuation. It reports what Sleeper states, and states where it came from.
+
+**The format diff is the honest bit.** The panel reads the connected league's own settings - PPR
+value, pass TD, INT, fumble, slot shape, bench depth, playoff teams and week, trade deadline, FAAB
+budget, keepers - and then diffs its `scoring_settings` against the HBGBs league fetched live.
+The diff is over the **union of both leagues' keys**, not a curated list: a hand-picked list is
+precisely how you fail to notice the new league pays 6 for a passing TD or bonuses long receptions.
+Matching keys are dropped; whatever is left is a real difference and is shown however long the list
+runs. Bold is the connected league. If the HBGBs fetch fails the page says the diff is missing rather
+than implying the formats match.
+
+**Names come from the draft feed first.** Sleeper's roster endpoint returns bare player ids. Each
+pick in the draft feed carries first/last/position/team in its metadata, which right after a draft
+covers essentially every rostered player for nothing. Only the leftovers - waiver adds, undrafted
+fill-ins - need `/players/nfl`, and that stays behind a **"name them"** button that says it is about
+5 MB. A silent multi-megabyte download on a page opened to glance at standings is a rude default; on
+the 2025 fixture (a whole season of transactions) it was 52 players, and on a just-finished draft it
+is normally none.
+
+**Slot labels come from the league, pick labels from the pick.** Starters are index-aligned with the
+non-bench entries of `roster_positions`, so a superflex or 3-WR league renders correctly with no
+special case. The `round.slot` label on each rostered player uses that pick's own `draft_slot`;
+deriving it from `pick_no` modulo team count was the first cut and it silently inverts every even
+round of a snake (Burrow read 6.04 instead of 6.07 in testing).
+
+**What the diff actually found.** Run against the real Panther Pit league object, the union-of-keys
+diff reduces to exactly one scoring difference from the HBGBs: the Pit takes a flat `fgmiss: -1`,
+where the HBGBs uses distance-banded miss penalties (`fgmiss_0_19` .. `fgmiss_50_59`, each -1) and
+`fgmiss: 0`. Net effect: a missed 60+ FG costs -1 in the Pit and is free in the HBGBs. Everything
+else about scoring is identical. The difference that matters is structural rather than scoring -
+**12 teams against the same 10 starters + 5 bench**, so 180 rostered players against the HBGBs' 150,
+which is a materially thinner pool. The page states the format and leaves that read to you.
+
+**Honest empty states, everywhere.** No games played yet -> the table says so and lists teams in
+Sleeper's roster order rather than presenting an arbitrary order as a standing. Week not scored ->
+the pairings render with an em-dash and a note. Draft not complete -> whatever has been picked. Bad
+id -> the HTTP error, the id, and nothing else on screen; the page never falls back to a cached
+picture. Every fetch carries a unique cache-busting param for the reason in §1.15.
+
+**Reuse, not a second design.** The page borrows `.rr-ltab` / `.rr-lrow` / `.rr-rtab` / `.cutlabel`
+from the roster room, because it is the same object - a league, its teams, one roster expanded in
+place - and a parallel set of near-identical rules is how two tables drift. Only what this page has
+and the roster room does not (the format grid, the diff rows, the matchup pairs, the round
+disclosures) gets new CSS.
+
+**Deliberately not.** No optimal-lineup recomputation, no per-slot ranks, no trade search, no FAAB
+prices, no owner dossier, no player-news dialog. All of those are the HBGBs pipeline. If the second
+league ever earns that treatment it needs its own build - the scripts hard-code `LEAGUE_ID` and the
+projections are re-scored per format - and that is a bigger job than a tab.
+
+**At renewal that is now three league ids, not two.** `CLAUDE.md` already says to update `LEAGUE_ID`
+in both `CLAUDE.md` and `site/config.js`; `OTHER_LEAGUE_ID` is a third and runs on its own schedule.
+Nothing breaks if it goes stale - the tab opens on last year's league, says `complete` in the header,
+and takes a pasted id like it always did.
+
 ## 2. Challenge 2 — `scouting_brief` (public commentary)
 
 ### 2.1 What it is
