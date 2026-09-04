@@ -954,7 +954,8 @@ whatever you paste) and the page renders that league from Sleeper's public API: 
 standings, any team's roster in its own slot shape, this week's pairings, and the full draft board.
 Three sources pick the league, in order: `?league=<id>` for one visit, then whatever this browser
 last connected to, then `OTHER_LEAGUE_ID` in `config.js` (currently `1401363352046825472`, the league
-Ben drafted on 2026-09-03). That entry is a **default, not a binding** - it exists so the tab opens on
+Ben drafted on 2026-09-03 - **The Panther Pit**, 12 teams, 15-round snake, complete; Ben is roster 1).
+That entry is a **default, not a binding** - it exists so the tab opens on
 the right league on a device that has never seen it, and any pasted id beats it. Disconnect writes a
 `"none"` sentinel rather than clearing the key, because a cleared key falls straight through to the
 config default and silently reconnects you to the league you just dismissed.
@@ -992,6 +993,14 @@ non-bench entries of `roster_positions`, so a superflex or 3-WR league renders c
 special case. The `round.slot` label on each rostered player uses that pick's own `draft_slot`;
 deriving it from `pick_no` modulo team count was the first cut and it silently inverts every even
 round of a snake (Burrow read 6.04 instead of 6.07 in testing).
+
+**What the diff actually found.** Run against the real Panther Pit league object, the union-of-keys
+diff reduces to exactly one scoring difference from the HBGBs: the Pit takes a flat `fgmiss: -1`,
+where the HBGBs uses distance-banded miss penalties (`fgmiss_0_19` .. `fgmiss_50_59`, each -1) and
+`fgmiss: 0`. Net effect: a missed 60+ FG costs -1 in the Pit and is free in the HBGBs. Everything
+else about scoring is identical. The difference that matters is structural rather than scoring -
+**12 teams against the same 10 starters + 5 bench**, so 180 rostered players against the HBGBs' 150,
+which is a materially thinner pool. The page states the format and leaves that read to you.
 
 **Honest empty states, everywhere.** No games played yet -> the table says so and lists teams in
 Sleeper's roster order rather than presenting an arbitrary order as a standing. Week not scored ->
