@@ -24,11 +24,16 @@
     ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const num = (n, d = 1) => n == null ? "—" : Number(n).toFixed(d);
 
+  /* Three sources for the league, in this order: `?league=` for one visit, whatever this browser
+     last connected to, then the default in config.js. The sentinel matters — "disconnect" has to
+     stick, and a cleared key would just fall through to the config default on the next load and
+     silently reconnect you to a league you had just dismissed. */
   const LS_KEY = "hq-other-league-id";
+  const NONE = "none";
   const store = {
     get: () => { try { return localStorage.getItem(LS_KEY); } catch { return null; } },
     set: (v) => { try { localStorage.setItem(LS_KEY, v); } catch { /* private mode */ } },
-    clear: () => { try { localStorage.removeItem(LS_KEY); } catch { /* private mode */ } },
+    clear: () => { try { localStorage.setItem(LS_KEY, NONE); } catch { /* private mode */ } },
   };
 
   const sleeperGet = async (path) => {
@@ -490,6 +495,7 @@
 
   /* ------------------------------------------------------------- boot */
   const fromUrl = parseId(new URLSearchParams(location.search).get("league"));
-  const boot = fromUrl ?? store.get();
+  const saved = store.get();
+  const boot = fromUrl ?? (saved === NONE ? null : (saved || parseId(C.OTHER_LEAGUE_ID)));
   if (boot) { $("#ol-id").value = boot; load(boot); }
 })();

@@ -5,6 +5,11 @@ window.HQ_CONFIG = {
   MY_ROSTER_ID: 10,
   MY_USER_ID: "603035152494436352",
   MY_NAME: "ThatWasButtery",
+  /* The other-league tab's starting league (site/league.html, §1.24). A DEFAULT, not a binding:
+     the page still takes any league id you paste, `?league=<id>` beats this, a connected league is
+     remembered per-browser, and disconnect sticks. It exists so the tab opens on the right league
+     on a device you have never used it on. Set it to "" to have the tab start empty. */
+  OTHER_LEAGUE_ID: "1401363352046825472",
   PLAYOFF_TEAMS: 6, // top N in standings make the playoffs (drives the cut line)
   API: "https://api.sleeper.app/v1",
   // Local data published by the Claude commands (/waivers, /brief) and the daily events routine

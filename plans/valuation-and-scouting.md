@@ -952,12 +952,17 @@ the desktop board has used all along, but the numbers move week to week.
 chip in the nav of all four pages. Paste any Sleeper league id (or its URL - the id is pulled out of
 whatever you paste) and the page renders that league from Sleeper's public API: its format, its
 standings, any team's roster in its own slot shape, this week's pairings, and the full draft board.
-The id is remembered in localStorage, so the tab reopens on the same league; `?league=<id>`
-overrides it for one visit; **disconnect** forgets it.
+Three sources pick the league, in order: `?league=<id>` for one visit, then whatever this browser
+last connected to, then `OTHER_LEAGUE_ID` in `config.js` (currently `1401363352046825472`, the league
+Ben drafted on 2026-09-03). That entry is a **default, not a binding** - it exists so the tab opens on
+the right league on a device that has never seen it, and any pasted id beats it. Disconnect writes a
+`"none"` sentinel rather than clearing the key, because a cleared key falls straight through to the
+config default and silently reconnects you to the league you just dismissed.
 
 **Why it computes nothing.** Ben finished a draft in a second league and asked for a tab to switch to
-it. The obvious-looking implementation - point `config.js` at a second league id and let the existing
-panels follow - is the one thing this project must not do. Every other page renders JSON built *for
+it. The obvious-looking implementation - repoint `LEAGUE_ID` and let the existing panels follow - is
+the one thing this project must not do. (`OTHER_LEAGUE_ID` next to it is not that: it names the league
+a page that *computes nothing* starts on, and moves nothing else.) Every other page renders JSON built *for
 the HBGBs*: `draft-board.json` is projections re-scored in HBGBs settings, `roster-room.json` is
 optimal lineups under the HBGBs slot shape keyed to its ten roster ids, `faab-market.json` is six
 seasons of HBGBs bidding, the owner dossiers are HBGBs owners. Re-pointing those at another league
@@ -1004,6 +1009,11 @@ disclosures) gets new CSS.
 prices, no owner dossier, no player-news dialog. All of those are the HBGBs pipeline. If the second
 league ever earns that treatment it needs its own build - the scripts hard-code `LEAGUE_ID` and the
 projections are re-scored per format - and that is a bigger job than a tab.
+
+**At renewal that is now three league ids, not two.** `CLAUDE.md` already says to update `LEAGUE_ID`
+in both `CLAUDE.md` and `site/config.js`; `OTHER_LEAGUE_ID` is a third and runs on its own schedule.
+Nothing breaks if it goes stale - the tab opens on last year's league, says `complete` in the header,
+and takes a pasted id like it always did.
 
 ## 2. Challenge 2 — `scouting_brief` (public commentary)
 
