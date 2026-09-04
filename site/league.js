@@ -105,6 +105,11 @@
   const NON_START = new Set(["BN", "IR", "TAXI"]);
   const startSlots = (lg) => (lg.roster_positions ?? []).filter((s) => !NON_START.has(s));
   const benchCount = (lg) => (lg.roster_positions ?? []).filter((s) => s === "BN").length;
+  /* IR reaches us two ways depending on the league: as "IR" entries in roster_positions, or only
+     as settings.reserve_slots with nothing in the array (The Panther Pit does the latter). Reading
+     one and not the other quietly understates the roster by a spot. */
+  const irCount = (lg) => (lg.roster_positions ?? []).filter((s) => s === "IR").length
+    || (lg.settings?.reserve_slots ?? 0);
 
   const ownerOf = (rid) => {
     const r = (S.rosters ?? []).find((x) => x.roster_id === rid);
@@ -156,7 +161,7 @@
       ["interception", sc.pass_int ?? 0],
       ["fumble lost", sc.fum_lost ?? 0],
       ["starting slots", slots.join(" · ")],
-      ["bench", `${benchCount(lg)}${(lg.roster_positions ?? []).includes("IR") ? " + IR" : ""}`],
+      ["bench", `${benchCount(lg)}${irCount(lg) ? ` + ${irCount(lg)} IR` : ""}`],
       ["playoff teams", s.playoff_teams ?? "—"],
       ["playoffs start", s.playoff_week_start ? `week ${s.playoff_week_start}` : "—"],
       ["trade deadline", s.trade_deadline ? `week ${s.trade_deadline}` : "none"],
