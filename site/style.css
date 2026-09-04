@@ -1463,3 +1463,90 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
   .pn-body { max-height: calc(92vh - 62px); }
   .pn-close { min-height: 44px; min-width: 44px; }
 }
+
+/* ---------------- other league (site/league.html) ----------------
+   A deliberately thin skin. The page reuses the roster-room table classes (.rr-ltab, .rr-rtab,
+   .rr-lrow, .cutlabel) because it is the same object — a league, its teams, one roster expanded in
+   place — and a second set of near-identical rules is how two tables drift apart. Only what this
+   page has and the roster room does not gets a rule here. */
+.ol-main { display: block; max-width: 1100px; margin: 0 auto; padding: 16px 24px 40px; }
+.ol-main > * + * { margin-top: 16px; }
+.ol-bar { margin-bottom: 0; }
+.ol-empty { font-size: 13px; color: var(--dim); line-height: 1.6; max-width: 640px; }
+.ol-empty code { font-family: var(--font-data); font-size: 12px; color: var(--faint); }
+.ol-empty b { color: var(--text); }
+.ol-sub {
+  margin: 16px 0 6px; font-size: 12px; text-transform: uppercase; letter-spacing: .06em;
+  color: var(--faint); font-weight: 700;
+}
+.ol-warn {
+  margin: 6px 0 10px; padding: 8px 10px; font-size: 12.5px; line-height: 1.5;
+  color: var(--warn); background: rgba(201,180,88,.07);
+  border-left: 2px solid var(--warn); border-radius: var(--radius-sm);
+}
+.ol-warn .lsync-btn { margin: 0 4px; }
+
+/* format read: a two-column key/value block, not a table — there is one row per fact and no
+   cross-row comparison to align. */
+.ol-kv { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 2px 14px; font-size: 13px; }
+.ol-kv-k { color: var(--faint); }
+.ol-kv-v { color: var(--text); }
+
+.ol-diffs { display: flex; flex-direction: column; gap: 2px; }
+.ol-diff-row { display: flex; align-items: baseline; gap: 10px; font-size: 12.5px; padding: 2px 0; }
+.ol-diff-row + .ol-diff-row { border-top: 1px solid rgba(34,48,31,.5); }
+.ol-dk { color: var(--dim); min-width: 132px; font-size: 11.5px; }
+.ol-dv { color: var(--text); }
+.ol-dh { color: var(--faint); margin-left: auto; font-size: 11.5px; white-space: nowrap; }
+.ol-diff-same { font-size: 12.5px; color: var(--accent); padding: 2px 0; }
+
+.ol-cutrow td { border-bottom: none; padding: 8px 8px 4px; }
+.ol-exp > td { background: rgba(0,0,0,.18); padding: 10px 12px 14px; }
+.ol-roster { max-width: 620px; }
+.ol-bn td { background: rgba(0,0,0,.16); }
+.ol-pk { font-family: var(--font-data); font-size: 11px; color: var(--faint); white-space: nowrap; }
+
+/* this week */
+.ol-mu {
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px;
+  padding: 6px 0; border-bottom: 1px solid var(--border);
+}
+.ol-mu:last-of-type { border-bottom: none; }
+.ol-mu-side { display: flex; align-items: baseline; gap: 8px; font-size: 13px; color: var(--dim); }
+.ol-mu-side.up { color: var(--text); }
+.ol-mu-side.mine .ol-mu-tm { color: var(--accent); font-weight: 600; }
+.ol-mu-tm { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ol-mu-pts { font-size: 13px; }
+.ol-mu-side.up .ol-mu-pts { color: var(--accent); font-weight: 600; }
+
+/* draft results */
+.ol-round + .ol-round { margin-top: 4px; }
+.ol-round > summary {
+  cursor: pointer; list-style: none; font-size: 12px; font-weight: 700; letter-spacing: .05em;
+  text-transform: uppercase; color: var(--dim); padding: 6px 0; border-bottom: 1px solid var(--border);
+}
+.ol-round > summary::-webkit-details-marker { display: none; }
+.ol-round > summary::before { content: "▸ "; font-size: 9px; color: var(--faint); }
+.ol-round[open] > summary::before { content: "▾ "; }
+.ol-round > summary:hover { color: var(--text); }
+.ol-round > summary .faint { text-transform: none; letter-spacing: 0; font-weight: 400; }
+.ol-picks { padding: 4px 0 10px; }
+.ol-pick {
+  display: flex; align-items: baseline; gap: 10px; padding: 3px 4px; font-size: 13px;
+  border-bottom: 1px solid rgba(34,48,31,.5);
+}
+.ol-pick:last-child { border-bottom: none; }
+.ol-pick.mine { background: rgba(99,191,90,.08); box-shadow: inset 3px 0 0 var(--accent); }
+.ol-pick .ol-pk { min-width: 40px; }
+.ol-pick .ol-pn { font-weight: 600; color: var(--text); }
+.ol-pick .ol-pp { font-size: 11px; color: var(--moss); }
+.ol-pick .ol-po { margin-left: auto; font-size: 11.5px; color: var(--faint); white-space: nowrap; }
+
+@media (max-width: 700px) {
+  .ol-main { padding: 12px 12px 32px; }
+  .ol-mu { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .ol-kv { grid-template-columns: minmax(0, 1fr); gap: 0 0; }
+  .ol-kv-v { margin-bottom: 6px; }
+  .ol-dh { margin-left: 0; }
+  .ol-diff-row { flex-wrap: wrap; }
+}
