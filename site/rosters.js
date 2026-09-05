@@ -1,10 +1,12 @@
-/* Roster room — the ten teams as scouting objects.
-   Renders data/site/roster-room.json, published by scripts/build-roster-room.mjs, joined with the
-   live standings from Sleeper. Same rule as every other page here: no analysis is generated in the
+/* Roster room — every team in the active league as a scouting object.
+   Renders that league's roster-room.json, published by scripts/build-roster-room.mjs, joined with
+   the live standings from Sleeper. Same rule as every other page here: no analysis is generated in the
    browser, and a missing feed produces a stated error rather than a blank panel that reads as
    "nothing to report". */
 (() => {
   const C = window.HQ_CONFIG;
+  // The league in view, resolved by league-switch.js.
+  const A = C.active;
   const $ = (s) => document.querySelector(s);
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) =>
     ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -12,10 +14,16 @@
   const num = (n, d = 0) => n == null ? "—" : Number(n).toFixed(d);
   const sign = (n, d = 0) => n == null ? "—" : `${n >= 0 ? "+" : ""}${Number(n).toFixed(d)}`;
   const signCls = (n) => n == null ? "" : n > 0 ? "rr-pos" : n < 0 ? "rr-neg" : "rr-zero";
-  const ORD = (n) => ["", "1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th", "9th", "10th"][n] ?? `${n}th`;
-  // Rank colour is a three-way read, not a gradient: top third, bottom third, and the middle that
-  // deliberately gets no colour at all so the extremes stay legible.
-  const rankCls = (r) => r <= 3 ? "rr-r-good" : r >= 8 ? "rr-r-bad" : "rr-r-mid";
+  const ORD = (n) => ["", "1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th", "9th", "10th",
+    "11th", "12th", "13th", "14th"][n] ?? `${n}th`;
+  const TEAMS = () => DATA.teams.length;
+  /* Rank colour is a three-way read, not a gradient. Top third good, bottom third bad, and a middle that deliberately gets no colour so the extremes
+     stay legible. Derived from the league size: hardcoding "8th or worse is bad" made 8th of 12 a
+     red flag when it is upper-middle. */
+  const rankCls = (r) => {
+    const third = Math.max(1, Math.round(TEAMS() / 3));
+    return r <= third ? "rr-r-good" : r > TEAMS() - third ? "rr-r-bad" : "rr-r-mid";
+  };
 
   // `openRid` not `open`: a module-scope `open` shadows window.open for the whole IIFE.
   let DATA = null, sel = null, openRid = null;
@@ -30,7 +38,7 @@
   /* ----------------------------------------------------------------- the league table */
   function order(a, b) {
     // Wins, then points for — the same key Sleeper seeds playoffs on. Before anyone has played,
-    // that key is a ten-way tie, so the projection breaks it and the panel meta says so out loud
+    // that key is an N-way tie, so the projection breaks it and the panel meta says so out loud
     // rather than presenting an arbitrary order as a standing.
     if (played()) {
       const x = STAND.get(a.roster_id), y = STAND.get(b.roster_id);
@@ -48,7 +56,22 @@
     const frac = (p) => max === min ? 1 : 0.08 + 0.92 * ((p - min) / (max - min));
     const live = standState === "ok";
     const COLS = 9;
-    const cut = C.PLAYOFF_TEAMS ?? 6;
+    const cut = A.playoff_teams ?? 6;
+
+    /* Last column, and which one it is depends on what the league can actually know. A league with
+       a transaction archive gets the behavioural read - a trade-appetite band. A year-one league has
+       no evidence for one, so it gets the moves its teams have actually made this season, which is
+       zero for everybody until somebody churns and is never wrong in the meantime. */
+    const lastCell = (t) => {
+      if (t.tendencies) {
+        const a = t.tendencies.appetite;
+        return `<span class="rr-app rr-app-${esc(a.band)}" title="${esc(a.note)}">${esc(a.band)}<span class="rr-appn"> · ${a.n}</span></span>`;
+      }
+      if (t.moves) {
+        return `<span class="rr-app rr-app-${t.moves.n === 0 ? "quiet" : "busy"}" title="${esc(t.moves.note)}">${t.moves.n}</span>`;
+      }
+      return `<span class="faint">—</span>`;
+    };
 
     const rec = (t) => {
       if (!live) return `<td class="num rr-c-rec faint">—</td><td class="num rr-c-pf faint">—</td>`;
@@ -60,7 +83,7 @@
 
     let body = "";
     teams.forEach((t, i) => {
-      // The playoff line is only drawn once it means something. Ten 0-0 teams have no top six.
+      // The playoff line is only drawn once it means something. A field of 0-0 teams has no top six.
       if (live && played() && i === cut && teams.length > cut) {
         body += `<tr class="cutrow"><td colspan="${COLS}"><div class="cutlabel">playoff line · top ${cut}</div></td></tr>`;
       }
@@ -76,7 +99,7 @@
           <td class="num rr-c-vs ${signCls(t.vs_league_median)}">${sign(t.vs_league_median)}</td>
           <td class="rr-sw rr-c-sw">${s ? `<span class="rr-pos">${esc(s.pos)}</span> <span class="faint">${ORD(s.rank)}</span>` : `<span class="faint">none</span>`}</td>
           <td class="rr-sw rr-c-sw">${w ? `<span class="rr-neg">${esc(w.pos)}</span> <span class="faint">${ORD(w.rank)}</span>` : `<span class="faint">none</span>`}</td>
-          <td class="rr-c-tr"><span class="rr-app rr-app-${esc(t.tendencies.appetite.band)}" title="${esc(t.tendencies.appetite.note)}">${esc(t.tendencies.appetite.band)}<span class="rr-appn"> · ${t.tendencies.appetite.n}</span></span></td>
+          <td class="rr-c-tr">${lastCell(t)}</td>
         </tr>`;
       if (isOpen) {
         body += `<tr class="rr-exprow"><td colspan="${COLS}">
@@ -85,7 +108,7 @@
               <b>${esc(t.owner)}</b><span class="faint">${esc(window.HBGB_RosterTable.meta(t))}</span>
               <span class="faint">click any name for the latest published on that player</span>
             </div>
-            ${window.HBGB_RosterTable.html(t, { split: true })}
+            ${window.HBGB_RosterTable.html(t, { split: true, teams: TEAMS() })}
           </div></td></tr>`;
       }
     });
@@ -101,7 +124,9 @@
         <th class="num" title="Projected points from an optimal lineup under this league's slot shape">Proj</th>
         <th class="num rr-c-vs" title="Projected starting points minus the league median">vs med</th>
         <th class="rr-c-sw">Strength</th><th class="rr-c-sw">Hole</th>
-        <th class="rr-c-tr" title="Completed trades 2020-2025, from the raw Sleeper archive">Trades</th>
+        ${DATA.teams[0] && DATA.teams[0].tendencies
+          ? `<th class="rr-c-tr" title="Completed trades 2020-2025, from the raw Sleeper archive">Trades</th>`
+          : `<th class="num rr-c-tr" title="Completed transactions this season — trades, waiver claims and free-agent adds, live from Sleeper">Moves</th>`}
       </tr></thead>
       <tbody>${body}</tbody></table>`;
     leaguePainted = true;
@@ -128,7 +153,7 @@
 
   /* --------------------------------------------------------------- summary + shape + risk */
   function paintSummary(t) {
-    $("#rr-sum-meta").textContent = `${ORD(t.starter_rank)} of 10 by projection${t.draft_slot ? ` · drafted from slot ${t.draft_slot}` : ""}`;
+    $("#rr-sum-meta").textContent = `${ORD(t.starter_rank)} of ${TEAMS()} by projection${t.draft_slot ? ` · drafted from slot ${t.draft_slot}` : ""}`;
     $("#rr-sum-body").innerHTML = `<p class="rr-summary">${esc(t.summary)}</p>`;
   }
 
@@ -184,6 +209,15 @@
   }
 
   function paintTendencies(t) {
+    // The panel is removed from the markup on a league with no dossiers (data-league-only in
+    // rosters.html), so this is the belt to that braces: a league that grows tendencies later needs
+    // no change here, and one without them can never reach a null dereference.
+    if (!$("#rr-tend-body")) return;
+    if (!t.tendencies) {
+      $("#rr-tend-body").innerHTML = `<div class="loading">${esc(A.name)} is in its first season, so there is
+        no owner history to read. The league table reports completed moves this season instead.</div>`;
+      return;
+    }
     const d = t.tendencies, rows = [
       ["draft", d.draft], ["FAAB", d.faab], ["trades", d.trades], ["history", d.history],
     ].filter(([, v]) => v);
@@ -295,8 +329,14 @@
       <dt>standings</dt><dd>Wins and points for come live from the Sleeper API on every page load, not from the
         published file — they move weekly and the room is rebuilt on demand. The table sorts on them once
         anybody has played; before that it sorts on the projection and says so.</dd>
-      <dt>trade archive</dt><dd>${DATA.trade_history.total} completed trades, ${esc(DATA.trade_history.seasons)}: ${
-        Object.entries(DATA.trade_history.by_year).map(([y, n]) => `${y} ${n}`).join(" · ")}.</dd>
+      ${DATA.trade_history
+        ? `<dt>trade archive</dt><dd>${DATA.trade_history.total} completed trades, ${esc(DATA.trade_history.seasons)}: ${
+            Object.entries(DATA.trade_history.by_year).map(([y, n]) => `${y} ${n}`).join(" · ")}.</dd>`
+        : `<dt>moves</dt><dd>${esc(A.name)} has no trade archive — it is in its first season. The Moves column counts
+            completed transactions this season straight off Sleeper${DATA.season_moves
+              ? `: ${DATA.season_moves.total} through week ${DATA.season_moves.through_week}`
+              : ""}. It is zero for everybody until somebody makes one, which is the honest state of a
+            brand-new league rather than a borrowed read from another one.</dd>`}
     </dl>`;
   }
 
@@ -305,7 +345,7 @@
     try {
       // Sleeper sits behind Cloudflare with stale-while-revalidate, so every read of a moving
       // endpoint carries a unique param. See CLAUDE.md — this has bitten the draft tooling before.
-      const r = await fetch(`${C.API}/league/${C.LEAGUE_ID}/rosters?cb=${Date.now()}`, { cache: "no-store" });
+      const r = await fetch(`${C.API}/league/${A.league_id}/rosters?cb=${Date.now()}`, { cache: "no-store" });
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
       const rows = await r.json();
       STAND = new Map(rows.map((x) => [x.roster_id, {
@@ -328,14 +368,14 @@
   (async () => {
     let d;
     try {
-      const r = await fetch(C.ROSTER_ROOM_JSON, { cache: "no-store" });
+      const r = await fetch(A.ROSTER_ROOM_JSON, { cache: "no-store" });
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
       d = await r.json();
     } catch (e) {
       const el = $("#rr-err");
       el.hidden = false;
-      el.innerHTML = `<div class="panel-error" role="alert">No published roster room (${esc(e.message)}).
-        Run <code>node scripts/build-roster-room.mjs</code> — it writes <code>data/site/roster-room.json</code>.
+      el.innerHTML = `<div class="panel-error" role="alert">No published roster room for ${esc(A.name)} (${esc(e.message)}).
+        Run <code>node scripts/build-roster-room.mjs --league=${esc(A.key)}</code> — it writes <code>${esc(A.data)}/roster-room.json</code>.
         The build refuses to run until every roster has players, so before the draft this page is empty by design.</div>`;
       $("#rr-league-body").innerHTML = "";
       $("#rr-sum-body").innerHTML = "";

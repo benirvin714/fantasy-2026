@@ -1110,6 +1110,13 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
 .rr-selbar h2 { margin: 0; font-size: 17px; letter-spacing: -.01em; }
 .rr-selbar .faint { font-size: 12px; }
 
+/* The league switcher. Deliberately a different shape from the page nav next to it - these two rows
+   sit side by side in the header and would read as one eight-item menu if they matched. */
+.lgswitch { gap: 4px; padding: 2px; border: 1px solid var(--border); border-radius: var(--radius); }
+.lgchip { font-family: var(--font-data); font-size: 11px; letter-spacing: .04em; cursor: pointer; border-color: transparent; }
+.lgchip:hover { color: var(--text); border-color: var(--border); }
+.lgchip.active { color: var(--accent); border-color: var(--accent); cursor: default; }
+
 /* ---------- the league table ---------- */
 .rr-ltab td { font-size: 13px; }
 .rr-lrow { cursor: pointer; }
@@ -1137,6 +1144,10 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
 .rr-app-reachable { color: var(--dim); }
 .rr-app-cold { color: var(--warn); border-color: rgba(201,180,88,.5); }
 .rr-app-dead { color: var(--neg); border-color: rgba(208,106,92,.5); }
+/* A year-one league shows a move count instead of an appetite band. Two states only, and neither is
+   a judgement: nobody has done anything yet, or somebody has. */
+.rr-app-quiet { color: var(--faint); }
+.rr-app-busy { color: var(--moss); border-color: var(--moss); }
 
 .rr-pos { color: var(--accent); }
 .rr-neg { color: var(--neg); }

@@ -12,6 +12,9 @@
    that is a more useful answer than an empty box that reads as "nothing happened". */
 (() => {
   const C = window.HQ_CONFIG;
+  // Per-league: each league publishes its own dossiers, because the roster join and the projection
+  // are the two things in there that are not facts about the player.
+  const A = C.active;
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) =>
     ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
@@ -53,7 +56,7 @@
     if (DATA) return DATA;
     if (!loading) {
       loading = (async () => {
-        const r = await fetch(C.PLAYER_NEWS_JSON, { cache: "no-store" });
+        const r = await fetch(A.PLAYER_NEWS_JSON, { cache: "no-store" });
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
         return r.json();
       })().catch((e) => { loading = null; throw e; });
@@ -73,9 +76,9 @@
 
     if (!p) {
       dlg.querySelector(".pn-body").innerHTML = `<div class="panel-error" role="alert">
-        ${esc(fallbackName)} isn't in the published dossier file. That file covers rostered players only,
-        and it is rebuilt with the rosters — if he was just added, re-run
-        <code>node scripts/build-player-news.mjs</code>.</div>`;
+        ${esc(fallbackName)} isn't in ${esc(A.name)}'s dossier file. That file covers players rostered in
+        this league only, and it is rebuilt with the rosters — if he was just added, re-run
+        <code>node scripts/build-player-news.mjs --league=${esc(A.key)}</code>.</div>`;
       return;
     }
 
@@ -87,7 +90,7 @@
     const stale = dayAge(DATA.generated);
     if (stale != null && stale > 2) {
       secs.push(`<div class="stale-warn">These dossiers were built ${stale} days ago, and the events feed has
-        run since. Re-run <code>node scripts/build-player-news.mjs</code> for what's current.</div>`);
+        run since. Re-run <code>node scripts/build-player-news.mjs --league=${esc(A.key)}</code> for what's current.</div>`);
     }
 
     /* Numbers first, because they are the only part of this panel that is a fact rather than a read. */
@@ -194,9 +197,10 @@
       render(d.players[id] ?? null, name ?? id);
     } catch (e) {
       dlg.querySelector(".pn-body").innerHTML = `<div class="panel-error" role="alert">
-        No published player dossiers (${esc(e.message)}). Run
-        <code>node scripts/build-player-news.mjs</code> — it writes <code>data/site/player-news.json</code>
-        from the roster room, the draft board and the events feed.</div>`;
+        No published player dossiers for ${esc(A.name)} (${esc(e.message)}). Run
+        <code>node scripts/build-player-news.mjs --league=${esc(A.key)}</code> — it writes
+        <code>${esc(A.data)}/player-news.json</code> from that league's roster room, the shared draft
+        board and the shared events feed.</div>`;
     }
   }
 

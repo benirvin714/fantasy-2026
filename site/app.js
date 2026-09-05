@@ -5,6 +5,9 @@
    Rule: never fabricate — every panel shows an explicit error state when its source is unreachable. */
 (() => {
   const C = window.HQ_CONFIG;
+  // The league in view, resolved by league-switch.js. Every per-league path comes off this; nothing
+  // in here should read HQ_CONFIG's flat *_JSON keys, which are back-compat only.
+  const A = C.active;
   const $ = (sel) => document.querySelector(sel);
 
   const fetchJSON = async (url) => {
@@ -39,7 +42,7 @@
 
   /* ---------- league chip (live) ---------- */
   async function renderLeague() {
-    const league = await fetchJSON(`${C.API}/league/${C.LEAGUE_ID}?cb=${Date.now()}`);
+    const league = await fetchJSON(`${C.API}/league/${A.league_id}?cb=${Date.now()}`);
     $("#league-chip").textContent = `${league.name} · ${league.season} (${league.status})`;
   }
 
@@ -51,18 +54,18 @@
   async function renderMyRoster() {
     $("#myroster-body").innerHTML = skel(8);
     let d;
-    try { d = await fetchJSON(C.ROSTER_ROOM_JSON); }
+    try { d = await fetchJSON(A.ROSTER_ROOM_JSON); }
     catch {
       return err("#myroster-body",
-        "No published roster room. Run <code>node scripts/build-roster-room.mjs</code> — it writes data/site/roster-room.json. It refuses to run until every roster has players, so before a draft this panel is empty by design.");
+        `No published roster room for ${esc(A.name)}. Run <code>node scripts/build-roster-room.mjs --league=${esc(A.key)}</code> — it writes ${esc(A.data)}/roster-room.json. It refuses to run until every roster has players, so before a draft this panel is empty by design.`);
     }
-    const t = d.teams.find((x) => x.is_me) ?? d.teams.find((x) => x.roster_id === C.MY_ROSTER_ID);
-    if (!t) return err("#myroster-body", `Roster ${C.MY_ROSTER_ID} isn't in the published room — check MY_ROSTER_ID in config.js.`);
+    const t = d.teams.find((x) => x.is_me) ?? d.teams.find((x) => x.roster_id === A.my_roster_id);
+    if (!t) return err("#myroster-body", `Roster ${A.my_roster_id} isn't in the published ${esc(A.name)} room — check my_roster_id in config.js.`);
 
     $("#myroster-meta").textContent = `${window.HBGB_RosterTable.meta(t)} · ${t.starter_rank} of ${d.teams.length} by projection`;
     $("#myroster-body").innerHTML =
       staleBanner(d.generated, "This roster", 3) +
-      window.HBGB_RosterTable.html(t) +
+      window.HBGB_RosterTable.html(t, { teams: d.teams.length }) +
       `<p class="rr-note">Click any name for the latest published on that player. Every other team is in the
         <a href="rosters.html">roster room</a>, with the standings and the trade search.</p>`;
   }
@@ -104,8 +107,8 @@
   async function renderWaivers() {
     $("#waivers-body").innerHTML = skel(4);
     let d;
-    try { d = await fetchJSON(C.WAIVERS_JSON); }
-    catch { return err("#waivers-body", "No published waiver board. Run /waivers in Claude Code — it writes data/site/waivers.json."); }
+    try { d = await fetchJSON(A.WAIVERS_JSON); }
+    catch { return err("#waivers-body", `No published waiver board for ${esc(A.name)}. Run /waivers in Claude Code — it writes ${esc(A.data)}/waivers.json.`); }
     $("#waivers-meta").textContent = `generated ${d.generated} · ${d.mode}`;
     const age = (Date.now() - new Date(d.generated).getTime()) / 864e5;
     const stale = age > 7 ? `<div class="stale-warn">This board is ${Math.floor(age)} days old — re-run /waivers for current suggestions.</div>` : "";
@@ -136,10 +139,13 @@
 
   /* ---------- brief panel (published by /brief) ---------- */
   async function renderBrief() {
+    // The panel is removed outright on a league /brief has not written for (see data-league-only
+    // in index.html), so this is a normal skip, not a failure.
+    if (!$("#brief-body")) return;
     $("#brief-body").innerHTML = skel(4);
     let d;
-    try { d = await fetchJSON(C.BRIEF_JSON); }
-    catch { return err("#brief-body", "No published brief. Run /brief in Claude Code — it writes data/site/latest-brief.json."); }
+    try { d = await fetchJSON(A.BRIEF_JSON); }
+    catch { return err("#brief-body", `No published brief. Run /brief in Claude Code — it writes ${esc(A.data)}/latest-brief.json.`); }
     $("#brief-meta").textContent = `from briefs/${d.date}.md`;
     $("#brief-body").innerHTML = `<ol class="sowhat">${d.so_what.map((s) => `<li>${esc(s)}</li>`).join("")}</ol>`;
   }

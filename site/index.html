@@ -8,13 +8,23 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap">
-  <link rel="stylesheet" href="style.css?v=51">
-  <link rel="stylesheet" href="backdrop.css?v=2">
+  <link rel="stylesheet" href="style.css?v=52">
+  <link rel="stylesheet" href="backdrop.css?v=3">
   <script>/* ?bg=none disables the backdrop for this visit - see backdrop.css */
     if (new URLSearchParams(location.search).get("bg") === "none")
       document.documentElement.setAttribute("data-backdrop", "none");</script>
+  <script src="config.js?v=11"></script>
+  <script>/* Stamp the active league before the stylesheet paints, so the palette never flashes the
+    wrong league. Resolution is duplicated from league-switch.js on purpose: that file has to load at
+    the end of the body (it edits markup the page renderers then read), and nothing loaded down there
+    can beat first paint. league-switch honours whatever this writes, so the two cannot disagree. */
+    (() => { const C = window.HQ_CONFIG;
+      const q = new URLSearchParams(location.search).get("league");
+      let k = q && C.LEAGUES[q] ? q : null;
+      if (!k) { try { const s = localStorage.getItem("hbgb.activeLeague"); if (s && C.LEAGUES[s]) k = s; } catch {} }
+      document.documentElement.setAttribute("data-league", k || C.DEFAULT_LEAGUE); })();</script>
 </head>
-<body>
+<body data-page="HQ">
   <!-- Ambient backdrop. Static markup rather than injected by script: with one treatment there is
        nothing to switch, so a JS file would be a request and a paint delay for no behaviour. It is
        aria-hidden because it is pure decoration and has no business in the accessibility tree. -->
@@ -24,11 +34,12 @@
     <div class="bd-vignette"></div>
   </div>
   <header>
-    <h1>THE HBGBS <span class="hq">/ HQ</span></h1>
+    <h1><span data-league-name>THE HBGBS</span> <span class="hq">/ HQ</span></h1>
+    <nav class="chips lgswitch" aria-label="League" data-league-switch></nav>
     <nav class="chips" aria-label="Pages">
       <span class="chip navlink active" aria-current="page">in-season HQ</span>
       <a class="chip navlink" href="rosters.html">roster room</a>
-      <a class="chip navlink" href="draft.html">draft day</a>
+      <a class="chip navlink" href="draft.html" data-league-only="hbgbs">draft day</a>
       <a class="chip navlink" href="league.html">other league</a>
     </nav>
     <div class="chips">
@@ -88,7 +99,9 @@
         <div class="panel-body" id="waivers-body"><div class="loading">Loading…</div></div>
       </section>
 
-      <section class="panel" aria-labelledby="brief-h">
+      <!-- Removed outright on any league /brief has not written for, rather than hidden: a
+           display:none panel still fetches and still reports its error into a box nobody sees. -->
+      <section class="panel" aria-labelledby="brief-h" data-league-only="hbgbs">
         <div class="panel-head">
           <h2 id="brief-h">Latest brief — so what</h2>
           <span class="meta" id="brief-meta"></span>
@@ -106,9 +119,9 @@
     invented data.
   </footer>
 
-  <script src="config.js?v=10"></script>
-  <script src="player-news.js?v=1"></script>
-  <script src="roster-table.js?v=2"></script>
-  <script src="app.js?v=9"></script>
+  <script src="league-switch.js?v=2"></script>
+  <script src="player-news.js?v=2"></script>
+  <script src="roster-table.js?v=3"></script>
+  <script src="app.js?v=10"></script>
 </body>
 </html>
