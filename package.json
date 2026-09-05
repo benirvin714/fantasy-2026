@@ -18,6 +18,7 @@
     "build:draft-aid": "node scripts/build-draft-aid.mjs",
     "build:roster-room": "node scripts/build-roster-room.mjs",
     "build:player-news": "node scripts/build-player-news.mjs",
+    "build:pit": "node scripts/build-roster-room.mjs --league=pit && node scripts/build-player-news.mjs --league=pit",
     "build:faab-model": "node scripts/build-faab-model.mjs",
     "measure:positional-ladder": "node scripts/measure-positional-ladder.mjs",
     "measure:flex-split": "node scripts/measure-flex-split.mjs",

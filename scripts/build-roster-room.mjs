@@ -1,10 +1,10 @@
 /* Roster room — every team in the league as a scouting object.
  *
- * Reads the ten post-draft rosters, prices every rostered player with the same league-scored
- * projection the draft board uses, then answers four questions per team:
+ * Reads the post-draft rosters, prices every rostered player in THIS league's scoring, then
+ * answers four questions per team:
  *   1. how good is it        -> optimal starting lineup under this league's slot shape
- *   2. where is it strong    -> per-slot and per-position rank against the other nine teams
- *   3. who owns it           -> the six-season dossier in league-tendencies.md, keyed by roster id
+ *   2. where is it strong    -> per-slot and per-position rank against the other teams
+ *   3. who owns it           -> the owner dossier, where the league has one
  *   4. what can I get        -> trades that raise BOTH lineups, searched exhaustively, not guessed
  *
  * Nothing here is a judgment call the script invented. Every number traces to a projection, a
@@ -12,16 +12,25 @@
  * assembled from those numbers. Where a player can't be priced he is named and excluded rather
  * than assumed, because a missing projection silently read as 0 would fake a weakness.
  *
- * Output: data/site/roster-room.json   Page: site/rosters.html
+ * Runs per league:  node scripts/build-roster-room.mjs [--league=hbgbs|pit]
+ * Output: <league out_dir>/roster-room.json   Page: site/rosters.html
+ *
+ * Two things vary by league and both are branches rather than assumptions. A league whose scoring
+ * is not the draft board's re-prices every rostered player from Sleeper's raw projected stat lines
+ * instead of reading the board's points. A league with no history (year one) has no owner dossiers
+ * and no trade archive, so it reports the moves its teams have actually made this season instead of
+ * a behavioural read it has no evidence for.
  */
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { resolveLeague, ordinal as ORD_N, spell } from "./lib/leagues.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const LEAGUE_ID = "1386608052991447040";
-const OUT = path.join(ROOT, "data", "site", "roster-room.json");
-const MY_ROSTER = 10;
+const L = resolveLeague();
+const LEAGUE_ID = L.league_id;
+const OUT = path.join(ROOT, ...L.out_dir.split("/"), "roster-room.json");
+const MY_ROSTER = L.my_roster;
 
 // LOCAL date, not toISOString() (UTC) — see the build-stamp note in progress.md.
 const TODAY = (() => {
@@ -53,6 +62,10 @@ const picks = draft && draft.status === "complete"
   ? await get(`https://api.sleeper.app/v1/draft/${draft.draft_id}/picks`)
   : [];
 
+/* Read from the live roster count, never hardcoded: a team count that disagrees with the league is
+   the kind of quiet wrongness every guard in this file exists to prevent. */
+const TEAMS = rosters.length;
+
 const board = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "site", "draft-board.json"), "utf8"));
 const byId = new Map(board.players.map((p) => [p.id, p]));
 
@@ -71,44 +84,82 @@ if (filled < rosters.length) {
    that really does hold them) they get the same treatment the board gives everyone: Sleeper's
    2026 projected stat line re-scored with this league's exact settings. */
 const scoring = JSON.parse(
-  fs.readFileSync(path.join(ROOT, "data", "raw", "league-2026.json"), "utf8")).scoring_settings;
+  fs.readFileSync(path.join(ROOT, ...L.scoring_snapshot.split("/")), "utf8")).scoring_settings;
 const SKILL_KEYS = ["pass_yd", "pass_td", "pass_int", "pass_2pt", "rush_yd", "rush_td", "rush_2pt",
   "rec", "rec_yd", "rec_td", "rec_2pt", "fum_lost"];
 const K_KEYS = ["fgm_0_19", "fgm_20_29", "fgm_30_39", "fgm_40_49", "xpm", "xpmiss",
   "fgmiss_0_19", "fgmiss_20_29", "fgmiss_30_39", "fgmiss_40_49"];
 const DEF_KEYS = ["sack", "int", "fum_rec", "blk_kick", "safe", "def_td"];
+/* Sleeper's kicker projection only carries fgmiss_40_49 and fgmiss_50p, so a league that bands its
+   miss penalties can never be scored exactly from it. A league with a FLAT `fgmiss` can: the
+   penalty is the same at every distance, so it applies to every miss bucket the projection has.
+   The HBGBs bands; the Panther Pit is flat. Handling both here rather than assuming one is what
+   lets a second league share this script without its kickers being scored in someone else's rules. */
+const MISS_KEYS = ["fgmiss_0_19", "fgmiss_20_29", "fgmiss_30_39", "fgmiss_40_49", "fgmiss_50p"];
+const FLAT_MISS = scoring.fgmiss != null && scoring.fgmiss !== 0;
 
 function rescore(p, pos) {
   if (!p) return null;
   let pts = 0;
   const keys = pos === "K" ? K_KEYS : pos === "DEF" ? DEF_KEYS : SKILL_KEYS;
-  for (const k of keys) if (p[k] != null && scoring[k] != null) pts += p[k] * scoring[k];
-  if (pos === "K" && p.fgm_50p != null) pts += p.fgm_50p * (scoring.fgm_50_59 ?? 5);
+  for (const k of keys) {
+    if (FLAT_MISS && MISS_KEYS.includes(k)) continue;   // charged below instead, at one flat rate
+    if (p[k] != null && scoring[k] != null) pts += p[k] * scoring[k];
+  }
+  if (pos === "K") {
+    if (p.fgm_50p != null) pts += p.fgm_50p * (scoring.fgm_50_59 ?? 5);
+    if (FLAT_MISS) for (const k of MISS_KEYS) if (p[k] != null) pts += p[k] * scoring.fgmiss;
+  }
   return +pts.toFixed(1);
 }
 
 const rosteredIds = [...new Set(rosters.flatMap((r) => r.players))];
-const offBoard = rosteredIds.filter((id) => !byId.has(id));
+/* The draft board's projection.pts is scored in the HBGBs' settings. For that league the board's
+   number IS this league's number and is used as-is; for any other league it is another league's
+   arithmetic wearing this league's label, so every rostered player is re-priced from the raw stat
+   lines. The board's league-agnostic half - ADP, Boris Chen tier, scouting brief, availability -
+   is still read straight through, because none of it depends on scoring. */
+const offBoard = L.board_scored
+  ? rosteredIds.filter((id) => !byId.has(id))
+  : rosteredIds;
 if (offBoard.length) {
-  console.log(`${offBoard.length} rostered player(s) outside the board pool — pricing from Sleeper directly.`);
+  console.log(L.board_scored
+    ? `${offBoard.length} rostered player(s) outside the board pool — pricing from Sleeper directly.`
+    : `Re-pricing all ${offBoard.length} rostered players in ${L.name}'s own scoring.`);
   const [allPlayers, proj] = await Promise.all([
     get("https://api.sleeper.app/v1/players/nfl"),
     get("https://api.sleeper.app/v1/projections/nfl/regular/2026"),
   ]);
+  let repriced = 0, added = 0, unknown = 0;
   for (const id of offBoard) {
+    const onBoard = byId.get(id);
     const sp = allPlayers[id];
-    if (!sp) { console.warn(`  ${id}: unknown to Sleeper — listed as unpriced`); continue; }
-    const pos = sp.position;
+    if (!onBoard && !sp) { console.warn(`  ${id}: unknown to Sleeper — listed as unpriced`); unknown++; continue; }
+    const pos = onBoard ? onBoard.pos : sp.position;
     const pts = rescore(proj[id], pos);
-    byId.set(id, {
-      id, name: `${sp.first_name} ${sp.last_name}`.trim(), pos, team: sp.team, age: sp.age,
-      years_exp: sp.years_exp, bye: null, rookie: sp.years_exp === 0, off_board: true,
-      projection: { pts, method: "Sleeper projected stat line re-scored with exact league settings" },
-      availability: { current_injury_status: sp.injury_status || null },
-      adp: {}, risk_flags: {},
-    });
-    console.log(`  ${id}: ${sp.first_name} ${sp.last_name} (${pos} ${sp.team}) = ${pts} pts`);
+    const projection = { pts, method: `Sleeper projected stat line re-scored with ${L.name}'s exact scoring_settings` };
+    if (onBoard) {
+      /* MERGE, never replace. Everything else on a board entry - bye week, ADP, the scouting
+         brief, the availability model, risk flags - is league-agnostic and is the reason the two
+         leagues share one board. Overwriting the record to change one number would silently drop
+         the bye weeks the risk panel counts stacks from. */
+      byId.set(id, { ...onBoard, projection });
+      repriced++;
+    } else {
+      byId.set(id, {
+        id, name: `${sp.first_name} ${sp.last_name}`.trim(), pos, team: sp.team, age: sp.age,
+        years_exp: sp.years_exp, bye: null, rookie: sp.years_exp === 0, off_board: true,
+        projection,
+        availability: { current_injury_status: sp.injury_status || null },
+        adp: {}, risk_flags: {},
+      });
+      added++;
+      console.log(`  off board: ${sp.first_name} ${sp.last_name} (${pos} ${sp.team}) = ${pts} pts`);
+    }
   }
+  if (repriced) console.log(`  ${repriced} board players re-priced in ${L.name}'s scoring, everything else on their record kept.`);
+  if (added) console.log(`  ${added} player(s) priced from Sleeper directly (outside the board pool).`);
+  if (unknown) console.log(`  ${unknown} unknown to Sleeper — left unpriced.`);
 }
 
 /* ------------------------------------------- owner dossiers, parsed from league-tendencies.md
@@ -116,7 +167,7 @@ if (offBoard.length) {
    would rot the first time a dossier is revised. The parser is strict on purpose — if the file's
    shape changes it fails the build instead of shipping nine owners out of ten. */
 function parseDossiers() {
-  const md = fs.readFileSync(path.join(ROOT, "league-tendencies.md"), "utf8");
+  const md = fs.readFileSync(path.join(ROOT, ...L.dossiers.split("/")), "utf8");
   const out = new Map();
   // "### mfkr (commissioner, roster 1)" and "### ThatWasButtery — you (roster 10). Self-scout."
   for (const sec of md.split(/^### /m).slice(1)) {
@@ -132,9 +183,13 @@ function parseDossiers() {
   }
   return out;
 }
-const dossiers = parseDossiers();
-if (dossiers.size !== rosters.length) {
-  console.error(`Refusing to build: parsed ${dossiers.size} dossiers from league-tendencies.md, ` +
+/* A league with no dossier file has no owner read, and that is a fact rather than a failure: the
+   Panther Pit is in its first season and nobody has done anything yet to have tendencies about.
+   The strict guard still applies to any league that DOES claim dossiers - partial tendencies are
+   worse than none, because nine owners out of ten reads as complete. */
+const dossiers = L.dossiers ? parseDossiers() : new Map();
+if (L.dossiers && dossiers.size !== rosters.length) {
+  console.error(`Refusing to build: parsed ${dossiers.size} dossiers from ${L.dossiers}, ` +
     `expected ${rosters.length}. The "### <owner> (roster N)" heading shape changed — fix the ` +
     `parser rather than shipping partial tendencies.`);
   process.exit(1);
@@ -146,7 +201,7 @@ if (dossiers.size !== rosters.length) {
 function tradeHistory() {
   const per = {}, channel = {}, years = {};
   let total = 0;
-  for (let y = 2020; y <= 2025; y++) {
+  for (let y = L.trade_archive.from; y <= L.trade_archive.to; y++) {
     const f = path.join(ROOT, "data", "raw", `transactions-${y}.json`);
     if (!fs.existsSync(f)) continue;
     const tr = JSON.parse(fs.readFileSync(f, "utf8"))
@@ -162,9 +217,35 @@ function tradeHistory() {
       }
     }
   }
-  return { per, channel, total, years, seasons: "2020-2025" };
+  return { per, channel, total, years, seasons: `${L.trade_archive.from}-${L.trade_archive.to}` };
 }
-const trades = tradeHistory();
+
+/* ---------------------------------------------- moves: what a year-one league can actually say
+   With no archive there is no behavioural read to make, so the page reports observed activity
+   instead of inferred appetite: completed transactions this season, per roster, straight off
+   Sleeper. In week 1 that is zero for everybody and says so; by week 6 it is a real signal, and
+   unlike a borrowed appetite band it was never wrong in the meantime. */
+async function seasonMoves() {
+  const per = {}, kinds = { trade: 0, waiver: 0, free_agent: 0 };
+  const through = Math.max(1, +state.week || 1);
+  let total = 0;
+  for (let w = 1; w <= through; w++) {
+    let tx = [];
+    try { tx = await get(`https://api.sleeper.app/v1/league/${LEAGUE_ID}/transactions/${w}`); }
+    catch { continue; }   // a week Sleeper will not serve is skipped, not counted as zero moves
+    for (const t of tx) {
+      if (t.status !== "complete") continue;
+      total++;
+      if (kinds[t.type] != null) kinds[t.type]++;
+      for (const rid of t.roster_ids || []) per[rid] = (per[rid] || 0) + 1;
+    }
+  }
+  return { per, total, kinds, through_week: through };
+}
+
+const trades = L.trade_archive ? tradeHistory() : null;
+const moves = L.trade_archive ? null : await seasonMoves();
+if (moves) console.log(`No trade archive for ${L.name} — counted ${moves.total} completed move(s) through week ${moves.through_week}.`);
 
 /* --------------------------------------------------------------------- the lineup model
    QB / RB / RB / WR / WR / TE / FLEX / FLEX / K / DEF, five bench, one IR. Greedy is provably
@@ -226,8 +307,8 @@ const median = (xs) => {
   return s.length % 2 ? s[m] : +((s[m - 1] + s[m]) / 2).toFixed(1);
 };
 
-/* Rank each team at every slot against the other nine. Slot rank is the honest read of a
-   weakness: "your RB2 is 9th of 10 at that slot" is actionable in a way "7th in RB points" is not. */
+/* Rank each team at every slot against the others. Slot rank is the honest read of a weakness:
+   "your RB2 is 9th of 10 at that slot" is actionable in a way "7th in RB points" is not. */
 const slotTable = SLOTS.map((slot, i) => {
   const vals = teams.map((t) => ({ rid: t.roster_id, pts: ptsOf(t.lineup[i].player) || 0 }));
   const sorted = [...vals].sort((a, b) => b.pts - a.pts);
@@ -262,7 +343,7 @@ const leagueMedianStarters = median(teams.map((t) => t.total));
 /* ------------------------------------------------------ surplus: who else would start him
    The cleanest definition of a trade asset in a five-bench league is a player who improves
    someone else's starting lineup while sitting on yours. Counted by actually recomputing the
-   other nine optimal lineups with him inserted, not by comparing ranks. */
+   other optimal lineups with him inserted, not by comparing ranks. */
 for (const t of teams) {
   for (const p of t.bench) {
     let starts = 0, best = 0, bestRid = null;
@@ -429,7 +510,7 @@ const signed = (x, d = 0) => `${x >= 0 ? "+" : ""}${x.toFixed(d)}`;
 
 function summarize(t, strengths, weaknesses, r) {
   const s = [];
-  s.push(`${ORD(t.starter_rank)} of 10 in projected starting points (${t.total.toFixed(0)}), ` +
+  s.push(`${ORD(t.starter_rank)} of ${TEAMS} in projected starting points (${t.total.toFixed(0)}), ` +
     `${signed(t.total - leagueMedianStarters)} against the league median.`);
   if (strengths.length) {
     const a = strengths[0];
@@ -498,12 +579,22 @@ for (const t of teams) {
       id, name: byId.get(id) ? byId.get(id).name : id,
       note: "no 2026 projection — excluded from every total on this page",
     })),
-    tendencies: {
+    /* One of these two is always null. A league with an archive gets the behavioural read; a
+       year-one league gets the observed move count and no read at all. The page branches on which
+       is present rather than on a league key, so a third league needs no front-end change. */
+    tendencies: L.dossiers ? {
       draft: d.draft || null, faab: d.faab || null, trades: d.trades || null,
       exploit: d.exploit || null, history: d.history || null,
       appetite: appetite(t.roster_id),
       channel_with_me: (trades.channel[MY_ROSTER] || {})[t.roster_id] || 0,
-    },
+    } : null,
+    moves: moves ? {
+      n: moves.per[t.roster_id] || 0,
+      through_week: moves.through_week,
+      note: (moves.per[t.roster_id] || 0) === 0
+        ? `No completed moves through week ${moves.through_week}.`
+        : `${moves.per[t.roster_id]} completed move(s) through week ${moves.through_week} — trades, waiver claims and free-agent adds.`,
+    } : null,
     proposals: t.is_me ? [] : proposalsFor(t),
     fit: t.is_me ? null : fitWith(t),
   };
@@ -523,10 +614,12 @@ const payload = {
   basis: {
     projection: "Sleeper 2026 projected stat lines re-scored with the league's exact scoring_settings (data/raw/league-2026.json) — the same numbers the draft board runs on.",
     lineup: `Optimal lineup under ${SLOTS.join("/")}, five bench. Greedy is optimal here because slot eligibility nests.`,
-    strength: "Per-slot and per-position rank against the other nine teams. K and DEF are reported but never graded — they are streaming positions in this format.",
-    surplus: "A bench player's \"starts on N\" is measured by recomputing each of the other nine optimal lineups with him inserted.",
+    strength: `Per-slot and per-position rank against the other ${spell(TEAMS - 1)} teams. K and DEF are reported but never graded — they are streaming positions in this format.`,
+    surplus: `A bench player's "starts on N" is measured by recomputing each of the other ${spell(TEAMS - 1)} optimal lineups with him inserted.`,
     trades: `Exhaustive 1-for-1 and 2-for-1 search. A proposal ships only if BOTH optimal lineups rise (>= ${GAIN_1} season points for a 1-for-1; >= ${GAIN_2_ME} to me and >= ${GAIN_2_THEM} to them for a 2-for-1, where the other side must also take on more raw projected points than it gives).`,
-    tendencies: "Parsed from league-tendencies.md; trade counts recomputed from data/raw/transactions-2020..2025.json.",
+    tendencies: L.dossiers
+      ? `Parsed from ${L.dossiers}; trade counts recomputed from data/raw/transactions-${L.trade_archive.from}..${L.trade_archive.to}.json.`
+      : `${L.name} is in its first season, so there is no owner history to read. The league table reports completed moves this season instead — observed, and zero for everybody until somebody makes one.`,
     caveat: "A projection is a season-long point estimate. It cannot see a camp role change, it prices DEF poorly (points-allowed tiers do not project), and it says nothing about week-to-week ceiling. Every number here is the start of an argument, not the end of one.",
   },
   coverage: {
@@ -537,10 +630,14 @@ const payload = {
   },
   slot_table: slotTable.map((s) => ({ slot: s.slot, index: s.index, median: s.median, best: s.best })),
   pos_table: Object.fromEntries(POSES.map((p) => [p, { median: posTable[p].median }])),
-  trade_history: { total: trades.total, seasons: trades.seasons, by_year: trades.years, per_roster: trades.per },
+  trade_history: trades
+    ? { total: trades.total, seasons: trades.seasons, by_year: trades.years, per_roster: trades.per }
+    : null,
+  season_moves: moves,
   teams: teams.map((t) => t.out),
 };
 
+fs.mkdirSync(path.dirname(OUT), { recursive: true });
 fs.writeFileSync(OUT, JSON.stringify(payload, null, 1));
 
 const nProp = payload.teams.reduce((a, t) => a + t.proposals.length, 0);
@@ -549,5 +646,5 @@ console.log(`  ${payload.teams.length} teams · ${payload.coverage.priced}/${pay
 console.log(`  ${nProp} trade proposals across ${payload.teams.filter((t) => t.proposals.length).length} partners`);
 for (const t of [...payload.teams].sort((a, b) => a.starter_rank - b.starter_rank)) {
   console.log(`  ${String(t.starter_rank).padStart(2)}. ${t.owner.padEnd(17)} ${String(t.starter_pts).padStart(7)}  ` +
-    `${t.proposals.length} offers  [${t.tendencies.appetite.band}]`);
+    `${t.proposals.length} offers  [${t.tendencies ? t.tendencies.appetite.band : `${t.moves.n} moves`}]`);
 }

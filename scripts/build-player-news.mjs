@@ -7,19 +7,34 @@
  * Joining them at build time means the browser fetches one 200KB file instead of the 800KB board.
  *
  * Inputs (all local, no network):
- *   data/site/roster-room.json  — who is rostered, and the league-scored projection
- *   data/site/draft-board.json  — scouting brief, ADP + commentary, availability, risk flags
- *   data/site/nfl-events.json   — the dated feed, already tagged with player names
+ *   <league out_dir>/roster-room.json  — who is rostered, and the league-scored projection
+ *   data/site/draft-board.json         — scouting brief, ADP + commentary, availability, risk flags
+ *   data/site/nfl-events.json          — the dated feed, already tagged with player names
  * Output:
- *   data/site/player-news.json
+ *   <league out_dir>/player-news.json
+ *
+ * The draft board and the events feed are shared across leagues on purpose: a scouting brief, an
+ * ADP, an availability score and a news item are facts about a player, not about a league. Only the
+ * roster join and the projection are per-league, and both come from that league's own roster room.
  *
  * Run it after the daily refresh, since two of the three inputs move daily.
+ *   node scripts/build-player-news.mjs [--league=hbgbs|pit]
  */
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { resolveLeague } from "./lib/leagues.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const L = resolveLeague();
+
+/* LOCAL date, not toISOString() (UTC) — see the build-stamp note in progress.md. After ~7pm Central
+   a UTC stamp files today's build under tomorrow's date, which made this file's `generated` disagree
+   with the roster room's on the same run and would trip the dialog's own staleness check a day early. */
+const TODAY = (() => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+})();
 const read = (rel) => {
   const p = path.join(ROOT, rel);
   if (!fs.existsSync(p)) {
@@ -29,7 +44,7 @@ const read = (rel) => {
   return JSON.parse(fs.readFileSync(p, "utf8"));
 };
 
-const room = read("data/site/roster-room.json");
+const room = read(`${L.out_dir}/roster-room.json`);
 const board = read("data/site/draft-board.json");
 const events = read("data/site/nfl-events.json");
 
@@ -125,7 +140,7 @@ for (const [id, r] of rostered) {
 }
 
 const out = {
-  generated: new Date().toISOString().slice(0, 10),
+  generated: TODAY,
   sources: {
     events: events.updated ?? null,
     draft_board: board.generated ?? null,
@@ -141,11 +156,12 @@ const out = {
   players,
 };
 
-const dest = path.join(ROOT, "data/site/player-news.json");
+const dest = path.join(ROOT, ...L.out_dir.split("/"), "player-news.json");
+fs.mkdirSync(path.dirname(dest), { recursive: true });
 fs.writeFileSync(dest, JSON.stringify(out));
 const kb = (fs.statSync(dest).size / 1024).toFixed(0);
 
-console.log(`player-news.json — ${rostered.size} rostered players, ${kb}KB`);
+console.log(`${L.out_dir}/player-news.json — ${L.name}, ${rostered.size} rostered players, ${kb}KB`);
 console.log(`  scouting brief: ${withBrief}   recent events: ${withEvents}   off the draft board: ${offBoard}`);
 console.log(`  feeds: events ${out.sources.events} · board ${out.sources.draft_board} · room ${out.sources.roster_room}`);
 if (unmatched.size) {

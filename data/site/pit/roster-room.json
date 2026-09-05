@@ -1,0 +1,4831 @@
+{
+ "generated": "2026-09-04",
+ "league": {
+  "id": "1401363352046825472",
+  "name": "The Panther Pit",
+  "season": "2026",
+  "status": "in_season",
+  "week": 1,
+  "season_type": "regular"
+ },
+ "draft": {
+  "id": "1401363352625618944",
+  "status": "complete",
+  "rounds": 15,
+  "type": "snake"
+ },
+ "basis": {
+  "projection": "Sleeper 2026 projected stat lines re-scored with the league's exact scoring_settings (data/raw/league-2026.json) — the same numbers the draft board runs on.",
+  "lineup": "Optimal lineup under QB/RB/RB/WR/WR/TE/FLEX/FLEX/K/DEF, five bench. Greedy is optimal here because slot eligibility nests.",
+  "strength": "Per-slot and per-position rank against the other eleven teams. K and DEF are reported but never graded — they are streaming positions in this format.",
+  "surplus": "A bench player's \"starts on N\" is measured by recomputing each of the other eleven optimal lineups with him inserted.",
+  "trades": "Exhaustive 1-for-1 and 2-for-1 search. A proposal ships only if BOTH optimal lineups rise (>= 5 season points for a 1-for-1; >= 8 to me and >= 5 to them for a 2-for-1, where the other side must also take on more raw projected points than it gives).",
+  "tendencies": "The Panther Pit is in its first season, so there is no owner history to read. The league table reports completed moves this season instead — observed, and zero for everybody until somebody makes one.",
+  "caveat": "A projection is a season-long point estimate. It cannot see a camp role change, it prices DEF poorly (points-allowed tiers do not project), and it says nothing about week-to-week ceiling. Every number here is the start of an argument, not the end of one."
+ },
+ "coverage": {
+  "rostered": 181,
+  "priced": 181,
+  "off_board_priced": 181,
+  "league_median_starters": 1804.8
+ },
+ "slot_table": [
+  {
+   "slot": "QB",
+   "index": 0,
+   "median": 305,
+   "best": 361.5
+  },
+  {
+   "slot": "RB",
+   "index": 1,
+   "median": 234.2,
+   "best": 299.9
+  },
+  {
+   "slot": "RB",
+   "index": 2,
+   "median": 188.9,
+   "best": 228.2
+  },
+  {
+   "slot": "WR",
+   "index": 3,
+   "median": 206.7,
+   "best": 259
+  },
+  {
+   "slot": "WR",
+   "index": 4,
+   "median": 185.4,
+   "best": 220
+  },
+  {
+   "slot": "TE",
+   "index": 5,
+   "median": 142.2,
+   "best": 202.5
+  },
+  {
+   "slot": "FLEX",
+   "index": 6,
+   "median": 163.5,
+   "best": 183.4
+  },
+  {
+   "slot": "FLEX",
+   "index": 7,
+   "median": 145.1,
+   "best": 160.5
+  },
+  {
+   "slot": "K",
+   "index": 8,
+   "median": 102,
+   "best": 112
+  },
+  {
+   "slot": "DEF",
+   "index": 9,
+   "median": 93.5,
+   "best": 106
+  }
+ ],
+ "pos_table": {
+  "QB": {
+   "median": 305
+  },
+  "RB": {
+   "median": 516.7
+  },
+  "WR": {
+   "median": 623
+  },
+  "TE": {
+   "median": 142.2
+  },
+  "K": {
+   "median": 102
+  },
+  "DEF": {
+   "median": 93.5
+  }
+ },
+ "trade_history": null,
+ "season_moves": {
+  "per": {
+   "8": 1
+  },
+  "total": 1,
+  "kinds": {
+   "trade": 0,
+   "waiver": 0,
+   "free_agent": 1
+  },
+  "through_week": 1
+ },
+ "teams": [
+  {
+   "roster_id": 1,
+   "owner": "ThatWasButtery",
+   "user_id": "603035152494436352",
+   "is_me": true,
+   "draft_slot": 6,
+   "starter_pts": 1811.5,
+   "starter_rank": 6,
+   "vs_league_median": 6.7,
+   "bench_pts": 574.3,
+   "summary": "6th of 12 in projected starting points (1812), +7 against the league median. Built on QB: 321 starting points, 3rd in the league, +16 on the median. TE is the hole — 126 points, 11th, -16 behind. No bench player would start on four other teams, so there is little here to trade from. Week 8 takes 4 starters off the field at once, and five bench spots do not cover that.",
+   "slots": [
+    {
+     "slot": "QB",
+     "player": {
+      "id": "11564",
+      "name": "Drake Maye",
+      "pos": "QB",
+      "team": "NE",
+      "pts": 320.8,
+      "round": 5,
+      "bye": 11,
+      "adp": 51.9,
+      "injury": null
+     },
+     "rank": 3,
+     "vs_median": 15.8
+    },
+    {
+     "slot": "RB",
+     "player": {
+      "id": "7543",
+      "name": "Travis Etienne",
+      "pos": "RB",
+      "team": "NO",
+      "pts": 189.7,
+      "round": 4,
+      "bye": 8,
+      "adp": 40.4,
+      "injury": null
+     },
+     "rank": 12,
+     "vs_median": -44.5
+    },
+    {
+     "slot": "RB",
+     "player": {
+      "id": "13287",
+      "name": "Jeremiyah Love",
+      "pos": "RB",
+      "team": "ARI",
+      "pts": 188.3,
+      "round": 3,
+      "bye": 14,
+      "adp": 27.4,
+      "injury": "Questionable"
+     },
+     "rank": 7,
+     "vs_median": -0.6
+    },
+    {
+     "slot": "WR",
+     "player": {
+      "id": "9488",
+      "name": "Jaxon Smith-Njigba",
+      "pos": "WR",
+      "team": "SEA",
+      "pts": 235.1,
+      "round": 1,
+      "bye": 11,
+      "adp": 8.4,
+      "injury": null
+     },
+     "rank": 3,
+     "vs_median": 28.4
+    },
+    {
+     "slot": "WR",
+     "player": {
+      "id": "7569",
+      "name": "Nico Collins",
+      "pos": "WR",
+      "team": "HOU",
+      "pts": 220,
+      "round": 2,
+      "bye": 8,
+      "adp": 22.7,
+      "injury": null
+     },
+     "rank": 1,
+     "vs_median": 34.6
+    },
+    {
+     "slot": "TE",
+     "player": {
+      "id": "8131",
+      "name": "Isaiah Likely",
+      "pos": "TE",
+      "team": "NYG",
+      "pts": 126.3,
+      "round": 10,
+      "bye": 8,
+      "adp": 108,
+      "injury": null
+     },
+     "rank": 11,
+     "vs_median": -15.9
+    },
+    {
+     "slot": "FLEX",
+     "player": {
+      "id": "5927",
+      "name": "Terry McLaurin",
+      "pos": "WR",
+      "team": "WAS",
+      "pts": 176.8,
+      "round": 6,
+      "bye": 7,
+      "adp": 53.5,
+      "injury": null
+     },
+     "rank": 2,
+     "vs_median": 13.3
+    },
+    {
+     "slot": "FLEX",
+     "player": {
+      "id": "12529",
+      "name": "TreVeyon Henderson",
+      "pos": "RB",
+      "team": "NE",
+      "pts": 153.5,
+      "round": 7,
+      "bye": 11,
+      "adp": 56,
+      "injury": "Questionable"
+     },
+     "rank": 4,
+     "vs_median": 8.4
+    },
+    {
+     "slot": "K",
+     "player": {
+      "id": "3451",
+      "name": "Ka'imi Fairbairn",
+      "pos": "K",
+      "team": "HOU",
+      "pts": 109,
+      "round": 13,
+      "bye": 8,
+      "adp": 140.3,
+      "injury": null
+     },
+     "rank": 2,
+     "vs_median": 7
+    },
+    {
+     "slot": "DEF",
+     "player": {
+      "id": "MIN",
+      "name": "Minnesota Vikings",
+      "pos": "DEF",
+      "team": "MIN",
+      "pts": 92,
+      "round": 12,
+      "bye": 6,
+      "adp": 157.5,
+      "injury": null
+     },
+     "rank": 7,
+     "vs_median": -1.5
+    }
+   ],
+   "by_pos": [
+    {
+     "pos": "QB",
+     "pts": 320.8,
+     "rank": 3,
+     "vs_median": 15.8,
+     "starters": 1,
+     "rostered": 1
+    },
+    {
+     "pos": "RB",
+     "pts": 531.5,
+     "rank": 5,
+     "vs_median": 14.8,
+     "starters": 3,
+     "rostered": 5
+    },
+    {
+     "pos": "WR",
+     "pts": 631.9,
+     "rank": 6,
+     "vs_median": 8.9,
+     "starters": 3,
+     "rostered": 5
+    },
+    {
+     "pos": "TE",
+     "pts": 126.3,
+     "rank": 11,
+     "vs_median": -15.9,
+     "starters": 1,
+     "rostered": 2
+    },
+    {
+     "pos": "K",
+     "pts": 109,
+     "rank": 2,
+     "vs_median": 7,
+     "starters": 1,
+     "rostered": 1
+    },
+    {
+     "pos": "DEF",
+     "pts": 92,
+     "rank": 7,
+     "vs_median": -1.5,
+     "starters": 1,
+     "rostered": 1
+    }
+   ],
+   "strengths": [
+    {
+     "pos": "QB",
+     "pts": 320.8,
+     "rank": 3,
+     "vs_median": 15.8,
+     "starters": 1,
+     "rostered": 1
+    }
+   ],
+   "weaknesses": [
+    {
+     "pos": "TE",
+     "pts": 126.3,
+     "rank": 11,
+     "vs_median": -15.9,
+     "starters": 1,
+     "rostered": 2
+    }
+   ],
+   "risks": {
+    "bye_stacks": [
+     {
+      "week": 8,
+      "n": 4,
+      "players": [
+       "Travis Etienne (RB)",
+       "Nico Collins (WR)",
+       "Isaiah Likely (TE)",
+       "Ka'imi Fairbairn (K)"
+      ]
+     },
+     {
+      "week": 11,
+      "n": 3,
+      "players": [
+       "Drake Maye (QB)",
+       "Jaxon Smith-Njigba (WR)",
+       "TreVeyon Henderson (RB)"
+      ]
+     }
+    ],
+    "injured": [
+     {
+      "name": "Jeremiyah Love",
+      "pos": "RB",
+      "status": "Questionable"
+     },
+     {
+      "name": "TreVeyon Henderson",
+      "pos": "RB",
+      "status": "Questionable"
+     }
+    ],
+    "fragile": [
+     {
+      "name": "Terry McLaurin",
+      "pos": "WR",
+      "score": 0.89,
+      "why": "2025 missed time (10 games)."
+     },
+     {
+      "name": "Nico Collins",
+      "pos": "WR",
+      "score": 0.894,
+      "why": "MISSED TIME IN ALL FIVE NFL SEASONS: chronic soft-tissue availability concern. Ceiling is a Tier-1 WR if he ever plays 17."
+     }
+    ],
+    "flagged": [
+     {
+      "name": "Terry McLaurin",
+      "pos": "WR",
+      "notes": [
+       "Live training-camp holdout for a new deal (unresolved as of this research). Fined per day; missed-camp/games risk until settled."
+      ]
+     }
+    ]
+   },
+   "bench": [
+    {
+     "id": "11583",
+     "name": "Jonathon Brooks",
+     "pos": "RB",
+     "team": "CAR",
+     "pts": 137.9,
+     "round": 8,
+     "bye": 5,
+     "starts_on": 2,
+     "best_gain": 12.6,
+     "best_team": 7,
+     "own_cost": 0
+    },
+    {
+     "id": "9754",
+     "name": "Quentin Johnston",
+     "pos": "WR",
+     "team": "LAC",
+     "pts": 134.9,
+     "round": 9,
+     "bye": 7,
+     "starts_on": 1,
+     "best_gain": 9.6,
+     "best_team": 7,
+     "own_cost": 0
+    },
+    {
+     "id": "7002",
+     "name": "Juwan Johnson",
+     "pos": "TE",
+     "team": "NO",
+     "pts": 112.9,
+     "round": 14,
+     "bye": 8,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    },
+    {
+     "id": "8136",
+     "name": "Rachaad White",
+     "pos": "RB",
+     "team": "WAS",
+     "pts": 111.1,
+     "round": 11,
+     "bye": 7,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    },
+    {
+     "id": "13413",
+     "name": "Cyrus Allen",
+     "pos": "WR",
+     "team": "KC",
+     "pts": 77.5,
+     "round": 15,
+     "bye": null,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    }
+   ],
+   "unpriced": [],
+   "tendencies": null,
+   "moves": {
+    "n": 0,
+    "through_week": 1,
+    "note": "No completed moves through week 1."
+   },
+   "proposals": [],
+   "fit": null
+  },
+  {
+   "roster_id": 2,
+   "owner": "kate0826",
+   "user_id": "1401367095278632960",
+   "is_me": false,
+   "draft_slot": 4,
+   "starter_pts": 1824.6,
+   "starter_rank": 3,
+   "vs_league_median": 19.8,
+   "bench_pts": 802.9,
+   "summary": "3rd of 12 in projected starting points (1825), +20 against the league median. QB is the hole — 284 points, 12th, -22 behind. 1 bench player would start on four or more other teams (Alec Pierce) — that is the tradeable surplus. Week 6 takes 3 starters off the field at once, and five bench spots do not cover that.",
+   "slots": [
+    {
+     "slot": "QB",
+     "player": {
+      "id": "3163",
+      "name": "Jared Goff",
+      "pos": "QB",
+      "team": "DET",
+      "pts": 283.5,
+      "round": 10,
+      "bye": 6,
+      "adp": 143.4,
+      "injury": null
+     },
+     "rank": 12,
+     "vs_median": -21.5
+    },
+    {
+     "slot": "RB",
+     "player": {
+      "id": "12527",
+      "name": "Ashton Jeanty",
+      "pos": "RB",
+      "team": "LV",
+      "pts": 211.4,
+      "round": 2,
+      "bye": 13,
+      "adp": 15.2,
+      "injury": "Questionable"
+     },
+     "rank": 10,
+     "vs_median": -22.8
+    },
+    {
+     "slot": "RB",
+     "player": {
+      "id": "8155",
+      "name": "Breece Hall",
+      "pos": "RB",
+      "team": "NYJ",
+      "pts": 192.5,
+      "round": 3,
+      "bye": 13,
+      "adp": 31.8,
+      "injury": "Questionable"
+     },
+     "rank": 4,
+     "vs_median": 3.6
+    },
+    {
+     "slot": "WR",
+     "player": {
+      "id": "7564",
+      "name": "Ja'Marr Chase",
+      "pos": "WR",
+      "team": "CIN",
+      "pts": 256.6,
+      "round": 1,
+      "bye": 6,
+      "adp": 3,
+      "injury": "Questionable"
+     },
+     "rank": 2,
+     "vs_median": 49.9
+    },
+    {
+     "slot": "WR",
+     "player": {
+      "id": "12526",
+      "name": "Tetairoa McMillan",
+      "pos": "WR",
+      "team": "CAR",
+      "pts": 184.5,
+      "round": 4,
+      "bye": 5,
+      "adp": 35.2,
+      "injury": null
+     },
+     "rank": 8,
+     "vs_median": -0.9
+    },
+    {
+     "slot": "TE",
+     "player": {
+      "id": "12518",
+      "name": "Tyler Warren",
+      "pos": "TE",
+      "team": "IND",
+      "pts": 159.6,
+      "round": 5,
+      "bye": 13,
+      "adp": 50.3,
+      "injury": "Questionable"
+     },
+     "rank": 4,
+     "vs_median": 17.4
+    },
+    {
+     "slot": "FLEX",
+     "player": {
+      "id": "12519",
+      "name": "Luther Burden",
+      "pos": "WR",
+      "team": "CHI",
+      "pts": 173,
+      "round": 7,
+      "bye": 10,
+      "adp": 59.2,
+      "injury": "Questionable"
+     },
+     "rank": 5,
+     "vs_median": 9.5
+    },
+    {
+     "slot": "FLEX",
+     "player": {
+      "id": "7611",
+      "name": "Rhamondre Stevenson",
+      "pos": "RB",
+      "team": "NE",
+      "pts": 154.5,
+      "round": 6,
+      "bye": 11,
+      "adp": 71.6,
+      "injury": null
+     },
+     "rank": 3,
+     "vs_median": 9.4
+    },
+    {
+     "slot": "K",
+     "player": {
+      "id": "11792",
+      "name": "Will Reichard",
+      "pos": "K",
+      "team": "MIN",
+      "pts": 106,
+      "round": 14,
+      "bye": 6,
+      "adp": 165.1,
+      "injury": null
+     },
+     "rank": 5,
+     "vs_median": 4
+    },
+    {
+     "slot": "DEF",
+     "player": {
+      "id": "SEA",
+      "name": "Seattle Seahawks",
+      "pos": "DEF",
+      "team": "SEA",
+      "pts": 103,
+      "round": 11,
+      "bye": 11,
+      "adp": 113.4,
+      "injury": null
+     },
+     "rank": 3,
+     "vs_median": 9.5
+    }
+   ],
+   "by_pos": [
+    {
+     "pos": "QB",
+     "pts": 283.5,
+     "rank": 12,
+     "vs_median": -21.5,
+     "starters": 1,
+     "rostered": 2
+    },
+    {
+     "pos": "RB",
+     "pts": 558.4,
+     "rank": 4,
+     "vs_median": 41.7,
+     "starters": 3,
+     "rostered": 4
+    },
+    {
+     "pos": "WR",
+     "pts": 614.1,
+     "rank": 7,
+     "vs_median": -8.9,
+     "starters": 3,
+     "rostered": 6
+    },
+    {
+     "pos": "TE",
+     "pts": 159.6,
+     "rank": 4,
+     "vs_median": 17.4,
+     "starters": 1,
+     "rostered": 1
+    },
+    {
+     "pos": "K",
+     "pts": 106,
+     "rank": 5,
+     "vs_median": 4,
+     "starters": 1,
+     "rostered": 1
+    },
+    {
+     "pos": "DEF",
+     "pts": 103,
+     "rank": 3,
+     "vs_median": 9.5,
+     "starters": 1,
+     "rostered": 1
+    }
+   ],
+   "strengths": [],
+   "weaknesses": [
+    {
+     "pos": "QB",
+     "pts": 283.5,
+     "rank": 12,
+     "vs_median": -21.5,
+     "starters": 1,
+     "rostered": 2
+    }
+   ],
+   "risks": {
+    "bye_stacks": [
+     {
+      "week": 6,
+      "n": 3,
+      "players": [
+       "Jared Goff (QB)",
+       "Ja'Marr Chase (WR)",
+       "Will Reichard (K)"
+      ]
+     },
+     {
+      "week": 13,
+      "n": 3,
+      "players": [
+       "Ashton Jeanty (RB)",
+       "Breece Hall (RB)",
+       "Tyler Warren (TE)"
+      ]
+     }
+    ],
+    "injured": [
+     {
+      "name": "Ashton Jeanty",
+      "pos": "RB",
+      "status": "Questionable"
+     },
+     {
+      "name": "Breece Hall",
+      "pos": "RB",
+      "status": "Questionable"
+     },
+     {
+      "name": "Ja'Marr Chase",
+      "pos": "WR",
+      "status": "Questionable"
+     },
+     {
+      "name": "Tyler Warren",
+      "pos": "TE",
+      "status": "Questionable"
+     },
+     {
+      "name": "Luther Burden",
+      "pos": "WR",
+      "status": "Questionable"
+     }
+    ],
+    "fragile": [
+     {
+      "name": "Rhamondre Stevenson",
+      "pos": "RB",
+      "score": 0.829,
+      "why": "No significant missed time (12/15/14)."
+     }
+    ],
+    "flagged": []
+   },
+   "bench": [
+    {
+     "id": "12545",
+     "name": "Tyler Shough",
+     "pos": "QB",
+     "team": "NO",
+     "pts": 270.9,
+     "round": 13,
+     "bye": 8,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    },
+    {
+     "id": "8142",
+     "name": "Alec Pierce",
+     "pos": "WR",
+     "team": "IND",
+     "pts": 150.9,
+     "round": 9,
+     "bye": 13,
+     "starts_on": 7,
+     "best_gain": 25.6,
+     "best_team": 7,
+     "own_cost": 0
+    },
+    {
+     "id": "11581",
+     "name": "MarShawn Lloyd",
+     "pos": "RB",
+     "team": "GB",
+     "pts": 137,
+     "round": 8,
+     "bye": 11,
+     "starts_on": 2,
+     "best_gain": 11.7,
+     "best_team": 7,
+     "own_cost": 0
+    },
+    {
+     "id": "11646",
+     "name": "Jalen Coker",
+     "pos": "WR",
+     "team": "CAR",
+     "pts": 135.9,
+     "round": 12,
+     "bye": 5,
+     "starts_on": 1,
+     "best_gain": 10.6,
+     "best_team": 7,
+     "own_cost": 0
+    },
+    {
+     "id": "13346",
+     "name": "Denzel Boston",
+     "pos": "WR",
+     "team": "CLE",
+     "pts": 108.2,
+     "round": 15,
+     "bye": 11,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    }
+   ],
+   "unpriced": [],
+   "tendencies": null,
+   "moves": {
+    "n": 0,
+    "through_week": 1,
+    "note": "No completed moves through week 1."
+   },
+   "proposals": [],
+   "fit": {
+    "they_have": [],
+    "they_want": [],
+    "note": "No surplus mismatch in either direction. Every player on both rosters is already worth at least as much where he is."
+   }
+  },
+  {
+   "roster_id": 3,
+   "owner": "BrylerAnderson",
+   "user_id": "1401367388556926976",
+   "is_me": false,
+   "draft_slot": 2,
+   "starter_pts": 1752.6,
+   "starter_rank": 10,
+   "vs_league_median": -52.2,
+   "bench_pts": 771.3,
+   "summary": "10th of 12 in projected starting points (1753), -52 against the league median. Built on QB: 326 starting points, 2nd in the league, +21 on the median. WR is the hole — 567 points, 8th, -57 behind. No bench player would start on four other teams, so there is little here to trade from. Week 11 takes 4 starters off the field at once, and five bench spots do not cover that.",
+   "slots": [
+    {
+     "slot": "QB",
+     "player": {
+      "id": "4881",
+      "name": "Lamar Jackson",
+      "pos": "QB",
+      "team": "BAL",
+      "pts": 326,
+      "round": 2,
+      "bye": 13,
+      "adp": 34.5,
+      "injury": null
+     },
+     "rank": 2,
+     "vs_median": 21
+    },
+    {
+     "slot": "RB",
+     "player": {
+      "id": "8150",
+      "name": "Kyren Williams",
+      "pos": "RB",
+      "team": "LAR",
+      "pts": 192,
+      "round": 3,
+      "bye": 11,
+      "adp": 23.7,
+      "injury": null
+     },
+     "rank": 11,
+     "vs_median": -42.2
+    },
+    {
+     "slot": "RB",
+     "player": {
+      "id": "11584",
+      "name": "Bucky Irving",
+      "pos": "RB",
+      "team": "TB",
+      "pts": 179.3,
+      "round": 4,
+      "bye": 10,
+      "adp": 47.1,
+      "injury": null
+     },
+     "rank": 10,
+     "vs_median": -9.6
+    },
+    {
+     "slot": "WR",
+     "player": {
+      "id": "7547",
+      "name": "Amon-Ra St. Brown",
+      "pos": "WR",
+      "team": "DET",
+      "pts": 227.5,
+      "round": 1,
+      "bye": 6,
+      "adp": 7.9,
+      "injury": null
+     },
+     "rank": 4,
+     "vs_median": 20.8
+    },
+    {
+     "slot": "WR",
+     "player": {
+      "id": "9487",
+      "name": "Parker Washington",
+      "pos": "WR",
+      "team": "JAX",
+      "pts": 176.4,
+      "round": 7,
+      "bye": 7,
+      "adp": 70.5,
+      "injury": null
+     },
+     "rank": 10,
+     "vs_median": -9
+    },
+    {
+     "slot": "TE",
+     "player": {
+      "id": "7553",
+      "name": "Kyle Pitts",
+      "pos": "TE",
+      "team": "ATL",
+      "pts": 138.6,
+      "round": 5,
+      "bye": 11,
+      "adp": 71.6,
+      "injury": null
+     },
+     "rank": 8,
+     "vs_median": -3.6
+    },
+    {
+     "slot": "FLEX",
+     "player": {
+      "id": "10222",
+      "name": "Jayden Reed",
+      "pos": "WR",
+      "team": "GB",
+      "pts": 162.6,
+      "round": 8,
+      "bye": 11,
+      "adp": 101.5,
+      "injury": null
+     },
+     "rank": 7,
+     "vs_median": -0.9
+    },
+    {
+     "slot": "FLEX",
+     "player": {
+      "id": "6806",
+      "name": "J.K. Dobbins",
+      "pos": "RB",
+      "team": "DEN",
+      "pts": 147.2,
+      "round": 6,
+      "bye": 10,
+      "adp": 85.1,
+      "injury": null
+     },
+     "rank": 6,
+     "vs_median": 2.1
+    },
+    {
+     "slot": "K",
+     "player": {
+      "id": "2747",
+      "name": "Jason Myers",
+      "pos": "K",
+      "team": "SEA",
+      "pts": 107,
+      "round": 10,
+      "bye": 11,
+      "adp": 139.3,
+      "injury": null
+     },
+     "rank": 4,
+     "vs_median": 5
+    },
+    {
+     "slot": "DEF",
+     "player": {
+      "id": "DEN",
+      "name": "Denver Broncos",
+      "pos": "DEF",
+      "team": "DEN",
+      "pts": 96,
+      "round": 9,
+      "bye": 10,
+      "adp": 121.7,
+      "injury": null
+     },
+     "rank": 5,
+     "vs_median": 2.5
+    }
+   ],
+   "by_pos": [
+    {
+     "pos": "QB",
+     "pts": 326,
+     "rank": 2,
+     "vs_median": 21,
+     "starters": 1,
+     "rostered": 2
+    },
+    {
+     "pos": "RB",
+     "pts": 518.5,
+     "rank": 6,
+     "vs_median": 1.8,
+     "starters": 3,
+     "rostered": 3
+    },
+    {
+     "pos": "WR",
+     "pts": 566.5,
+     "rank": 8,
+     "vs_median": -56.5,
+     "starters": 3,
+     "rostered": 5
+    },
+    {
+     "pos": "TE",
+     "pts": 138.6,
+     "rank": 8,
+     "vs_median": -3.6,
+     "starters": 1,
+     "rostered": 3
+    },
+    {
+     "pos": "K",
+     "pts": 107,
+     "rank": 4,
+     "vs_median": 5,
+     "starters": 1,
+     "rostered": 1
+    },
+    {
+     "pos": "DEF",
+     "pts": 96,
+     "rank": 5,
+     "vs_median": 2.5,
+     "starters": 1,
+     "rostered": 1
+    }
+   ],
+   "strengths": [
+    {
+     "pos": "QB",
+     "pts": 326,
+     "rank": 2,
+     "vs_median": 21,
+     "starters": 1,
+     "rostered": 2
+    }
+   ],
+   "weaknesses": [
+    {
+     "pos": "WR",
+     "pts": 566.5,
+     "rank": 8,
+     "vs_median": -56.5,
+     "starters": 3,
+     "rostered": 5
+    },
+    {
+     "pos": "TE",
+     "pts": 138.6,
+     "rank": 8,
+     "vs_median": -3.6,
+     "starters": 1,
+     "rostered": 3
+    }
+   ],
+   "risks": {
+    "bye_stacks": [
+     {
+      "week": 11,
+      "n": 4,
+      "players": [
+       "Kyren Williams (RB)",
+       "Kyle Pitts (TE)",
+       "Jayden Reed (WR)",
+       "Jason Myers (K)"
+      ]
+     },
+     {
+      "week": 10,
+      "n": 3,
+      "players": [
+       "Bucky Irving (RB)",
+       "J.K. Dobbins (RB)",
+       "Denver Broncos (DEF)"
+      ]
+     }
+    ],
+    "injured": [],
+    "fragile": [
+     {
+      "name": "J.K. Dobbins",
+      "pos": "RB",
+      "score": 0.662,
+      "why": "Chronically injury-prone: long Achilles history plus a Nov 2025 foot injury that required a second opinion. gp 1/13/10 over three years. Now in a crowded Denver backfield."
+     },
+     {
+      "name": "Jayden Reed",
+      "pos": "WR",
+      "score": 0.871,
+      "why": "2025 missed time (7 games); cause not separately verified this pass. Flagged for re-check."
+     },
+     {
+      "name": "Bucky Irving",
+      "pos": "RB",
+      "score": 0.876,
+      "why": "2025 foot + shoulder injuries wrecked the year (10 games, 588 yds); listed 1A with Gainwell 1B. Camp health is the swing variable."
+     }
+    ],
+    "flagged": []
+   },
+   "bench": [
+    {
+     "id": "11563",
+     "name": "Bo Nix",
+     "pos": "QB",
+     "team": "DEN",
+     "pts": 295.7,
+     "round": 11,
+     "bye": 10,
+     "starts_on": 2,
+     "best_gain": 12.2,
+     "best_team": 2,
+     "own_cost": 0
+    },
+    {
+     "id": "9480",
+     "name": "Brenton Strange",
+     "pos": "TE",
+     "team": "JAX",
+     "pts": 129.5,
+     "round": 12,
+     "bye": 7,
+     "starts_on": 3,
+     "best_gain": 4.7,
+     "best_team": 4,
+     "own_cost": 0
+    },
+    {
+     "id": "5872",
+     "name": "Deebo Samuel",
+     "pos": "WR",
+     "team": "SF",
+     "pts": 127.7,
+     "round": 13,
+     "bye": 8,
+     "starts_on": 1,
+     "best_gain": 2.4,
+     "best_team": 7,
+     "own_cost": 0
+    },
+    {
+     "id": "12493",
+     "name": "Oronde Gadsden",
+     "pos": "TE",
+     "team": "LAC",
+     "pts": 113.8,
+     "round": 15,
+     "bye": 7,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    },
+    {
+     "id": "13276",
+     "name": "Omar Cooper",
+     "pos": "WR",
+     "team": "NYJ",
+     "pts": 104.6,
+     "round": 14,
+     "bye": 13,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    }
+   ],
+   "unpriced": [],
+   "tendencies": null,
+   "moves": {
+    "n": 0,
+    "through_week": 1,
+    "note": "No completed moves through week 1."
+   },
+   "proposals": [],
+   "fit": {
+    "they_have": [
+     {
+      "id": "9480",
+      "name": "Brenton Strange",
+      "pos": "TE",
+      "team": "JAX",
+      "pts": 129.5,
+      "round": 12,
+      "gain": 3.2,
+      "cost": 0,
+      "net": 3.2
+     },
+     {
+      "id": "7553",
+      "name": "Kyle Pitts",
+      "pos": "TE",
+      "team": "ATL",
+      "pts": 138.6,
+      "round": 5,
+      "gain": 12.3,
+      "cost": 9.1,
+      "net": 3.2
+     }
+    ],
+    "they_want": [],
+    "note": "One-way fit — they hold players worth more to you than to them, but nothing you own is worth more over there. You are the side that has to overpay."
+   }
+  },
+  {
+   "roster_id": 4,
+   "owner": "LaPray0814",
+   "user_id": "1401368020206555136",
+   "is_me": false,
+   "draft_slot": 8,
+   "starter_pts": 1669.2,
+   "starter_rank": 12,
+   "vs_league_median": -135.6,
+   "bench_pts": 687.7,
+   "summary": "12th of 12 in projected starting points (1669), -136 against the league median. TE is the hole — 125 points, 12th, -17 behind. No bench player would start on four other teams, so there is little here to trade from. Week 9 takes 3 starters off the field at once, and five bench spots do not cover that.",
+   "slots": [
+    {
+     "slot": "QB",
+     "player": {
+      "id": "6770",
+      "name": "Joe Burrow",
+      "pos": "QB",
+      "team": "CIN",
+      "pts": 306.1,
+      "round": 3,
+      "bye": 6,
+      "adp": 53.3,
+      "injury": null
+     },
+     "rank": 6,
+     "vs_median": 1.1
+    },
+    {
+     "slot": "RB",
+     "player": {
+      "id": "9224",
+      "name": "Chase Brown",
+      "pos": "RB",
+      "team": "CIN",
+      "pts": 226.7,
+      "round": 2,
+      "bye": 6,
+      "adp": 17.6,
+      "injury": null
+     },
+     "rank": 8,
+     "vs_median": -7.5
+    },
+    {
+     "slot": "RB",
+     "player": {
+      "id": "5967",
+      "name": "Tony Pollard",
+      "pos": "RB",
+      "team": "TEN",
+      "pts": 146.1,
+      "round": 7,
+      "bye": 9,
+      "adp": 77.8,
+      "injury": null
+     },
+     "rank": 12,
+     "vs_median": -42.8
+    },
+    {
+     "slot": "WR",
+     "player": {
+      "id": "6786",
+      "name": "CeeDee Lamb",
+      "pos": "WR",
+      "team": "DAL",
+      "pts": 222.5,
+      "round": 1,
+      "bye": 14,
+      "adp": 11.6,
+      "injury": null
+     },
+     "rank": 5,
+     "vs_median": 15.8
+    },
+    {
+     "slot": "WR",
+     "player": {
+      "id": "7526",
+      "name": "Jaylen Waddle",
+      "pos": "WR",
+      "team": "DEN",
+      "pts": 182.5,
+      "round": 4,
+      "bye": 10,
+      "adp": 46.2,
+      "injury": null
+     },
+     "rank": 9,
+     "vs_median": -2.9
+    },
+    {
+     "slot": "TE",
+     "player": {
+      "id": "8110",
+      "name": "Jake Ferguson",
+      "pos": "TE",
+      "team": "DAL",
+      "pts": 124.8,
+      "round": 6,
+      "bye": 14,
+      "adp": 113.5,
+      "injury": null
+     },
+     "rank": 12,
+     "vs_median": -17.4
+    },
+    {
+     "slot": "FLEX",
+     "player": {
+      "id": "7021",
+      "name": "Rico Dowdle",
+      "pos": "RB",
+      "team": "PIT",
+      "pts": 142.1,
+      "round": 5,
+      "bye": 9,
+      "adp": 83.4,
+      "injury": null
+     },
+     "rank": 12,
+     "vs_median": -21.4
+    },
+    {
+     "slot": "FLEX",
+     "player": {
+      "id": "6819",
+      "name": "Michael Pittman",
+      "pos": "WR",
+      "team": "PIT",
+      "pts": 136.4,
+      "round": 9,
+      "bye": 9,
+      "adp": 103.4,
+      "injury": "Questionable"
+     },
+     "rank": 11,
+     "vs_median": -8.7
+    },
+    {
+     "slot": "K",
+     "player": {
+      "id": "4227",
+      "name": "Harrison Butker",
+      "pos": "K",
+      "team": "KC",
+      "pts": 96,
+      "round": 14,
+      "bye": null,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 11,
+     "vs_median": -6
+    },
+    {
+     "slot": "DEF",
+     "player": {
+      "id": "GB",
+      "name": "Green Bay Packers",
+      "pos": "DEF",
+      "team": "GB",
+      "pts": 86,
+      "round": 15,
+      "bye": 11,
+      "adp": 207.6,
+      "injury": null
+     },
+     "rank": 11,
+     "vs_median": -7.5
+    }
+   ],
+   "by_pos": [
+    {
+     "pos": "QB",
+     "pts": 306.1,
+     "rank": 6,
+     "vs_median": 1.1,
+     "starters": 1,
+     "rostered": 2
+    },
+    {
+     "pos": "RB",
+     "pts": 514.9,
+     "rank": 7,
+     "vs_median": -1.8,
+     "starters": 3,
+     "rostered": 5
+    },
+    {
+     "pos": "WR",
+     "pts": 541.4,
+     "rank": 10,
+     "vs_median": -81.6,
+     "starters": 3,
+     "rostered": 4
+    },
+    {
+     "pos": "TE",
+     "pts": 124.8,
+     "rank": 12,
+     "vs_median": -17.4,
+     "starters": 1,
+     "rostered": 2
+    },
+    {
+     "pos": "K",
+     "pts": 96,
+     "rank": 11,
+     "vs_median": -6,
+     "starters": 1,
+     "rostered": 1
+    },
+    {
+     "pos": "DEF",
+     "pts": 86,
+     "rank": 11,
+     "vs_median": -7.5,
+     "starters": 1,
+     "rostered": 1
+    }
+   ],
+   "strengths": [],
+   "weaknesses": [
+    {
+     "pos": "TE",
+     "pts": 124.8,
+     "rank": 12,
+     "vs_median": -17.4,
+     "starters": 1,
+     "rostered": 2
+    },
+    {
+     "pos": "WR",
+     "pts": 541.4,
+     "rank": 10,
+     "vs_median": -81.6,
+     "starters": 3,
+     "rostered": 4
+    }
+   ],
+   "risks": {
+    "bye_stacks": [
+     {
+      "week": 9,
+      "n": 3,
+      "players": [
+       "Tony Pollard (RB)",
+       "Rico Dowdle (RB)",
+       "Michael Pittman (WR)"
+      ]
+     }
+    ],
+    "injured": [
+     {
+      "name": "Michael Pittman",
+      "pos": "WR",
+      "status": "Questionable"
+     }
+    ],
+    "fragile": [
+     {
+      "name": "Joe Burrow",
+      "pos": "QB",
+      "score": 0.812,
+      "why": "2025 limited to 8 games (turf-toe surgery). When healthy a top-5 fantasy QB, but that version has shown up once in three seasons; the injury history is the story."
+     },
+     {
+      "name": "Tony Pollard",
+      "pos": "RB",
+      "score": 0.899,
+      "why": "No significant missed time (17/16/17)."
+     }
+    ],
+    "flagged": []
+   },
+   "bench": [
+    {
+     "id": "4943",
+     "name": "Sam Darnold",
+     "pos": "QB",
+     "team": "SEA",
+     "pts": 262.7,
+     "round": 11,
+     "bye": 11,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    },
+    {
+     "id": "12489",
+     "name": "RJ Harvey",
+     "pos": "RB",
+     "team": "DEN",
+     "pts": 125.6,
+     "round": 8,
+     "bye": 10,
+     "starts_on": 1,
+     "best_gain": 0.3,
+     "best_team": 7,
+     "own_cost": 0
+    },
+    {
+     "id": "5844",
+     "name": "T.J. Hockenson",
+     "pos": "TE",
+     "team": "MIN",
+     "pts": 122,
+     "round": 12,
+     "bye": 6,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    },
+    {
+     "id": "9504",
+     "name": "Kayshon Boutte",
+     "pos": "WR",
+     "team": "HOU",
+     "pts": 104.7,
+     "round": 13,
+     "bye": 8,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    },
+    {
+     "id": "8132",
+     "name": "Tyler Allgeier",
+     "pos": "RB",
+     "team": "ARI",
+     "pts": 72.7,
+     "round": 10,
+     "bye": 14,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    }
+   ],
+   "unpriced": [],
+   "tendencies": null,
+   "moves": {
+    "n": 0,
+    "through_week": 1,
+    "note": "No completed moves through week 1."
+   },
+   "proposals": [],
+   "fit": {
+    "they_have": [],
+    "they_want": [
+     {
+      "id": "11583",
+      "name": "Jonathon Brooks",
+      "pos": "RB",
+      "team": "CAR",
+      "pts": 137.9,
+      "round": 8,
+      "gain": 1.5,
+      "cost": 0,
+      "net": 1.5
+     },
+     {
+      "id": "12529",
+      "name": "TreVeyon Henderson",
+      "pos": "RB",
+      "team": "NE",
+      "pts": 153.5,
+      "round": 7,
+      "gain": 17.1,
+      "cost": 15.6,
+      "net": 1.5
+     },
+     {
+      "id": "5927",
+      "name": "Terry McLaurin",
+      "pos": "WR",
+      "team": "WAS",
+      "pts": 176.8,
+      "round": 6,
+      "gain": 40.4,
+      "cost": 38.9,
+      "net": 1.5
+     },
+     {
+      "id": "13287",
+      "name": "Jeremiyah Love",
+      "pos": "RB",
+      "team": "ARI",
+      "pts": 188.3,
+      "round": 3,
+      "gain": 51.9,
+      "cost": 50.4,
+      "net": 1.5
+     },
+     {
+      "id": "7543",
+      "name": "Travis Etienne",
+      "pos": "RB",
+      "team": "NO",
+      "pts": 189.7,
+      "round": 4,
+      "gain": 53.3,
+      "cost": 51.8,
+      "net": 1.5
+     }
+    ],
+    "note": "One-way fit the other way — you hold surplus they could use and they hold none you can use. Sell, do not swap. Every name on your side nets the same +1.5 — they all fill the same slot over there, so the one to actually send is the cheapest, Jonathon Brooks."
+   }
+  },
+  {
+   "roster_id": 5,
+   "owner": "WreckingCrew09",
+   "user_id": "1401368065660203008",
+   "is_me": false,
+   "draft_slot": 10,
+   "starter_pts": 1777.6,
+   "starter_rank": 9,
+   "vs_league_median": -27.2,
+   "bench_pts": 764.7,
+   "summary": "9th of 12 in projected starting points (1778), -27 against the league median. Built on RB: 607 starting points, 2nd in the league, +91 on the median. WR is the hole — 527 points, 12th, -96 behind. 1 bench player would start on four or more other teams (Mark Andrews) — that is the tradeable surplus. Week 7 takes 4 starters off the field at once, and five bench spots do not cover that.",
+   "slots": [
+    {
+     "slot": "QB",
+     "player": {
+      "id": "11566",
+      "name": "Jayden Daniels",
+      "pos": "QB",
+      "team": "WAS",
+      "pts": 308.7,
+      "round": 8,
+      "bye": 7,
+      "adp": 69.2,
+      "injury": null
+     },
+     "rank": 5,
+     "vs_median": 3.7
+    },
+    {
+     "slot": "RB",
+     "player": {
+      "id": "8138",
+      "name": "James Cook",
+      "pos": "RB",
+      "team": "BUF",
+      "pts": 245.3,
+      "round": 1,
+      "bye": 7,
+      "adp": 9.9,
+      "injury": null
+     },
+     "rank": 5,
+     "vs_median": 11.1
+    },
+    {
+     "slot": "RB",
+     "player": {
+      "id": "12507",
+      "name": "Omarion Hampton",
+      "pos": "RB",
+      "team": "LAC",
+      "pts": 218.9,
+      "round": 2,
+      "bye": 7,
+      "adp": 16.5,
+      "injury": null
+     },
+     "rank": 2,
+     "vs_median": 30
+    },
+    {
+     "slot": "WR",
+     "player": {
+      "id": "11632",
+      "name": "Malik Nabers",
+      "pos": "WR",
+      "team": "NYG",
+      "pts": 193.7,
+      "round": 3,
+      "bye": 8,
+      "adp": 28,
+      "injury": "Questionable"
+     },
+     "rank": 10,
+     "vs_median": -13
+    },
+    {
+     "slot": "WR",
+     "player": {
+      "id": "12514",
+      "name": "Emeka Egbuka",
+      "pos": "WR",
+      "team": "TB",
+      "pts": 185.5,
+      "round": 4,
+      "bye": 10,
+      "adp": 41.7,
+      "injury": "Questionable"
+     },
+     "rank": 6,
+     "vs_median": 0.1
+    },
+    {
+     "slot": "TE",
+     "player": {
+      "id": "9484",
+      "name": "Tucker Kraft",
+      "pos": "TE",
+      "team": "GB",
+      "pts": 140.9,
+      "round": 6,
+      "bye": 11,
+      "adp": 65.4,
+      "injury": "Questionable"
+     },
+     "rank": 7,
+     "vs_median": -1.3
+    },
+    {
+     "slot": "FLEX",
+     "player": {
+      "id": "4983",
+      "name": "DJ Moore",
+      "pos": "WR",
+      "team": "BUF",
+      "pts": 147.5,
+      "round": 5,
+      "bye": 7,
+      "adp": 52.4,
+      "injury": null
+     },
+     "rank": 9,
+     "vs_median": -16
+    },
+    {
+     "slot": "FLEX",
+     "player": {
+      "id": "12534",
+      "name": "Kyle Monangai",
+      "pos": "RB",
+      "team": "CHI",
+      "pts": 143.1,
+      "round": 9,
+      "bye": 10,
+      "adp": 96,
+      "injury": "Questionable"
+     },
+     "rank": 7,
+     "vs_median": -2
+    },
+    {
+     "slot": "K",
+     "player": {
+      "id": "7839",
+      "name": "Evan McPherson",
+      "pos": "K",
+      "team": "CIN",
+      "pts": 102,
+      "round": 14,
+      "bye": 6,
+      "adp": 151,
+      "injury": null
+     },
+     "rank": 6,
+     "vs_median": 0
+    },
+    {
+     "slot": "DEF",
+     "player": {
+      "id": "NE",
+      "name": "New England Patriots",
+      "pos": "DEF",
+      "team": "NE",
+      "pts": 92,
+      "round": 13,
+      "bye": 11,
+      "adp": 134.6,
+      "injury": null
+     },
+     "rank": 8,
+     "vs_median": -1.5
+    }
+   ],
+   "by_pos": [
+    {
+     "pos": "QB",
+     "pts": 308.7,
+     "rank": 5,
+     "vs_median": 3.7,
+     "starters": 1,
+     "rostered": 2
+    },
+    {
+     "pos": "RB",
+     "pts": 607.3,
+     "rank": 2,
+     "vs_median": 90.6,
+     "starters": 3,
+     "rostered": 4
+    },
+    {
+     "pos": "WR",
+     "pts": 526.7,
+     "rank": 12,
+     "vs_median": -96.3,
+     "starters": 3,
+     "rostered": 5
+    },
+    {
+     "pos": "TE",
+     "pts": 140.9,
+     "rank": 7,
+     "vs_median": -1.3,
+     "starters": 1,
+     "rostered": 2
+    },
+    {
+     "pos": "K",
+     "pts": 102,
+     "rank": 6,
+     "vs_median": 0,
+     "starters": 1,
+     "rostered": 1
+    },
+    {
+     "pos": "DEF",
+     "pts": 92,
+     "rank": 8,
+     "vs_median": -1.5,
+     "starters": 1,
+     "rostered": 1
+    }
+   ],
+   "strengths": [
+    {
+     "pos": "RB",
+     "pts": 607.3,
+     "rank": 2,
+     "vs_median": 90.6,
+     "starters": 3,
+     "rostered": 4
+    }
+   ],
+   "weaknesses": [
+    {
+     "pos": "WR",
+     "pts": 526.7,
+     "rank": 12,
+     "vs_median": -96.3,
+     "starters": 3,
+     "rostered": 5
+    }
+   ],
+   "risks": {
+    "bye_stacks": [
+     {
+      "week": 7,
+      "n": 4,
+      "players": [
+       "Jayden Daniels (QB)",
+       "James Cook (RB)",
+       "Omarion Hampton (RB)",
+       "DJ Moore (WR)"
+      ]
+     }
+    ],
+    "injured": [
+     {
+      "name": "Malik Nabers",
+      "pos": "WR",
+      "status": "Questionable"
+     },
+     {
+      "name": "Emeka Egbuka",
+      "pos": "WR",
+      "status": "Questionable"
+     },
+     {
+      "name": "Tucker Kraft",
+      "pos": "TE",
+      "status": "Questionable"
+     },
+     {
+      "name": "Kyle Monangai",
+      "pos": "RB",
+      "status": "Questionable"
+     }
+    ],
+    "fragile": [
+     {
+      "name": "Malik Nabers",
+      "pos": "WR",
+      "score": 0.713,
+      "why": "2025 ACL + meniscus (October) plus a spring scar-tissue cleanup; camp status uncertain (Questionable). Structural. Real Week-1 risk."
+     },
+     {
+      "name": "Omarion Hampton",
+      "pos": "RB",
+      "score": 0.718,
+      "why": "No significant missed time (--/--/9)."
+     },
+     {
+      "name": "Jayden Daniels",
+      "pos": "QB",
+      "score": 0.824,
+      "why": "2025 missed significant time (7 games); cause not separately verified this pass. Flagged for the final-weeks re-check."
+     }
+    ],
+    "flagged": []
+   },
+   "bench": [
+    {
+     "id": "5849",
+     "name": "Kyler Murray",
+     "pos": "QB",
+     "team": "MIN",
+     "pts": 283.1,
+     "round": 12,
+     "bye": 6,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    },
+    {
+     "id": "7594",
+     "name": "Chuba Hubbard",
+     "pos": "RB",
+     "team": "CAR",
+     "pts": 136.9,
+     "round": 7,
+     "bye": 5,
+     "starts_on": 2,
+     "best_gain": 11.6,
+     "best_team": 7,
+     "own_cost": 0
+    },
+    {
+     "id": "5012",
+     "name": "Mark Andrews",
+     "pos": "TE",
+     "team": "BAL",
+     "pts": 132.5,
+     "round": 11,
+     "bye": 13,
+     "starts_on": 4,
+     "best_gain": 7.7,
+     "best_team": 4,
+     "own_cost": 0
+    },
+    {
+     "id": "13298",
+     "name": "KC Concepcion",
+     "pos": "WR",
+     "team": "CLE",
+     "pts": 127.4,
+     "round": 10,
+     "bye": 11,
+     "starts_on": 1,
+     "best_gain": 2.1,
+     "best_team": 7,
+     "own_cost": 0
+    },
+    {
+     "id": "1479",
+     "name": "Keenan Allen",
+     "pos": "WR",
+     "team": "IND",
+     "pts": 84.8,
+     "round": 15,
+     "bye": null,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    }
+   ],
+   "unpriced": [],
+   "tendencies": null,
+   "moves": {
+    "n": 0,
+    "through_week": 1,
+    "note": "No completed moves through week 1."
+   },
+   "proposals": [],
+   "fit": {
+    "they_have": [
+     {
+      "id": "5012",
+      "name": "Mark Andrews",
+      "pos": "TE",
+      "team": "BAL",
+      "pts": 132.5,
+      "round": 11,
+      "gain": 6.2,
+      "cost": 0,
+      "net": 6.2
+     },
+     {
+      "id": "9484",
+      "name": "Tucker Kraft",
+      "pos": "TE",
+      "team": "GB",
+      "pts": 140.9,
+      "round": 6,
+      "gain": 14.6,
+      "cost": 8.4,
+      "net": 6.2
+     }
+    ],
+    "they_want": [],
+    "note": "One-way fit — they hold players worth more to you than to them, but nothing you own is worth more over there. You are the side that has to overpay."
+   }
+  },
+  {
+   "roster_id": 6,
+   "owner": "OrourkeP",
+   "user_id": "1401368601344135168",
+   "is_me": false,
+   "draft_slot": 9,
+   "starter_pts": 1791.2,
+   "starter_rank": 8,
+   "vs_league_median": -13.6,
+   "bench_pts": 707.3,
+   "summary": "8th of 12 in projected starting points (1791), -14 against the league median. Built on WR: 703 starting points, 2nd in the league, +80 on the median. RB is the hole — 406 points, 12th, -111 behind. No bench player would start on four other teams, so there is little here to trade from.",
+   "slots": [
+    {
+     "slot": "QB",
+     "player": {
+      "id": "11560",
+      "name": "Caleb Williams",
+      "pos": "QB",
+      "team": "CHI",
+      "pts": 299.3,
+      "round": 8,
+      "bye": 10,
+      "adp": 74.6,
+      "injury": null
+     },
+     "rank": 9,
+     "vs_median": -5.7
+    },
+    {
+     "slot": "RB",
+     "player": {
+      "id": "8151",
+      "name": "Kenneth Walker",
+      "pos": "RB",
+      "team": "KC",
+      "pts": 225.5,
+      "round": 2,
+      "bye": 5,
+      "adp": 18,
+      "injury": null
+     },
+     "rank": 9,
+     "vs_median": -8.7
+    },
+    {
+     "slot": "RB",
+     "player": {
+      "id": "12481",
+      "name": "Cam Skattebo",
+      "pos": "RB",
+      "team": "NYG",
+      "pts": 180.2,
+      "round": 3,
+      "bye": 8,
+      "adp": 37.1,
+      "injury": null
+     },
+     "rank": 8,
+     "vs_median": -8.7
+    },
+    {
+     "slot": "WR",
+     "player": {
+      "id": "9493",
+      "name": "Puka Nacua",
+      "pos": "WR",
+      "team": "LAR",
+      "pts": 259,
+      "round": 1,
+      "bye": 11,
+      "adp": 5.8,
+      "injury": "Questionable"
+     },
+     "rank": 1,
+     "vs_median": 52.3
+    },
+    {
+     "slot": "WR",
+     "player": {
+      "id": "2133",
+      "name": "Davante Adams",
+      "pos": "WR",
+      "team": "LAR",
+      "pts": 161,
+      "round": 6,
+      "bye": 11,
+      "adp": 55.3,
+      "injury": null
+     },
+     "rank": 12,
+     "vs_median": -24.4
+    },
+    {
+     "slot": "TE",
+     "player": {
+      "id": "8130",
+      "name": "Trey McBride",
+      "pos": "TE",
+      "team": "ARI",
+      "pts": 186.9,
+      "round": 4,
+      "bye": 14,
+      "adp": 26.6,
+      "injury": null
+     },
+     "rank": 2,
+     "vs_median": 44.7
+    },
+    {
+     "slot": "FLEX",
+     "player": {
+      "id": "13279",
+      "name": "Carnell Tate",
+      "pos": "WR",
+      "team": "TEN",
+      "pts": 144.8,
+      "round": 7,
+      "bye": 9,
+      "adp": 68.6,
+      "injury": "Questionable"
+     },
+     "rank": 10,
+     "vs_median": -18.7
+    },
+    {
+     "slot": "FLEX",
+     "player": {
+      "id": "13294",
+      "name": "Makai Lemon",
+      "pos": "WR",
+      "team": "PHI",
+      "pts": 138.5,
+      "round": 9,
+      "bye": 10,
+      "adp": 88.5,
+      "injury": null
+     },
+     "rank": 10,
+     "vs_median": -6.6
+    },
+    {
+     "slot": "K",
+     "player": {
+      "id": "11539",
+      "name": "Jake Bates",
+      "pos": "K",
+      "team": "DET",
+      "pts": 101,
+      "round": 14,
+      "bye": 6,
+      "adp": 155.7,
+      "injury": null
+     },
+     "rank": 9,
+     "vs_median": -1
+    },
+    {
+     "slot": "DEF",
+     "player": {
+      "id": "BAL",
+      "name": "Baltimore Ravens",
+      "pos": "DEF",
+      "team": "BAL",
+      "pts": 95,
+      "round": 13,
+      "bye": 13,
+      "adp": 133.1,
+      "injury": null
+     },
+     "rank": 6,
+     "vs_median": 1.5
+    }
+   ],
+   "by_pos": [
+    {
+     "pos": "QB",
+     "pts": 299.3,
+     "rank": 9,
+     "vs_median": -5.7,
+     "starters": 1,
+     "rostered": 2
+    },
+    {
+     "pos": "RB",
+     "pts": 405.7,
+     "rank": 12,
+     "vs_median": -111,
+     "starters": 2,
+     "rostered": 3
+    },
+    {
+     "pos": "WR",
+     "pts": 703.3,
+     "rank": 2,
+     "vs_median": 80.3,
+     "starters": 4,
+     "rostered": 6
+    },
+    {
+     "pos": "TE",
+     "pts": 186.9,
+     "rank": 2,
+     "vs_median": 44.7,
+     "starters": 1,
+     "rostered": 2
+    },
+    {
+     "pos": "K",
+     "pts": 101,
+     "rank": 9,
+     "vs_median": -1,
+     "starters": 1,
+     "rostered": 1
+    },
+    {
+     "pos": "DEF",
+     "pts": 95,
+     "rank": 6,
+     "vs_median": 1.5,
+     "starters": 1,
+     "rostered": 1
+    }
+   ],
+   "strengths": [
+    {
+     "pos": "WR",
+     "pts": 703.3,
+     "rank": 2,
+     "vs_median": 80.3,
+     "starters": 4,
+     "rostered": 6
+    },
+    {
+     "pos": "TE",
+     "pts": 186.9,
+     "rank": 2,
+     "vs_median": 44.7,
+     "starters": 1,
+     "rostered": 2
+    }
+   ],
+   "weaknesses": [
+    {
+     "pos": "RB",
+     "pts": 405.7,
+     "rank": 12,
+     "vs_median": -111,
+     "starters": 2,
+     "rostered": 3
+    },
+    {
+     "pos": "QB",
+     "pts": 299.3,
+     "rank": 9,
+     "vs_median": -5.7,
+     "starters": 1,
+     "rostered": 2
+    }
+   ],
+   "risks": {
+    "bye_stacks": [],
+    "injured": [
+     {
+      "name": "Puka Nacua",
+      "pos": "WR",
+      "status": "Questionable"
+     },
+     {
+      "name": "Carnell Tate",
+      "pos": "WR",
+      "status": "Questionable"
+     }
+    ],
+    "fragile": [
+     {
+      "name": "Cam Skattebo",
+      "pos": "RB",
+      "score": 0.682,
+      "why": "2025 ankle (8 games); expected full participation early in camp."
+     },
+     {
+      "name": "Davante Adams",
+      "pos": "WR",
+      "score": 0.818,
+      "why": "Missed time 2024-25 (14/14); age 33. Decline + durability is the compound risk."
+     },
+     {
+      "name": "Puka Nacua",
+      "pos": "WR",
+      "score": 0.89,
+      "why": "2024 PCL sprain (knee), re-aggravated from a joint practice, missed 6+; played 16 in 2025. Re-aggravation pattern is the watch."
+     }
+    ],
+    "flagged": []
+   },
+   "bench": [
+    {
+     "id": "4892",
+     "name": "Baker Mayfield",
+     "pos": "QB",
+     "team": "TB",
+     "pts": 274.9,
+     "round": 15,
+     "bye": 10,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    },
+    {
+     "id": "9500",
+     "name": "Josh Downs",
+     "pos": "WR",
+     "team": "IND",
+     "pts": 137.3,
+     "round": 10,
+     "bye": 13,
+     "starts_on": 2,
+     "best_gain": 12,
+     "best_team": 7,
+     "own_cost": 0
+    },
+    {
+     "id": "5022",
+     "name": "Dallas Goedert",
+     "pos": "TE",
+     "team": "PHI",
+     "pts": 109.5,
+     "round": 12,
+     "bye": 10,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    },
+    {
+     "id": "13417",
+     "name": "De'Zhaun Stribling",
+     "pos": "WR",
+     "team": "SF",
+     "pts": 105.4,
+     "round": 11,
+     "bye": 8,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    },
+    {
+     "id": "5850",
+     "name": "Josh Jacobs",
+     "pos": "RB",
+     "team": "GB",
+     "pts": 80.2,
+     "round": 5,
+     "bye": 11,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    }
+   ],
+   "unpriced": [],
+   "tendencies": null,
+   "moves": {
+    "n": 0,
+    "through_week": 1,
+    "note": "No completed moves through week 1."
+   },
+   "proposals": [],
+   "fit": {
+    "they_have": [],
+    "they_want": [],
+    "note": "No surplus mismatch in either direction. Every player on both rosters is already worth at least as much where he is."
+   }
+  },
+  {
+   "roster_id": 7,
+   "owner": "ColesMomPlays2Win",
+   "user_id": "1401370786995970048",
+   "is_me": false,
+   "draft_slot": 3,
+   "starter_pts": 1890,
+   "starter_rank": 1,
+   "vs_league_median": 85.2,
+   "bench_pts": 618.5,
+   "summary": "1st of 12 in projected starting points (1890), +85 against the league median. Built on QB: 362 starting points, 1st in the league, +57 on the median. RB is the hole — 446 points, 9th, -71 behind. No bench player would start on four other teams, so there is little here to trade from. Week 11 takes 3 starters off the field at once, and five bench spots do not cover that.",
+   "slots": [
+    {
+     "slot": "QB",
+     "player": {
+      "id": "4984",
+      "name": "Josh Allen",
+      "pos": "QB",
+      "team": "BUF",
+      "pts": 361.5,
+      "round": 3,
+      "bye": 7,
+      "adp": 20.8,
+      "injury": null
+     },
+     "rank": 1,
+     "vs_median": 56.5
+    },
+    {
+     "slot": "RB",
+     "player": {
+      "id": "9509",
+      "name": "Bijan Robinson",
+      "pos": "RB",
+      "team": "ATL",
+      "pts": 292.9,
+      "round": 1,
+      "bye": 11,
+      "adp": 2.9,
+      "injury": null
+     },
+     "rank": 2,
+     "vs_median": 58.7
+    },
+    {
+     "slot": "RB",
+     "player": {
+      "id": "8228",
+      "name": "Jaylen Warren",
+      "pos": "RB",
+      "team": "PIT",
+      "pts": 152.6,
+      "round": 6,
+      "bye": 9,
+      "adp": 67.5,
+      "injury": null
+     },
+     "rank": 11,
+     "vs_median": -36.3
+    },
+    {
+     "slot": "WR",
+     "player": {
+      "id": "8112",
+      "name": "Drake London",
+      "pos": "WR",
+      "team": "ATL",
+      "pts": 205.2,
+      "round": 2,
+      "bye": 11,
+      "adp": 21.6,
+      "injury": null
+     },
+     "rank": 9,
+     "vs_median": -1.5
+    },
+    {
+     "slot": "WR",
+     "player": {
+      "id": "2216",
+      "name": "Mike Evans",
+      "pos": "WR",
+      "team": "SF",
+      "pts": 187.2,
+      "round": 7,
+      "bye": 8,
+      "adp": 62,
+      "injury": "Questionable"
+     },
+     "rank": 4,
+     "vs_median": 1.8
+    },
+    {
+     "slot": "TE",
+     "player": {
+      "id": "12517",
+      "name": "Colston Loveland",
+      "pos": "TE",
+      "team": "CHI",
+      "pts": 173.4,
+      "round": 4,
+      "bye": 10,
+      "adp": 43.5,
+      "injury": null
+     },
+     "rank": 3,
+     "vs_median": 31.2
+    },
+    {
+     "slot": "FLEX",
+     "player": {
+      "id": "11620",
+      "name": "Rome Odunze",
+      "pos": "WR",
+      "team": "CHI",
+      "pts": 173.9,
+      "round": 5,
+      "bye": 10,
+      "adp": 64.2,
+      "injury": "Questionable"
+     },
+     "rank": 4,
+     "vs_median": 10.4
+    },
+    {
+     "slot": "FLEX",
+     "player": {
+      "id": "2449",
+      "name": "Stefon Diggs",
+      "pos": "WR",
+      "team": "WAS",
+      "pts": 125.3,
+      "round": 10,
+      "bye": 7,
+      "adp": 109.8,
+      "injury": null
+     },
+     "rank": 12,
+     "vs_median": -19.8
+    },
+    {
+     "slot": "K",
+     "player": {
+      "id": "11533",
+      "name": "Brandon Aubrey",
+      "pos": "K",
+      "team": "DAL",
+      "pts": 112,
+      "round": 9,
+      "bye": 14,
+      "adp": 135.5,
+      "injury": null
+     },
+     "rank": 1,
+     "vs_median": 10
+    },
+    {
+     "slot": "DEF",
+     "player": {
+      "id": "LAR",
+      "name": "Los Angeles Rams",
+      "pos": "DEF",
+      "team": "LAR",
+      "pts": 106,
+      "round": 8,
+      "bye": 11,
+      "adp": 97.3,
+      "injury": null
+     },
+     "rank": 1,
+     "vs_median": 12.5
+    }
+   ],
+   "by_pos": [
+    {
+     "pos": "QB",
+     "pts": 361.5,
+     "rank": 1,
+     "vs_median": 56.5,
+     "starters": 1,
+     "rostered": 2
+    },
+    {
+     "pos": "RB",
+     "pts": 445.5,
+     "rank": 9,
+     "vs_median": -71.2,
+     "starters": 2,
+     "rostered": 4
+    },
+    {
+     "pos": "WR",
+     "pts": 691.6,
+     "rank": 3,
+     "vs_median": 68.6,
+     "starters": 4,
+     "rostered": 6
+    },
+    {
+     "pos": "TE",
+     "pts": 173.4,
+     "rank": 3,
+     "vs_median": 31.2,
+     "starters": 1,
+     "rostered": 1
+    },
+    {
+     "pos": "K",
+     "pts": 112,
+     "rank": 1,
+     "vs_median": 10,
+     "starters": 1,
+     "rostered": 1
+    },
+    {
+     "pos": "DEF",
+     "pts": 106,
+     "rank": 1,
+     "vs_median": 12.5,
+     "starters": 1,
+     "rostered": 1
+    }
+   ],
+   "strengths": [
+    {
+     "pos": "QB",
+     "pts": 361.5,
+     "rank": 1,
+     "vs_median": 56.5,
+     "starters": 1,
+     "rostered": 2
+    },
+    {
+     "pos": "WR",
+     "pts": 691.6,
+     "rank": 3,
+     "vs_median": 68.6,
+     "starters": 4,
+     "rostered": 6
+    },
+    {
+     "pos": "TE",
+     "pts": 173.4,
+     "rank": 3,
+     "vs_median": 31.2,
+     "starters": 1,
+     "rostered": 1
+    }
+   ],
+   "weaknesses": [
+    {
+     "pos": "RB",
+     "pts": 445.5,
+     "rank": 9,
+     "vs_median": -71.2,
+     "starters": 2,
+     "rostered": 4
+    }
+   ],
+   "risks": {
+    "bye_stacks": [
+     {
+      "week": 11,
+      "n": 3,
+      "players": [
+       "Bijan Robinson (RB)",
+       "Drake London (WR)",
+       "Los Angeles Rams (DEF)"
+      ]
+     }
+    ],
+    "injured": [
+     {
+      "name": "Mike Evans",
+      "pos": "WR",
+      "status": "Questionable"
+     },
+     {
+      "name": "Rome Odunze",
+      "pos": "WR",
+      "status": "Questionable"
+     }
+    ],
+    "fragile": [
+     {
+      "name": "Mike Evans",
+      "pos": "WR",
+      "score": 0.733,
+      "why": "Age-33 season coming off injuries and his worst fantasy year (10.6 PPG, WR41); 1.62 YPRR is a separate red flag. Durability plus age-decline is the compound risk."
+     },
+     {
+      "name": "Stefon Diggs",
+      "pos": "WR",
+      "score": 0.814,
+      "why": null
+     },
+     {
+      "name": "Rome Odunze",
+      "pos": "WR",
+      "score": 0.884,
+      "why": "No significant missed time (--/17/12)."
+     }
+    ],
+    "flagged": []
+   },
+   "bench": [
+    {
+     "id": "4046",
+     "name": "Patrick Mahomes",
+     "pos": "QB",
+     "team": "KC",
+     "pts": 286.7,
+     "round": 11,
+     "bye": 5,
+     "starts_on": 1,
+     "best_gain": 3.2,
+     "best_team": 2,
+     "own_cost": 0
+    },
+    {
+     "id": "8676",
+     "name": "Rashid Shaheed",
+     "pos": "WR",
+     "team": "SEA",
+     "pts": 115.6,
+     "round": 14,
+     "bye": 11,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    },
+    {
+     "id": "13305",
+     "name": "Mike Washington",
+     "pos": "RB",
+     "team": "LV",
+     "pts": 89.5,
+     "round": 12,
+     "bye": 13,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    },
+    {
+     "id": "13293",
+     "name": "Ja'Kobi Lane",
+     "pos": "WR",
+     "team": "BAL",
+     "pts": 87.4,
+     "round": 13,
+     "bye": 13,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    },
+    {
+     "id": "13414",
+     "name": "Kaelon Black",
+     "pos": "RB",
+     "team": "SF",
+     "pts": 39.3,
+     "round": 15,
+     "bye": 8,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    }
+   ],
+   "unpriced": [],
+   "tendencies": null,
+   "moves": {
+    "n": 0,
+    "through_week": 1,
+    "note": "No completed moves through week 1."
+   },
+   "proposals": [],
+   "fit": {
+    "they_have": [],
+    "they_want": [
+     {
+      "id": "11583",
+      "name": "Jonathon Brooks",
+      "pos": "RB",
+      "team": "CAR",
+      "pts": 137.9,
+      "round": 8,
+      "gain": 12.6,
+      "cost": 0,
+      "net": 12.6
+     },
+     {
+      "id": "12529",
+      "name": "TreVeyon Henderson",
+      "pos": "RB",
+      "team": "NE",
+      "pts": 153.5,
+      "round": 7,
+      "gain": 28.2,
+      "cost": 15.6,
+      "net": 12.6
+     },
+     {
+      "id": "5927",
+      "name": "Terry McLaurin",
+      "pos": "WR",
+      "team": "WAS",
+      "pts": 176.8,
+      "round": 6,
+      "gain": 51.5,
+      "cost": 38.9,
+      "net": 12.6
+     },
+     {
+      "id": "13287",
+      "name": "Jeremiyah Love",
+      "pos": "RB",
+      "team": "ARI",
+      "pts": 188.3,
+      "round": 3,
+      "gain": 63,
+      "cost": 50.4,
+      "net": 12.6
+     },
+     {
+      "id": "7543",
+      "name": "Travis Etienne",
+      "pos": "RB",
+      "team": "NO",
+      "pts": 189.7,
+      "round": 4,
+      "gain": 64.4,
+      "cost": 51.8,
+      "net": 12.6
+     }
+    ],
+    "note": "One-way fit the other way — you hold surplus they could use and they hold none you can use. Sell, do not swap. Every name on your side nets the same +12.6 — they all fill the same slot over there, so the one to actually send is the cheapest, Jonathon Brooks."
+   }
+  },
+  {
+   "roster_id": 8,
+   "owner": "Eharmon1986",
+   "user_id": "1401374585626087424",
+   "is_me": false,
+   "draft_slot": 12,
+   "starter_pts": 1708.6,
+   "starter_rank": 11,
+   "vs_league_median": -96.2,
+   "bench_pts": 656.9,
+   "summary": "11th of 12 in projected starting points (1709), -96 against the league median. QB is the hole — 296 points, 11th, -10 behind. No bench player would start on four other teams, so there is little here to trade from. Week 7 takes 4 starters off the field at once, and five bench spots do not cover that.",
+   "slots": [
+    {
+     "slot": "QB",
+     "player": {
+      "id": "6797",
+      "name": "Justin Herbert",
+      "pos": "QB",
+      "team": "LAC",
+      "pts": 295.5,
+      "round": 6,
+      "bye": 7,
+      "adp": 80.9,
+      "injury": null
+     },
+     "rank": 11,
+     "vs_median": -9.5
+    },
+    {
+     "slot": "RB",
+     "player": {
+      "id": "9226",
+      "name": "De'Von Achane",
+      "pos": "RB",
+      "team": "MIA",
+      "pts": 229.9,
+      "round": 2,
+      "bye": 6,
+      "adp": 13.1,
+      "injury": null
+     },
+     "rank": 7,
+     "vs_median": -4.3
+    },
+    {
+     "slot": "RB",
+     "player": {
+      "id": "6790",
+      "name": "D'Andre Swift",
+      "pos": "RB",
+      "team": "CHI",
+      "pts": 189.5,
+      "round": 4,
+      "bye": 10,
+      "adp": 47.9,
+      "injury": "Questionable"
+     },
+     "rank": 6,
+     "vs_median": 0.6
+    },
+    {
+     "slot": "WR",
+     "player": {
+      "id": "6794",
+      "name": "Justin Jefferson",
+      "pos": "WR",
+      "team": "MIN",
+      "pts": 205.4,
+      "round": 1,
+      "bye": 6,
+      "adp": 11.3,
+      "injury": null
+     },
+     "rank": 8,
+     "vs_median": -1.3
+    },
+    {
+     "slot": "WR",
+     "player": {
+      "id": "10229",
+      "name": "Rashee Rice",
+      "pos": "WR",
+      "team": "KC",
+      "pts": 185.3,
+      "round": 3,
+      "bye": 5,
+      "adp": 29.6,
+      "injury": null
+     },
+     "rank": 7,
+     "vs_median": -0.1
+    },
+    {
+     "slot": "TE",
+     "player": {
+      "id": "10236",
+      "name": "Dalton Kincaid",
+      "pos": "TE",
+      "team": "BUF",
+      "pts": 130.6,
+      "round": 5,
+      "bye": 7,
+      "adp": 91.7,
+      "injury": null
+     },
+     "rank": 10,
+     "vs_median": -11.6
+    },
+    {
+     "slot": "FLEX",
+     "player": {
+      "id": "5045",
+      "name": "Courtland Sutton",
+      "pos": "WR",
+      "team": "DEN",
+      "pts": 144.8,
+      "round": 7,
+      "bye": 10,
+      "adp": 81.2,
+      "injury": null
+     },
+     "rank": 11,
+     "vs_median": -18.7
+    },
+    {
+     "slot": "FLEX",
+     "player": {
+      "id": "4037",
+      "name": "Chris Godwin",
+      "pos": "WR",
+      "team": "TB",
+      "pts": 139.6,
+      "round": 8,
+      "bye": 10,
+      "adp": 89.8,
+      "injury": null
+     },
+     "rank": 9,
+     "vs_median": -5.5
+    },
+    {
+     "slot": "K",
+     "player": {
+      "id": "8259",
+      "name": "Cameron Dicker",
+      "pos": "K",
+      "team": "LAC",
+      "pts": 102,
+      "round": 12,
+      "bye": 7,
+      "adp": 137.7,
+      "injury": "Questionable"
+     },
+     "rank": 7,
+     "vs_median": 0
+    },
+    {
+     "slot": "DEF",
+     "player": {
+      "id": "LAC",
+      "name": "Los Angeles Chargers",
+      "pos": "DEF",
+      "team": "LAC",
+      "pts": 86,
+      "round": 13,
+      "bye": 7,
+      "adp": 154.7,
+      "injury": null
+     },
+     "rank": 12,
+     "vs_median": -7.5
+    }
+   ],
+   "by_pos": [
+    {
+     "pos": "QB",
+     "pts": 295.5,
+     "rank": 11,
+     "vs_median": -9.5,
+     "starters": 1,
+     "rostered": 1
+    },
+    {
+     "pos": "RB",
+     "pts": 419.4,
+     "rank": 11,
+     "vs_median": -97.3,
+     "starters": 2,
+     "rostered": 4
+    },
+    {
+     "pos": "WR",
+     "pts": 675.1,
+     "rank": 5,
+     "vs_median": 52.1,
+     "starters": 4,
+     "rostered": 7
+    },
+    {
+     "pos": "TE",
+     "pts": 130.6,
+     "rank": 10,
+     "vs_median": -11.6,
+     "starters": 1,
+     "rostered": 2
+    },
+    {
+     "pos": "K",
+     "pts": 102,
+     "rank": 7,
+     "vs_median": 0,
+     "starters": 1,
+     "rostered": 1
+    },
+    {
+     "pos": "DEF",
+     "pts": 86,
+     "rank": 12,
+     "vs_median": -7.5,
+     "starters": 1,
+     "rostered": 1
+    }
+   ],
+   "strengths": [],
+   "weaknesses": [
+    {
+     "pos": "QB",
+     "pts": 295.5,
+     "rank": 11,
+     "vs_median": -9.5,
+     "starters": 1,
+     "rostered": 1
+    },
+    {
+     "pos": "RB",
+     "pts": 419.4,
+     "rank": 11,
+     "vs_median": -97.3,
+     "starters": 2,
+     "rostered": 4
+    },
+    {
+     "pos": "TE",
+     "pts": 130.6,
+     "rank": 10,
+     "vs_median": -11.6,
+     "starters": 1,
+     "rostered": 2
+    }
+   ],
+   "risks": {
+    "bye_stacks": [
+     {
+      "week": 7,
+      "n": 4,
+      "players": [
+       "Justin Herbert (QB)",
+       "Dalton Kincaid (TE)",
+       "Cameron Dicker (K)",
+       "Los Angeles Chargers (DEF)"
+      ]
+     },
+     {
+      "week": 10,
+      "n": 3,
+      "players": [
+       "D'Andre Swift (RB)",
+       "Courtland Sutton (WR)",
+       "Chris Godwin (WR)"
+      ]
+     }
+    ],
+    "injured": [
+     {
+      "name": "D'Andre Swift",
+      "pos": "RB",
+      "status": "Questionable"
+     },
+     {
+      "name": "Cameron Dicker",
+      "pos": "K",
+      "status": "Questionable"
+     }
+    ],
+    "fragile": [
+     {
+      "name": "Rashee Rice",
+      "pos": "WR",
+      "score": 0.729,
+      "why": "2024 knee (LCL, 4 games) then a 2026 offseason knee clean-up (~2 months, debris removal). Verify the knee clears camp."
+     },
+     {
+      "name": "Chris Godwin",
+      "pos": "WR",
+      "score": 0.765,
+      "why": "2024 season-ending dislocated/fractured ankle that also delayed and wrecked 2025 (9 PPG over injury-hit games). ~30 games missed across 9 seasons. Reportedly enters 2026 healthy."
+     },
+     {
+      "name": "Dalton Kincaid",
+      "pos": "TE",
+      "score": 0.882,
+      "why": "Missed time in 2024-25 (13/12 games): nagging soft-tissue/lower-body issues, no single structural event."
+     }
+    ],
+    "flagged": []
+   },
+   "bench": [
+    {
+     "id": "8121",
+     "name": "Romeo Doubs",
+     "pos": "WR",
+     "team": "NE",
+     "pts": 132.7,
+     "round": 11,
+     "bye": 11,
+     "starts_on": 1,
+     "best_gain": 7.4,
+     "best_team": 7,
+     "own_cost": 0
+    },
+    {
+     "id": "3214",
+     "name": "Hunter Henry",
+     "pos": "TE",
+     "team": "NE",
+     "pts": 124.5,
+     "round": 14,
+     "bye": 11,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    },
+    {
+     "id": "12533",
+     "name": "Jacory Croskey-Merritt",
+     "pos": "RB",
+     "team": "WAS",
+     "pts": 118.4,
+     "round": 10,
+     "bye": 7,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    },
+    {
+     "id": "10213",
+     "name": "Tre Tucker",
+     "pos": "WR",
+     "team": "LV",
+     "pts": 102.9,
+     "round": null,
+     "bye": null,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    },
+    {
+     "id": "13281",
+     "name": "Jordyn Tyson",
+     "pos": "WR",
+     "team": "NO",
+     "pts": 90.5,
+     "round": 9,
+     "bye": 8,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    },
+    {
+     "id": "9511",
+     "name": "Keaton Mitchell",
+     "pos": "RB",
+     "team": "LAC",
+     "pts": 87.9,
+     "round": 15,
+     "bye": 7,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    }
+   ],
+   "unpriced": [],
+   "tendencies": null,
+   "moves": {
+    "n": 1,
+    "through_week": 1,
+    "note": "1 completed move(s) through week 1 — trades, waiver claims and free-agent adds."
+   },
+   "proposals": [],
+   "fit": {
+    "they_have": [],
+    "they_want": [],
+    "note": "No surplus mismatch in either direction. Every player on both rosters is already worth at least as much where he is."
+   }
+  },
+  {
+   "roster_id": 9,
+   "owner": "BrittAndTheBoys",
+   "user_id": "1004535453195857920",
+   "is_me": false,
+   "draft_slot": 5,
+   "starter_pts": 1814.6,
+   "starter_rank": 5,
+   "vs_league_median": 9.8,
+   "bench_pts": 710.2,
+   "summary": "5th of 12 in projected starting points (1815), +10 against the league median. Built on WR: 727 starting points, 1st in the league, +104 on the median. RB is the hole — 434 points, 10th, -82 behind. 1 bench player would start on four or more other teams (Travis Kelce) — that is the tradeable surplus. Week 11 takes 5 starters off the field at once, and five bench spots do not cover that.",
+   "slots": [
+    {
+     "slot": "QB",
+     "player": {
+      "id": "3294",
+      "name": "Dak Prescott",
+      "pos": "QB",
+      "team": "DAL",
+      "pts": 303.9,
+      "round": 7,
+      "bye": 14,
+      "adp": 86.3,
+      "injury": null
+     },
+     "rank": 7,
+     "vs_median": -1.1
+    },
+    {
+     "slot": "RB",
+     "player": {
+      "id": "6813",
+      "name": "Jonathan Taylor",
+      "pos": "RB",
+      "team": "IND",
+      "pts": 254.3,
+      "round": 1,
+      "bye": 13,
+      "adp": 5.6,
+      "injury": null
+     },
+     "rank": 4,
+     "vs_median": 20.1
+    },
+    {
+     "slot": "RB",
+     "player": {
+      "id": "12512",
+      "name": "Quinshon Judkins",
+      "pos": "RB",
+      "team": "CLE",
+      "pts": 180,
+      "round": 4,
+      "bye": 11,
+      "adp": 49.5,
+      "injury": null
+     },
+     "rank": 9,
+     "vs_median": -8.9
+    },
+    {
+     "slot": "WR",
+     "player": {
+      "id": "5859",
+      "name": "A.J. Brown",
+      "pos": "WR",
+      "team": "NE",
+      "pts": 207.7,
+      "round": 2,
+      "bye": 11,
+      "adp": 19.2,
+      "injury": null
+     },
+     "rank": 6,
+     "vs_median": 1
+    },
+    {
+     "slot": "WR",
+     "player": {
+      "id": "8144",
+      "name": "Chris Olave",
+      "pos": "WR",
+      "team": "NO",
+      "pts": 194.9,
+      "round": 3,
+      "bye": 8,
+      "adp": 29.9,
+      "injury": null
+     },
+     "rank": 2,
+     "vs_median": 9.5
+    },
+    {
+     "slot": "TE",
+     "player": {
+      "id": "12506",
+      "name": "Harold Fannin",
+      "pos": "TE",
+      "team": "CLE",
+      "pts": 143.4,
+      "round": 9,
+      "bye": 11,
+      "adp": 76.6,
+      "injury": null
+     },
+     "rank": 6,
+     "vs_median": 1.2
+    },
+    {
+     "slot": "FLEX",
+     "player": {
+      "id": "8146",
+      "name": "Garrett Wilson",
+      "pos": "WR",
+      "team": "NYJ",
+      "pts": 183.4,
+      "round": 5,
+      "bye": 13,
+      "adp": 45.9,
+      "injury": null
+     },
+     "rank": 1,
+     "vs_median": 19.9
+    },
+    {
+     "slot": "FLEX",
+     "player": {
+      "id": "12501",
+      "name": "Matthew Golden",
+      "pos": "WR",
+      "team": "GB",
+      "pts": 141,
+      "round": 11,
+      "bye": 11,
+      "adp": 119,
+      "injury": null
+     },
+     "rank": 8,
+     "vs_median": -4.1
+    },
+    {
+     "slot": "K",
+     "player": {
+      "id": "12015",
+      "name": "Harrison Mevis",
+      "pos": "K",
+      "team": "LAR",
+      "pts": 102,
+      "round": 14,
+      "bye": 11,
+      "adp": 160,
+      "injury": null
+     },
+     "rank": 8,
+     "vs_median": 0
+    },
+    {
+     "slot": "DEF",
+     "player": {
+      "id": "HOU",
+      "name": "Houston Texans",
+      "pos": "DEF",
+      "team": "HOU",
+      "pts": 104,
+      "round": 10,
+      "bye": 8,
+      "adp": 104.8,
+      "injury": null
+     },
+     "rank": 2,
+     "vs_median": 10.5
+    }
+   ],
+   "by_pos": [
+    {
+     "pos": "QB",
+     "pts": 303.9,
+     "rank": 7,
+     "vs_median": -1.1,
+     "starters": 1,
+     "rostered": 2
+    },
+    {
+     "pos": "RB",
+     "pts": 434.3,
+     "rank": 10,
+     "vs_median": -82.4,
+     "starters": 2,
+     "rostered": 4
+    },
+    {
+     "pos": "WR",
+     "pts": 727,
+     "rank": 1,
+     "vs_median": 104,
+     "starters": 4,
+     "rostered": 5
+    },
+    {
+     "pos": "TE",
+     "pts": 143.4,
+     "rank": 6,
+     "vs_median": 1.2,
+     "starters": 1,
+     "rostered": 2
+    },
+    {
+     "pos": "K",
+     "pts": 102,
+     "rank": 8,
+     "vs_median": 0,
+     "starters": 1,
+     "rostered": 1
+    },
+    {
+     "pos": "DEF",
+     "pts": 104,
+     "rank": 2,
+     "vs_median": 10.5,
+     "starters": 1,
+     "rostered": 1
+    }
+   ],
+   "strengths": [
+    {
+     "pos": "WR",
+     "pts": 727,
+     "rank": 1,
+     "vs_median": 104,
+     "starters": 4,
+     "rostered": 5
+    }
+   ],
+   "weaknesses": [
+    {
+     "pos": "RB",
+     "pts": 434.3,
+     "rank": 10,
+     "vs_median": -82.4,
+     "starters": 2,
+     "rostered": 4
+    }
+   ],
+   "risks": {
+    "bye_stacks": [
+     {
+      "week": 11,
+      "n": 5,
+      "players": [
+       "Quinshon Judkins (RB)",
+       "A.J. Brown (WR)",
+       "Harold Fannin (TE)",
+       "Matthew Golden (WR)",
+       "Harrison Mevis (K)"
+      ]
+     }
+    ],
+    "injured": [],
+    "fragile": [
+     {
+      "name": "Harrison Mevis",
+      "pos": "K",
+      "score": 0.718,
+      "why": null
+     },
+     {
+      "name": "Jonathan Taylor",
+      "pos": "RB",
+      "score": 0.856,
+      "why": "Recurring high-ankle sprains (2022 surgery, 2024 re-injury), a documented re-injury pattern; played 17 in 2025, currently healthy."
+     },
+     {
+      "name": "Chris Olave",
+      "pos": "WR",
+      "score": 0.871,
+      "why": "MAJOR RED FLAG: 4-5 diagnosed concussions (2022-2024; missed 9 games in 2024) PLUS a January-2026 blood clot in the lung, limited in offseason work. Concussion recurrence + clot is the board's most serious availability profile."
+     }
+    ],
+    "flagged": []
+   },
+   "bench": [
+    {
+     "id": "6804",
+     "name": "Jordan Love",
+     "pos": "QB",
+     "team": "GB",
+     "pts": 278.5,
+     "round": 12,
+     "bye": 11,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    },
+    {
+     "id": "1466",
+     "name": "Travis Kelce",
+     "pos": "TE",
+     "team": "KC",
+     "pts": 136.4,
+     "round": 6,
+     "bye": 5,
+     "starts_on": 4,
+     "best_gain": 11.6,
+     "best_team": 4,
+     "own_cost": 0
+    },
+    {
+     "id": "7567",
+     "name": "Kenny Gainwell",
+     "pos": "RB",
+     "team": "TB",
+     "pts": 128.8,
+     "round": 8,
+     "bye": 10,
+     "starts_on": 1,
+     "best_gain": 3.5,
+     "best_team": 7,
+     "own_cost": 0
+    },
+    {
+     "id": "8180",
+     "name": "Jalen Nailor",
+     "pos": "WR",
+     "team": "LV",
+     "pts": 107.6,
+     "round": 15,
+     "bye": 13,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    },
+    {
+     "id": "13345",
+     "name": "Jonah Coleman",
+     "pos": "RB",
+     "team": "DEN",
+     "pts": 58.9,
+     "round": 13,
+     "bye": 10,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    }
+   ],
+   "unpriced": [],
+   "tendencies": null,
+   "moves": {
+    "n": 0,
+    "through_week": 1,
+    "note": "No completed moves through week 1."
+   },
+   "proposals": [],
+   "fit": {
+    "they_have": [
+     {
+      "id": "1466",
+      "name": "Travis Kelce",
+      "pos": "TE",
+      "team": "KC",
+      "pts": 136.4,
+      "round": 6,
+      "gain": 10.1,
+      "cost": 0,
+      "net": 10.1
+     },
+     {
+      "id": "12506",
+      "name": "Harold Fannin",
+      "pos": "TE",
+      "team": "CLE",
+      "pts": 143.4,
+      "round": 9,
+      "gain": 17.1,
+      "cost": 7,
+      "net": 10.1
+     }
+    ],
+    "they_want": [],
+    "note": "One-way fit — they hold players worth more to you than to them, but nothing you own is worth more over there. You are the side that has to overpay."
+   }
+  },
+  {
+   "roster_id": 10,
+   "owner": "tyanserg",
+   "user_id": "1128102358241632256",
+   "is_me": false,
+   "draft_slot": 1,
+   "starter_pts": 1846.7,
+   "starter_rank": 2,
+   "vs_league_median": 41.9,
+   "bench_pts": 598.4,
+   "summary": "2nd of 12 in projected starting points (1847), +42 against the league median. Built on RB: 652 starting points, 1st in the league, +135 on the median. WR is the hole — 540 points, 11th, -83 behind. No bench player would start on four other teams, so there is little here to trade from.",
+   "slots": [
+    {
+     "slot": "QB",
+     "player": {
+      "id": "12508",
+      "name": "Jaxson Dart",
+      "pos": "QB",
+      "team": "NYG",
+      "pts": 296.5,
+      "round": 11,
+      "bye": 8,
+      "adp": 106.7,
+      "injury": null
+     },
+     "rank": 10,
+     "vs_median": -8.5
+    },
+    {
+     "slot": "RB",
+     "player": {
+      "id": "9221",
+      "name": "Jahmyr Gibbs",
+      "pos": "RB",
+      "team": "DET",
+      "pts": 299.9,
+      "round": 1,
+      "bye": 6,
+      "adp": 1.3,
+      "injury": null
+     },
+     "rank": 1,
+     "vs_median": 65.7
+    },
+    {
+     "slot": "RB",
+     "player": {
+      "id": "7588",
+      "name": "Javonte Williams",
+      "pos": "RB",
+      "team": "DAL",
+      "pts": 193,
+      "round": 2,
+      "bye": 14,
+      "adp": 32,
+      "injury": null
+     },
+     "rank": 3,
+     "vs_median": 4.1
+    },
+    {
+     "slot": "WR",
+     "player": {
+      "id": "9997",
+      "name": "Zay Flowers",
+      "pos": "WR",
+      "team": "BAL",
+      "pts": 187.7,
+      "round": 4,
+      "bye": 13,
+      "adp": 41.1,
+      "injury": "Questionable"
+     },
+     "rank": 12,
+     "vs_median": -19
+    },
+    {
+     "slot": "WR",
+     "player": {
+      "id": "8148",
+      "name": "Jameson Williams",
+      "pos": "WR",
+      "team": "DET",
+      "pts": 176.2,
+      "round": 6,
+      "bye": 6,
+      "adp": 58.5,
+      "injury": null
+     },
+     "rank": 11,
+     "vs_median": -9.2
+    },
+    {
+     "slot": "TE",
+     "player": {
+      "id": "11604",
+      "name": "Brock Bowers",
+      "pos": "TE",
+      "team": "LV",
+      "pts": 202.5,
+      "round": 3,
+      "bye": 13,
+      "adp": 23.9,
+      "injury": null
+     },
+     "rank": 1,
+     "vs_median": 60.3
+    },
+    {
+     "slot": "FLEX",
+     "player": {
+      "id": "8167",
+      "name": "Christian Watson",
+      "pos": "WR",
+      "team": "GB",
+      "pts": 176.1,
+      "round": 7,
+      "bye": 11,
+      "adp": 65,
+      "injury": null
+     },
+     "rank": 3,
+     "vs_median": 12.6
+    },
+    {
+     "slot": "FLEX",
+     "player": {
+      "id": "12490",
+      "name": "Bhayshul Tuten",
+      "pos": "RB",
+      "team": "JAX",
+      "pts": 158.8,
+      "round": 5,
+      "bye": 7,
+      "adp": 59.5,
+      "injury": "Questionable"
+     },
+     "rank": 2,
+     "vs_median": 13.7
+    },
+    {
+     "slot": "K",
+     "player": {
+      "id": "13545",
+      "name": "Trey Smack",
+      "pos": "K",
+      "team": "GB",
+      "pts": 68,
+      "round": 14,
+      "bye": null,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 12,
+     "vs_median": -34
+    },
+    {
+     "slot": "DEF",
+     "player": {
+      "id": "PIT",
+      "name": "Pittsburgh Steelers",
+      "pos": "DEF",
+      "team": "PIT",
+      "pts": 88,
+      "round": 15,
+      "bye": 9,
+      "adp": 167.6,
+      "injury": null
+     },
+     "rank": 10,
+     "vs_median": -5.5
+    }
+   ],
+   "by_pos": [
+    {
+     "pos": "QB",
+     "pts": 296.5,
+     "rank": 10,
+     "vs_median": -8.5,
+     "starters": 1,
+     "rostered": 1
+    },
+    {
+     "pos": "RB",
+     "pts": 651.7,
+     "rank": 1,
+     "vs_median": 135,
+     "starters": 3,
+     "rostered": 6
+    },
+    {
+     "pos": "WR",
+     "pts": 540,
+     "rank": 11,
+     "vs_median": -83,
+     "starters": 3,
+     "rostered": 5
+    },
+    {
+     "pos": "TE",
+     "pts": 202.5,
+     "rank": 1,
+     "vs_median": 60.3,
+     "starters": 1,
+     "rostered": 1
+    },
+    {
+     "pos": "K",
+     "pts": 68,
+     "rank": 12,
+     "vs_median": -34,
+     "starters": 1,
+     "rostered": 1
+    },
+    {
+     "pos": "DEF",
+     "pts": 88,
+     "rank": 10,
+     "vs_median": -5.5,
+     "starters": 1,
+     "rostered": 1
+    }
+   ],
+   "strengths": [
+    {
+     "pos": "RB",
+     "pts": 651.7,
+     "rank": 1,
+     "vs_median": 135,
+     "starters": 3,
+     "rostered": 6
+    },
+    {
+     "pos": "TE",
+     "pts": 202.5,
+     "rank": 1,
+     "vs_median": 60.3,
+     "starters": 1,
+     "rostered": 1
+    }
+   ],
+   "weaknesses": [
+    {
+     "pos": "WR",
+     "pts": 540,
+     "rank": 11,
+     "vs_median": -83,
+     "starters": 3,
+     "rostered": 5
+    },
+    {
+     "pos": "QB",
+     "pts": 296.5,
+     "rank": 10,
+     "vs_median": -8.5,
+     "starters": 1,
+     "rostered": 1
+    }
+   ],
+   "risks": {
+    "bye_stacks": [],
+    "injured": [
+     {
+      "name": "Zay Flowers",
+      "pos": "WR",
+      "status": "Questionable"
+     },
+     {
+      "name": "Bhayshul Tuten",
+      "pos": "RB",
+      "status": "Questionable"
+     }
+    ],
+    "fragile": [
+     {
+      "name": "Christian Watson",
+      "pos": "WR",
+      "score": 0.8,
+      "why": "20 games missed over 4 seasons, but the recurring hamstrings were tied to a biomechanical asymmetry reportedly corrected ~2 years ago, and his ACL was a 'clean' tear. Enters 2026 fully healthy for the first time in a while."
+     },
+     {
+      "name": "Jaxson Dart",
+      "pos": "QB",
+      "score": 0.894,
+      "why": "No significant missed time (--/--/14)."
+     }
+    ],
+    "flagged": [
+     {
+      "name": "Jameson Williams",
+      "pos": "WR",
+      "notes": [
+       "Repeat offender: 4-game gambling suspension (2023) + 2-game PED suspension (2024). A PED repeat escalates to a 17-game ban, genuine week-loss exposure. No confirmed 2026 suspension, but documented exposure per the user's 'suspension exposure' flag."
+      ]
+     }
+    ]
+   },
+   "bench": [
+    {
+     "id": "5947",
+     "name": "Jakobi Meyers",
+     "pos": "WR",
+     "team": "JAX",
+     "pts": 137.3,
+     "round": 10,
+     "bye": 7,
+     "starts_on": 2,
+     "best_gain": 12,
+     "best_team": 7,
+     "own_cost": 0
+    },
+    {
+     "id": "11624",
+     "name": "Xavier Worthy",
+     "pos": "WR",
+     "team": "KC",
+     "pts": 134,
+     "round": 12,
+     "bye": 5,
+     "starts_on": 1,
+     "best_gain": 8.7,
+     "best_team": 7,
+     "own_cost": 0
+    },
+    {
+     "id": "11586",
+     "name": "Blake Corum",
+     "pos": "RB",
+     "team": "LAR",
+     "pts": 127.8,
+     "round": 8,
+     "bye": 11,
+     "starts_on": 1,
+     "best_gain": 2.5,
+     "best_team": 7,
+     "own_cost": 0
+    },
+    {
+     "id": "10219",
+     "name": "Chris Rodriguez",
+     "pos": "RB",
+     "team": "JAX",
+     "pts": 125,
+     "round": 9,
+     "bye": 7,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    },
+    {
+     "id": "12474",
+     "name": "Woody Marks",
+     "pos": "RB",
+     "team": "HOU",
+     "pts": 74.3,
+     "round": 13,
+     "bye": 8,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    }
+   ],
+   "unpriced": [],
+   "tendencies": null,
+   "moves": {
+    "n": 0,
+    "through_week": 1,
+    "note": "No completed moves through week 1."
+   },
+   "proposals": [],
+   "fit": {
+    "they_have": [],
+    "they_want": [],
+    "note": "No surplus mismatch in either direction. Every player on both rosters is already worth at least as much where he is."
+   }
+  },
+  {
+   "roster_id": 11,
+   "owner": "trentonwest33",
+   "user_id": "1401412617825693696",
+   "is_me": false,
+   "draft_slot": 7,
+   "starter_pts": 1821.1,
+   "starter_rank": 4,
+   "vs_league_median": 16.3,
+   "bench_pts": 819.7,
+   "summary": "4th of 12 in projected starting points (1821), +16 against the league median. Built on RB: 607 starting points, 3rd in the league, +90 on the median. WR is the hole — 558 points, 9th, -65 behind. 2 bench players would start on four or more other teams (Jordan Mason, Jordan Addison) — that is the tradeable surplus. Week 8 takes 4 starters off the field at once, and five bench spots do not cover that.",
+   "slots": [
+    {
+     "slot": "QB",
+     "player": {
+      "id": "8183",
+      "name": "Brock Purdy",
+      "pos": "QB",
+      "team": "SF",
+      "pts": 303.2,
+      "round": 12,
+      "bye": 8,
+      "adp": 125.9,
+      "injury": null
+     },
+     "rank": 8,
+     "vs_median": -1.8
+    },
+    {
+     "slot": "RB",
+     "player": {
+      "id": "4034",
+      "name": "Christian McCaffrey",
+      "pos": "RB",
+      "team": "SF",
+      "pts": 256,
+      "round": 1,
+      "bye": 8,
+      "adp": 4,
+      "injury": "Questionable"
+     },
+     "rank": 3,
+     "vs_median": 21.8
+    },
+    {
+     "slot": "RB",
+     "player": {
+      "id": "5892",
+      "name": "David Montgomery",
+      "pos": "RB",
+      "team": "HOU",
+      "pts": 190.1,
+      "round": 3,
+      "bye": 8,
+      "adp": 44.5,
+      "injury": null
+     },
+     "rank": 5,
+     "vs_median": 1.2
+    },
+    {
+     "slot": "WR",
+     "player": {
+      "id": "8137",
+      "name": "George Pickens",
+      "pos": "WR",
+      "team": "DAL",
+      "pts": 205.7,
+      "round": 2,
+      "bye": 14,
+      "adp": 25.7,
+      "injury": null
+     },
+     "rank": 7,
+     "vs_median": -1
+    },
+    {
+     "slot": "WR",
+     "player": {
+      "id": "11635",
+      "name": "Ladd McConkey",
+      "pos": "WR",
+      "team": "LAC",
+      "pts": 187.7,
+      "round": 4,
+      "bye": 7,
+      "adp": 35.3,
+      "injury": null
+     },
+     "rank": 3,
+     "vs_median": 2.3
+    },
+    {
+     "slot": "TE",
+     "player": {
+      "id": "10859",
+      "name": "Sam LaPorta",
+      "pos": "TE",
+      "team": "DET",
+      "pts": 158.5,
+      "round": 5,
+      "bye": 6,
+      "adp": 63.2,
+      "injury": "Questionable"
+     },
+     "rank": 5,
+     "vs_median": 16.3
+    },
+    {
+     "slot": "FLEX",
+     "player": {
+      "id": "11631",
+      "name": "Brian Thomas",
+      "pos": "WR",
+      "team": "JAX",
+      "pts": 164.4,
+      "round": 7,
+      "bye": 7,
+      "adp": 75.8,
+      "injury": null
+     },
+     "rank": 6,
+     "vs_median": 0.9
+    },
+    {
+     "slot": "FLEX",
+     "player": {
+      "id": "13286",
+      "name": "Jadarian Price",
+      "pos": "RB",
+      "team": "SEA",
+      "pts": 160.5,
+      "round": 6,
+      "bye": 11,
+      "adp": 57.5,
+      "injury": null
+     },
+     "rank": 1,
+     "vs_median": 15.4
+    },
+    {
+     "slot": "K",
+     "player": {
+      "id": "5189",
+      "name": "Eddy Pineiro",
+      "pos": "K",
+      "team": "SF",
+      "pts": 97,
+      "round": 15,
+      "bye": 8,
+      "adp": 173.8,
+      "injury": null
+     },
+     "rank": 10,
+     "vs_median": -5
+    },
+    {
+     "slot": "DEF",
+     "player": {
+      "id": "PHI",
+      "name": "Philadelphia Eagles",
+      "pos": "DEF",
+      "team": "PHI",
+      "pts": 98,
+      "round": 11,
+      "bye": 10,
+      "adp": 129.2,
+      "injury": null
+     },
+     "rank": 4,
+     "vs_median": 4.5
+    }
+   ],
+   "by_pos": [
+    {
+     "pos": "QB",
+     "pts": 303.2,
+     "rank": 8,
+     "vs_median": -1.8,
+     "starters": 1,
+     "rostered": 2
+    },
+    {
+     "pos": "RB",
+     "pts": 606.6,
+     "rank": 3,
+     "vs_median": 89.9,
+     "starters": 3,
+     "rostered": 4
+    },
+    {
+     "pos": "WR",
+     "pts": 557.8,
+     "rank": 9,
+     "vs_median": -65.2,
+     "starters": 3,
+     "rostered": 5
+    },
+    {
+     "pos": "TE",
+     "pts": 158.5,
+     "rank": 5,
+     "vs_median": 16.3,
+     "starters": 1,
+     "rostered": 2
+    },
+    {
+     "pos": "K",
+     "pts": 97,
+     "rank": 10,
+     "vs_median": -5,
+     "starters": 1,
+     "rostered": 1
+    },
+    {
+     "pos": "DEF",
+     "pts": 98,
+     "rank": 4,
+     "vs_median": 4.5,
+     "starters": 1,
+     "rostered": 1
+    }
+   ],
+   "strengths": [
+    {
+     "pos": "RB",
+     "pts": 606.6,
+     "rank": 3,
+     "vs_median": 89.9,
+     "starters": 3,
+     "rostered": 4
+    }
+   ],
+   "weaknesses": [
+    {
+     "pos": "WR",
+     "pts": 557.8,
+     "rank": 9,
+     "vs_median": -65.2,
+     "starters": 3,
+     "rostered": 5
+    },
+    {
+     "pos": "QB",
+     "pts": 303.2,
+     "rank": 8,
+     "vs_median": -1.8,
+     "starters": 1,
+     "rostered": 2
+    }
+   ],
+   "risks": {
+    "bye_stacks": [
+     {
+      "week": 8,
+      "n": 4,
+      "players": [
+       "Brock Purdy (QB)",
+       "Christian McCaffrey (RB)",
+       "David Montgomery (RB)",
+       "Eddy Pineiro (K)"
+      ]
+     }
+    ],
+    "injured": [
+     {
+      "name": "Christian McCaffrey",
+      "pos": "RB",
+      "status": "Questionable"
+     },
+     {
+      "name": "Sam LaPorta",
+      "pos": "TE",
+      "status": "Questionable"
+     }
+    ],
+    "fragile": [
+     {
+      "name": "Christian McCaffrey",
+      "pos": "RB",
+      "score": 0.713,
+      "why": "2024 lost 13 games to bilateral Achilles tendinitis (soft-tissue, both legs) + late PCL sprain; answered with a 17-game RB1 season in 2025. Age 30 + Achilles history is the recurrence/decline risk, not a current injury."
+     },
+     {
+      "name": "David Montgomery",
+      "pos": "RB",
+      "score": 0.846,
+      "why": "No significant missed time (14/14/17)."
+     },
+     {
+      "name": "Sam LaPorta",
+      "pos": "TE",
+      "score": 0.867,
+      "why": "Herniated disc in the back worsened in Nov 2025 → IR (9 games). Aiming to be fully cleared by camp; present read is Week 1, but back injuries can be tricky/recurrent."
+     }
+    ],
+    "flagged": []
+   },
+   "bench": [
+    {
+     "id": "421",
+     "name": "Matthew Stafford",
+     "pos": "QB",
+     "team": "LAR",
+     "pts": 280.2,
+     "round": 10,
+     "bye": 11,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    },
+    {
+     "id": "8408",
+     "name": "Jordan Mason",
+     "pos": "RB",
+     "team": "MIN",
+     "pts": 143.7,
+     "round": 8,
+     "bye": 6,
+     "starts_on": 6,
+     "best_gain": 18.4,
+     "best_team": 7,
+     "own_cost": 0
+    },
+    {
+     "id": "9756",
+     "name": "Jordan Addison",
+     "pos": "WR",
+     "team": "MIN",
+     "pts": 141.7,
+     "round": 9,
+     "bye": 6,
+     "starts_on": 5,
+     "best_gain": 16.4,
+     "best_team": 7,
+     "own_cost": 0
+    },
+    {
+     "id": "8134",
+     "name": "Khalil Shakir",
+     "pos": "WR",
+     "team": "BUF",
+     "pts": 135.2,
+     "round": 13,
+     "bye": 7,
+     "starts_on": 1,
+     "best_gain": 9.9,
+     "best_team": 7,
+     "own_cost": 0
+    },
+    {
+     "id": "5001",
+     "name": "Dalton Schultz",
+     "pos": "TE",
+     "team": "HOU",
+     "pts": 118.9,
+     "round": 14,
+     "bye": 8,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    }
+   ],
+   "unpriced": [],
+   "tendencies": null,
+   "moves": {
+    "n": 0,
+    "through_week": 1,
+    "note": "No completed moves through week 1."
+   },
+   "proposals": [],
+   "fit": {
+    "they_have": [],
+    "they_want": [],
+    "note": "No surplus mismatch in either direction. Every player on both rosters is already worth at least as much where he is."
+   }
+  },
+  {
+   "roster_id": 12,
+   "owner": "sbbroom",
+   "user_id": "1401415055504838656",
+   "is_me": false,
+   "draft_slot": 11,
+   "starter_pts": 1798,
+   "starter_rank": 7,
+   "vs_league_median": -6.8,
+   "bench_pts": 796,
+   "summary": "7th of 12 in projected starting points (1798), -7 against the league median. TE is the hole — 138 points, 9th, -4 behind. 1 bench player would start on four or more other teams (Trevor Lawrence) — that is the tradeable surplus. Week 10 takes 3 starters off the field at once, and five bench spots do not cover that.",
+   "slots": [
+    {
+     "slot": "QB",
+     "player": {
+      "id": "6904",
+      "name": "Jalen Hurts",
+      "pos": "QB",
+      "team": "PHI",
+      "pts": 310.5,
+      "round": 6,
+      "bye": 10,
+      "adp": 61.6,
+      "injury": null
+     },
+     "rank": 4,
+     "vs_median": 5.5
+    },
+    {
+     "slot": "RB",
+     "player": {
+      "id": "3198",
+      "name": "Derrick Henry",
+      "pos": "RB",
+      "team": "BAL",
+      "pts": 238.4,
+      "round": 2,
+      "bye": 13,
+      "adp": 14.2,
+      "injury": null
+     },
+     "rank": 6,
+     "vs_median": 4.2
+    },
+    {
+     "slot": "RB",
+     "player": {
+      "id": "4866",
+      "name": "Saquon Barkley",
+      "pos": "RB",
+      "team": "PHI",
+      "pts": 228.2,
+      "round": 1,
+      "bye": 10,
+      "adp": 10.8,
+      "injury": null
+     },
+     "rank": 1,
+     "vs_median": 39.3
+    },
+    {
+     "slot": "WR",
+     "player": {
+      "id": "7525",
+      "name": "DeVonta Smith",
+      "pos": "WR",
+      "team": "PHI",
+      "pts": 189.2,
+      "round": 4,
+      "bye": 10,
+      "adp": 33.1,
+      "injury": null
+     },
+     "rank": 11,
+     "vs_median": -17.5
+    },
+    {
+     "slot": "WR",
+     "player": {
+      "id": "6801",
+      "name": "Tee Higgins",
+      "pos": "WR",
+      "team": "CIN",
+      "pts": 186.9,
+      "round": 3,
+      "bye": 6,
+      "adp": 38.2,
+      "injury": "Questionable"
+     },
+     "rank": 5,
+     "vs_median": 1.5
+    },
+    {
+     "slot": "TE",
+     "player": {
+      "id": "4217",
+      "name": "George Kittle",
+      "pos": "TE",
+      "team": "SF",
+      "pts": 138.3,
+      "round": 5,
+      "bye": 8,
+      "adp": 83.4,
+      "injury": "Questionable"
+     },
+     "rank": 9,
+     "vs_median": -3.9
+    },
+    {
+     "slot": "FLEX",
+     "player": {
+      "id": "11628",
+      "name": "Marvin Harrison",
+      "pos": "WR",
+      "team": "ARI",
+      "pts": 155.2,
+      "round": 8,
+      "bye": 14,
+      "adp": 73.3,
+      "injury": null
+     },
+     "rank": 8,
+     "vs_median": -8.3
+    },
+    {
+     "slot": "FLEX",
+     "player": {
+      "id": "5846",
+      "name": "DK Metcalf",
+      "pos": "WR",
+      "team": "PIT",
+      "pts": 152.3,
+      "round": 7,
+      "bye": 9,
+      "adp": 77.1,
+      "injury": "Questionable"
+     },
+     "rank": 5,
+     "vs_median": 7.2
+    },
+    {
+     "slot": "K",
+     "player": {
+      "id": "11786",
+      "name": "Cam Little",
+      "pos": "K",
+      "team": "JAX",
+      "pts": 108,
+      "round": 13,
+      "bye": 7,
+      "adp": 146.4,
+      "injury": null
+     },
+     "rank": 3,
+     "vs_median": 6
+    },
+    {
+     "slot": "DEF",
+     "player": {
+      "id": "JAX",
+      "name": "Jacksonville Jaguars",
+      "pos": "DEF",
+      "team": "JAX",
+      "pts": 91,
+      "round": 15,
+      "bye": 7,
+      "adp": 158.4,
+      "injury": null
+     },
+     "rank": 9,
+     "vs_median": -2.5
+    }
+   ],
+   "by_pos": [
+    {
+     "pos": "QB",
+     "pts": 310.5,
+     "rank": 4,
+     "vs_median": 5.5,
+     "starters": 1,
+     "rostered": 2
+    },
+    {
+     "pos": "RB",
+     "pts": 466.6,
+     "rank": 8,
+     "vs_median": -50.1,
+     "starters": 2,
+     "rostered": 4
+    },
+    {
+     "pos": "WR",
+     "pts": 683.6,
+     "rank": 4,
+     "vs_median": 60.6,
+     "starters": 4,
+     "rostered": 6
+    },
+    {
+     "pos": "TE",
+     "pts": 138.3,
+     "rank": 9,
+     "vs_median": -3.9,
+     "starters": 1,
+     "rostered": 1
+    },
+    {
+     "pos": "K",
+     "pts": 108,
+     "rank": 3,
+     "vs_median": 6,
+     "starters": 1,
+     "rostered": 1
+    },
+    {
+     "pos": "DEF",
+     "pts": 91,
+     "rank": 9,
+     "vs_median": -2.5,
+     "starters": 1,
+     "rostered": 1
+    }
+   ],
+   "strengths": [],
+   "weaknesses": [
+    {
+     "pos": "TE",
+     "pts": 138.3,
+     "rank": 9,
+     "vs_median": -3.9,
+     "starters": 1,
+     "rostered": 1
+    },
+    {
+     "pos": "RB",
+     "pts": 466.6,
+     "rank": 8,
+     "vs_median": -50.1,
+     "starters": 2,
+     "rostered": 4
+    }
+   ],
+   "risks": {
+    "bye_stacks": [
+     {
+      "week": 10,
+      "n": 3,
+      "players": [
+       "Jalen Hurts (QB)",
+       "Saquon Barkley (RB)",
+       "DeVonta Smith (WR)"
+      ]
+     }
+    ],
+    "injured": [
+     {
+      "name": "Tee Higgins",
+      "pos": "WR",
+      "status": "Questionable"
+     },
+     {
+      "name": "George Kittle",
+      "pos": "TE",
+      "status": "Questionable"
+     },
+     {
+      "name": "DK Metcalf",
+      "pos": "WR",
+      "status": "Questionable"
+     }
+    ],
+    "fragile": [
+     {
+      "name": "George Kittle",
+      "pos": "TE",
+      "score": 0.789,
+      "why": "MAJOR: ruptured his Achilles on Jan 11 2026. Activated off Reserve/PUP Aug 23 after practicing alongside McCaffrey, putting the Sept 10 opener vs the Rams in Melbourne in real reach. Turns 33 in October; still watch the practice ramp before assuming a full Week 1 workload."
+     },
+     {
+      "name": "Tee Higgins",
+      "pos": "WR",
+      "score": 0.833,
+      "why": "Recurring soft-tissue history: hamstring (missed 2 to start a season) and a high-ankle sprain (3 games); expected 100% for Week 1. Perennial 'needs better injury luck' profile."
+     },
+     {
+      "name": "Derrick Henry",
+      "pos": "RB",
+      "score": 0.85,
+      "why": "Remarkably durable (17/17/17); the flag is age (32), not health."
+     }
+    ],
+    "flagged": []
+   },
+   "bench": [
+    {
+     "id": "7523",
+     "name": "Trevor Lawrence",
+     "pos": "QB",
+     "team": "JAX",
+     "pts": 303.4,
+     "round": 10,
+     "bye": 7,
+     "starts_on": 5,
+     "best_gain": 19.9,
+     "best_team": 2,
+     "own_cost": 0
+    },
+    {
+     "id": "10232",
+     "name": "Michael Wilson",
+     "pos": "WR",
+     "team": "ARI",
+     "pts": 136.5,
+     "round": 9,
+     "bye": 14,
+     "starts_on": 2,
+     "best_gain": 11.2,
+     "best_team": 7,
+     "own_cost": 0
+    },
+    {
+     "id": "8126",
+     "name": "Wan'Dale Robinson",
+     "pos": "WR",
+     "team": "TEN",
+     "pts": 135.2,
+     "round": 12,
+     "bye": 9,
+     "starts_on": 1,
+     "best_gain": 9.9,
+     "best_team": 7,
+     "own_cost": 0
+    },
+    {
+     "id": "4199",
+     "name": "Aaron Jones",
+     "pos": "RB",
+     "team": "MIN",
+     "pts": 120.1,
+     "round": 11,
+     "bye": 6,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    },
+    {
+     "id": "11655",
+     "name": "Tyrone Tracy",
+     "pos": "RB",
+     "team": "NYG",
+     "pts": 100.8,
+     "round": 14,
+     "bye": 8,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    }
+   ],
+   "unpriced": [],
+   "tendencies": null,
+   "moves": {
+    "n": 0,
+    "through_week": 1,
+    "note": "No completed moves through week 1."
+   },
+   "proposals": [],
+   "fit": {
+    "they_have": [],
+    "they_want": [],
+    "note": "No surplus mismatch in either direction. Every player on both rosters is already worth at least as much where he is."
+   }
+  }
+ ]
+}
