@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap">
-  <link rel="stylesheet" href="style.css?v=53">
+  <link rel="stylesheet" href="style.css?v=54">
   <link rel="stylesheet" href="backdrop.css?v=4">
   <script>/* ?bg=none disables the backdrop for this visit - see backdrop.css */
     if (new URLSearchParams(location.search).get("bg") === "none")
@@ -99,9 +99,11 @@
         <div class="panel-body" id="waivers-body"><div class="loading">Loading…</div></div>
       </section>
 
-      <!-- Removed outright on any league /brief has not written for, rather than hidden: a
-           display:none panel still fetches and still reports its error into a box nobody sees. -->
-      <section class="panel" aria-labelledby="brief-h" data-league-only="hbgbs">
+      <!-- Both leagues, as of 2026-09-04 when /brief got a Tuesday-morning slot in the daily
+           routine. A league with no brief yet shows the standard explicit error, which is the same
+           thing the waiver panel above it does and the convention this whole dashboard runs on:
+           say what is missing and how to get it, never hide the slot. -->
+      <section class="panel" aria-labelledby="brief-h">
         <div class="panel-head">
           <h2 id="brief-h">Latest brief — so what</h2>
           <span class="meta" id="brief-meta"></span>
@@ -122,6 +124,6 @@
   <script src="league-switch.js?v=2"></script>
   <script src="player-news.js?v=2"></script>
   <script src="roster-table.js?v=3"></script>
-  <script src="app.js?v=10"></script>
+  <script src="app.js?v=12"></script>
 </body>
 </html>

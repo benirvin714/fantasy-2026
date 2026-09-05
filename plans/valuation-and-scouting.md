@@ -1098,10 +1098,31 @@ for 50-59. The Pit's flat rule catches them. That is a pre-existing HBGBs bug, *
 because it would move live numbers mid-build, and it is flagged in `league-profile-pit.md` §2 and in
 `build-roster-room.mjs`.
 
-**Deliberately not.** No draft page for the Pit, no brief until `/brief` writes one per league (that
-panel had been showing a seven-week-old brief on HBGBs, which the same pass caught), no owner
-dossiers, and nothing at all for the third league on the account (`DFW Couples Clash`, 14 teams,
-`pre_draft`). The registry is shaped so that one is config plus a nav entry.
+**`/brief` on a weekly slot, added the same day.** The obvious-looking answer was to run it right
+after the player builds, twice a day with everything else. That is wrong for a specific reason: the
+routine's step 1 already scans `/brief`'s exact four lanes (injuries, roles, coaching, market) twice
+a day, so a twice-daily brief re-researches news the same run wrote twenty minutes earlier - and
+`/brief`'s one unique output is a **diff** against the previous brief, which at a 12-hour cadence
+collapses into the window `nfl-events.json` already covers item by item. The events routine, added
+after `/brief` was written, took over the "what happened" job; what is left that is `/brief`'s own is
+the aggregate read, and an aggregate read wants a cadence matched to how much aggregate change there
+is. In season that is the fantasy week.
+
+So: **Tuesday morning**, both leagues, inside the existing routine. Waivers process Tuesday and
+Monday night is settled, so it is the run where a landscape read can still change a decision. The
+gate is a `BRIEF-SLOT yes|no` line that `scripts/nfl-state.mjs` now prints alongside its season
+verdict - the routine already runs that command at step 9, so this costs no second command and no
+second 4am permission prompt, which is a trap that file documents twice.
+
+Two things fell out of turning the panel on for both leagues. The brief panel had **no staleness
+check at all** and had spent 50 days presenting a 2026-07-17 brief as current, which is precisely
+what every other panel here exists to prevent; it now warns past 10 days. And `staleBanner()` grew a
+`why` parameter, because the panels do not go stale for the same reason - blaming the twice-daily
+routine for a missed weekly slot sends the reader to check something that is working.
+
+**Deliberately not.** No draft page for the Pit, no owner dossiers, and nothing at all for the third
+league on the account (`DFW Couples Clash`, 14 teams, `pre_draft`). The registry is shaped so that
+one is config plus a nav entry.
 
 Files: `scripts/lib/leagues.mjs`; `--league` on `build-roster-room.mjs` and `build-player-news.mjs`;
 `data/raw/league-pit-2026.json`; `data/site/pit/`; `site/league-switch.js`; the `active`-aware paths

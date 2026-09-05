@@ -26,10 +26,14 @@
   const skel = (n) => `<div class="skel-wrap" aria-hidden="true">${
     Array.from({ length: n }).map(() => `<div class="skel-row"></div>`).join("")}</div>`;
 
-  const staleBanner = (dateStr, what, days = 2) => {
+  /* `why` is a parameter because the panels do not go stale for the same reason. The events feed and
+     the roster room are rebuilt by the twice-daily routine, so old means that routine did not run.
+     The brief is weekly, so old means a Tuesday slot was missed - blaming the daily routine there
+     would send the reader to check something that is working fine. */
+  const staleBanner = (dateStr, what, days = 2, why = "the daily routine may not have run") => {
     const age = (Date.now() - new Date(dateStr).getTime()) / 864e5;
     return age > days
-      ? `<div class="stale-warn">${what} is ${Math.floor(age)} days old — the daily routine may not have run.</div>`
+      ? `<div class="stale-warn">${what} is ${Math.floor(age)} days old — ${why}.</div>`
       : "";
   };
 
@@ -145,15 +149,20 @@
 
   /* ---------- brief panel (published by /brief) ---------- */
   async function renderBrief() {
-    // The panel is removed outright on a league /brief has not written for (see data-league-only
-    // in index.html), so this is a normal skip, not a failure.
+    // Guard kept even though both leagues now render the panel: if a league is ever gated out of it
+    // again, this is what stops the fetch and its error handler from racing the removal.
     if (!$("#brief-body")) return;
     $("#brief-body").innerHTML = skel(4);
     let d;
     try { d = await fetchJSON(A.BRIEF_JSON); }
-    catch { return err("#brief-body", `No published brief. Run /brief in Claude Code — it writes ${esc(A.data)}/latest-brief.json.`); }
+    catch { return err("#brief-body", `No published brief for ${esc(A.name)} yet. It publishes on the Tuesday morning run, or run <code>/brief ${esc(A.key)}</code> in Claude Code now — it writes ${esc(A.data)}/latest-brief.json.`); }
     $("#brief-meta").textContent = `from briefs/${d.date}.md`;
-    $("#brief-body").innerHTML = `<ol class="sowhat">${d.so_what.map((s) => `<li>${esc(s)}</li>`).join("")}</ol>`;
+    /* /brief runs weekly (Tuesday morning, via the daily routine), so anything past ten days means a
+       run was missed. This panel had no staleness check at all and spent seven weeks presenting a
+       2026-07-17 brief as current, which is exactly what every other panel here is built to prevent. */
+    $("#brief-body").innerHTML =
+      staleBanner(d.date, "This brief", 10, `the weekly Tuesday morning slot was missed; run <code>/brief ${esc(A.key)}</code> to refresh it now`) +
+      `<ol class="sowhat">${d.so_what.map((s) => `<li>${esc(s)}</li>`).join("")}</ol>`;
   }
 
   /* ---------- filters ---------- */

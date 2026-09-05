@@ -10,10 +10,21 @@
 //
 // Source: Sleeper's public NFL state endpoint (read-only GET), the same clock the league runs on.
 //
+// It also prints a BRIEF-SLOT line, because /brief wants a weekly cadence and the twice-daily
+// routine is the only thing running on a schedule. Rather than a second command (and a second 4am
+// permission prompt), the routine reads that line off the run it already makes here.
+//
+// Why Tuesday morning: waivers process Tuesday and Monday night is settled, so that is the run where
+// a landscape read can still change a decision. Why weekly at all: the events routine already scans
+// the same four lanes twice a day, so a twice-daily brief would re-research news written 20 minutes
+// earlier and its diff - the one thing it uniquely produces - would collapse to the same 12-hour
+// window the feed already covers item by item.
+//
 // Exit codes (for the caller; the printed verdict is what the routine reads):
 //   0  IN-SEASON      regular season, week 1-18
 //   3  OFF-SEASON     pre/post season, or outside the week range
 //   1  UNKNOWN        state could not be fetched. Do NOT guess: skip the run and say so.
+// The exit code is the SEASON gate only. BRIEF-SLOT never changes it.
 //
 // Usage: node scripts/nfl-state.mjs
 
@@ -45,5 +56,19 @@ const inSeason = type === "regular" && week >= 1 && week <= 18;
 
 console.log(`${inSeason ? "IN-SEASON" : "OFF-SEASON"}  season=${season} type=${type} week=${week} display_week=${display}`);
 if (!inSeason) console.log("  This slot is regular-season only. Exit now without scanning, writing, or committing.");
+
+/* Local clock, not UTC - the cron that calls this fires in local time, and a UTC hour would put the
+   4:05am run on the wrong side of noon for half the year. The routine fires at 4:05am and 4:05pm, so
+   hour<12 separates the two slots with hours to spare either side of the jitter. */
+const now = new Date();
+const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const day = DAYS[now.getDay()];
+const slot = now.getHours() < 12 ? "am" : "pm";
+const briefSlot = inSeason && day === "Tue" && slot === "am";
+console.log(`BRIEF-SLOT ${briefSlot ? "yes" : "no"}  day=${day} slot=${slot}`);
+if (!briefSlot && inSeason) {
+  console.log("  /brief runs on the Tuesday morning run only. Skip it this run; everything else proceeds.");
+}
+
 process.exitCode = inSeason ? 0 : 3;
 }
