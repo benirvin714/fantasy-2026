@@ -1024,6 +1024,91 @@ in both `CLAUDE.md` and `site/config.js`; `OTHER_LEAGUE_ID` is a third and runs 
 Nothing breaks if it goes stale - the tab opens on last year's league, says `complete` in the header,
 and takes a pasted id like it always did.
 
+### 1.25 A second league on the same pages - 2026-09-04
+
+Ben drafted **The Panther Pit** (`1401363352046825472`, 12 teams, first season) and asked for the
+HBGBs pages replicated for it, minus owner tendencies and the draft page. §1.24's other-league tab
+had already predicted this and named the bar: *"If the second league ever earns that treatment it
+needs its own build - the scripts hard-code LEAGUE_ID and the projections are re-scored per format."*
+This is that build.
+
+**What the diff actually said, before anything was written.** The two leagues are scoring-identical
+on **42 of 50 keys** with a **byte-identical roster shape**. The only scoring difference is a flat
+`fgmiss: -1` where the HBGBs bands its misses. So almost none of the format doctrine needed
+rewriting, and the work turned out to be about the two things that genuinely do not transfer: league
+size and history.
+
+**Size.** `league-profile.md` §1 rests on 2RB+2WR+2FLEX x 10 = 60 startable RB/WR slots, which it
+observes is identical to a 12-team 1-FLEX league. The same arithmetic at 12 teams gives **72**, which
+is deeper than a 14-team 1-FLEX league's 70. 180 rostered against 150 out of one NFL pool:
+replacement level drops, the last startable RB/WR moves from about RB30/WR32 to RB36/WR38, and
+"always consolidate" gets stronger. That is `league-profile-pit.md`, a delta rather than a second
+profile, because a full copy is the copy that goes stale.
+
+**History, or the lack of it.** Cutting Owner Tendencies was the visible half. Three more things
+were quietly powered by the same six seasons: the trade-appetite chip in the league table, the FAAB
+pricing layer of `/waivers`, and `/trade`'s counterparty step. Each now branches on a null in
+`scripts/lib/leagues.mjs` rather than borrowing:
+
+- the appetite chip becomes a **Moves** column - completed transactions this season, live off
+  Sleeper, zero for everybody in week 1 and honest about it;
+- the waiver board ships **unpriced**, with the reason in the `bid` field. Borrowing
+  `faab-market.json` was rejected explicitly: it is a 10-team model, a 12-team league on the same
+  $100 clears higher, so it would understate every bid in one direction and a labelled wrong number
+  still anchors;
+- `/trade` skips its counterparty step rather than inventing a read.
+
+**One set of pages, not two.** `site/league-switch.js` resolves the active league and publishes
+`HQ_CONFIG.active`; `index.html` and `rosters.html` render either one. Forking into `pit.html` would
+have meant two copies of every renderer, which is the problem `roster-table.js` was extracted to
+solve one session earlier. Two declarative hooks carry the differences: `[data-league-switch]` and
+`[data-league-only]`, the latter **removing** rather than hiding, because a `display:none` panel
+still fetches and still writes an error into a box nobody can see.
+
+**Where that file loads is load-bearing, and the first cut got it wrong.** It went in `<head>` with
+its DOM work on `DOMContentLoaded`. `app.js` runs at end-of-body, which is earlier, so `renderBrief()`
+found the brief panel, started its fetch, and had the panel removed out from under its error handler
+mid-request. Split in two: an inline block in `<head>` stamps `<html data-league>` so the palette
+cannot flash, and the file itself loads at the end of `<body>` above the renderers, honouring that
+stamp so the duplicated resolution cannot disagree.
+
+**Sharing the draft board, and the two leaks that found.** One board serves both: ADP, Boris Chen
+tiers, scouting briefs and availability are facts about a player. Only `projection.pts` is scored per
+league, so the Pit re-prices all 181 of its rostered players from Sleeper's raw stat lines - merging
+onto the board record, never replacing it, since a replace would have dropped the bye weeks the risk
+panel counts stacks from.
+
+Two fields turned out not to be facts about a player, and both were caught by **scanning the built
+file for rival owner names** rather than by reasoning about it:
+
+1. `so_what` on the events feed. **11 of 25** lines named an HBGBs owner. Split by hand into a shared
+   format read and a per-league `league_notes`, and the league size came out of the shared half too -
+   "this format's normal-depth WR math" is a claim about 10 teams.
+2. `adp_commentary`. I had scoped this as league-agnostic and it is not: *"ENOTS, a QB-punter, won't
+   chase him"*, *"bwalsh89/Stipe and your own TE-hunter history all compete here"*. Five players
+   carried it. ADP the number stays shared; the commentary is gated on the same flag as pricing.
+
+That scan is worth re-running after any change to what the leagues share. Reasoning about which
+fields are "about a player" got it wrong twice.
+
+**A measurement that corrected the plan.** The kicker delta was scoped at "0 to 1 points". Measured
+against the shared board it is **2 to 3**, and the reason matters: the HBGBs `K_KEYS` list omits
+`fgmiss_50p` entirely, so HBGBs kickers pay nothing for 50+ misses even though the league charges -1
+for 50-59. The Pit's flat rule catches them. That is a pre-existing HBGBs bug, **not fixed here**
+because it would move live numbers mid-build, and it is flagged in `league-profile-pit.md` §2 and in
+`build-roster-room.mjs`.
+
+**Deliberately not.** No draft page for the Pit, no brief until `/brief` writes one per league (that
+panel had been showing a seven-week-old brief on HBGBs, which the same pass caught), no owner
+dossiers, and nothing at all for the third league on the account (`DFW Couples Clash`, 14 teams,
+`pre_draft`). The registry is shaped so that one is config plus a nav entry.
+
+Files: `scripts/lib/leagues.mjs`; `--league` on `build-roster-room.mjs` and `build-player-news.mjs`;
+`data/raw/league-pit-2026.json`; `data/site/pit/`; `site/league-switch.js`; the `active`-aware paths
+in `app.js`, `rosters.js`, `player-news.js`, `roster-table.js`; `league-profile-pit.md`; the league
+argument in `.claude/commands/waivers.md` and `brief.md`; steps 8-9 of the `nfl-daily-events` task,
+which now loops both leagues and took over from the retired standalone `nfl-waivers` task.
+
 ## 2. Challenge 2 — `scouting_brief` (public commentary)
 
 ### 2.1 What it is
