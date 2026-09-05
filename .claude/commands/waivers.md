@@ -2,14 +2,33 @@
 description: Rank waiver targets with my-team impact verdicts, history-priced FAAB bids, and rival-need pressure (recommendations only)
 ---
 
-In-season waiver analysis for The HBGBs. Read CLAUDE.md rules first (read-only Sleeper; no stale data; league-format translation). **Recommendations only — never execute a claim.**
+In-season waiver analysis. Read CLAUDE.md rules first (read-only Sleeper; no stale data; league-format translation). **Recommendations only — never execute a claim.**
+
+## Which league
+
+Takes an optional league argument: `/waivers` or `/waivers hbgbs` for The HBGBs, `/waivers pit` for
+The Panther Pit. Everything league-specific comes from `scripts/lib/leagues.mjs`, which is the one
+place that knows there is more than one — read it rather than hardcoding an id anywhere.
+
+| | hbgbs (default) | pit |
+|---|---|---|
+| League | The HBGBs, 10 teams | The Panther Pit, 12 teams |
+| My roster id | 10 | **1** |
+| Doctrine | `league-profile.md` | `league-profile.md` **and** `league-profile-pit.md` (a delta — read both) |
+| FAAB model | `data/faab-market.json` | **none — see step 6a** |
+| Rival dossiers | `league-tendencies.md` | **none — first season** |
+| Publish to | `data/site/waivers.json` | `data/site/pit/waivers.json` |
+
+The two leagues are scoring-identical on 42 of 50 keys with the same slot shape, so the format
+doctrine transfers whole. What does **not** transfer is depth (12 teams means 72 startable RB/WR
+slots against 60, so replacement level is lower and the wire is thinner) and anything historical.
 
 NOTE: write FAAB amounts in this file and in outputs as "N dollars" or "FAAB N" — a dollar sign followed by a digit is a positional-argument placeholder in command files and gets stripped at load time.
 
 ## Procedure
 
 1. **Sleeper state**: `get_nfl_state` for season/week. If the Sleeper MCP is unavailable, stop and say exactly what's needed (league ID reachable via MCP or the public REST API) — do not fabricate a pool.
-2. **All rosters, one call**: `get_league_rosters` (the league ID in CLAUDE.md). From this single call take: my roster (roster ID 10), my remaining FAAB (`waiver_budget_used` out of 100), every rival's roster + remaining FAAB, and any in-season injury designations on rostered players (`player_info.status`).
+2. **All rosters, one call**: `get_league_rosters` for the chosen league's id. From this single call take: my roster (roster id per the table above — **10 in the HBGBs, 1 in the Pit**), my remaining FAAB (`waiver_budget_used` out of 100), every rival's roster + remaining FAAB, and any in-season injury designations on rostered players (`player_info.status`).
 3. **Build the waiver pool** (no direct free-agent tool exists):
    - Collect ALL rostered player IDs across the 10 rosters → the "taken" set.
    - Candidate sources: `get_trending_players` (adds), web search for this week's waiver-wire articles/snap-count risers, and any player the news pass surfaces.
@@ -19,7 +38,7 @@ NOTE: write FAAB amounts in this file and in outputs as "N dollars" or "FAAB N" 
    - Read `data/site/nfl-events.json` (local, curated daily) and cross-reference its injury/role/trade items against rival rosters: an item hitting a rival's starter marks that rival NEEDY at that position now.
    - Injury designations from the step-2 rosters data add to the same map (Out/IR starters = acute need).
    - ONE extra REST call: `https://api.sleeper.app/v1/league/<id>/transactions/<week>` for the current and previous week — intra-league trades/drops reveal fresh holes (traded away a WR → WR-needy) and who is actively churning.
-6. **Value each target with the 3-layer model, then price and rank** — value in THIS format (half-PPR, 2 FLEX, konami QB, kicker/DEF quirks per league-profile.md). This is the same asset → scarcity → edge → recommendation-with-confidence model the draft board uses (plans/valuation-and-scouting.md §1), re-pointed at the FAAB market. For pricing, read **`data/faab-market.json`** — do NOT re-read league-tendencies.md and NEVER re-aggregate data/raw for pricing (that is what the model file is for; regenerate it with `node scripts/build-faab-model.mjs` only when a new season's transactions accumulate). For each target produce:
+6. **Value each target with the 3-layer model, then price and rank** — value in THIS format (half-PPR, 2 FLEX, konami QB, kicker/DEF quirks per league-profile.md). This is the same asset → scarcity → edge → recommendation-with-confidence model the draft board uses (plans/valuation-and-scouting.md §1), re-pointed at the FAAB market. For pricing in **hbgbs**, read **`data/faab-market.json`** — do NOT re-read league-tendencies.md and NEVER re-aggregate data/raw for pricing (that is what the model file is for; regenerate it with `node scripts/build-faab-model.mjs` only when a new season's transactions accumulate). For each target produce:
    - **why**: the league-wide case (evidence + source date).
    - **asset** + **rate_basis** — *what he'd produce for you.* IN-SEASON: read it off the **recent snap/route/target trend (last 3-4 weeks)** — the freshest, most actionable signal, NOT the stale season rate (`rate_basis: "recent-trend (wks X-Y)"`). PRESEASON / no game data yet: fall back to the season projection and say so (`rate_basis: "projection (preseason)"`).
    - **my_team_impact**: would he crack my starting 10 (which slot/FLEX)? What does he add vs my incumbent (ceiling/floor/role)? Bye coverage? What does the drop cost me?
@@ -31,9 +50,17 @@ NOTE: write FAAB amounts in this file and in outputs as "N dollars" or "FAAB N" 
    - **bid**: the suggested FAAB amount = min(worth, price-to-clear). Start from the model's bands (routine_uncontested 1-3; contested_routine 8-12; frenzy_floor 60+); raise to clear interested rivals' `price_to_beat`, but apply the **small-sample rule**: if that rival's `n_contested` is below 8, ignore their price_to_beat and use the league band, saying so. Cap by my remaining budget and the calendar. One-line rationale naming who is priced in ("12 dollars — clears StoneBone69 volume claims; ENOTS is broke at 6 left").
    - **drop**: a specific drop candidate from my roster; flag if the drop is scoopable (StoneBone69 especially).
 7. **Output**: ranked table + bid plan. End with total FAAB committed if all claims hit, and what remains.
-8. **Publish to the dashboard**: write `data/site/waivers.json` with schema `{generated: "YYYY-MM-DD", mode, faab_remaining, note, targets: [{rank, player, pos, team, why, asset, rate_basis, my_team_impact, worth, edge: "value"|"fair"|"overpay", verdict: "pursue"|"watch"|"avoid", confidence: "high"|"med"|"low", confidence_why, pressure: "low"|"medium"|"high", competition, bid, drop}]}`, then commit that file ("Publish waivers YYYY-MM-DD"), pull --rebase, push (report failures plainly; never force-push). The HBGBs HQ site renders it and flags it stale after 7 days. (The `asset`/`worth`/`edge`/`confidence` fields are the 3-layer model from step 6; the render degrades gracefully if any are absent.) Note on `bid`: the dashboard renders it as a right-aligned chip on the name row when it is **24 characters or fewer** (a bare price like `$5` or `$18 (frenzy price)`) and on its own wrapping line below when it is longer. Both are supported — write the rationale sentence the step above asks for and don't pad a short bid to force a line break.
+6a. **Pricing in `pit`: there is none, and say so rather than borrowing.** The league is in its first season with zero completed waiver bids, so there is no price history — not thin, none. Write `bid` as a stated absence, not a number:
+
+    "unpriced — year one, no bidding history in this league yet. 12 teams on 100 FAAB chase a thinner pool than the HBGBs' 10, so HBGBs prices would read low here."
+
+    Do NOT price from `data/faab-market.json`. That model is 10 teams; a 12-team league clearing the same budget against a thinner pool will settle **higher**, so borrowing it understates every bid in one consistent direction, and a labelled wrong number still anchors. Every other field on the target — verdict, why, asset, edge, my_team_impact, pressure, competition, drop — is real and should be filled normally; only the price is missing. Once the Pit has its own 2026 bids, `build-faab-model.mjs` pointed at them turns this back on with no other change.
+
+    Same rule for **pressure/competition**: in `hbgbs` it is priced off rival dossiers and per-owner history. In `pit` there are no dossiers, so derive it only from what is observable — an opponent's roster hole at that position and their remaining FAAB — and never from an owner read you do not have.
+
+8. **Publish to the dashboard**: write the chosen league's waivers path (`data/site/waivers.json` for hbgbs, `data/site/pit/waivers.json` for pit) with schema `{generated: "YYYY-MM-DD", mode, faab_remaining, note, targets: [{rank, player, pos, team, why, asset, rate_basis, my_team_impact, worth, edge: "value"|"fair"|"overpay", verdict: "pursue"|"watch"|"avoid", confidence: "high"|"med"|"low", confidence_why, pressure: "low"|"medium"|"high", competition, bid, drop}]}`, then commit that file ("Publish waivers YYYY-MM-DD"), pull --rebase, push (report failures plainly; never force-push). The HBGBs HQ site renders it and flags it stale after 7 days. (The `asset`/`worth`/`edge`/`confidence` fields are the 3-layer model from step 6; the render degrades gracefully if any are absent.) Note on `bid`: the dashboard renders it as a right-aligned chip on the name row when it is **24 characters or fewer** (a bare price like `$5` or `$18 (frenzy price)`) and on its own wrapping line below when it is longer. Both are supported — write the rationale sentence the step above asks for and don't pad a short bid to force a line break.
 
 ## Degradation
 - No web search → Sleeper-only mode: trending adds + roster math + rival-need map from local data, clearly labeled as lacking role/injury verification.
 - No Sleeper MCP → stop; state that roster + pool data is unavailable and ask whether to proceed web-only against a user-provided roster list.
-- No `data/faab-market.json` → say so and price from bands stated in league-tendencies.md's FAAB section, flagged as unmodeled.
+- No `data/faab-market.json` **in hbgbs** → say so and price from bands stated in league-tendencies.md's FAAB section, flagged as unmodeled. In **pit** its absence is expected, not a fallback case — follow step 6a.

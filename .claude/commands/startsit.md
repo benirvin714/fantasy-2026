@@ -7,7 +7,7 @@ Start/sit review for The HBGBs. Read CLAUDE.md rules first. **Recommendations on
 ## Procedure
 
 1. **Sleeper state**: `get_nfl_state` → current week. If offseason, say start/sit doesn't apply and stop. If Sleeper MCP unavailable, stop and say what's missing.
-2. **My lineup**: `get_league_rosters` roster 10 — current starters vs bench, plus IR. `get_matchups` for this week → my opponent's roster; note their projected strengths for risk-calibration (favored → prefer floor; underdog → prefer ceiling).
+2. **My lineup**: `get_league_rosters` roster 10 (HBGBs). This command is **HBGBs-only for now** — for The Panther Pit pass its league id from `scripts/lib/leagues.mjs` and use roster **1**, and read `league-profile-pit.md` alongside `league-profile.md` for the 12-team depth delta — current starters vs bench, plus IR. `get_matchups` for this week → my opponent's roster; note their projected strengths for risk-calibration (favored → prefer floor; underdog → prefer ceiling).
 3. **Current-data checks** (web search, dated sources):
    - Injury designations for every player on my roster (Q/D/O, practice participation); game-time-decision risk and pivot plans for late games
    - Matchups: opposing defense vs position, implied totals/spreads
