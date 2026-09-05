@@ -123,6 +123,7 @@
             </div>
             <div class="detail">${esc(e.detail)}</div>
             ${e.so_what ? `<div class="sowhat-line">↳ ${esc(e.so_what)}</div>` : ""}
+            ${e.league_notes && e.league_notes[A.key] ? `<div class="sowhat-line lg-note">↳ ${esc(e.league_notes[A.key])}</div>` : ""}
             <div class="src">
               ${e.source?.url ? `<a href="${esc(e.source.url)}" target="_blank" rel="noopener">${esc(e.source.label ?? "source")}</a>` : ""}
               ${e.also?.length ? `<span class="faint"> · also names ${esc(e.also.join(", "))}</span>` : ""}

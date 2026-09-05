@@ -70,7 +70,12 @@
         <a href="rosters.html">roster room</a>, with the standings and the trade search.</p>`;
   }
 
-  /* ---------- NFL updates (published by the daily nfl-events routine) ---------- */
+  /* ---------- NFL updates (published by the daily nfl-events routine) ----------
+     The feed itself is shared by every league: an injury is an injury. `so_what` is the format read
+     and is true in both, because the two leagues match on 42 of 50 scoring keys and have an
+     identical slot shape. What does NOT transfer is the half that names an owner, so that lives in
+     league_notes keyed by league and only the league it belongs to ever renders it. */
+  const leagueNote = (e) => (e.league_notes && e.league_notes[A.key]) || null;
   let events = [], evFilter = "all";
   function paintEvents() {
     const rows = events.filter((e) => evFilter === "all" || e.type === evFilter);
@@ -84,6 +89,7 @@
             </div>
             <div class="detail">${esc(e.detail)}</div>
             ${e.so_what ? `<div class="sowhat-line">↳ ${esc(e.so_what)}</div>` : ""}
+            ${leagueNote(e) ? `<div class="sowhat-line lg-note">↳ ${esc(leagueNote(e))}</div>` : ""}
             ${e.source?.url ? `<div class="src"><a href="${esc(e.source.url)}" target="_blank" rel="noopener">${esc(e.source.label ?? "source")}</a></div>` : ""}
           </li>`).join("")}</ul>`
       : `<div class="loading">No ${evFilter === "all" ? "" : evFilter + " "}updates.</div>`;

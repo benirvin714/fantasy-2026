@@ -14,8 +14,12 @@
  *   <league out_dir>/player-news.json
  *
  * The draft board and the events feed are shared across leagues on purpose: a scouting brief, an
- * ADP, an availability score and a news item are facts about a player, not about a league. Only the
- * roster join and the projection are per-league, and both come from that league's own roster room.
+ * ADP, an availability score and a news item are facts about a player, not about a league.
+ *
+ * Two fields on those shared inputs are NOT facts about a player and are gated per league:
+ * `adp_commentary` (draft-room strategy naming one league's owners) and an event's `league_notes`
+ * (the half of a news item that is about who rosters whom). Both were caught only by scanning the
+ * built file for rival owner names, which is worth doing again after any change here.
  *
  * Run it after the daily refresh, since two of the three inputs move daily.
  *   node scripts/build-player-news.mjs [--league=hbgbs|pit]
@@ -90,6 +94,9 @@ for (const e of events.events) {
     evByPlayer.get(id).push({
       date: e.date, type: e.type, headline: e.headline, detail: e.detail,
       so_what: e.so_what ?? null, source: e.source ?? null,
+      /* Only this league's note travels. Carrying every league's would ship one league's owner
+         names into another league's dossier file, which is the thing splitting the field prevented. */
+      league_notes: e.league_notes && e.league_notes[L.key] ? { [L.key]: e.league_notes[L.key] } : null,
       /* An event naming four players is usually about one of them. Saying which other names it
          touched is cheaper than making the reader open all four to find that out. */
       also: (e.players ?? []).filter((x) => norm(x) !== norm(rostered.get(id).name)),
@@ -115,7 +122,12 @@ for (const [id, r] of rostered) {
       ? { pts: b.projection.pts, ppg: b.projection.ppg ?? null, updated: b.projection.updated ?? null }
       : (r.pts != null ? { pts: r.pts, ppg: null, updated: null } : null),
     adp: b?.adp?.half_ppr != null ? { half_ppr: b.adp.half_ppr, updated: b.adp.updated ?? null } : null,
-    adp_commentary: b?.adp_commentary ?? null,
+    /* ADP the NUMBER is a market fact and is shared. ADP COMMENTARY is not: it is draft-room prose
+       written through one league's dynamics, and it names that league's owners ("ENOTS, a QB-punter,
+       won't chase him"; "bwalsh89/Stipe and your own TE-hunter history all compete here"). Shipping
+       it to another league puts strangers' names on a page about twelve different people. Gated on
+       the same flag as pricing: the league the board was built for gets it, nobody else does. */
+    adp_commentary: L.board_scored ? (b?.adp_commentary ?? null) : null,
     availability: b?.availability
       ? {
           score: b.availability.score ?? null,
