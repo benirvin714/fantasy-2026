@@ -946,9 +946,25 @@ PPR), so the standard tail runs out sooner - it shows nothing rather than borrow
 number. And the tiers are a **weekly** fftiers file, not a draft-day snapshot; it is the same file
 the desktop board has used all along, but the numbers move week to week.
 
-### 1.24 The fourth tab - another Sleeper league, live, on demand - 2026-09-04
+### 1.24 The fourth tab - another Sleeper league, live, on demand - 2026-09-04 (REMOVED 2026-09-07)
 
-**What it is.** A fourth page, `site/league.html` + `site/league.js`, reached from an **other league**
+> **Removed on 2026-09-07, three days after it shipped.** `site/league.html`, `site/league.js` and
+> the `.ol-*` skin are gone, along with `OTHER_LEAGUE_ID`. The tab existed to look at a second league
+> the dashboard could not analyse; §1.25 then gave the Panther Pit real pages, which is the thing the
+> tab was standing in for. Ben called it, correctly.
+>
+> **The section stays because the reasoning is the point, not the code.** What it worked out - that
+> re-pointing `LEAGUE_ID` at another league would render HBGBs-scored numbers under someone else's
+> name, and that a page which computes nothing is the honest answer when the pipeline is
+> single-tenant - is exactly what §1.25 then built properly. Deleting the record would make the next
+> reader re-derive it.
+>
+> **What was genuinely lost.** This was the only way to look at a league with no build behind it. The
+> third league on the account (`DFW Couples Clash`, 14 teams, `pre_draft`) now has nothing pointed at
+> it. When it drafts, the answer is a `LEAGUES` entry in `scripts/lib/leagues.mjs` plus a nav chip,
+> not a rebuilt viewer.
+
+**What it was.** A fourth page, `site/league.html` + `site/league.js`, reached from an **other league**
 chip in the nav of all four pages. Paste any Sleeper league id (or its URL - the id is pulled out of
 whatever you paste) and the page renders that league from Sleeper's public API: its format, its
 standings, any team's roster in its own slot shape, this week's pairings, and the full draft board.

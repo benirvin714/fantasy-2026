@@ -8,12 +8,12 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap">
-  <link rel="stylesheet" href="style.css?v=53">
+  <link rel="stylesheet" href="style.css?v=55">
   <link rel="stylesheet" href="backdrop.css?v=4">
   <script>/* ?bg=none disables the backdrop for this visit - see backdrop.css */
     if (new URLSearchParams(location.search).get("bg") === "none")
       document.documentElement.setAttribute("data-backdrop", "none");</script>
-  <script src="config.js?v=11"></script>
+  <script src="config.js?v=12"></script>
   <script>/* Stamp the active league before the stylesheet paints, so the palette never flashes the
     wrong league. Resolution is duplicated from league-switch.js on purpose: that file has to load at
     the end of the body (it edits markup the page renderers then read), and nothing loaded down there
@@ -40,7 +40,6 @@
       <a class="chip navlink" href="index.html">in-season HQ</a>
       <span class="chip navlink active" aria-current="page">roster room</span>
       <a class="chip navlink" href="draft.html" data-league-only="hbgbs">draft day</a>
-      <a class="chip navlink" href="league.html">other league</a>
     </nav>
     <div class="spacer"></div>
     <span class="chip" id="rr-meta">loading…</span>
