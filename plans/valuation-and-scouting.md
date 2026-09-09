@@ -1124,6 +1124,109 @@ after `/brief` was written, took over the "what happened" job; what is left that
 the aggregate read, and an aggregate read wants a cadence matched to how much aggregate change there
 is. In season that is the fantasy week.
 
+### 1.26 A third league, in red, and the first one that scores differently - 2026-09-09
+
+Ben joined **Couples Clash** (`1403499370376179712`, 14 teams, first season, roster 11) and asked for
+a third tab with a red palette, noting it is full PPR and that this changes the analysis. He was
+right about the second half, and it is the more interesting half.
+
+**§1.25's premise expired.** That section was built on a diff that came back nearly empty: two
+leagues identical on 42 of 50 scoring keys, so "almost none of the format doctrine needed rewriting"
+and the work was about size and history. This league is identical on **43 of 50** - a *better* score -
+and yet it is the one that breaks things, because one of the seven differences is `rec: 1.0` against
+`0.5`. Key-count is a bad proxy for how much a scoring difference matters. A reception is the most
+frequently scored event in fantasy football; doubling it is worth 50 points a season on a target hog,
+which is several rounds of draft capital, while the six FG-miss keys around it are worth two.
+
+**What that broke, and how it was found.** `build-roster-room.mjs` merges a league's re-scored
+projection onto the shared draft-board record and keeps everything else, on an explicit stated
+ground: *"the board's league-agnostic half - ADP, Boris Chen tier, scouting brief, availability - is
+still read straight through, because none of it depends on scoring."* Two of those four do.
+
+- `adp` is `{ half_ppr: <n> }`. Sleeper publishes `adp_std` / `adp_half_ppr` / `adp_ppr` and the board
+  reads the half. The field name says so and it was still passed through as this league's ADP.
+- `fftiers` is Boris Chen's `weekly-ALL-HALF-PPR.csv`. He publishes a `-PPR` file too - the phone
+  Draft Aid has fetched all three since §1.23 - but the desktop board bakes in the half.
+
+Pass-catchers are precisely where a half-PPR and a full-PPR market disagree, so this was not a rounding
+error, it was wrong data under the right label. The fix is deliberately the small one: a league whose
+reception value does not match the board's **drops both fields and says so in `basis.market`**, which
+the roster room renders because it iterates `basis` generically. Dropping a signal beats relabelling
+one. The better fix - teaching `build-draft-board.mjs` to carry all three formats the way
+`build-draft-aid.mjs` already does - is a real build change that needs a network run to validate, and
+it is written down here rather than half-done.
+
+**The same leak was one layer over, and it had already been live for a week.** `build-player-news.mjs`
+reads `draft-board.json` directly rather than through the roster room, so fixing one file fixed
+nothing on the player dossier. Two joins there were wrong:
+
+- Its `adp` comment read *"ADP the NUMBER is a market fact and is shared."* ADP is a market fact and
+  it is **per-format**; the field is `adp_half_ppr`. Now gated on reception value - not on
+  `board_scored`, which would have wrongly stripped the Panther Pit's perfectly correct half-PPR ADP.
+- It preferred the board's `projection` over the room's whenever the board had one, because the board
+  also carries `ppg`. The board is HBGBs-scored. **Measured on the live committed data: 10 of the
+  Panther Pit's 176 board-listed players already carry HBGBs numbers in their dossier, all of them
+  kickers, 2-3 points each** - the exact size §1.25 measured for the FG-miss delta and then shipped
+  anyway one file away. In a full-PPR league the same line would have put HBGBs numbers on every
+  pass-catcher, up to 50 points out. It now prefers the room whenever the board is not this league's,
+  and loses `ppg` in that branch. A wrong total is not improved by a per-game version of itself.
+
+Which is the real lesson, and it is not about full PPR: **a shared artefact leaks through every
+consumer, not just the one you fixed.** §1.25 found two leaks by scanning the built file for rival
+owner names; the scan should have been re-run over every script that opens `draft-board.json`, and was
+not. There are two such scripts.
+
+The generalisable lesson is the same one §1.25 recorded and did not fully learn: **reasoning about
+which fields are "about a player" rather than "about a format" got it wrong a third time.** A field
+whose name contains the format (`adp.half_ppr`) is not league-agnostic no matter how it is grouped.
+
+**Red costs something, and the cost is paid in one token.** The Pit's navy could leave `--neg` alone
+because "bad is red" did not collide with a blue accent. It collides head-on with a red one, and the
+measurement is blunter than the argument: the shared `--neg` (`#d06a5c`) sits at **hue 7** and this
+accent at **hue 359**, so an injury tag, a fading target and a losing streak would land **eight
+degrees** from the colour meaning "this league, good, active". At 12px on a chip that is the wrong
+reading, not a subtle one. So in this palette **only**, `--neg` moves.
+
+It moved to violet first, on the reasoning that further from the accent is strictly better. Ben vetoed
+that and chose **orange**, and he was right: violet reads as "flagged" rather than "bad", and orange
+keeps the warm-is-bad half of the convention the whole exercise existed to encode. Maximising hue
+distance optimised the wrong thing - the constraint was never "be far from the accent", it was "stay
+legible as a loss while being far enough from the accent".
+
+`#f0843c` is picked rather than eyeballed: **hue 24, which is 25 degrees off the accent and 25 off
+`--warn`'s gold** - the balanced midpoint between the two colours it has to stay distinct from - at
+7.1:1 on `--surface` and 6.6:1 on `--surface-2`, past AA and better than the accent's own 5.2. Nearer
+the accent trades legibility for nothing; nearer `--warn` starts reading as caution instead of loss.
+`--warn` itself stays amber; caution never conflicted with anything. `--blue` (the bargain highlight)
+goes teal, so it cannot read as Panther Pit chrome that leaked onto the wrong page.
+
+**The same tokenisation trap, again, one token over.** §1.25 had to tokenise eleven longhand
+`rgba(99,191,90,...)` accent literals before a palette override could work. `--neg` had **seven** of
+its own, and they would have left salmon borders on injury tags and dead-app chips over a violet
+`--neg`. Found by grepping for the literal, not by reading the rules - the same method, because the
+same class of bug survives in whatever token has not been overridden yet. Anything added to this
+stylesheet that needs a colour at an alpha should reach for `rgba(var(--x-rgb), a)` from the start.
+
+**Favicons, now that three tabs is normal.** `league-switch.js` already rewrote `document.title` on
+the grounds that two of these open side by side is how they are used. At three, the title truncates in
+the tab strip long before "Couples Clash roster room" is distinguishable from "Panther Pit roster
+room", so the 16px icon is doing the work instead. It is repainted from the live computed `--accent`
+and `--bg` rather than from a colour repeated in config, so a palette edit cannot leave it behind.
+
+**What is deliberately not built.** No `data/site/clash/*` is committed: the container this was
+written in cannot reach `api.sleeper.app` (CLAUDE.md, MCP notes), so the builds have to run locally.
+The settings themselves came from a Flaim `get_league_info` read and `data/raw/league-clash-2026.json`
+carries a `_provenance` field saying exactly that, and omits `playoff_teams`, `waiver_budget` and the
+playoff week rather than copying the other two leagues' values into the gap. `config.js` carries the
+same warning on its `playoff_teams: 6`.
+
+**Scaling note.** Three leagues is where the two-league prose in the command files started to strain -
+`/waivers` and `/brief` each carry a comparison table that is now three columns wide, and a fourth
+league would make them unreadable. The code side scales fine (everything iterates `HQ_CONFIG.LEAGUES`
+or `scripts/lib/leagues.mjs`, and a new league is a config entry plus a palette block). If a fourth
+arrives, the tables should collapse to a pointer at the registry plus a short list of what actually
+differs, rather than growing another column.
+
 So: **Tuesday morning**, both leagues, inside the existing routine. Waivers process Tuesday and
 Monday night is settled, so it is the run where a landscape read can still change a decision. The
 gate is a `BRIEF-SLOT yes|no` line that `scripts/nfl-state.mjs` now prints alongside its season

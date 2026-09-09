@@ -50,6 +50,12 @@ const read = (rel) => {
 
 const room = read(`${L.out_dir}/roster-room.json`);
 const board = read("data/site/draft-board.json");
+/* Does the shared board's market apply to this league? The board is built on Sleeper's
+   `adp_half_ppr`, so the answer is "only if this league scores receptions at 0.5". See the note on
+   `adp` below, and the matching block in build-roster-room.mjs. */
+const BOARD_REC = 0.5;
+const REC_MATCHES = (JSON.parse(fs.readFileSync(path.join(ROOT, ...L.scoring_snapshot.split("/")), "utf8"))
+  .scoring_settings.rec ?? 0) === BOARD_REC;
 const events = read("data/site/nfl-events.json");
 
 /* Name matching is the one join here that isn't an id, because the events feed is written by a
@@ -118,15 +124,28 @@ for (const [id, r] of rostered) {
   players[id] = {
     id, name: r.name, pos: r.pos, team: r.team, bye: r.bye,
     roster: { roster_id: r.roster_id, owner: r.owner, is_me: r.is_me, slot: r.where },
-    projection: b?.projection
+    /* PREFER THE ROOM, NOT THE BOARD, whenever the board is not this league's. Both records carry a
+       `pts` and it is tempting to take the board's because it also carries `ppg` - but the board is
+       scored in the HBGBs' settings and the room has already been re-scored in this league's. Taking
+       the board's put HBGBs numbers on Panther Pit kickers (10 players, 2-3 points each) and would
+       put them on every pass-catcher in a full-PPR league, by up to 50 points. Losing `ppg` is the
+       correct trade; a wrong total is not improved by a per-game version of itself. */
+    projection: (L.board_scored && b?.projection)
       ? { pts: b.projection.pts, ppg: b.projection.ppg ?? null, updated: b.projection.updated ?? null }
-      : (r.pts != null ? { pts: r.pts, ppg: null, updated: null } : null),
-    adp: b?.adp?.half_ppr != null ? { half_ppr: b.adp.half_ppr, updated: b.adp.updated ?? null } : null,
-    /* ADP the NUMBER is a market fact and is shared. ADP COMMENTARY is not: it is draft-room prose
-       written through one league's dynamics, and it names that league's owners ("ENOTS, a QB-punter,
-       won't chase him"; "bwalsh89/Stipe and your own TE-hunter history all compete here"). Shipping
-       it to another league puts strangers' names on a page about twelve different people. Gated on
-       the same flag as pricing: the league the board was built for gets it, nobody else does. */
+      : (r.pts != null ? { pts: r.pts, ppg: null, updated: null }
+        : (b?.projection ? { pts: b.projection.pts, ppg: b.projection.ppg ?? null, updated: b.projection.updated ?? null } : null)),
+    /* ADP is a market fact, but it is a PER-FORMAT market fact, which this file used to call shared.
+       The board reads Sleeper's `adp_half_ppr`; the field name says so. That is the right market for
+       any half-PPR league and the wrong one for a full-PPR league, and pass-catchers are exactly where
+       the two disagree - so it is gated on reception value rather than on `board_scored`, which would
+       wrongly strip the Panther Pit's perfectly good half-PPR ADP too. Same rule as
+       build-roster-room.mjs: drop it rather than relabel it. */
+    adp: (REC_MATCHES && b?.adp?.half_ppr != null) ? { half_ppr: b.adp.half_ppr, updated: b.adp.updated ?? null } : null,
+    /* ADP COMMENTARY is not a market fact at all: it is draft-room prose written through one league's
+       dynamics, and it names that league's owners ("ENOTS, a QB-punter, won't chase him";
+       "bwalsh89/Stipe and your own TE-hunter history all compete here"). Shipping it to another league
+       puts strangers' names on a page about twelve different people. Gated on the same flag as
+       pricing: the league the board was built for gets it, nobody else does. */
     adp_commentary: L.board_scored ? (b?.adp_commentary ?? null) : null,
     availability: b?.availability
       ? {
