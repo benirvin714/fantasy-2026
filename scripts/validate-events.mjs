@@ -2,11 +2,14 @@
 //
 // Replaces the ad-hoc `node -e` checks the routine used to compose (every new string
 // tripped a fresh permission prompt — see the ~15 near-identical entries that piled up
-// in .claude/settings.local.json) with ONE stable command, and enforces the two quality
+// in .claude/settings.local.json) with ONE stable command, and enforces the quality
 // checks Ben signed off on:
-//   (i)  every source.url must actually resolve (dead link => drop that event)
-//   (ii) every players[] tag must be a real Sleeper player AND appear in the item's prose
-//        (the Dillon-Gabriel / wrong-Robinson mis-file => strip that one tag)
+//   (i)   every source.url must actually resolve (dead link => drop that event)
+//   (ii)  every players[] tag must be a real Sleeper player AND appear in the item's prose
+//         (the Dillon-Gabriel / wrong-Robinson mis-file => strip that one tag)
+//   (iii) team-consistency: an event whose tags resolve to 2+ CURRENT teams, with no
+//         trade/market language to explain it, is FLAGGED (the "Egbuka WR2 behind Mike
+//         Evans" case, Evans since traded to SF). Flag-only, never strips or drops.
 //
 // Item-level quarantine, NEVER halts: a dead source drops that one event, a bad tag is
 // stripped from that one event, everything else publishes. Findings are written to
@@ -44,6 +47,15 @@ const normName = (s) =>
     .join(" ")
     .trim();
 
+// ---- cross-team consistency (stale-depth-chart guard) ------------------------------
+// An event whose player tags resolve to 2+ CURRENT teams usually rests on a stale depth
+// chart or mis-files a tag onto a departed player (the "Egbuka WR2 behind Mike Evans,"
+// with Evans since traded to SF, case). Trades and signings legitimately span teams, so an
+// item whose type is "market" or whose prose carries move language is NOT flagged. FLAG-ONLY:
+// never strip a tag or drop an event on this signal, or a real trade item would be gutted.
+const REL_WORDS = /\b(behind|ahead of|alongside|opposite|second fiddle|backup|handcuff|hand cuff|committee|duo|tandem|next to|paired|complement|target share|wr1|wr2|wr3|rb1|rb2|te1|1a|1b|the room|across from|split)\b/;
+const MOVE_WORDS = /\b(traded|trade|gone|departed|departure|leaves|left|exit|released|waived|cut|signed|signing|joins|joined|acquired|added|moved|no longer|offseason|free agent|replaces|vacated|now (with|in|on))\b/;
+
 // ---- minimal CSV line splitter (quote-aware) ---------------------------------------
 function splitCsv(line) {
   const out = [];
@@ -67,7 +79,8 @@ function splitCsv(line) {
 // display suggestions, for actionable "did you mean" hints. surnameToFullNorms: surname ->
 // the active skill players carrying it, so a tag whose full name is absent can be checked
 // against whether a DIFFERENT same-surname player is named in full (the Bijan-vs-Brian case).
-let realNames = new Set(), suggestBySurname = new Map(), surnameToFullNorms = new Map(), universeStatus = "ok";
+// name2team: normalized full name -> current team (skill players only), for the cross-team check.
+let realNames = new Set(), suggestBySurname = new Map(), surnameToFullNorms = new Map(), name2team = new Map(), universeStatus = "ok";
 {
   try {
     const csv = fs.readFileSync(PIDS_CACHE, "utf8");
@@ -90,6 +103,9 @@ let realNames = new Set(), suggestBySurname = new Map(), surnameToFullNorms = ne
       if (FANTASY.has(pos) && team && team !== "NA") {
         if (!surnameToFullNorms.has(surname)) surnameToFullNorms.set(surname, new Set());
         surnameToFullNorms.get(surname).add(nn);
+        // First-wins so a same-normalized-name collision (Marvin Harrison Jr./Sr.) doesn't
+        // thrash; team "FA" is not a team, so it can't create a false cross-team pair.
+        if (team !== "FA" && !name2team.has(nn)) name2team.set(nn, team);
       }
     }
   } catch (e) {
@@ -142,10 +158,11 @@ const flags = {
   mode: CHECK_ONLY ? "check" : "enforce",
   net: !NO_NET,
   universe: universeStatus,
-  summary: { events: events.length, dropped: 0, tags_stripped: 0, tags_flagged: 0, urls_inconclusive: 0, structural: 0 },
+  summary: { events: events.length, dropped: 0, tags_stripped: 0, tags_flagged: 0, cross_team: 0, urls_inconclusive: 0, structural: 0 },
   dropped: [],
   stripped_tags: [],
   flagged_tags: [],
+  cross_team: [],
   inconclusive_urls: [],
   structural: [],
 };
@@ -232,16 +249,42 @@ events.forEach((e, idx) => {
     }
     cleanPlayers.push(tag);
   }
+
+  // cross-team consistency (flag-only): surviving tags resolving to 2+ current teams, with no
+  // trade/market language to explain the split, point at a stale depth chart or a mis-filed tag.
+  const teamsByTag = new Map();
+  for (const tag of cleanPlayers) {
+    const t = name2team.get(normName(tag));
+    if (t) { if (!teamsByTag.has(t)) teamsByTag.set(t, []); teamsByTag.get(t).push(tag); }
+  }
+  if (teamsByTag.size >= 2) {
+    const explained = e.type === "market" || MOVE_WORDS.test(` ${normName(`${e.headline || ""} ${e.detail || ""} ${e.so_what || ""}`)} `);
+    if (!explained) {
+      const relational = REL_WORDS.test(` ${normName(e.so_what || "")} `);
+      flags.cross_team.push({
+        date: e.date,
+        headline: e.headline,
+        severity: relational ? "high" : "review",
+        teams: Object.fromEntries([...teamsByTag].map(([t, ns]) => [t, ns.join("/")])),
+        reason: relational
+          ? "so_what relates players on different current teams (stale depth chart?)"
+          : "tags span 2+ current teams with no trade/market language",
+      });
+    }
+  }
+
   kept.push(cleanPlayers.length === (e.players || []).length ? e : { ...e, players: cleanPlayers });
 });
 
 flags.summary.dropped = flags.dropped.length;
 flags.summary.tags_stripped = flags.stripped_tags.length;
 flags.summary.tags_flagged = flags.flagged_tags.length;
+flags.summary.cross_team = flags.cross_team.length;
 flags.summary.urls_inconclusive = flags.inconclusive_urls.length;
 flags.summary.structural = flags.structural.length;
 
 // ---- write flags (always) + cleaned feed (enforce mode, only if changed) ------------
+// cross_team is FLAG-ONLY and never counts as a change: it never mutates the feed.
 fs.writeFileSync(FLAGS_PATH, JSON.stringify(flags, null, 2) + "\n");
 const changed = flags.dropped.length > 0 || flags.stripped_tags.length > 0;
 if (!CHECK_ONLY && changed) {
@@ -252,11 +295,12 @@ if (!CHECK_ONLY && changed) {
 const s = flags.summary;
 const mode = CHECK_ONLY ? "CHECK (no mutation)" : changed ? "ENFORCE (file cleaned)" : "ENFORCE (no changes)";
 console.log(`validate-events [${mode}]  net=${!NO_NET}  universe=${universeStatus}`);
-console.log(`  events=${s.events}  dropped=${s.dropped}  tags_stripped=${s.tags_stripped}  tags_flagged=${s.tags_flagged}  urls_inconclusive=${s.urls_inconclusive}  structural=${s.structural}`);
+console.log(`  events=${s.events}  dropped=${s.dropped}  tags_stripped=${s.tags_stripped}  tags_flagged=${s.tags_flagged}  cross_team=${s.cross_team}  urls_inconclusive=${s.urls_inconclusive}  structural=${s.structural}`);
 for (const d of flags.dropped) console.log(`  DROP   ${d.date}  ${d.reason}  ${d.headline?.slice(0, 70)}`);
 for (const t of flags.stripped_tags) console.log(`  STRIP  "${t.tag}"  ${t.reason}  <- ${t.headline?.slice(0, 55)}`);
 for (const t of flags.flagged_tags) console.log(`  FLAG   "${t.tag}"  ${t.reason}${t.suggestion ? "  [did you mean: " + t.suggestion + "]" : ""}  <- ${t.headline?.slice(0, 50)}`);
+for (const c of flags.cross_team) console.log(`  XTEAM  [${c.severity}] ${JSON.stringify(c.teams)}  ${c.reason}  <- ${(c.headline || "").slice(0, 45)}`);
 for (const u of flags.inconclusive_urls) console.log(`  URL?   ${u.code}  ${u.url}`);
 for (const st of flags.structural) console.log(`  STRUCT ${st.problem}  ${st.headline?.slice(0, 60)}`);
-if (!s.dropped && !s.tags_stripped && !s.tags_flagged && !s.urls_inconclusive && !s.structural) console.log("  clean.");
+if (!s.dropped && !s.tags_stripped && !s.tags_flagged && !s.cross_team && !s.urls_inconclusive && !s.structural) console.log("  clean.");
 console.log(`  flags -> ${path.relative(ROOT, FLAGS_PATH)}`);

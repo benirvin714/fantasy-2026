@@ -50,14 +50,6 @@ window.HQ_CONFIG = {
   MY_USER_ID: "603035152494436352",
   MY_NAME: "ThatWasButtery",
 
-  /* The other-league tab's starting league (site/league.html, §1.24). A DEFAULT, not a binding:
-     the page still takes any league id you paste, `?league=<id>` beats this, a connected league is
-     remembered per-browser, and disconnect sticks. It exists so the tab opens on the right league
-     on a device you have never used it on. Set it to "" to have the tab start empty.
-     Deliberately still pointed at the Pit even though the Pit now has real pages: that tab is for
-     ANY league, and the Pit is simply the most likely one to want to glance at raw. */
-  OTHER_LEAGUE_ID: "1401363352046825472",
-
   API: "https://api.sleeper.app/v1",
 
   /* Shared across every league — none of it depends on scoring or on who is rostered where. */
@@ -74,8 +66,6 @@ window.HQ_CONFIG = {
   BRIEF_JSON: "/data/site/latest-brief.json",
 };
 
-/* Back-compat for site/draft.js and site/league.js, which predate the switcher and read a single
-   flat league. Both are HBGBs-only or league-agnostic, so they keep pointing at the HBGBs. */
-window.HQ_CONFIG.LEAGUE_ID = window.HQ_CONFIG.LEAGUES.hbgbs.league_id;
-window.HQ_CONFIG.MY_ROSTER_ID = window.HQ_CONFIG.LEAGUES.hbgbs.my_roster_id;
-window.HQ_CONFIG.PLAYOFF_TEAMS = window.HQ_CONFIG.LEAGUES.hbgbs.playoff_teams;
+/* No back-compat aliases here any more. They existed for site/league.js, which was removed on
+   2026-09-07; draft.js reads only API, DRAFT_BOARD_JSON, MY_USER_ID and TEAM_ENV_JSON, none of
+   which is per-league. Every league fact now comes off LEAGUES via HQ_CONFIG.active. */
