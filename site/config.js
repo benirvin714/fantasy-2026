@@ -30,6 +30,20 @@ window.HQ_CONFIG = {
       data: "/data/site/pit",
       pages: { draft: false, brief: false },
     },
+    clash: {
+      key: "clash",
+      name: "Couples Clash",
+      short: "Couples Clash",
+      league_id: "1403499370376179712", // year one; 14 teams; drafted 2026-09-08
+      my_roster_id: 11,
+      /* Not verified. Sleeper's league object carries playoff_teams, but the only read available
+         when this was added did not return it, and six is the shape of the other two leagues rather
+         than evidence about this one. Confirm against the live object before week 15, and until then
+         treat the playoff cut line on the standings table as provisional. */
+      playoff_teams: 6,
+      data: "/data/site/clash",
+      pages: { draft: false, brief: false },
+    },
   },
   DEFAULT_LEAGUE: "hbgbs",
 

@@ -1,8 +1,10 @@
 /* league-switch.js — which league is in-season HQ and the roster room looking at.
  *
- * The dashboard renders two leagues from one set of pages. Rather than forking index.html and
- * rosters.html per league (two copies of every renderer, guaranteed to drift the first time either
- * grows a column), the pages take a league dimension and this file resolves it once.
+ * The dashboard renders three leagues from one set of pages. Rather than forking index.html and
+ * rosters.html per league (three copies of every renderer, guaranteed to drift the first time any
+ * of them grows a column), the pages take a league dimension and this file resolves it once. The
+ * count is not baked in anywhere: everything below iterates HQ_CONFIG.LEAGUES, so a fourth league
+ * is a config entry and a palette block, not an edit here.
  *
  * WHERE THIS FILE LOADS MATTERS, and it is the end of <body>, above app.js / rosters.js. The inline
  * block in each page's <head> stamps the palette early so it cannot flash; the DOM work has to
@@ -70,7 +72,27 @@
     location.assign(u.toString());
   };
 
+  /* The browser tab icon follows the palette too. Two of these open side by side was already the
+     normal way to use them and it is three now, so the 16px square in the tab strip is doing real
+     work - the page title truncates long before "Couples Clash roster room" is distinguishable from
+     "Panther Pit roster room". The colours are read off the live custom properties rather than
+     repeated in config.js, so a palette edit cannot leave the favicon behind on the old accent. */
+  function repaintFavicon() {
+    const link = document.querySelector('link[rel="icon"]');
+    if (!link) return;
+    const cs = getComputedStyle(document.documentElement);
+    const ink = cs.getPropertyValue("--accent").trim();
+    const bg = cs.getPropertyValue("--bg").trim();
+    if (!ink || !bg) return;   // stylesheet still loading: keep the markup's own icon
+    link.href = "data:image/svg+xml," + encodeURIComponent(
+      `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">` +
+      `<rect width="32" height="32" fill="${bg}"/>` +
+      `<rect x="6" y="6" width="20" height="20" fill="${ink}"/>` +
+      `<rect x="12" y="12" width="8" height="8" fill="${bg}"/></svg>`);
+  }
+
   function paint() {
+    repaintFavicon();
     for (const el of document.querySelectorAll("[data-league-name]")) el.textContent = L.name.toUpperCase();
     // The tab title too: two of these open side by side is the normal way to use them. The page's
     // own label comes off <body data-page>, not off parsing the existing title - a regex over a

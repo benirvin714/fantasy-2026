@@ -1,0 +1,36 @@
+{
+  "_provenance": "NOT a raw Sleeper GET. This session could not reach api.sleeper.app (the remote container's egress proxy blocks it - see CLAUDE.md MCP notes), so this snapshot was assembled on 2026-09-09 from a Flaim get_league_info read of the same live league. scoring_settings is verbatim and complete, and it is the ONLY key any build consumes (scripts/build-roster-room.mjs). settings is PARTIAL: it holds the fields that read returned and deliberately omits playoff_teams, playoff_week_start, playoff_seed_type, waiver_budget and waiver_day rather than inventing them from the other two leagues. Replace this file with a real `curl https://api.sleeper.app/v1/league/1403499370376179712` snapshot on the next local run; nothing priced from it will move, because the scoring half is already exact.",
+  "name": "Couples Clash",
+  "league_id": "1403499370376179712",
+  "draft_id": "1403499371508592640",
+  "previous_league_id": null,
+  "season": "2026",
+  "season_type": "regular",
+  "sport": "nfl",
+  "status": "in_season",
+  "total_rosters": 14,
+  "roster_positions": ["QB","RB","RB","WR","WR","TE","FLEX","FLEX","K","DEF","BN","BN","BN","BN","BN"],
+  "settings": {
+    "type": 0,
+    "max_keepers": 1,
+    "trade_deadline": 99,
+    "disable_trades": 0,
+    "disable_adds": 0,
+    "reserve_slots": 2,
+    "taxi_slots": 0,
+    "taxi_years": 0,
+    "taxi_allow_vets": 0,
+    "taxi_deadline": 0
+  },
+  "scoring_settings": {
+    "sack": 1, "fgm_40_49": 4, "pass_int": -1, "pts_allow_0": 10, "pass_2pt": 2,
+    "st_td": 6, "rec_td": 6, "fgm_30_39": 3, "fgm_50_59": 5, "xpmiss": -1,
+    "rush_td": 6, "rec_2pt": 2, "st_fum_rec": 1, "fgmiss": -1, "ff": 1,
+    "rec": 1, "pts_allow_14_20": 1, "fgm_0_19": 3, "int": 2, "def_st_fum_rec": 1,
+    "fum_lost": -2, "pts_allow_1_6": 7, "fgm_60p": 6, "fgm_20_29": 3, "pts_allow_21_27": 0,
+    "xpm": 1, "rush_2pt": 2, "fum_rec": 2, "def_st_td": 6, "def_td": 6,
+    "safe": 2, "pass_yd": 0.04, "blk_kick": 2, "pass_td": 4, "rush_yd": 0.1,
+    "fum": 0, "pts_allow_28_34": -1, "pts_allow_35p": -4, "fum_rec_td": 6, "rec_yd": 0.1,
+    "def_st_ff": 1, "pts_allow_7_13": 4, "st_ff": 1
+  }
+}

@@ -43,6 +43,24 @@ export const LEAGUES = {
     trade_archive: null,
     profile: "league-profile-pit.md",
   },
+  clash: {
+    key: "clash",
+    name: "Couples Clash",
+    short: "Couples Clash",
+    league_id: "1403499370376179712",
+    my_roster: 11,
+    out_dir: "data/site/clash",
+    scoring_snapshot: "data/raw/league-clash-2026.json",
+    /* FULL PPR, which is why this flag matters more here than it did for the Pit. The board's
+       projection.pts is half-PPR arithmetic; run it against this league and every pass-catcher is
+       understated by half a point a reception - 40 to 50 points over a season on a target hog, or
+       several rounds of draft value. Everything rostered here is re-priced from the raw stat lines. */
+    board_scored: false,
+    /* Year one, and eleven of the fourteen owners have never appeared in this repo. */
+    dossiers: null,
+    trade_archive: null,
+    profile: "league-profile-clash.md",
+  },
 };
 
 /* Resolve `--league=<key>` (or a bare `--league <key>`) out of argv. Defaults to hbgbs so every

@@ -113,6 +113,33 @@ function rescore(p, pos) {
   return +pts.toFixed(1);
 }
 
+/* ------------------------------------------------------ what on a board entry is format-specific
+   The merge below keeps everything on a board record except the projection, on the stated grounds
+   that the rest is league-agnostic. That was true while every league was half PPR. It is not true
+   any more, and the two exceptions are easy to miss because neither one announces itself:
+
+     - `adp` is literally `{ half_ppr: <n> }` - Sleeper publishes adp_std / adp_half_ppr / adp_ppr
+       and build-draft-board.mjs reads the half. In a full-PPR league that number is another
+       format's market, and pass-catchers are exactly where the two markets disagree.
+     - `fftiers` is Boris Chen's weekly-ALL-HALF-PPR.csv. He publishes a -PPR file too (the phone
+       Draft Aid already fetches all three); the desktop board bakes in the half.
+
+   Rather than ship either one under the wrong league's label, a league whose reception value does
+   not match the board's drops both and says so in `basis`. The scouting brief, availability, bye
+   week and risk flags genuinely are format-agnostic and are kept. The better fix is for
+   build-draft-board.mjs to carry all three formats the way build-draft-aid.mjs does; until it
+   does, dropping beats guessing. */
+const BOARD_REC = 0.5;                       // build-draft-board.mjs: adp_half_ppr + weekly-ALL-HALF-PPR
+const REC_MATCHES = (scoring.rec ?? 0) === BOARD_REC;
+const boardMarket = (rec) => {
+  if (REC_MATCHES) return rec;
+  const { adp, adp_commentary, fftiers, ...rest } = rec;
+  return rest;
+};
+if (!REC_MATCHES) {
+  console.log(`${L.name} scores receptions at ${scoring.rec}, the board at ${BOARD_REC} — dropping the board's half-PPR ADP and Boris Chen tiers rather than relabelling them.`);
+}
+
 const rosteredIds = [...new Set(rosters.flatMap((r) => r.players))];
 /* The draft board's projection.pts is scored in the HBGBs' settings. For that league the board's
    number IS this league's number and is used as-is; for any other league it is another league's
@@ -143,7 +170,7 @@ if (offBoard.length) {
          brief, the availability model, risk flags - is league-agnostic and is the reason the two
          leagues share one board. Overwriting the record to change one number would silently drop
          the bye weeks the risk panel counts stacks from. */
-      byId.set(id, { ...onBoard, projection });
+      byId.set(id, { ...boardMarket(onBoard), projection });
       repriced++;
     } else {
       byId.set(id, {
@@ -612,7 +639,12 @@ const payload = {
     rounds: draft.settings ? draft.settings.rounds : null, type: draft.type,
   } : null,
   basis: {
-    projection: "Sleeper 2026 projected stat lines re-scored with the league's exact scoring_settings (data/raw/league-2026.json) — the same numbers the draft board runs on.",
+    projection: L.board_scored
+      ? `Sleeper 2026 projected stat lines re-scored with the league's exact scoring_settings (${L.scoring_snapshot}) — the same numbers the draft board runs on.`
+      : `Sleeper 2026 projected stat lines re-scored with ${L.name}'s exact scoring_settings (${L.scoring_snapshot}). NOT the draft board's numbers: the board is scored in the HBGBs' settings.`,
+    market: REC_MATCHES
+      ? "ADP and Boris Chen tiers come from the shared draft board, which is built in this league's reception value."
+      : `Omitted. The shared draft board's ADP and Boris Chen tiers are half-PPR; ${L.name} scores receptions at ${scoring.rec}, so they are another format's market and are dropped rather than shown under this league's name.`,
     lineup: `Optimal lineup under ${SLOTS.join("/")}, five bench. Greedy is optimal here because slot eligibility nests.`,
     strength: `Per-slot and per-position rank against the other ${spell(TEAMS - 1)} teams. K and DEF are reported but never graded — they are streaming positions in this format.`,
     surplus: `A bench player's "starts on N" is measured by recomputing each of the other ${spell(TEAMS - 1)} optimal lineups with him inserted.`,

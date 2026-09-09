@@ -17,6 +17,10 @@
   --accent-press: #4ea346;
   --moss: #8fae6d;
   --neg: #d06a5c;
+  /* Same story as --accent-rgb, found the same way: seven rules wanted --neg at an alpha and
+     had the literal written out longhand, so the third league's --neg override would have
+     left salmon borders on injury tags, dead-app chips and the losing half of a PF bar. */
+  --neg-rgb: 208, 106, 92;
   --warn: #c9b458;
   --blue: #6cb6f2;   /* value-vs-ADP bargain highlight (added for draft board name coloring) */
   --radius: 6px;   /* softened from 2px to sit better under shadows (in-chat override of the sharp-edge foundation) */
@@ -73,6 +77,45 @@
   --grad-panel: linear-gradient(180deg, #131c2d 0%, #0e1523 100%);
   --grad-raise: linear-gradient(180deg, #182238 0%, #111a2b 100%);
   --bg-wash: #0d1522;
+}
+
+/* ============================================================ The Couples Clash palette (§1.26)
+   Red, per the same full-swap rule the Pit set: the accent moves too, so three tabs open side by
+   side are never mistaken for each other.
+
+   RED COSTS SOMETHING HERE AND THIS IS WHERE IT IS PAID. Green and navy could both leave --neg
+   alone, because "bad is red" did not collide with either accent. It collides head-on with this
+   one: an injury tag, a fading target and a losing streak would all be within a few degrees of hue
+   of the colour that means "this league, good, active". At 12px on a chip that is not a subtle
+   confusion, it is the wrong reading.
+
+   So in THIS league only, --neg moves to violet. Violet is ~120 degrees off the accent, ~60 off the
+   Pit's blue, and nowhere near the HBGBs green, so it cannot be misread as any league's "good".
+   It gives up the "red means bad" convention, which is a real loss, and buys back the ability to
+   tell a gain from a loss at a glance, which is the thing the convention existed to provide.
+   --warn stays amber: caution never conflicted with anything.
+
+   --blue (the value-vs-ADP bargain highlight) goes teal rather than staying blue. It is a highlight
+   with no good/bad meaning, and leaving it blue would have it read as a Panther Pit accent that had
+   leaked onto the wrong page. */
+:root[data-league="clash"] {
+  --bg: #150809;
+  --surface: #1f0f11;
+  --surface-2: #2a1518;
+  --border: #432126;
+  --text: #f2e6e6;
+  --dim: #c0a3a4;
+  --faint: #a68a8c;        /* 5.9:1 on --surface and 5.4:1 on --surface-2, measured; clears AA */
+  --accent: #ef4d51;       /* 5.2:1 on --surface, 4.8:1 on --surface-2 - AA, and a true red */
+  --accent-rgb: 239, 77, 81;
+  --accent-press: #e05356;
+  --moss: #e08a7d;         /* the second-string accent follows the primary, as it does in the Pit */
+  --neg: #b57ce8;          /* violet - see the note above; this is the one palette that moves it */
+  --neg-rgb: 181, 124, 232;
+  --blue: #63cfc4;
+  --grad-panel: linear-gradient(180deg, #241215 0%, #1b0d0f 100%);
+  --grad-raise: linear-gradient(180deg, #2e181b 0%, #200f12 100%);
+  --bg-wash: #1d0d10;
 }
 
 * { box-sizing: border-box; }
@@ -644,7 +687,7 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
 }
 .tgt-hold.tgt-hold-safe { color: var(--accent); border-color: rgba(var(--accent-rgb),.45); }
 .tgt-hold.tgt-hold-flip { color: var(--warn); border-color: rgba(201,180,88,.45); }
-.tgt-hold.tgt-hold-gone { color: var(--neg); border-color: rgba(208,106,92,.5); }
+.tgt-hold.tgt-hold-gone { color: var(--neg); border-color: rgba(var(--neg-rgb),.5); }
 /* min-height:0 lets this flex child actually shrink so overflow-y has something to bite on */
 .panel.targets .tgt-body { padding: 6px 8px 10px; overflow-y: auto; min-height: 0; max-height: 46vh; }
 @media (min-width: 1040px) {
@@ -1183,7 +1226,7 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
 .rr-app-active { color: var(--moss); border-color: var(--moss); }
 .rr-app-reachable { color: var(--dim); }
 .rr-app-cold { color: var(--warn); border-color: rgba(201,180,88,.5); }
-.rr-app-dead { color: var(--neg); border-color: rgba(208,106,92,.5); }
+.rr-app-dead { color: var(--neg); border-color: rgba(var(--neg-rgb),.5); }
 /* A year-one league shows a move count instead of an appetite band. Two states only, and neither is
    a judgement: nobody has done anything yet, or somebody has. */
 .rr-app-quiet { color: var(--faint); }
@@ -1207,7 +1250,7 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
 .rr-pt { font-family: var(--font-data); font-size: 11px; color: var(--dim); white-space: nowrap; }
 .rr-inj {
   font-family: var(--font-data); font-size: 10px; color: var(--neg);
-  border: 1px solid rgba(208,106,92,.5); border-radius: var(--radius-sm); padding: 0 3px;
+  border: 1px solid rgba(var(--neg-rgb),.5); border-radius: var(--radius-sm); padding: 0 3px;
 }
 .rr-slotrk, .rr-starts { font-size: 12px; white-space: nowrap; }
 .rr-vs { font-size: 10px; margin-left: 5px; }
@@ -1234,7 +1277,7 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
 .rr-smid { position: absolute; left: 50%; top: -2px; bottom: -2px; width: 1px; background: var(--border); }
 .rr-sfill { position: absolute; top: 0; bottom: 0; }
 .rr-sfill.up { background: linear-gradient(90deg, rgba(var(--accent-rgb),.55) 0%, rgba(var(--accent-rgb),.28) 100%); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
-.rr-sfill.down { background: linear-gradient(270deg, rgba(208,106,92,.55) 0%, rgba(208,106,92,.28) 100%); border-radius: var(--radius-sm) 0 0 var(--radius-sm); }
+.rr-sfill.down { background: linear-gradient(270deg, rgba(var(--neg-rgb),.55) 0%, rgba(var(--neg-rgb),.28) 100%); border-radius: var(--radius-sm) 0 0 var(--radius-sm); }
 .rr-spts { color: var(--text); }
 .rr-svs { font-size: 11px; }
 .rr-srk { font-size: 11px; text-align: right; }
@@ -1474,7 +1517,7 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
   border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 3px 7px;
 }
 .pn-fact b { color: var(--text); font-size: 12px; }
-.pn-inj { color: var(--neg); border-color: rgba(208,106,92,.5); text-transform: uppercase; }
+.pn-inj { color: var(--neg); border-color: rgba(var(--neg-rgb),.5); text-transform: uppercase; }
 
 .pn-sec { margin-top: 14px; }
 .pn-sec:first-child { margin-top: 0; }
@@ -1494,7 +1537,7 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
 }
 .pn-role-locked, .pn-fit-plus { color: var(--accent); border-color: var(--accent); }
 .pn-role-contested, .pn-fit-neutral { color: var(--warn); border-color: rgba(201,180,88,.5); }
-.pn-role-committee, .pn-fit-minus { color: var(--neg); border-color: rgba(208,106,92,.5); }
+.pn-role-committee, .pn-fit-minus { color: var(--neg); border-color: rgba(var(--neg-rgb),.5); }
 .pn-srcs { margin-top: 8px; font-size: 11.5px; line-height: 1.8; }
 .pn-events li { padding: 9px 0; }
 .pn-events .detail { line-height: 1.6; }
