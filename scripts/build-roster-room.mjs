@@ -25,6 +25,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { resolveLeague, ordinal as ORD_N, spell } from "./lib/leagues.mjs";
+import { weekSchedule, gameFor, weekProjections, hasWeekLine } from "./lib/nfl-week.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const L = resolveLeague();
@@ -187,6 +188,57 @@ if (offBoard.length) {
   if (repriced) console.log(`  ${repriced} board players re-priced in ${L.name}'s scoring, everything else on their record kept.`);
   if (added) console.log(`  ${added} player(s) priced from Sleeper directly (outside the board pool).`);
   if (unknown) console.log(`  ${unknown} unknown to Sleeper — left unpriced.`);
+}
+
+/* ------------------------------------------------------- the week in front of the roster
+   Everything above prices a season. A season number is the right basis for a trade and the wrong
+   one for a Sunday: it cannot tell you that your WR2 is on a bye, and it flattens a Thursday
+   kickoff into the same cell as a Monday night one. So each rostered player also carries the one
+   week the league is currently on - who he plays, when that game starts, and what he is projected
+   to score in it.
+
+   Priced by the same rescore() the rest of this build uses, so the week number and the season
+   number are the same arithmetic over the same source in the same league's settings. What it is
+   NOT is a slice of the season projection: Sleeper publishes a separate week-N stat line, and this
+   reads that. Summing seventeen of them will land near the season figure without matching it, and
+   neither one is wrong.
+
+   A missing week number is null, never zero. A player on a bye still has a projection row - it
+   just holds nothing but an ADP field, which prices to 0.0 and would read on the page as
+   "projected to score nothing" when the truth is "no projection was published". */
+const WEEK = Math.max(1, +state.display_week || +state.week || 1);
+console.log(`\nWeek ${WEEK}: fetching the schedule and this week's projections...`);
+const sched = await weekSchedule(state.season, WEEK);
+const wproj = await weekProjections(state.season, WEEK);
+for (const w of sched.warnings) console.warn(`  ! ${w}`);
+if (wproj.error) console.warn(`  ! week ${WEEK} projections unavailable (${wproj.error}) — every player's week number will be null and the page will say so.`);
+
+const weekPts = new Map();
+for (const id of rosteredIds) {
+  const row = wproj.rows[id];
+  if (!hasWeekLine(row)) continue;
+  const p = byId.get(id);
+  weekPts.set(id, rescore(row, p ? p.pos : null));
+}
+const weekOf = (id) => {
+  const p = byId.get(id);
+  return {
+    week_pts: weekPts.has(id) ? weekPts.get(id) : null,
+    game: gameFor(sched, p ? p.team : null, p ? p.bye : null),
+  };
+};
+{
+  const idle = rosteredIds.filter((id) => {
+    const g = weekOf(id).game;
+    return g && g.status === "unknown";
+  });
+  console.log(`  ${sched.teams_playing}/32 teams play in week ${WEEK} · ${weekPts.size}/${rosteredIds.length} rostered players have a week-${WEEK} projection`);
+  if (sched.canceled.length) console.log(`  canceled: ${sched.canceled.join("; ")}`);
+  /* Not a bye and not a game: either the schedule is short a row or a player is on a team code the
+     schedule does not carry. Named rather than swallowed, because the page renders it as an honest
+     blank and a silent one would look identical to a bye. */
+  if (idle.length) console.warn(`  ! ${idle.length} rostered player(s) have neither a week-${WEEK} game nor a bye: ` +
+    idle.map((id) => `${byId.get(id)?.name ?? id} (${byId.get(id)?.team ?? "?"})`).join(", "));
 }
 
 /* ------------------------------------------- owner dossiers, parsed from league-tendencies.md
@@ -568,6 +620,7 @@ for (const t of teams) {
     slot: s.slot,
     player: s.player ? {
       ...label(s.player.id),
+      ...weekOf(s.player.id),
       bye: s.player.bye != null ? s.player.bye : null,
       adp: s.player.adp && s.player.adp.half_ppr != null ? s.player.adp.half_ppr : null,
       injury: s.player.availability ? s.player.availability.current_injury_status || null : null,
@@ -599,9 +652,24 @@ for (const t of teams) {
     starter_pts: t.total, starter_rank: t.starter_rank,
     vs_league_median: +(t.total - leagueMedianStarters).toFixed(1),
     bench_pts: +t.bench.reduce((a, p) => a + ptsOf(p), 0).toFixed(1),
+    /* The same two totals for week WEEK, and the count they were taken over. A bye or an
+       unprojected player contributes nothing and is excluded rather than counted as zero, so the
+       count is what makes the total readable: "84.2 over 8 of 10 starters" says something a bare
+       84.2 does not, which is that two of the slots are not playing. */
+    week: (() => {
+      const s = t.lineup.map((x) => x.player && weekPts.get(x.player.id)).filter((v) => v != null);
+      const b = t.bench.map((p) => weekPts.get(p.id)).filter((v) => v != null);
+      return {
+        n: WEEK,
+        starter_pts: +s.reduce((a, v) => a + v, 0).toFixed(1),
+        starter_n: s.length, starter_of: t.lineup.length,
+        bench_pts: +b.reduce((a, v) => a + v, 0).toFixed(1),
+        bench_n: b.length, bench_of: t.bench.length,
+      };
+    })(),
     summary: summarize(t, strengths, weaknesses, r),
     slots, by_pos: posRows, strengths, weaknesses, risks: r,
-    bench: t.bench.map((p) => ({ ...label(p.id), bye: p.bye != null ? p.bye : null, ...p._surplus })),
+    bench: t.bench.map((p) => ({ ...label(p.id), ...weekOf(p.id), bye: p.bye != null ? p.bye : null, ...p._surplus })),
     unpriced: t.unpriced.map((id) => ({
       id, name: byId.get(id) ? byId.get(id).name : id,
       note: "no 2026 projection — excluded from every total on this page",
@@ -653,6 +721,21 @@ const payload = {
       ? `Parsed from ${L.dossiers}; trade counts recomputed from data/raw/transactions-${L.trade_archive.from}..${L.trade_archive.to}.json.`
       : `${L.name} is in its first season, so there is no owner history to read. The league table reports completed moves this season instead — observed, and zero for everybody until somebody makes one.`,
     caveat: "A projection is a season-long point estimate. It cannot see a camp role change, it prices DEF poorly (points-allowed tiers do not project), and it says nothing about week-to-week ceiling. Every number here is the start of an argument, not the end of one.",
+  },
+  /* Everything the page needs to caption the two week-scoped columns honestly: which week, where
+     the kickoff times came from, how many teams are actually playing, and what could not be read.
+     A page that shows a time has to be able to say where the time came from. */
+  week: {
+    n: WEEK,
+    teams_playing: sched.teams_playing,
+    projected: weekPts.size,
+    of_rostered: rosteredIds.length,
+    schedule_source: sched.source,
+    projection_source: wproj.error
+      ? null
+      : `Sleeper week-${WEEK} projected stat lines re-scored with ${L.name}'s exact scoring_settings — the same arithmetic as the season column, over a different stat line.`,
+    canceled: sched.canceled,
+    warnings: [...sched.warnings, ...(wproj.error ? [`week ${WEEK} projections unavailable: ${wproj.error}`] : [])],
   },
   coverage: {
     rostered: rosteredIds.length,

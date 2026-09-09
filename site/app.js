@@ -66,12 +66,18 @@
     const t = d.teams.find((x) => x.is_me) ?? d.teams.find((x) => x.roster_id === A.my_roster_id);
     if (!t) return err("#myroster-body", `Roster ${A.my_roster_id} isn't in the published ${esc(A.name)} room — check my_roster_id in config.js.`);
 
-    $("#myroster-meta").textContent = `${window.HBGB_RosterTable.meta(t)} · ${t.starter_rank} of ${d.teams.length} by projection`;
+    /* The week, where the build published one. This panel is the in-season lineup view, so it asks
+       for the week basis: a Game column and this week's points rather than the season's. `d.week` is
+       absent from any roster-room.json built before that existed, and the table falls back to the
+       season view on its own rather than painting a column of dashes. */
+    const opts = { teams: d.teams.length, week: d.week ?? null };
+    $("#myroster-meta").textContent = `${window.HBGB_RosterTable.meta(t, opts)} · ${t.starter_rank} of ${d.teams.length} by season projection`;
     $("#myroster-body").innerHTML =
       staleBanner(d.generated, "This roster", 3) +
-      window.HBGB_RosterTable.html(t, { teams: d.teams.length }) +
-      `<p class="rr-note">Click any name for the latest published on that player. Every other team is in the
-        <a href="rosters.html">roster room</a>, with the standings and the trade search.</p>`;
+      window.HBGB_RosterTable.html(t, opts) +
+      `<p class="rr-note">Click any name for the latest published on that player. Kickoffs are in your
+        timezone. Every other team is in the <a href="rosters.html">roster room</a>, with the standings,
+        the season projections and the trade search.</p>`;
   }
 
   /* ---------- NFL updates (published by the daily nfl-events routine) ----------

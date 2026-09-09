@@ -15,13 +15,24 @@
   "type": "snake"
  },
  "basis": {
-  "projection": "Sleeper 2026 projected stat lines re-scored with the league's exact scoring_settings (data/raw/league-2026.json) — the same numbers the draft board runs on.",
+  "projection": "Sleeper 2026 projected stat lines re-scored with The Panther Pit's exact scoring_settings (data/raw/league-pit-2026.json). NOT the draft board's numbers: the board is scored in the HBGBs' settings.",
+  "market": "ADP and Boris Chen tiers come from the shared draft board, which is built in this league's reception value.",
   "lineup": "Optimal lineup under QB/RB/RB/WR/WR/TE/FLEX/FLEX/K/DEF, five bench. Greedy is optimal here because slot eligibility nests.",
   "strength": "Per-slot and per-position rank against the other eleven teams. K and DEF are reported but never graded — they are streaming positions in this format.",
   "surplus": "A bench player's \"starts on N\" is measured by recomputing each of the other eleven optimal lineups with him inserted.",
   "trades": "Exhaustive 1-for-1 and 2-for-1 search. A proposal ships only if BOTH optimal lineups rise (>= 5 season points for a 1-for-1; >= 8 to me and >= 5 to them for a 2-for-1, where the other side must also take on more raw projected points than it gives).",
   "tendencies": "The Panther Pit is in its first season, so there is no owner history to read. The league table reports completed moves this season instead — observed, and zero for everybody until somebody makes one.",
   "caveat": "A projection is a season-long point estimate. It cannot see a camp role change, it prices DEF poorly (points-allowed tiers do not project), and it says nothing about week-to-week ceiling. Every number here is the start of an argument, not the end of one."
+ },
+ "week": {
+  "n": 1,
+  "teams_playing": 32,
+  "projected": 177,
+  "of_rostered": 181,
+  "schedule_source": "pairings from Sleeper's regular-season schedule, kickoff times from ESPN's public scoreboard",
+  "projection_source": "Sleeper week-1 projected stat lines re-scored with The Panther Pit's exact scoring_settings — the same arithmetic as the season column, over a different stat line.",
+  "canceled": [],
+  "warnings": []
  },
  "coverage": {
   "rostered": 181,
@@ -135,6 +146,15 @@
    "starter_rank": 6,
    "vs_league_median": 6.7,
    "bench_pts": 574.3,
+   "week": {
+    "n": 1,
+    "starter_pts": 107.3,
+    "starter_n": 9,
+    "starter_of": 10,
+    "bench_pts": 36,
+    "bench_n": 5,
+    "bench_of": 5
+   },
    "summary": "6th of 12 in projected starting points (1812), +7 against the league median. Built on QB: 321 starting points, 3rd in the league, +16 on the median. TE is the hole — 126 points, 11th, -16 behind. No bench player would start on four other teams, so there is little here to trade from. Week 8 takes 4 starters off the field at once, and five bench spots do not cover that.",
    "slots": [
     {
@@ -146,6 +166,15 @@
       "team": "NE",
       "pts": 320.8,
       "round": 5,
+      "week_pts": 19.7,
+      "game": {
+       "week": 1,
+       "opp": "SEA",
+       "home": false,
+       "kickoff": "2026-09-10T00:20Z",
+       "date": "2026-09-09",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 11,
       "adp": 52.1,
       "injury": null
@@ -162,6 +191,15 @@
       "team": "NO",
       "pts": 189.7,
       "round": 4,
+      "week_pts": 13.5,
+      "game": {
+       "week": 1,
+       "opp": "DET",
+       "home": false,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 8,
       "adp": 38.1,
       "injury": null
@@ -178,6 +216,15 @@
       "team": "ARI",
       "pts": 188.3,
       "round": 3,
+      "week_pts": 11.7,
+      "game": {
+       "week": 1,
+       "opp": "LAC",
+       "home": false,
+       "kickoff": "2026-09-13T20:25Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 14,
       "adp": 27.2,
       "injury": "Questionable"
@@ -194,6 +241,15 @@
       "team": "SEA",
       "pts": 235.1,
       "round": 1,
+      "week_pts": 16.3,
+      "game": {
+       "week": 1,
+       "opp": "NE",
+       "home": true,
+       "kickoff": "2026-09-10T00:20Z",
+       "date": "2026-09-09",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 11,
       "adp": 9.4,
       "injury": null
@@ -210,6 +266,15 @@
       "team": "HOU",
       "pts": 220,
       "round": 2,
+      "week_pts": 14.5,
+      "game": {
+       "week": 1,
+       "opp": "BUF",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 8,
       "adp": 22,
       "injury": null
@@ -226,6 +291,15 @@
       "team": "NYG",
       "pts": 126.3,
       "round": 10,
+      "week_pts": 7.6,
+      "game": {
+       "week": 1,
+       "opp": "DAL",
+       "home": true,
+       "kickoff": "2026-09-14T00:20Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 8,
       "adp": 108.6,
       "injury": null
@@ -242,6 +316,15 @@
       "team": "WAS",
       "pts": 176.8,
       "round": 6,
+      "week_pts": 11.2,
+      "game": {
+       "week": 1,
+       "opp": "PHI",
+       "home": false,
+       "kickoff": "2026-09-13T20:25Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 7,
       "adp": 55.9,
       "injury": null
@@ -258,6 +341,15 @@
       "team": "NE",
       "pts": 153.5,
       "round": 7,
+      "week_pts": null,
+      "game": {
+       "week": 1,
+       "opp": "SEA",
+       "home": false,
+       "kickoff": "2026-09-10T00:20Z",
+       "date": "2026-09-09",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 11,
       "adp": 58.2,
       "injury": "Out"
@@ -274,6 +366,15 @@
       "team": "HOU",
       "pts": 109,
       "round": 13,
+      "week_pts": 6.7,
+      "game": {
+       "week": 1,
+       "opp": "BUF",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 8,
       "adp": 141.9,
       "injury": null
@@ -290,6 +391,15 @@
       "team": "MIN",
       "pts": 92,
       "round": 12,
+      "week_pts": 6.1,
+      "game": {
+       "week": 1,
+       "opp": "GB",
+       "home": true,
+       "kickoff": "2026-09-13T20:25Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 6,
       "adp": 158.4,
       "injury": null
@@ -440,6 +550,15 @@
      "team": "CAR",
      "pts": 137.9,
      "round": 8,
+     "week_pts": 8.4,
+     "game": {
+      "week": 1,
+      "opp": "CHI",
+      "home": true,
+      "kickoff": "2026-09-13T17:00Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
      "bye": 5,
      "starts_on": 2,
      "best_gain": 12.6,
@@ -453,6 +572,15 @@
      "team": "LAC",
      "pts": 134.9,
      "round": 9,
+     "week_pts": 9.4,
+     "game": {
+      "week": 1,
+      "opp": "ARI",
+      "home": true,
+      "kickoff": "2026-09-13T20:25Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
      "bye": 7,
      "starts_on": 1,
      "best_gain": 9.6,
@@ -466,6 +594,15 @@
      "team": "NO",
      "pts": 112.9,
      "round": 14,
+     "week_pts": 8.2,
+     "game": {
+      "week": 1,
+      "opp": "DET",
+      "home": false,
+      "kickoff": "2026-09-13T17:00Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
      "bye": 8,
      "starts_on": 0,
      "best_gain": 0,
@@ -479,6 +616,15 @@
      "team": "WAS",
      "pts": 111.1,
      "round": 11,
+     "week_pts": 8.6,
+     "game": {
+      "week": 1,
+      "opp": "PHI",
+      "home": false,
+      "kickoff": "2026-09-13T20:25Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
      "bye": 7,
      "starts_on": 0,
      "best_gain": 0,
@@ -492,6 +638,15 @@
      "team": "KC",
      "pts": 77.5,
      "round": 15,
+     "week_pts": 1.4,
+     "game": {
+      "week": 1,
+      "opp": "DEN",
+      "home": true,
+      "kickoff": "2026-09-15T00:15Z",
+      "date": "2026-09-14",
+      "status": "STATUS_SCHEDULED"
+     },
      "bye": null,
      "starts_on": 0,
      "best_gain": 0,
@@ -519,6 +674,15 @@
    "starter_rank": 3,
    "vs_league_median": 19.8,
    "bench_pts": 802.9,
+   "week": {
+    "n": 1,
+    "starter_pts": 123.1,
+    "starter_n": 10,
+    "starter_of": 10,
+    "bench_pts": 51,
+    "bench_n": 5,
+    "bench_of": 5
+   },
    "summary": "3rd of 12 in projected starting points (1825), +20 against the league median. QB is the hole — 284 points, 12th, -22 behind. 1 bench player would start on four or more other teams (Alec Pierce) — that is the tradeable surplus. Week 6 takes 3 starters off the field at once, and five bench spots do not cover that.",
    "slots": [
     {
@@ -530,6 +694,15 @@
       "team": "DET",
       "pts": 283.5,
       "round": 10,
+      "week_pts": 18.2,
+      "game": {
+       "week": 1,
+       "opp": "NO",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 6,
       "adp": 142,
       "injury": null
@@ -546,6 +719,15 @@
       "team": "LV",
       "pts": 211.4,
       "round": 2,
+      "week_pts": 13.4,
+      "game": {
+       "week": 1,
+       "opp": "MIA",
+       "home": true,
+       "kickoff": "2026-09-13T20:25Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 13,
       "adp": 17.6,
       "injury": null
@@ -562,6 +744,15 @@
       "team": "NYJ",
       "pts": 192.5,
       "round": 3,
+      "week_pts": 12.7,
+      "game": {
+       "week": 1,
+       "opp": "TEN",
+       "home": false,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 13,
       "adp": 32.1,
       "injury": null
@@ -578,6 +769,15 @@
       "team": "CIN",
       "pts": 256.6,
       "round": 1,
+      "week_pts": 16.4,
+      "game": {
+       "week": 1,
+       "opp": "TB",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 6,
       "adp": 3.8,
       "injury": null
@@ -594,6 +794,15 @@
       "team": "CAR",
       "pts": 184.5,
       "round": 4,
+      "week_pts": 11.7,
+      "game": {
+       "week": 1,
+       "opp": "CHI",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 5,
       "adp": 37.4,
       "injury": null
@@ -610,6 +819,15 @@
       "team": "IND",
       "pts": 159.6,
       "round": 5,
+      "week_pts": 11.3,
+      "game": {
+       "week": 1,
+       "opp": "BAL",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 13,
       "adp": 51.8,
       "injury": null
@@ -626,6 +844,15 @@
       "team": "CHI",
       "pts": 173,
       "round": 7,
+      "week_pts": 11.1,
+      "game": {
+       "week": 1,
+       "opp": "CAR",
+       "home": false,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 10,
       "adp": 60.7,
       "injury": null
@@ -642,6 +869,15 @@
       "team": "NE",
       "pts": 154.5,
       "round": 6,
+      "week_pts": 15,
+      "game": {
+       "week": 1,
+       "opp": "SEA",
+       "home": false,
+       "kickoff": "2026-09-10T00:20Z",
+       "date": "2026-09-09",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 11,
       "adp": 71.2,
       "injury": null
@@ -658,6 +894,15 @@
       "team": "MIN",
       "pts": 106,
       "round": 14,
+      "week_pts": 6.6,
+      "game": {
+       "week": 1,
+       "opp": "GB",
+       "home": true,
+       "kickoff": "2026-09-13T20:25Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 6,
       "adp": 170.5,
       "injury": null
@@ -674,6 +919,15 @@
       "team": "SEA",
       "pts": 103,
       "round": 11,
+      "week_pts": 6.7,
+      "game": {
+       "week": 1,
+       "opp": "NE",
+       "home": true,
+       "kickoff": "2026-09-10T00:20Z",
+       "date": "2026-09-09",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 11,
       "adp": 113.6,
       "injury": null
@@ -783,6 +1037,15 @@
      "team": "NO",
      "pts": 270.9,
      "round": 13,
+     "week_pts": 17.2,
+     "game": {
+      "week": 1,
+      "opp": "DET",
+      "home": false,
+      "kickoff": "2026-09-13T17:00Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
      "bye": 8,
      "starts_on": 0,
      "best_gain": 0,
@@ -796,6 +1059,15 @@
      "team": "IND",
      "pts": 150.9,
      "round": 9,
+     "week_pts": 7.6,
+     "game": {
+      "week": 1,
+      "opp": "BAL",
+      "home": true,
+      "kickoff": "2026-09-13T17:00Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
      "bye": 13,
      "starts_on": 7,
      "best_gain": 25.6,
@@ -809,6 +1081,15 @@
      "team": "GB",
      "pts": 137,
      "round": 8,
+     "week_pts": 9.9,
+     "game": {
+      "week": 1,
+      "opp": "MIN",
+      "home": false,
+      "kickoff": "2026-09-13T20:25Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
      "bye": 11,
      "starts_on": 2,
      "best_gain": 11.7,
@@ -822,6 +1103,15 @@
      "team": "CAR",
      "pts": 135.9,
      "round": 12,
+     "week_pts": 9.9,
+     "game": {
+      "week": 1,
+      "opp": "CHI",
+      "home": true,
+      "kickoff": "2026-09-13T17:00Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
      "bye": 5,
      "starts_on": 1,
      "best_gain": 10.6,
@@ -835,6 +1125,15 @@
      "team": "CLE",
      "pts": 108.2,
      "round": 15,
+     "week_pts": 6.4,
+     "game": {
+      "week": 1,
+      "opp": "JAX",
+      "home": false,
+      "kickoff": "2026-09-13T17:00Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
      "bye": 11,
      "starts_on": 0,
      "best_gain": 0,
@@ -866,6 +1165,15 @@
    "starter_rank": 10,
    "vs_league_median": -52.2,
    "bench_pts": 771.3,
+   "week": {
+    "n": 1,
+    "starter_pts": 114.4,
+    "starter_n": 10,
+    "starter_of": 10,
+    "bench_pts": 40.2,
+    "bench_n": 5,
+    "bench_of": 5
+   },
    "summary": "10th of 12 in projected starting points (1753), -52 against the league median. Built on QB: 326 starting points, 2nd in the league, +21 on the median. WR is the hole — 567 points, 8th, -57 behind. No bench player would start on four other teams, so there is little here to trade from. Week 11 takes 4 starters off the field at once, and five bench spots do not cover that.",
    "slots": [
     {
@@ -877,6 +1185,15 @@
       "team": "BAL",
       "pts": 326,
       "round": 2,
+      "week_pts": 20.8,
+      "game": {
+       "week": 1,
+       "opp": "IND",
+       "home": false,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 13,
       "adp": 34.4,
       "injury": null
@@ -893,6 +1210,15 @@
       "team": "LAR",
       "pts": 192,
       "round": 3,
+      "week_pts": 13.4,
+      "game": {
+       "week": 1,
+       "opp": "SF",
+       "home": true,
+       "kickoff": "2026-09-11T00:35Z",
+       "date": "2026-09-10",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 11,
       "adp": 24.5,
       "injury": null
@@ -909,6 +1235,15 @@
       "team": "TB",
       "pts": 179.3,
       "round": 4,
+      "week_pts": 11,
+      "game": {
+       "week": 1,
+       "opp": "CIN",
+       "home": false,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 10,
       "adp": 47.8,
       "injury": null
@@ -925,6 +1260,15 @@
       "team": "DET",
       "pts": 227.5,
       "round": 1,
+      "week_pts": 16.3,
+      "game": {
+       "week": 1,
+       "opp": "NO",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 6,
       "adp": 6.7,
       "injury": null
@@ -941,6 +1285,15 @@
       "team": "JAX",
       "pts": 176.4,
       "round": 7,
+      "week_pts": 10,
+      "game": {
+       "week": 1,
+       "opp": "CLE",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 7,
       "adp": 68.5,
       "injury": null
@@ -957,6 +1310,15 @@
       "team": "ATL",
       "pts": 138.6,
       "round": 5,
+      "week_pts": 8.7,
+      "game": {
+       "week": 1,
+       "opp": "PIT",
+       "home": false,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 11,
       "adp": 72.8,
       "injury": null
@@ -973,6 +1335,15 @@
       "team": "GB",
       "pts": 162.6,
       "round": 8,
+      "week_pts": 10.9,
+      "game": {
+       "week": 1,
+       "opp": "MIN",
+       "home": false,
+       "kickoff": "2026-09-13T20:25Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 11,
       "adp": 100.4,
       "injury": null
@@ -989,6 +1360,15 @@
       "team": "DEN",
       "pts": 147.2,
       "round": 6,
+      "week_pts": 10.2,
+      "game": {
+       "week": 1,
+       "opp": "KC",
+       "home": false,
+       "kickoff": "2026-09-15T00:15Z",
+       "date": "2026-09-14",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 10,
       "adp": 85.3,
       "injury": null
@@ -1005,6 +1385,15 @@
       "team": "SEA",
       "pts": 107,
       "round": 10,
+      "week_pts": 6.8,
+      "game": {
+       "week": 1,
+       "opp": "NE",
+       "home": true,
+       "kickoff": "2026-09-10T00:20Z",
+       "date": "2026-09-09",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 11,
       "adp": 139.1,
       "injury": null
@@ -1021,6 +1410,15 @@
       "team": "DEN",
       "pts": 96,
       "round": 9,
+      "week_pts": 6.3,
+      "game": {
+       "week": 1,
+       "opp": "KC",
+       "home": false,
+       "kickoff": "2026-09-15T00:15Z",
+       "date": "2026-09-14",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 10,
       "adp": 122.8,
       "injury": null
@@ -1160,6 +1558,15 @@
      "team": "DEN",
      "pts": 295.7,
      "round": 11,
+     "week_pts": 17.9,
+     "game": {
+      "week": 1,
+      "opp": "KC",
+      "home": false,
+      "kickoff": "2026-09-15T00:15Z",
+      "date": "2026-09-14",
+      "status": "STATUS_SCHEDULED"
+     },
      "bye": 10,
      "starts_on": 2,
      "best_gain": 12.2,
@@ -1173,6 +1580,15 @@
      "team": "JAX",
      "pts": 129.5,
      "round": 12,
+     "week_pts": 6.6,
+     "game": {
+      "week": 1,
+      "opp": "CLE",
+      "home": true,
+      "kickoff": "2026-09-13T17:00Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
      "bye": 7,
      "starts_on": 3,
      "best_gain": 4.7,
@@ -1186,6 +1602,15 @@
      "team": "SF",
      "pts": 127.7,
      "round": 13,
+     "week_pts": 8.4,
+     "game": {
+      "week": 1,
+      "opp": "LAR",
+      "home": false,
+      "kickoff": "2026-09-11T00:35Z",
+      "date": "2026-09-10",
+      "status": "STATUS_SCHEDULED"
+     },
      "bye": 8,
      "starts_on": 1,
      "best_gain": 2.4,
@@ -1199,6 +1624,15 @@
      "team": "LAC",
      "pts": 113.8,
      "round": 15,
+     "week_pts": 4,
+     "game": {
+      "week": 1,
+      "opp": "ARI",
+      "home": true,
+      "kickoff": "2026-09-13T20:25Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
      "bye": 7,
      "starts_on": 0,
      "best_gain": 0,
@@ -1212,6 +1646,15 @@
      "team": "NYJ",
      "pts": 104.6,
      "round": 14,
+     "week_pts": 3.3,
+     "game": {
+      "week": 1,
+      "opp": "TEN",
+      "home": false,
+      "kickoff": "2026-09-13T17:00Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
      "bye": 13,
      "starts_on": 0,
      "best_gain": 0,
@@ -1266,6 +1709,15 @@
    "starter_rank": 12,
    "vs_league_median": -135.6,
    "bench_pts": 687.7,
+   "week": {
+    "n": 1,
+    "starter_pts": 110.1,
+    "starter_n": 10,
+    "starter_of": 10,
+    "bench_pts": 48.4,
+    "bench_n": 5,
+    "bench_of": 5
+   },
    "summary": "12th of 12 in projected starting points (1669), -136 against the league median. TE is the hole — 125 points, 12th, -17 behind. No bench player would start on four other teams, so there is little here to trade from. Week 9 takes 3 starters off the field at once, and five bench spots do not cover that.",
    "slots": [
     {
@@ -1277,6 +1729,15 @@
       "team": "CIN",
       "pts": 306.1,
       "round": 3,
+      "week_pts": 20.1,
+      "game": {
+       "week": 1,
+       "opp": "TB",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 6,
       "adp": 54.7,
       "injury": null
@@ -1293,6 +1754,15 @@
       "team": "CIN",
       "pts": 226.7,
       "round": 2,
+      "week_pts": 14.6,
+      "game": {
+       "week": 1,
+       "opp": "TB",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 6,
       "adp": 16.4,
       "injury": null
@@ -1309,6 +1779,15 @@
       "team": "TEN",
       "pts": 146.1,
       "round": 7,
+      "week_pts": 9.2,
+      "game": {
+       "week": 1,
+       "opp": "NYJ",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 9,
       "adp": 76,
       "injury": null
@@ -1325,6 +1804,15 @@
       "team": "DAL",
       "pts": 222.5,
       "round": 1,
+      "week_pts": 14.1,
+      "game": {
+       "week": 1,
+       "opp": "NYG",
+       "home": false,
+       "kickoff": "2026-09-14T00:20Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 14,
       "adp": 11.3,
       "injury": null
@@ -1341,6 +1829,15 @@
       "team": "DEN",
       "pts": 182.5,
       "round": 4,
+      "week_pts": 12.2,
+      "game": {
+       "week": 1,
+       "opp": "KC",
+       "home": false,
+       "kickoff": "2026-09-15T00:15Z",
+       "date": "2026-09-14",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 10,
       "adp": 44.5,
       "injury": null
@@ -1357,6 +1854,15 @@
       "team": "DAL",
       "pts": 124.8,
       "round": 6,
+      "week_pts": 7.6,
+      "game": {
+       "week": 1,
+       "opp": "NYG",
+       "home": false,
+       "kickoff": "2026-09-14T00:20Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 14,
       "adp": 115.2,
       "injury": null
@@ -1373,6 +1879,15 @@
       "team": "PIT",
       "pts": 142.1,
       "round": 5,
+      "week_pts": 11.2,
+      "game": {
+       "week": 1,
+       "opp": "ATL",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 9,
       "adp": 82.6,
       "injury": null
@@ -1389,6 +1904,15 @@
       "team": "PIT",
       "pts": 136.4,
       "round": 9,
+      "week_pts": 8.7,
+      "game": {
+       "week": 1,
+       "opp": "ATL",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 9,
       "adp": 106,
       "injury": null
@@ -1405,6 +1929,15 @@
       "team": "KC",
       "pts": 96,
       "round": 14,
+      "week_pts": 6.3,
+      "game": {
+       "week": 1,
+       "opp": "DEN",
+       "home": true,
+       "kickoff": "2026-09-15T00:15Z",
+       "date": "2026-09-14",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": null,
       "adp": null,
       "injury": null
@@ -1421,6 +1954,15 @@
       "team": "GB",
       "pts": 86,
       "round": 15,
+      "week_pts": 6.1,
+      "game": {
+       "week": 1,
+       "opp": "MIN",
+       "home": false,
+       "kickoff": "2026-09-13T20:25Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 11,
       "adp": 209.4,
       "injury": null
@@ -1535,6 +2077,15 @@
      "team": "SEA",
      "pts": 262.7,
      "round": 11,
+     "week_pts": 17.1,
+     "game": {
+      "week": 1,
+      "opp": "NE",
+      "home": true,
+      "kickoff": "2026-09-10T00:20Z",
+      "date": "2026-09-09",
+      "status": "STATUS_SCHEDULED"
+     },
      "bye": 11,
      "starts_on": 0,
      "best_gain": 0,
@@ -1548,6 +2099,15 @@
      "team": "DEN",
      "pts": 125.6,
      "round": 8,
+     "week_pts": 8.8,
+     "game": {
+      "week": 1,
+      "opp": "KC",
+      "home": false,
+      "kickoff": "2026-09-15T00:15Z",
+      "date": "2026-09-14",
+      "status": "STATUS_SCHEDULED"
+     },
      "bye": 10,
      "starts_on": 1,
      "best_gain": 0.3,
@@ -1561,6 +2121,15 @@
      "team": "MIN",
      "pts": 122,
      "round": 12,
+     "week_pts": 6.6,
+     "game": {
+      "week": 1,
+      "opp": "GB",
+      "home": true,
+      "kickoff": "2026-09-13T20:25Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
      "bye": 6,
      "starts_on": 0,
      "best_gain": 0,
@@ -1574,6 +2143,15 @@
      "team": "HOU",
      "pts": 104.7,
      "round": 13,
+     "week_pts": 8,
+     "game": {
+      "week": 1,
+      "opp": "BUF",
+      "home": true,
+      "kickoff": "2026-09-13T17:00Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
      "bye": 8,
      "starts_on": 0,
      "best_gain": 0,
@@ -1587,6 +2165,15 @@
      "team": "ARI",
      "pts": 72.7,
      "round": 10,
+     "week_pts": 7.9,
+     "game": {
+      "week": 1,
+      "opp": "LAC",
+      "home": false,
+      "kickoff": "2026-09-13T20:25Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
      "bye": 14,
      "starts_on": 0,
      "best_gain": 0,
@@ -1674,6 +2261,15 @@
    "starter_rank": 9,
    "vs_league_median": -27.2,
    "bench_pts": 764.7,
+   "week": {
+    "n": 1,
+    "starter_pts": 108.3,
+    "starter_n": 10,
+    "starter_of": 10,
+    "bench_pts": 50.1,
+    "bench_n": 5,
+    "bench_of": 5
+   },
    "summary": "9th of 12 in projected starting points (1778), -27 against the league median. Built on RB: 607 starting points, 2nd in the league, +91 on the median. WR is the hole — 527 points, 12th, -96 behind. 1 bench player would start on four or more other teams (Mark Andrews) — that is the tradeable surplus. Week 7 takes 4 starters off the field at once, and five bench spots do not cover that.",
    "slots": [
     {
@@ -1685,6 +2281,15 @@
       "team": "WAS",
       "pts": 308.7,
       "round": 8,
+      "week_pts": 19,
+      "game": {
+       "week": 1,
+       "opp": "PHI",
+       "home": false,
+       "kickoff": "2026-09-13T20:25Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 7,
       "adp": 69.9,
       "injury": null
@@ -1701,6 +2306,15 @@
       "team": "BUF",
       "pts": 245.3,
       "round": 1,
+      "week_pts": 15.9,
+      "game": {
+       "week": 1,
+       "opp": "HOU",
+       "home": false,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 7,
       "adp": 8.4,
       "injury": null
@@ -1717,6 +2331,15 @@
       "team": "LAC",
       "pts": 218.9,
       "round": 2,
+      "week_pts": 13.8,
+      "game": {
+       "week": 1,
+       "opp": "ARI",
+       "home": true,
+       "kickoff": "2026-09-13T20:25Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 7,
       "adp": 15.1,
       "injury": null
@@ -1733,6 +2356,15 @@
       "team": "NYG",
       "pts": 193.7,
       "round": 3,
+      "week_pts": 11.3,
+      "game": {
+       "week": 1,
+       "opp": "DAL",
+       "home": true,
+       "kickoff": "2026-09-14T00:20Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 8,
       "adp": 27.3,
       "injury": "Questionable"
@@ -1749,6 +2381,15 @@
       "team": "TB",
       "pts": 185.5,
       "round": 4,
+      "week_pts": 9.9,
+      "game": {
+       "week": 1,
+       "opp": "CIN",
+       "home": false,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 10,
       "adp": 41.4,
       "injury": null
@@ -1765,6 +2406,15 @@
       "team": "GB",
       "pts": 140.9,
       "round": 6,
+      "week_pts": 9.1,
+      "game": {
+       "week": 1,
+       "opp": "MIN",
+       "home": false,
+       "kickoff": "2026-09-13T20:25Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 11,
       "adp": 66.1,
       "injury": null
@@ -1781,6 +2431,15 @@
       "team": "BUF",
       "pts": 147.5,
       "round": 5,
+      "week_pts": 10,
+      "game": {
+       "week": 1,
+       "opp": "HOU",
+       "home": false,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 7,
       "adp": 50.4,
       "injury": null
@@ -1797,6 +2456,15 @@
       "team": "CHI",
       "pts": 143.1,
       "round": 9,
+      "week_pts": 6.9,
+      "game": {
+       "week": 1,
+       "opp": "CAR",
+       "home": false,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 10,
       "adp": 97.3,
       "injury": null
@@ -1813,6 +2481,15 @@
       "team": "CIN",
       "pts": 102,
       "round": 14,
+      "week_pts": 6.8,
+      "game": {
+       "week": 1,
+       "opp": "TB",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 6,
       "adp": 153.1,
       "injury": null
@@ -1829,6 +2506,15 @@
       "team": "NE",
       "pts": 92,
       "round": 13,
+      "week_pts": 5.6,
+      "game": {
+       "week": 1,
+       "opp": "SEA",
+       "home": false,
+       "kickoff": "2026-09-10T00:20Z",
+       "date": "2026-09-09",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 11,
       "adp": 137.7,
       "injury": null
@@ -1957,6 +2643,15 @@
      "team": "MIN",
      "pts": 283.1,
      "round": 12,
+     "week_pts": 17.4,
+     "game": {
+      "week": 1,
+      "opp": "GB",
+      "home": true,
+      "kickoff": "2026-09-13T20:25Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
      "bye": 6,
      "starts_on": 0,
      "best_gain": 0,
@@ -1970,6 +2665,15 @@
      "team": "CAR",
      "pts": 136.9,
      "round": 7,
+     "week_pts": 9.5,
+     "game": {
+      "week": 1,
+      "opp": "CHI",
+      "home": true,
+      "kickoff": "2026-09-13T17:00Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
      "bye": 5,
      "starts_on": 2,
      "best_gain": 11.6,
@@ -1983,6 +2687,15 @@
      "team": "BAL",
      "pts": 132.5,
      "round": 11,
+     "week_pts": 8.9,
+     "game": {
+      "week": 1,
+      "opp": "IND",
+      "home": false,
+      "kickoff": "2026-09-13T17:00Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
      "bye": 13,
      "starts_on": 4,
      "best_gain": 7.7,
@@ -1996,6 +2709,15 @@
      "team": "CLE",
      "pts": 127.4,
      "round": 10,
+     "week_pts": 7.9,
+     "game": {
+      "week": 1,
+      "opp": "JAX",
+      "home": false,
+      "kickoff": "2026-09-13T17:00Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
      "bye": 11,
      "starts_on": 1,
      "best_gain": 2.1,
@@ -2009,6 +2731,15 @@
      "team": "IND",
      "pts": 84.8,
      "round": 15,
+     "week_pts": 6.4,
+     "game": {
+      "week": 1,
+      "opp": "BAL",
+      "home": true,
+      "kickoff": "2026-09-13T17:00Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
      "bye": null,
      "starts_on": 0,
      "best_gain": 0,
@@ -2063,6 +2794,15 @@
    "starter_rank": 8,
    "vs_league_median": -13.6,
    "bench_pts": 707.3,
+   "week": {
+    "n": 1,
+    "starter_pts": 114.4,
+    "starter_n": 10,
+    "starter_of": 10,
+    "bench_pts": 41.1,
+    "bench_n": 4,
+    "bench_of": 5
+   },
    "summary": "8th of 12 in projected starting points (1791), -14 against the league median. Built on WR: 703 starting points, 2nd in the league, +80 on the median. RB is the hole — 406 points, 12th, -111 behind. No bench player would start on four other teams, so there is little here to trade from.",
    "slots": [
     {
@@ -2074,6 +2814,15 @@
       "team": "CHI",
       "pts": 299.3,
       "round": 8,
+      "week_pts": 19.6,
+      "game": {
+       "week": 1,
+       "opp": "CAR",
+       "home": false,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 10,
       "adp": 74.8,
       "injury": null
@@ -2090,6 +2839,15 @@
       "team": "KC",
       "pts": 225.5,
       "round": 2,
+      "week_pts": 14.5,
+      "game": {
+       "week": 1,
+       "opp": "DEN",
+       "home": true,
+       "kickoff": "2026-09-15T00:15Z",
+       "date": "2026-09-14",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 5,
       "adp": 18,
       "injury": null
@@ -2106,6 +2864,15 @@
       "team": "NYG",
       "pts": 180.2,
       "round": 3,
+      "week_pts": 12.6,
+      "game": {
+       "week": 1,
+       "opp": "DAL",
+       "home": true,
+       "kickoff": "2026-09-14T00:20Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 8,
       "adp": 36.2,
       "injury": null
@@ -2122,6 +2889,15 @@
       "team": "LAR",
       "pts": 259,
       "round": 1,
+      "week_pts": 16.8,
+      "game": {
+       "week": 1,
+       "opp": "SF",
+       "home": true,
+       "kickoff": "2026-09-11T00:35Z",
+       "date": "2026-09-10",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 11,
       "adp": 6.7,
       "injury": null
@@ -2138,6 +2914,15 @@
       "team": "LAR",
       "pts": 161,
       "round": 6,
+      "week_pts": 10.4,
+      "game": {
+       "week": 1,
+       "opp": "SF",
+       "home": true,
+       "kickoff": "2026-09-11T00:35Z",
+       "date": "2026-09-10",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 11,
       "adp": 55.5,
       "injury": null
@@ -2154,6 +2939,15 @@
       "team": "ARI",
       "pts": 186.9,
       "round": 4,
+      "week_pts": 12.2,
+      "game": {
+       "week": 1,
+       "opp": "LAC",
+       "home": false,
+       "kickoff": "2026-09-13T20:25Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 14,
       "adp": 26.7,
       "injury": null
@@ -2170,6 +2964,15 @@
       "team": "TEN",
       "pts": 144.8,
       "round": 7,
+      "week_pts": 9.8,
+      "game": {
+       "week": 1,
+       "opp": "NYJ",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 9,
       "adp": 69.3,
       "injury": null
@@ -2186,6 +2989,15 @@
       "team": "PHI",
       "pts": 138.5,
       "round": 9,
+      "week_pts": 4.9,
+      "game": {
+       "week": 1,
+       "opp": "WAS",
+       "home": true,
+       "kickoff": "2026-09-13T20:25Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 10,
       "adp": 90.8,
       "injury": null
@@ -2202,6 +3014,15 @@
       "team": "DET",
       "pts": 101,
       "round": 14,
+      "week_pts": 7.1,
+      "game": {
+       "week": 1,
+       "opp": "NO",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 6,
       "adp": 156.7,
       "injury": null
@@ -2218,6 +3039,15 @@
       "team": "BAL",
       "pts": 95,
       "round": 13,
+      "week_pts": 6.5,
+      "game": {
+       "week": 1,
+       "opp": "IND",
+       "home": false,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 13,
       "adp": 136.4,
       "injury": null
@@ -2339,6 +3169,15 @@
      "team": "TB",
      "pts": 274.9,
      "round": 15,
+     "week_pts": 17.3,
+     "game": {
+      "week": 1,
+      "opp": "CIN",
+      "home": false,
+      "kickoff": "2026-09-13T17:00Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
      "bye": 10,
      "starts_on": 0,
      "best_gain": 0,
@@ -2352,6 +3191,15 @@
      "team": "IND",
      "pts": 137.3,
      "round": 10,
+     "week_pts": 10.2,
+     "game": {
+      "week": 1,
+      "opp": "BAL",
+      "home": true,
+      "kickoff": "2026-09-13T17:00Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
      "bye": 13,
      "starts_on": 2,
      "best_gain": 12,
@@ -2365,6 +3213,15 @@
      "team": "PHI",
      "pts": 109.5,
      "round": 12,
+     "week_pts": 7.9,
+     "game": {
+      "week": 1,
+      "opp": "WAS",
+      "home": true,
+      "kickoff": "2026-09-13T20:25Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
      "bye": 10,
      "starts_on": 0,
      "best_gain": 0,
@@ -2378,6 +3235,15 @@
      "team": "SF",
      "pts": 105.4,
      "round": 11,
+     "week_pts": 5.7,
+     "game": {
+      "week": 1,
+      "opp": "LAR",
+      "home": false,
+      "kickoff": "2026-09-11T00:35Z",
+      "date": "2026-09-10",
+      "status": "STATUS_SCHEDULED"
+     },
      "bye": 8,
      "starts_on": 0,
      "best_gain": 0,
@@ -2391,6 +3257,15 @@
      "team": "GB",
      "pts": 80.2,
      "round": 5,
+     "week_pts": null,
+     "game": {
+      "week": 1,
+      "opp": "MIN",
+      "home": false,
+      "kickoff": "2026-09-13T20:25Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
      "bye": 11,
      "starts_on": 0,
      "best_gain": 0,
@@ -2422,6 +3297,15 @@
    "starter_rank": 1,
    "vs_league_median": 85.2,
    "bench_pts": 618.5,
+   "week": {
+    "n": 1,
+    "starter_pts": 119.6,
+    "starter_n": 10,
+    "starter_of": 10,
+    "bench_pts": 36,
+    "bench_n": 5,
+    "bench_of": 5
+   },
    "summary": "1st of 12 in projected starting points (1890), +85 against the league median. Built on QB: 362 starting points, 1st in the league, +57 on the median. RB is the hole — 446 points, 9th, -71 behind. No bench player would start on four other teams, so there is little here to trade from. Week 11 takes 3 starters off the field at once, and five bench spots do not cover that.",
    "slots": [
     {
@@ -2433,6 +3317,15 @@
       "team": "BUF",
       "pts": 361.5,
       "round": 3,
+      "week_pts": 21.1,
+      "game": {
+       "week": 1,
+       "opp": "HOU",
+       "home": false,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 7,
       "adp": 20.5,
       "injury": null
@@ -2449,6 +3342,15 @@
       "team": "ATL",
       "pts": 292.9,
       "round": 1,
+      "week_pts": 19.3,
+      "game": {
+       "week": 1,
+       "opp": "PIT",
+       "home": false,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 11,
       "adp": 2,
       "injury": null
@@ -2465,6 +3367,15 @@
       "team": "PIT",
       "pts": 152.6,
       "round": 6,
+      "week_pts": 11.7,
+      "game": {
+       "week": 1,
+       "opp": "ATL",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 9,
       "adp": 67.3,
       "injury": null
@@ -2481,6 +3392,15 @@
       "team": "ATL",
       "pts": 205.2,
       "round": 2,
+      "week_pts": 13.2,
+      "game": {
+       "week": 1,
+       "opp": "PIT",
+       "home": false,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 11,
       "adp": 20.8,
       "injury": null
@@ -2497,6 +3417,15 @@
       "team": "SF",
       "pts": 187.2,
       "round": 7,
+      "week_pts": 10.8,
+      "game": {
+       "week": 1,
+       "opp": "LAR",
+       "home": false,
+       "kickoff": "2026-09-11T00:35Z",
+       "date": "2026-09-10",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 8,
       "adp": 62.9,
       "injury": null
@@ -2513,6 +3442,15 @@
       "team": "CHI",
       "pts": 173.4,
       "round": 4,
+      "week_pts": 11.6,
+      "game": {
+       "week": 1,
+       "opp": "CAR",
+       "home": false,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 10,
       "adp": 43.2,
       "injury": null
@@ -2529,6 +3467,15 @@
       "team": "CHI",
       "pts": 173.9,
       "round": 5,
+      "week_pts": 9.7,
+      "game": {
+       "week": 1,
+       "opp": "CAR",
+       "home": false,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 10,
       "adp": 64.8,
       "injury": "Questionable"
@@ -2545,6 +3492,15 @@
       "team": "WAS",
       "pts": 125.3,
       "round": 10,
+      "week_pts": 9.2,
+      "game": {
+       "week": 1,
+       "opp": "PHI",
+       "home": false,
+       "kickoff": "2026-09-13T20:25Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 7,
       "adp": 109,
       "injury": null
@@ -2561,6 +3517,15 @@
       "team": "DAL",
       "pts": 112,
       "round": 9,
+      "week_pts": 6.8,
+      "game": {
+       "week": 1,
+       "opp": "NYG",
+       "home": false,
+       "kickoff": "2026-09-14T00:20Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 14,
       "adp": 138.1,
       "injury": null
@@ -2577,6 +3542,15 @@
       "team": "LAR",
       "pts": 106,
       "round": 8,
+      "week_pts": 6.2,
+      "game": {
+       "week": 1,
+       "opp": "SF",
+       "home": true,
+       "kickoff": "2026-09-11T00:35Z",
+       "date": "2026-09-10",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 11,
       "adp": 95.7,
       "injury": null
@@ -2720,6 +3694,15 @@
      "team": "KC",
      "pts": 286.7,
      "round": 11,
+     "week_pts": 17.1,
+     "game": {
+      "week": 1,
+      "opp": "DEN",
+      "home": true,
+      "kickoff": "2026-09-15T00:15Z",
+      "date": "2026-09-14",
+      "status": "STATUS_SCHEDULED"
+     },
      "bye": 5,
      "starts_on": 1,
      "best_gain": 3.2,
@@ -2733,6 +3716,15 @@
      "team": "SEA",
      "pts": 115.6,
      "round": 14,
+     "week_pts": 7.6,
+     "game": {
+      "week": 1,
+      "opp": "NE",
+      "home": true,
+      "kickoff": "2026-09-10T00:20Z",
+      "date": "2026-09-09",
+      "status": "STATUS_SCHEDULED"
+     },
      "bye": 11,
      "starts_on": 0,
      "best_gain": 0,
@@ -2746,6 +3738,15 @@
      "team": "LV",
      "pts": 89.5,
      "round": 12,
+     "week_pts": 5.2,
+     "game": {
+      "week": 1,
+      "opp": "MIA",
+      "home": true,
+      "kickoff": "2026-09-13T20:25Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
      "bye": 13,
      "starts_on": 0,
      "best_gain": 0,
@@ -2759,6 +3760,15 @@
      "team": "BAL",
      "pts": 87.4,
      "round": 13,
+     "week_pts": 4.3,
+     "game": {
+      "week": 1,
+      "opp": "IND",
+      "home": false,
+      "kickoff": "2026-09-13T17:00Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
      "bye": 13,
      "starts_on": 0,
      "best_gain": 0,
@@ -2772,6 +3782,15 @@
      "team": "SF",
      "pts": 39.3,
      "round": 15,
+     "week_pts": 1.8,
+     "game": {
+      "week": 1,
+      "opp": "LAR",
+      "home": false,
+      "kickoff": "2026-09-11T00:35Z",
+      "date": "2026-09-10",
+      "status": "STATUS_SCHEDULED"
+     },
      "bye": 8,
      "starts_on": 0,
      "best_gain": 0,
@@ -2859,6 +3878,15 @@
    "starter_rank": 11,
    "vs_league_median": -96.2,
    "bench_pts": 656.9,
+   "week": {
+    "n": 1,
+    "starter_pts": 111.6,
+    "starter_n": 10,
+    "starter_of": 10,
+    "bench_pts": 40.4,
+    "bench_n": 5,
+    "bench_of": 6
+   },
    "summary": "11th of 12 in projected starting points (1709), -96 against the league median. QB is the hole — 296 points, 11th, -10 behind. No bench player would start on four other teams, so there is little here to trade from. Week 7 takes 4 starters off the field at once, and five bench spots do not cover that.",
    "slots": [
     {
@@ -2870,6 +3898,15 @@
       "team": "LAC",
       "pts": 295.5,
       "round": 6,
+      "week_pts": 18.1,
+      "game": {
+       "week": 1,
+       "opp": "ARI",
+       "home": true,
+       "kickoff": "2026-09-13T20:25Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 7,
       "adp": 79.6,
       "injury": null
@@ -2886,6 +3923,15 @@
       "team": "MIA",
       "pts": 229.9,
       "round": 2,
+      "week_pts": 15.8,
+      "game": {
+       "week": 1,
+       "opp": "LV",
+       "home": false,
+       "kickoff": "2026-09-13T20:25Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 6,
       "adp": 13.9,
       "injury": null
@@ -2902,6 +3948,15 @@
       "team": "CHI",
       "pts": 189.5,
       "round": 4,
+      "week_pts": 12.5,
+      "game": {
+       "week": 1,
+       "opp": "CAR",
+       "home": false,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 10,
       "adp": 46.9,
       "injury": null
@@ -2918,6 +3973,15 @@
       "team": "MIN",
       "pts": 205.4,
       "round": 1,
+      "week_pts": 13.8,
+      "game": {
+       "week": 1,
+       "opp": "GB",
+       "home": true,
+       "kickoff": "2026-09-13T20:25Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 6,
       "adp": 12.6,
       "injury": null
@@ -2934,6 +3998,15 @@
       "team": "KC",
       "pts": 185.3,
       "round": 3,
+      "week_pts": 11.7,
+      "game": {
+       "week": 1,
+       "opp": "DEN",
+       "home": true,
+       "kickoff": "2026-09-15T00:15Z",
+       "date": "2026-09-14",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 5,
       "adp": 30.5,
       "injury": null
@@ -2950,6 +4023,15 @@
       "team": "BUF",
       "pts": 130.6,
       "round": 5,
+      "week_pts": 7.6,
+      "game": {
+       "week": 1,
+       "opp": "HOU",
+       "home": false,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 7,
       "adp": 94.5,
       "injury": null
@@ -2966,6 +4048,15 @@
       "team": "DEN",
       "pts": 144.8,
       "round": 7,
+      "week_pts": 8.8,
+      "game": {
+       "week": 1,
+       "opp": "KC",
+       "home": false,
+       "kickoff": "2026-09-15T00:15Z",
+       "date": "2026-09-14",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 10,
       "adp": 81.9,
       "injury": null
@@ -2982,6 +4073,15 @@
       "team": "TB",
       "pts": 139.6,
       "round": 8,
+      "week_pts": 8.9,
+      "game": {
+       "week": 1,
+       "opp": "CIN",
+       "home": false,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 10,
       "adp": 88.9,
       "injury": null
@@ -2998,6 +4098,15 @@
       "team": "LAC",
       "pts": 102,
       "round": 12,
+      "week_pts": 7.1,
+      "game": {
+       "week": 1,
+       "opp": "ARI",
+       "home": true,
+       "kickoff": "2026-09-13T20:25Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 7,
       "adp": 139.9,
       "injury": "Questionable"
@@ -3014,6 +4123,15 @@
       "team": "LAC",
       "pts": 86,
       "round": 13,
+      "week_pts": 7.3,
+      "game": {
+       "week": 1,
+       "opp": "ARI",
+       "home": true,
+       "kickoff": "2026-09-13T20:25Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 7,
       "adp": 152.2,
       "injury": null
@@ -3158,6 +4276,15 @@
      "team": "NE",
      "pts": 132.7,
      "round": 11,
+     "week_pts": 8.7,
+     "game": {
+      "week": 1,
+      "opp": "SEA",
+      "home": false,
+      "kickoff": "2026-09-10T00:20Z",
+      "date": "2026-09-09",
+      "status": "STATUS_SCHEDULED"
+     },
      "bye": 11,
      "starts_on": 1,
      "best_gain": 7.4,
@@ -3171,6 +4298,15 @@
      "team": "NE",
      "pts": 124.5,
      "round": 14,
+     "week_pts": 7.6,
+     "game": {
+      "week": 1,
+      "opp": "SEA",
+      "home": false,
+      "kickoff": "2026-09-10T00:20Z",
+      "date": "2026-09-09",
+      "status": "STATUS_SCHEDULED"
+     },
      "bye": 11,
      "starts_on": 0,
      "best_gain": 0,
@@ -3184,6 +4320,15 @@
      "team": "WAS",
      "pts": 118.4,
      "round": 10,
+     "week_pts": 9.8,
+     "game": {
+      "week": 1,
+      "opp": "PHI",
+      "home": false,
+      "kickoff": "2026-09-13T20:25Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
      "bye": 7,
      "starts_on": 0,
      "best_gain": 0,
@@ -3197,6 +4342,15 @@
      "team": "LV",
      "pts": 102.9,
      "round": null,
+     "week_pts": 8.3,
+     "game": {
+      "week": 1,
+      "opp": "MIA",
+      "home": true,
+      "kickoff": "2026-09-13T20:25Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
      "bye": null,
      "starts_on": 0,
      "best_gain": 0,
@@ -3210,6 +4364,15 @@
      "team": "NO",
      "pts": 90.5,
      "round": 9,
+     "week_pts": null,
+     "game": {
+      "week": 1,
+      "opp": "DET",
+      "home": false,
+      "kickoff": "2026-09-13T17:00Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
      "bye": 8,
      "starts_on": 0,
      "best_gain": 0,
@@ -3223,6 +4386,15 @@
      "team": "LAC",
      "pts": 87.9,
      "round": 15,
+     "week_pts": 6,
+     "game": {
+      "week": 1,
+      "opp": "ARI",
+      "home": true,
+      "kickoff": "2026-09-13T20:25Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
      "bye": 7,
      "starts_on": 0,
      "best_gain": 0,
@@ -3254,6 +4426,15 @@
    "starter_rank": 5,
    "vs_league_median": 9.8,
    "bench_pts": 710.2,
+   "week": {
+    "n": 1,
+    "starter_pts": 117.1,
+    "starter_n": 10,
+    "starter_of": 10,
+    "bench_pts": 44.7,
+    "bench_n": 5,
+    "bench_of": 5
+   },
    "summary": "5th of 12 in projected starting points (1815), +10 against the league median. Built on WR: 727 starting points, 1st in the league, +104 on the median. RB is the hole — 434 points, 10th, -82 behind. 1 bench player would start on four or more other teams (Travis Kelce) — that is the tradeable surplus. Week 11 takes 5 starters off the field at once, and five bench spots do not cover that.",
    "slots": [
     {
@@ -3265,6 +4446,15 @@
       "team": "DAL",
       "pts": 303.9,
       "round": 7,
+      "week_pts": 18.8,
+      "game": {
+       "week": 1,
+       "opp": "NYG",
+       "home": false,
+       "kickoff": "2026-09-14T00:20Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 14,
       "adp": 86,
       "injury": null
@@ -3281,6 +4471,15 @@
       "team": "IND",
       "pts": 254.3,
       "round": 1,
+      "week_pts": 17.8,
+      "game": {
+       "week": 1,
+       "opp": "BAL",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 13,
       "adp": 5.7,
       "injury": null
@@ -3297,6 +4496,15 @@
       "team": "CLE",
       "pts": 180,
       "round": 4,
+      "week_pts": 11.2,
+      "game": {
+       "week": 1,
+       "opp": "JAX",
+       "home": false,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 11,
       "adp": 48.6,
       "injury": null
@@ -3313,6 +4521,15 @@
       "team": "NE",
       "pts": 207.7,
       "round": 2,
+      "week_pts": 14.1,
+      "game": {
+       "week": 1,
+       "opp": "SEA",
+       "home": false,
+       "kickoff": "2026-09-10T00:20Z",
+       "date": "2026-09-09",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 11,
       "adp": 19.1,
       "injury": null
@@ -3329,6 +4546,15 @@
       "team": "NO",
       "pts": 194.9,
       "round": 3,
+      "week_pts": 13.3,
+      "game": {
+       "week": 1,
+       "opp": "DET",
+       "home": false,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 8,
       "adp": 29.9,
       "injury": null
@@ -3345,6 +4571,15 @@
       "team": "CLE",
       "pts": 143.4,
       "round": 9,
+      "week_pts": 9.3,
+      "game": {
+       "week": 1,
+       "opp": "JAX",
+       "home": false,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 11,
       "adp": 76.1,
       "injury": null
@@ -3361,6 +4596,15 @@
       "team": "NYJ",
       "pts": 183.4,
       "round": 5,
+      "week_pts": 11.2,
+      "game": {
+       "week": 1,
+       "opp": "TEN",
+       "home": false,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 13,
       "adp": 45.4,
       "injury": null
@@ -3377,6 +4621,15 @@
       "team": "GB",
       "pts": 141,
       "round": 11,
+      "week_pts": 8.3,
+      "game": {
+       "week": 1,
+       "opp": "MIN",
+       "home": false,
+       "kickoff": "2026-09-13T20:25Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 11,
       "adp": 118.8,
       "injury": null
@@ -3393,6 +4646,15 @@
       "team": "LAR",
       "pts": 102,
       "round": 14,
+      "week_pts": 7,
+      "game": {
+       "week": 1,
+       "opp": "SF",
+       "home": true,
+       "kickoff": "2026-09-11T00:35Z",
+       "date": "2026-09-10",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 11,
       "adp": 160.3,
       "injury": null
@@ -3409,6 +4671,15 @@
       "team": "HOU",
       "pts": 104,
       "round": 10,
+      "week_pts": 6.1,
+      "game": {
+       "week": 1,
+       "opp": "BUF",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 8,
       "adp": 104,
       "injury": null
@@ -3532,6 +4803,15 @@
      "team": "GB",
      "pts": 278.5,
      "round": 12,
+     "week_pts": 17.4,
+     "game": {
+      "week": 1,
+      "opp": "MIN",
+      "home": false,
+      "kickoff": "2026-09-13T20:25Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
      "bye": 11,
      "starts_on": 0,
      "best_gain": 0,
@@ -3545,6 +4825,15 @@
      "team": "KC",
      "pts": 136.4,
      "round": 6,
+     "week_pts": 8.8,
+     "game": {
+      "week": 1,
+      "opp": "DEN",
+      "home": true,
+      "kickoff": "2026-09-15T00:15Z",
+      "date": "2026-09-14",
+      "status": "STATUS_SCHEDULED"
+     },
      "bye": 5,
      "starts_on": 4,
      "best_gain": 11.6,
@@ -3558,6 +4847,15 @@
      "team": "TB",
      "pts": 128.8,
      "round": 8,
+     "week_pts": 8.1,
+     "game": {
+      "week": 1,
+      "opp": "CIN",
+      "home": false,
+      "kickoff": "2026-09-13T17:00Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
      "bye": 10,
      "starts_on": 1,
      "best_gain": 3.5,
@@ -3571,6 +4869,15 @@
      "team": "LV",
      "pts": 107.6,
      "round": 15,
+     "week_pts": 8,
+     "game": {
+      "week": 1,
+      "opp": "MIA",
+      "home": true,
+      "kickoff": "2026-09-13T20:25Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
      "bye": 13,
      "starts_on": 0,
      "best_gain": 0,
@@ -3584,6 +4891,15 @@
      "team": "DEN",
      "pts": 58.9,
      "round": 13,
+     "week_pts": 2.4,
+     "game": {
+      "week": 1,
+      "opp": "KC",
+      "home": false,
+      "kickoff": "2026-09-15T00:15Z",
+      "date": "2026-09-14",
+      "status": "STATUS_SCHEDULED"
+     },
      "bye": 10,
      "starts_on": 0,
      "best_gain": 0,
@@ -3638,6 +4954,15 @@
    "starter_rank": 2,
    "vs_league_median": 41.9,
    "bench_pts": 598.4,
+   "week": {
+    "n": 1,
+    "starter_pts": 115.8,
+    "starter_n": 9,
+    "starter_of": 10,
+    "bench_pts": 40,
+    "bench_n": 5,
+    "bench_of": 5
+   },
    "summary": "2nd of 12 in projected starting points (1847), +42 against the league median. Built on RB: 652 starting points, 1st in the league, +135 on the median. WR is the hole — 540 points, 11th, -83 behind. No bench player would start on four other teams, so there is little here to trade from.",
    "slots": [
     {
@@ -3649,6 +4974,15 @@
       "team": "NYG",
       "pts": 296.5,
       "round": 11,
+      "week_pts": 19.4,
+      "game": {
+       "week": 1,
+       "opp": "DAL",
+       "home": true,
+       "kickoff": "2026-09-14T00:20Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 8,
       "adp": 110,
       "injury": null
@@ -3665,6 +4999,15 @@
       "team": "DET",
       "pts": 299.9,
       "round": 1,
+      "week_pts": 21.4,
+      "game": {
+       "week": 1,
+       "opp": "NO",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 6,
       "adp": 1.9,
       "injury": null
@@ -3681,6 +5024,15 @@
       "team": "DAL",
       "pts": 193,
       "round": 2,
+      "week_pts": 14.2,
+      "game": {
+       "week": 1,
+       "opp": "NYG",
+       "home": false,
+       "kickoff": "2026-09-14T00:20Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 14,
       "adp": 31.5,
       "injury": null
@@ -3697,6 +5049,15 @@
       "team": "BAL",
       "pts": 187.7,
       "round": 4,
+      "week_pts": 12.8,
+      "game": {
+       "week": 1,
+       "opp": "IND",
+       "home": false,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 13,
       "adp": 40.9,
       "injury": "Questionable"
@@ -3713,6 +5074,15 @@
       "team": "DET",
       "pts": 176.2,
       "round": 6,
+      "week_pts": 11.9,
+      "game": {
+       "week": 1,
+       "opp": "NO",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 6,
       "adp": 57.8,
       "injury": null
@@ -3729,6 +5099,15 @@
       "team": "LV",
       "pts": 202.5,
       "round": 3,
+      "week_pts": null,
+      "game": {
+       "week": 1,
+       "opp": "MIA",
+       "home": true,
+       "kickoff": "2026-09-13T20:25Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 13,
       "adp": 23.6,
       "injury": "Doubtful"
@@ -3745,6 +5124,15 @@
       "team": "GB",
       "pts": 176.1,
       "round": 7,
+      "week_pts": 11.7,
+      "game": {
+       "week": 1,
+       "opp": "MIN",
+       "home": false,
+       "kickoff": "2026-09-13T20:25Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 11,
       "adp": 65,
       "injury": null
@@ -3761,6 +5149,15 @@
       "team": "JAX",
       "pts": 158.8,
       "round": 5,
+      "week_pts": 10.4,
+      "game": {
+       "week": 1,
+       "opp": "CLE",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 7,
       "adp": 59,
       "injury": null
@@ -3777,6 +5174,15 @@
       "team": "GB",
       "pts": 68,
       "round": 14,
+      "week_pts": 6.9,
+      "game": {
+       "week": 1,
+       "opp": "MIN",
+       "home": false,
+       "kickoff": "2026-09-13T20:25Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": null,
       "adp": null,
       "injury": null
@@ -3793,6 +5199,15 @@
       "team": "PIT",
       "pts": 88,
       "round": 15,
+      "week_pts": 7.1,
+      "game": {
+       "week": 1,
+       "opp": "ATL",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 9,
       "adp": 159.9,
       "injury": null
@@ -3933,6 +5348,15 @@
      "team": "JAX",
      "pts": 137.3,
      "round": 10,
+     "week_pts": 8.5,
+     "game": {
+      "week": 1,
+      "opp": "CLE",
+      "home": true,
+      "kickoff": "2026-09-13T17:00Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
      "bye": 7,
      "starts_on": 2,
      "best_gain": 12,
@@ -3946,6 +5370,15 @@
      "team": "KC",
      "pts": 134,
      "round": 12,
+     "week_pts": 8.3,
+     "game": {
+      "week": 1,
+      "opp": "DEN",
+      "home": true,
+      "kickoff": "2026-09-15T00:15Z",
+      "date": "2026-09-14",
+      "status": "STATUS_SCHEDULED"
+     },
      "bye": 5,
      "starts_on": 1,
      "best_gain": 8.7,
@@ -3959,6 +5392,15 @@
      "team": "LAR",
      "pts": 127.8,
      "round": 8,
+     "week_pts": 8.1,
+     "game": {
+      "week": 1,
+      "opp": "SF",
+      "home": true,
+      "kickoff": "2026-09-11T00:35Z",
+      "date": "2026-09-10",
+      "status": "STATUS_SCHEDULED"
+     },
      "bye": 11,
      "starts_on": 1,
      "best_gain": 2.5,
@@ -3972,6 +5414,15 @@
      "team": "JAX",
      "pts": 125,
      "round": 9,
+     "week_pts": 7.8,
+     "game": {
+      "week": 1,
+      "opp": "CLE",
+      "home": true,
+      "kickoff": "2026-09-13T17:00Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
      "bye": 7,
      "starts_on": 0,
      "best_gain": 0,
@@ -3985,6 +5436,15 @@
      "team": "HOU",
      "pts": 74.3,
      "round": 13,
+     "week_pts": 7.3,
+     "game": {
+      "week": 1,
+      "opp": "BUF",
+      "home": true,
+      "kickoff": "2026-09-13T17:00Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
      "bye": 8,
      "starts_on": 0,
      "best_gain": 0,
@@ -4016,6 +5476,15 @@
    "starter_rank": 4,
    "vs_league_median": 16.3,
    "bench_pts": 819.7,
+   "week": {
+    "n": 1,
+    "starter_pts": 117.2,
+    "starter_n": 10,
+    "starter_of": 10,
+    "bench_pts": 51.5,
+    "bench_n": 5,
+    "bench_of": 5
+   },
    "summary": "4th of 12 in projected starting points (1821), +16 against the league median. Built on RB: 607 starting points, 3rd in the league, +90 on the median. WR is the hole — 558 points, 9th, -65 behind. 2 bench players would start on four or more other teams (Jordan Mason, Jordan Addison) — that is the tradeable surplus. Week 8 takes 4 starters off the field at once, and five bench spots do not cover that.",
    "slots": [
     {
@@ -4027,6 +5496,15 @@
       "team": "SF",
       "pts": 303.2,
       "round": 12,
+      "week_pts": 18.8,
+      "game": {
+       "week": 1,
+       "opp": "LAR",
+       "home": false,
+       "kickoff": "2026-09-11T00:35Z",
+       "date": "2026-09-10",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 8,
       "adp": 128.5,
       "injury": null
@@ -4043,6 +5521,15 @@
       "team": "SF",
       "pts": 256,
       "round": 1,
+      "week_pts": 18.6,
+      "game": {
+       "week": 1,
+       "opp": "LAR",
+       "home": false,
+       "kickoff": "2026-09-11T00:35Z",
+       "date": "2026-09-10",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 8,
       "adp": 4.1,
       "injury": null
@@ -4059,6 +5546,15 @@
       "team": "HOU",
       "pts": 190.1,
       "round": 3,
+      "week_pts": 12.8,
+      "game": {
+       "week": 1,
+       "opp": "BUF",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 8,
       "adp": 41.7,
       "injury": null
@@ -4075,6 +5571,15 @@
       "team": "DAL",
       "pts": 205.7,
       "round": 2,
+      "week_pts": 13.9,
+      "game": {
+       "week": 1,
+       "opp": "NYG",
+       "home": false,
+       "kickoff": "2026-09-14T00:20Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 14,
       "adp": 25.2,
       "injury": null
@@ -4091,6 +5596,15 @@
       "team": "LAC",
       "pts": 187.7,
       "round": 4,
+      "week_pts": 11,
+      "game": {
+       "week": 1,
+       "opp": "ARI",
+       "home": true,
+       "kickoff": "2026-09-13T20:25Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 7,
       "adp": 34.2,
       "injury": null
@@ -4107,6 +5621,15 @@
       "team": "DET",
       "pts": 158.5,
       "round": 5,
+      "week_pts": 10.9,
+      "game": {
+       "week": 1,
+       "opp": "NO",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 6,
       "adp": 62,
       "injury": null
@@ -4123,6 +5646,15 @@
       "team": "JAX",
       "pts": 164.4,
       "round": 7,
+      "week_pts": 8.8,
+      "game": {
+       "week": 1,
+       "opp": "CLE",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 7,
       "adp": 75.1,
       "injury": null
@@ -4139,6 +5671,15 @@
       "team": "SEA",
       "pts": 160.5,
       "round": 6,
+      "week_pts": 9.2,
+      "game": {
+       "week": 1,
+       "opp": "NE",
+       "home": true,
+       "kickoff": "2026-09-10T00:20Z",
+       "date": "2026-09-09",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 11,
       "adp": 53.6,
       "injury": null
@@ -4155,6 +5696,15 @@
       "team": "SF",
       "pts": 97,
       "round": 15,
+      "week_pts": 6.3,
+      "game": {
+       "week": 1,
+       "opp": "LAR",
+       "home": false,
+       "kickoff": "2026-09-11T00:35Z",
+       "date": "2026-09-10",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 8,
       "adp": 174,
       "injury": null
@@ -4171,6 +5721,15 @@
       "team": "PHI",
       "pts": 98,
       "round": 11,
+      "week_pts": 6.9,
+      "game": {
+       "week": 1,
+       "opp": "WAS",
+       "home": true,
+       "kickoff": "2026-09-13T20:25Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 10,
       "adp": 130.3,
       "injury": null
@@ -4301,6 +5860,15 @@
      "team": "LAR",
      "pts": 280.2,
      "round": 10,
+     "week_pts": 16.9,
+     "game": {
+      "week": 1,
+      "opp": "SF",
+      "home": true,
+      "kickoff": "2026-09-11T00:35Z",
+      "date": "2026-09-10",
+      "status": "STATUS_SCHEDULED"
+     },
      "bye": 11,
      "starts_on": 0,
      "best_gain": 0,
@@ -4314,6 +5882,15 @@
      "team": "MIN",
      "pts": 143.7,
      "round": 8,
+     "week_pts": 8.6,
+     "game": {
+      "week": 1,
+      "opp": "GB",
+      "home": true,
+      "kickoff": "2026-09-13T20:25Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
      "bye": 6,
      "starts_on": 6,
      "best_gain": 18.4,
@@ -4327,6 +5904,15 @@
      "team": "MIN",
      "pts": 141.7,
      "round": 9,
+     "week_pts": 9.5,
+     "game": {
+      "week": 1,
+      "opp": "GB",
+      "home": true,
+      "kickoff": "2026-09-13T20:25Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
      "bye": 6,
      "starts_on": 5,
      "best_gain": 16.4,
@@ -4340,6 +5926,15 @@
      "team": "BUF",
      "pts": 135.2,
      "round": 13,
+     "week_pts": 9.1,
+     "game": {
+      "week": 1,
+      "opp": "HOU",
+      "home": false,
+      "kickoff": "2026-09-13T17:00Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
      "bye": 7,
      "starts_on": 1,
      "best_gain": 9.9,
@@ -4353,6 +5948,15 @@
      "team": "HOU",
      "pts": 118.9,
      "round": 14,
+     "week_pts": 7.4,
+     "game": {
+      "week": 1,
+      "opp": "BUF",
+      "home": true,
+      "kickoff": "2026-09-13T17:00Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
      "bye": 8,
      "starts_on": 0,
      "best_gain": 0,
@@ -4384,6 +5988,15 @@
    "starter_rank": 7,
    "vs_league_median": -6.8,
    "bench_pts": 796,
+   "week": {
+    "n": 1,
+    "starter_pts": 115.5,
+    "starter_n": 10,
+    "starter_of": 10,
+    "bench_pts": 46.8,
+    "bench_n": 5,
+    "bench_of": 5
+   },
    "summary": "7th of 12 in projected starting points (1798), -7 against the league median. TE is the hole — 138 points, 9th, -4 behind. 1 bench player would start on four or more other teams (Trevor Lawrence) — that is the tradeable surplus. Week 10 takes 3 starters off the field at once, and five bench spots do not cover that.",
    "slots": [
     {
@@ -4395,6 +6008,15 @@
       "team": "PHI",
       "pts": 310.5,
       "round": 6,
+      "week_pts": 19.9,
+      "game": {
+       "week": 1,
+       "opp": "WAS",
+       "home": true,
+       "kickoff": "2026-09-13T20:25Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 10,
       "adp": 61.2,
       "injury": null
@@ -4411,6 +6033,15 @@
       "team": "BAL",
       "pts": 238.4,
       "round": 2,
+      "week_pts": 15.1,
+      "game": {
+       "week": 1,
+       "opp": "IND",
+       "home": false,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 13,
       "adp": 13.7,
       "injury": null
@@ -4427,6 +6058,15 @@
       "team": "PHI",
       "pts": 228.2,
       "round": 1,
+      "week_pts": 13.6,
+      "game": {
+       "week": 1,
+       "opp": "WAS",
+       "home": true,
+       "kickoff": "2026-09-13T20:25Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 10,
       "adp": 10.7,
       "injury": null
@@ -4443,6 +6083,15 @@
       "team": "PHI",
       "pts": 189.2,
       "round": 4,
+      "week_pts": 12.2,
+      "game": {
+       "week": 1,
+       "opp": "WAS",
+       "home": true,
+       "kickoff": "2026-09-13T20:25Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 10,
       "adp": 33.3,
       "injury": null
@@ -4459,6 +6108,15 @@
       "team": "CIN",
       "pts": 186.9,
       "round": 3,
+      "week_pts": 13.3,
+      "game": {
+       "week": 1,
+       "opp": "TB",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 6,
       "adp": 39.9,
       "injury": null
@@ -4475,6 +6133,15 @@
       "team": "SF",
       "pts": 138.3,
       "round": 5,
+      "week_pts": 8.2,
+      "game": {
+       "week": 1,
+       "opp": "LAR",
+       "home": false,
+       "kickoff": "2026-09-11T00:35Z",
+       "date": "2026-09-10",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 8,
       "adp": 83.8,
       "injury": "Questionable"
@@ -4491,6 +6158,15 @@
       "team": "ARI",
       "pts": 155.2,
       "round": 8,
+      "week_pts": 9,
+      "game": {
+       "week": 1,
+       "opp": "LAC",
+       "home": false,
+       "kickoff": "2026-09-13T20:25Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 14,
       "adp": 73.3,
       "injury": null
@@ -4507,6 +6183,15 @@
       "team": "PIT",
       "pts": 152.3,
       "round": 7,
+      "week_pts": 10.1,
+      "game": {
+       "week": 1,
+       "opp": "ATL",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 9,
       "adp": 78,
       "injury": null
@@ -4523,6 +6208,15 @@
       "team": "JAX",
       "pts": 108,
       "round": 13,
+      "week_pts": 6.5,
+      "game": {
+       "week": 1,
+       "opp": "CLE",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 7,
       "adp": 146.6,
       "injury": null
@@ -4539,6 +6233,15 @@
       "team": "JAX",
       "pts": 91,
       "round": 15,
+      "week_pts": 7.6,
+      "game": {
+       "week": 1,
+       "opp": "CLE",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
       "bye": 7,
       "adp": 157.6,
       "injury": null
@@ -4665,6 +6368,15 @@
      "team": "JAX",
      "pts": 303.4,
      "round": 10,
+     "week_pts": 17.8,
+     "game": {
+      "week": 1,
+      "opp": "CLE",
+      "home": true,
+      "kickoff": "2026-09-13T17:00Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
      "bye": 7,
      "starts_on": 5,
      "best_gain": 19.9,
@@ -4678,6 +6390,15 @@
      "team": "ARI",
      "pts": 136.5,
      "round": 9,
+     "week_pts": 9.4,
+     "game": {
+      "week": 1,
+      "opp": "LAC",
+      "home": false,
+      "kickoff": "2026-09-13T20:25Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
      "bye": 14,
      "starts_on": 2,
      "best_gain": 11.2,
@@ -4691,6 +6412,15 @@
      "team": "TEN",
      "pts": 135.2,
      "round": 12,
+     "week_pts": 7.9,
+     "game": {
+      "week": 1,
+      "opp": "NYJ",
+      "home": true,
+      "kickoff": "2026-09-13T17:00Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
      "bye": 9,
      "starts_on": 1,
      "best_gain": 9.9,
@@ -4704,6 +6434,15 @@
      "team": "MIN",
      "pts": 120.1,
      "round": 11,
+     "week_pts": 8.1,
+     "game": {
+      "week": 1,
+      "opp": "GB",
+      "home": true,
+      "kickoff": "2026-09-13T20:25Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
      "bye": 6,
      "starts_on": 0,
      "best_gain": 0,
@@ -4717,6 +6456,15 @@
      "team": "NYG",
      "pts": 100.8,
      "round": 14,
+     "week_pts": 3.6,
+     "game": {
+      "week": 1,
+      "opp": "DAL",
+      "home": true,
+      "kickoff": "2026-09-14T00:20Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
      "bye": 8,
      "starts_on": 0,
      "best_gain": 0,

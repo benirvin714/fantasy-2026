@@ -1,0 +1,7570 @@
+{
+ "generated": "2026-09-09",
+ "league": {
+  "id": "1403499370376179712",
+  "name": "Couples Clash",
+  "season": "2026",
+  "status": "in_season",
+  "week": 1,
+  "season_type": "regular"
+ },
+ "draft": {
+  "id": "1403499371508592640",
+  "status": "complete",
+  "rounds": 15,
+  "type": "snake"
+ },
+ "basis": {
+  "projection": "Sleeper 2026 projected stat lines re-scored with Couples Clash's exact scoring_settings (data/raw/league-clash-2026.json). NOT the draft board's numbers: the board is scored in the HBGBs' settings.",
+  "market": "Omitted. The shared draft board's ADP and Boris Chen tiers are half-PPR; Couples Clash scores receptions at 1, so they are another format's market and are dropped rather than shown under this league's name.",
+  "lineup": "Optimal lineup under QB/RB/RB/WR/WR/TE/FLEX/FLEX/K/DEF, five bench. Greedy is optimal here because slot eligibility nests.",
+  "strength": "Per-slot and per-position rank against the other thirteen teams. K and DEF are reported but never graded — they are streaming positions in this format.",
+  "surplus": "A bench player's \"starts on N\" is measured by recomputing each of the other thirteen optimal lineups with him inserted.",
+  "trades": "Exhaustive 1-for-1 and 2-for-1 search. A proposal ships only if BOTH optimal lineups rise (>= 5 season points for a 1-for-1; >= 8 to me and >= 5 to them for a 2-for-1, where the other side must also take on more raw projected points than it gives).",
+  "tendencies": "Couples Clash is in its first season, so there is no owner history to read. The league table reports completed moves this season instead — observed, and zero for everybody until somebody makes one.",
+  "caveat": "A projection is a season-long point estimate. It cannot see a camp role change, it prices DEF poorly (points-allowed tiers do not project), and it says nothing about week-to-week ceiling. Every number here is the start of an argument, not the end of one."
+ },
+ "week": {
+  "n": 1,
+  "teams_playing": 32,
+  "projected": 204,
+  "of_rostered": 210,
+  "schedule_source": "pairings from Sleeper's regular-season schedule, kickoff times from ESPN's public scoreboard",
+  "projection_source": "Sleeper week-1 projected stat lines re-scored with Couples Clash's exact scoring_settings — the same arithmetic as the season column, over a different stat line.",
+  "canceled": [],
+  "warnings": []
+ },
+ "coverage": {
+  "rostered": 210,
+  "priced": 210,
+  "off_board_priced": 210,
+  "league_median_starters": 1950.3
+ },
+ "slot_table": [
+  {
+   "slot": "QB",
+   "index": 0,
+   "median": 303.6,
+   "best": 361.5
+  },
+  {
+   "slot": "RB",
+   "index": 1,
+   "median": 246.8,
+   "best": 331.4
+  },
+  {
+   "slot": "RB",
+   "index": 2,
+   "median": 203.6,
+   "best": 255.2
+  },
+  {
+   "slot": "WR",
+   "index": 3,
+   "median": 248.8,
+   "best": 312.5
+  },
+  {
+   "slot": "WR",
+   "index": 4,
+   "median": 222.6,
+   "best": 250.2
+  },
+  {
+   "slot": "TE",
+   "index": 5,
+   "median": 173,
+   "best": 253.5
+  },
+  {
+   "slot": "FLEX",
+   "index": 6,
+   "median": 176.1,
+   "best": 213.8
+  },
+  {
+   "slot": "FLEX",
+   "index": 7,
+   "median": 168.8,
+   "best": 206.2
+  },
+  {
+   "slot": "K",
+   "index": 8,
+   "median": 102,
+   "best": 112
+  },
+  {
+   "slot": "DEF",
+   "index": 9,
+   "median": 92,
+   "best": 106
+  }
+ ],
+ "pos_table": {
+  "QB": {
+   "median": 303.6
+  },
+  "RB": {
+   "median": 472.7
+  },
+  "WR": {
+   "median": 784.8
+  },
+  "TE": {
+   "median": 176
+  },
+  "K": {
+   "median": 102
+  },
+  "DEF": {
+   "median": 92
+  }
+ },
+ "trade_history": null,
+ "season_moves": {
+  "per": {},
+  "total": 0,
+  "kinds": {
+   "trade": 0,
+   "waiver": 0,
+   "free_agent": 0
+  },
+  "through_week": 1
+ },
+ "teams": [
+  {
+   "roster_id": 1,
+   "owner": "nashsmom",
+   "user_id": "1135744520370712576",
+   "is_me": false,
+   "draft_slot": 6,
+   "starter_pts": 1877.9,
+   "starter_rank": 13,
+   "vs_league_median": -72.4,
+   "bench_pts": 613.2,
+   "week": {
+    "n": 1,
+    "starter_pts": 115.7,
+    "starter_n": 10,
+    "starter_of": 10,
+    "bench_pts": 24.8,
+    "bench_n": 4,
+    "bench_of": 5
+   },
+   "summary": "13th of 14 in projected starting points (1878), -72 against the league median. RB is the hole — 407 points, 12th, -66 behind. No bench player would start on four other teams, so there is little here to trade from.",
+   "slots": [
+    {
+     "slot": "QB",
+     "player": {
+      "id": "6770",
+      "name": "Joe Burrow",
+      "pos": "QB",
+      "team": "CIN",
+      "pts": 306.1,
+      "round": 3,
+      "week_pts": 20.1,
+      "game": {
+       "week": 1,
+       "opp": "TB",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 6,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 6,
+     "vs_median": 2.5
+    },
+    {
+     "slot": "RB",
+     "player": {
+      "id": "4866",
+      "name": "Saquon Barkley",
+      "pos": "RB",
+      "team": "PHI",
+      "pts": 246.7,
+      "round": 1,
+      "week_pts": 14.9,
+      "game": {
+       "week": 1,
+       "opp": "WAS",
+       "home": true,
+       "kickoff": "2026-09-13T20:25Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 10,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 8,
+     "vs_median": -0.1
+    },
+    {
+     "slot": "RB",
+     "player": {
+      "id": "5967",
+      "name": "Tony Pollard",
+      "pos": "RB",
+      "team": "TEN",
+      "pts": 160.1,
+      "round": 5,
+      "week_pts": 10.1,
+      "game": {
+       "week": 1,
+       "opp": "NYJ",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 9,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 12,
+     "vs_median": -43.5
+    },
+    {
+     "slot": "WR",
+     "player": {
+      "id": "10229",
+      "name": "Rashee Rice",
+      "pos": "WR",
+      "team": "KC",
+      "pts": 229.3,
+      "round": 2,
+      "week_pts": 14.5,
+      "game": {
+       "week": 1,
+       "opp": "DEN",
+       "home": true,
+       "kickoff": "2026-09-15T00:15Z",
+       "date": "2026-09-14",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 5,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 11,
+     "vs_median": -19.5
+    },
+    {
+     "slot": "WR",
+     "player": {
+      "id": "2216",
+      "name": "Mike Evans",
+      "pos": "WR",
+      "team": "SF",
+      "pts": 222.2,
+      "round": 4,
+      "week_pts": 12.7,
+      "game": {
+       "week": 1,
+       "opp": "LAR",
+       "home": false,
+       "kickoff": "2026-09-11T00:35Z",
+       "date": "2026-09-10",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 8,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 8,
+     "vs_median": -0.4
+    },
+    {
+     "slot": "TE",
+     "player": {
+      "id": "7553",
+      "name": "Kyle Pitts",
+      "pos": "TE",
+      "team": "ATL",
+      "pts": 171.6,
+      "round": 6,
+      "week_pts": 10.8,
+      "game": {
+       "week": 1,
+       "opp": "PIT",
+       "home": false,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 11,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 8,
+     "vs_median": -1.4
+    },
+    {
+     "slot": "FLEX",
+     "player": {
+      "id": "8142",
+      "name": "Alec Pierce",
+      "pos": "WR",
+      "team": "IND",
+      "pts": 177.9,
+      "round": 7,
+      "week_pts": 8.8,
+      "game": {
+       "week": 1,
+       "opp": "BAL",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 13,
+      "adp": null,
+      "injury": "Questionable"
+     },
+     "rank": 6,
+     "vs_median": 1.8
+    },
+    {
+     "slot": "FLEX",
+     "player": {
+      "id": "10232",
+      "name": "Michael Wilson",
+      "pos": "WR",
+      "team": "ARI",
+      "pts": 166,
+      "round": 8,
+      "week_pts": 11.3,
+      "game": {
+       "week": 1,
+       "opp": "LAC",
+       "home": false,
+       "kickoff": "2026-09-13T20:25Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 14,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 9,
+     "vs_median": -2.8
+    },
+    {
+     "slot": "K",
+     "player": {
+      "id": "1945",
+      "name": "Chris Boswell",
+      "pos": "K",
+      "team": "PIT",
+      "pts": 103,
+      "round": 12,
+      "week_pts": 6,
+      "game": {
+       "week": 1,
+       "opp": "ATL",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 9,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 6,
+     "vs_median": 1
+    },
+    {
+     "slot": "DEF",
+     "player": {
+      "id": "BAL",
+      "name": "Baltimore Ravens",
+      "pos": "DEF",
+      "team": "BAL",
+      "pts": 95,
+      "round": 9,
+      "week_pts": 6.5,
+      "game": {
+       "week": 1,
+       "opp": "IND",
+       "home": false,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 13,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 6,
+     "vs_median": 3
+    }
+   ],
+   "by_pos": [
+    {
+     "pos": "QB",
+     "pts": 306.1,
+     "rank": 6,
+     "vs_median": 2.5,
+     "starters": 1,
+     "rostered": 2
+    },
+    {
+     "pos": "RB",
+     "pts": 406.8,
+     "rank": 12,
+     "vs_median": -65.9,
+     "starters": 2,
+     "rostered": 4
+    },
+    {
+     "pos": "WR",
+     "pts": 795.4,
+     "rank": 7,
+     "vs_median": 10.6,
+     "starters": 4,
+     "rostered": 6
+    },
+    {
+     "pos": "TE",
+     "pts": 171.6,
+     "rank": 8,
+     "vs_median": -4.4,
+     "starters": 1,
+     "rostered": 1
+    },
+    {
+     "pos": "K",
+     "pts": 103,
+     "rank": 6,
+     "vs_median": 1,
+     "starters": 1,
+     "rostered": 1
+    },
+    {
+     "pos": "DEF",
+     "pts": 95,
+     "rank": 6,
+     "vs_median": 3,
+     "starters": 1,
+     "rostered": 1
+    }
+   ],
+   "strengths": [],
+   "weaknesses": [
+    {
+     "pos": "RB",
+     "pts": 406.8,
+     "rank": 12,
+     "vs_median": -65.9,
+     "starters": 2,
+     "rostered": 4
+    },
+    {
+     "pos": "TE",
+     "pts": 171.6,
+     "rank": 8,
+     "vs_median": -4.4,
+     "starters": 1,
+     "rostered": 1
+    }
+   ],
+   "risks": {
+    "bye_stacks": [],
+    "injured": [
+     {
+      "name": "Alec Pierce",
+      "pos": "WR",
+      "status": "Questionable"
+     }
+    ],
+    "fragile": [
+     {
+      "name": "Rashee Rice",
+      "pos": "WR",
+      "score": 0.729,
+      "why": "2024 knee (LCL, 4 games) then a 2026 offseason knee clean-up (~2 months, debris removal). Verify the knee clears camp."
+     },
+     {
+      "name": "Mike Evans",
+      "pos": "WR",
+      "score": 0.756,
+      "why": "Age-33 season coming off injuries and his worst fantasy year (10.6 PPG, WR41); 1.62 YPRR is a separate red flag. Durability plus age-decline is the compound risk."
+     },
+     {
+      "name": "Joe Burrow",
+      "pos": "QB",
+      "score": 0.812,
+      "why": "2025 limited to 8 games (turf-toe surgery). When healthy a top-5 fantasy QB, but that version has shown up once in three seasons; the injury history is the story."
+     }
+    ],
+    "flagged": []
+   },
+   "bench": [
+    {
+     "id": "13269",
+     "name": "Fernando Mendoza",
+     "pos": "QB",
+     "team": "LV",
+     "pts": 212.2,
+     "round": 10,
+     "week_pts": null,
+     "game": {
+      "week": 1,
+      "opp": "MIA",
+      "home": true,
+      "kickoff": "2026-09-13T20:25Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 13,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    },
+    {
+     "id": "8676",
+     "name": "Rashid Shaheed",
+     "pos": "WR",
+     "team": "SEA",
+     "pts": 138.1,
+     "round": 11,
+     "week_pts": 9,
+     "game": {
+      "week": 1,
+      "opp": "NE",
+      "home": true,
+      "kickoff": "2026-09-10T00:20Z",
+      "date": "2026-09-09",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 11,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    },
+    {
+     "id": "11655",
+     "name": "Tyrone Tracy",
+     "pos": "RB",
+     "team": "NYG",
+     "pts": 111.3,
+     "round": 13,
+     "week_pts": 4.1,
+     "game": {
+      "week": 1,
+      "opp": "DAL",
+      "home": true,
+      "kickoff": "2026-09-14T00:20Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 8,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    },
+    {
+     "id": "4039",
+     "name": "Cooper Kupp",
+     "pos": "WR",
+     "team": "SEA",
+     "pts": 86.4,
+     "round": 14,
+     "week_pts": 7.9,
+     "game": {
+      "week": 1,
+      "opp": "NE",
+      "home": true,
+      "kickoff": "2026-09-10T00:20Z",
+      "date": "2026-09-09",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": null,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    },
+    {
+     "id": "13337",
+     "name": "Emmett Johnson",
+     "pos": "RB",
+     "team": "KC",
+     "pts": 65.2,
+     "round": 15,
+     "week_pts": 3.8,
+     "game": {
+      "week": 1,
+      "opp": "DEN",
+      "home": true,
+      "kickoff": "2026-09-15T00:15Z",
+      "date": "2026-09-14",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 5,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    }
+   ],
+   "unpriced": [],
+   "tendencies": null,
+   "moves": {
+    "n": 0,
+    "through_week": 1,
+    "note": "No completed moves through week 1."
+   },
+   "proposals": [],
+   "fit": {
+    "they_have": [],
+    "they_want": [],
+    "note": "No surplus mismatch in either direction. Every player on both rosters is already worth at least as much where he is."
+   }
+  },
+  {
+   "roster_id": 2,
+   "owner": "brobertson2",
+   "user_id": "1403501251898916864",
+   "is_me": false,
+   "draft_slot": 12,
+   "starter_pts": 1962.4,
+   "starter_rank": 6,
+   "vs_league_median": 12.1,
+   "bench_pts": 728.3,
+   "week": {
+    "n": 1,
+    "starter_pts": 126,
+    "starter_n": 10,
+    "starter_of": 10,
+    "bench_pts": 42.3,
+    "bench_n": 5,
+    "bench_of": 5
+   },
+   "summary": "6th of 14 in projected starting points (1962), +12 against the league median. Built on WR: 837 starting points, 3rd in the league, +52 on the median. TE is the hole — 164 points, 10th, -12 behind. 1 bench player would start on four or more other teams (Matthew Golden) — that is the tradeable surplus. Week 7 takes 3 starters off the field at once, and five bench spots do not cover that.",
+   "slots": [
+    {
+     "slot": "QB",
+     "player": {
+      "id": "3294",
+      "name": "Dak Prescott",
+      "pos": "QB",
+      "team": "DAL",
+      "pts": 303.9,
+      "round": 6,
+      "week_pts": 18.8,
+      "game": {
+       "week": 1,
+       "opp": "NYG",
+       "home": false,
+       "kickoff": "2026-09-14T00:20Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 14,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 7,
+     "vs_median": 0.3
+    },
+    {
+     "slot": "RB",
+     "player": {
+      "id": "9226",
+      "name": "De'Von Achane",
+      "pos": "RB",
+      "team": "MIA",
+      "pts": 257.4,
+      "round": 1,
+      "week_pts": 17.5,
+      "game": {
+       "week": 1,
+       "opp": "LV",
+       "home": false,
+       "kickoff": "2026-09-13T20:25Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 6,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 6,
+     "vs_median": 10.6
+    },
+    {
+     "slot": "RB",
+     "player": {
+      "id": "6790",
+      "name": "D'Andre Swift",
+      "pos": "RB",
+      "team": "CHI",
+      "pts": 208,
+      "round": 4,
+      "week_pts": 13.6,
+      "game": {
+       "week": 1,
+       "opp": "CAR",
+       "home": false,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 10,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 5,
+     "vs_median": 4.4
+    },
+    {
+     "slot": "WR",
+     "player": {
+      "id": "5859",
+      "name": "A.J. Brown",
+      "pos": "WR",
+      "team": "NE",
+      "pts": 247.2,
+      "round": 2,
+      "week_pts": 16.9,
+      "game": {
+       "week": 1,
+       "opp": "SEA",
+       "home": false,
+       "kickoff": "2026-09-10T00:20Z",
+       "date": "2026-09-09",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 11,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 8,
+     "vs_median": -1.6
+    },
+    {
+     "slot": "WR",
+     "player": {
+      "id": "12526",
+      "name": "Tetairoa McMillan",
+      "pos": "WR",
+      "team": "CAR",
+      "pts": 223,
+      "round": 3,
+      "week_pts": 13.9,
+      "game": {
+       "week": 1,
+       "opp": "CHI",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 5,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 7,
+     "vs_median": 0.4
+    },
+    {
+     "slot": "TE",
+     "player": {
+      "id": "10236",
+      "name": "Dalton Kincaid",
+      "pos": "TE",
+      "team": "BUF",
+      "pts": 163.6,
+      "round": 7,
+      "week_pts": 9.4,
+      "game": {
+       "week": 1,
+       "opp": "HOU",
+       "home": false,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 7,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 10,
+     "vs_median": -9.4
+    },
+    {
+     "slot": "FLEX",
+     "player": {
+      "id": "11631",
+      "name": "Brian Thomas",
+      "pos": "WR",
+      "team": "JAX",
+      "pts": 195.4,
+      "round": 5,
+      "week_pts": 10.5,
+      "game": {
+       "week": 1,
+       "opp": "CLE",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 7,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 3,
+     "vs_median": 19.3
+    },
+    {
+     "slot": "FLEX",
+     "player": {
+      "id": "6819",
+      "name": "Michael Pittman",
+      "pos": "WR",
+      "team": "PIT",
+      "pts": 170.9,
+      "round": 8,
+      "week_pts": 10.8,
+      "game": {
+       "week": 1,
+       "opp": "ATL",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 9,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 3,
+     "vs_median": 2.1
+    },
+    {
+     "slot": "K",
+     "player": {
+      "id": "12015",
+      "name": "Harrison Mevis",
+      "pos": "K",
+      "team": "LAR",
+      "pts": 102,
+      "round": 12,
+      "week_pts": 7,
+      "game": {
+       "week": 1,
+       "opp": "SF",
+       "home": true,
+       "kickoff": "2026-09-11T00:35Z",
+       "date": "2026-09-10",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 11,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 7,
+     "vs_median": 0
+    },
+    {
+     "slot": "DEF",
+     "player": {
+      "id": "JAX",
+      "name": "Jacksonville Jaguars",
+      "pos": "DEF",
+      "team": "JAX",
+      "pts": 91,
+      "round": 11,
+      "week_pts": 7.6,
+      "game": {
+       "week": 1,
+       "opp": "CLE",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 7,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 10,
+     "vs_median": -1
+    }
+   ],
+   "by_pos": [
+    {
+     "pos": "QB",
+     "pts": 303.9,
+     "rank": 7,
+     "vs_median": 0.3,
+     "starters": 1,
+     "rostered": 2
+    },
+    {
+     "pos": "RB",
+     "pts": 465.4,
+     "rank": 8,
+     "vs_median": -7.3,
+     "starters": 2,
+     "rostered": 3
+    },
+    {
+     "pos": "WR",
+     "pts": 836.5,
+     "rank": 3,
+     "vs_median": 51.7,
+     "starters": 4,
+     "rostered": 6
+    },
+    {
+     "pos": "TE",
+     "pts": 163.6,
+     "rank": 10,
+     "vs_median": -12.4,
+     "starters": 1,
+     "rostered": 2
+    },
+    {
+     "pos": "K",
+     "pts": 102,
+     "rank": 7,
+     "vs_median": 0,
+     "starters": 1,
+     "rostered": 1
+    },
+    {
+     "pos": "DEF",
+     "pts": 91,
+     "rank": 10,
+     "vs_median": -1,
+     "starters": 1,
+     "rostered": 1
+    }
+   ],
+   "strengths": [
+    {
+     "pos": "WR",
+     "pts": 836.5,
+     "rank": 3,
+     "vs_median": 51.7,
+     "starters": 4,
+     "rostered": 6
+    }
+   ],
+   "weaknesses": [
+    {
+     "pos": "TE",
+     "pts": 163.6,
+     "rank": 10,
+     "vs_median": -12.4,
+     "starters": 1,
+     "rostered": 2
+    },
+    {
+     "pos": "RB",
+     "pts": 465.4,
+     "rank": 8,
+     "vs_median": -7.3,
+     "starters": 2,
+     "rostered": 3
+    }
+   ],
+   "risks": {
+    "bye_stacks": [
+     {
+      "week": 7,
+      "n": 3,
+      "players": [
+       "Dalton Kincaid (TE)",
+       "Brian Thomas (WR)",
+       "Jacksonville Jaguars (DEF)"
+      ]
+     }
+    ],
+    "injured": [],
+    "fragile": [
+     {
+      "name": "Harrison Mevis",
+      "pos": "K",
+      "score": 0.718,
+      "why": null
+     },
+     {
+      "name": "Dalton Kincaid",
+      "pos": "TE",
+      "score": 0.882,
+      "why": "Missed time in 2024-25 (13/12 games): nagging soft-tissue/lower-body issues, no single structural event."
+     },
+     {
+      "name": "Dak Prescott",
+      "pos": "QB",
+      "score": 0.894,
+      "why": "2024 catastrophic hamstring (torn off the bone, Week 8, season-ending surgery; 8 games). Returned fully in 2025 (17 games, Comeback Player of the Year finalist)."
+     }
+    ],
+    "flagged": []
+   },
+   "bench": [
+    {
+     "id": "9758",
+     "name": "C.J. Stroud",
+     "pos": "QB",
+     "team": "HOU",
+     "pts": 247.8,
+     "round": 15,
+     "week_pts": 16.2,
+     "game": {
+      "week": 1,
+      "opp": "BUF",
+      "home": true,
+      "kickoff": "2026-09-13T17:00Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 8,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    },
+    {
+     "id": "12501",
+     "name": "Matthew Golden",
+     "pos": "WR",
+     "team": "GB",
+     "pts": 170,
+     "round": 10,
+     "week_pts": 9.9,
+     "game": {
+      "week": 1,
+      "opp": "MIN",
+      "home": false,
+      "kickoff": "2026-09-13T20:25Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 11,
+     "starts_on": 10,
+     "best_gain": 22.1,
+     "best_team": 8,
+     "own_cost": 0
+    },
+    {
+     "id": "12493",
+     "name": "Oronde Gadsden",
+     "pos": "TE",
+     "team": "LAC",
+     "pts": 141.8,
+     "round": 14,
+     "week_pts": 4.8,
+     "game": {
+      "week": 1,
+      "opp": "ARI",
+      "home": true,
+      "kickoff": "2026-09-13T20:25Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 7,
+     "starts_on": 1,
+     "best_gain": 5.8,
+     "best_team": 4,
+     "own_cost": 0
+    },
+    {
+     "id": "7049",
+     "name": "Jauan Jennings",
+     "pos": "WR",
+     "team": "MIN",
+     "pts": 105.7,
+     "round": 13,
+     "week_pts": 8.1,
+     "game": {
+      "week": 1,
+      "opp": "GB",
+      "home": true,
+      "kickoff": "2026-09-13T20:25Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 6,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    },
+    {
+     "id": "4035",
+     "name": "Alvin Kamara",
+     "pos": "RB",
+     "team": "NO",
+     "pts": 63,
+     "round": 9,
+     "week_pts": 3.3,
+     "game": {
+      "week": 1,
+      "opp": "DET",
+      "home": false,
+      "kickoff": "2026-09-13T17:00Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 8,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    }
+   ],
+   "unpriced": [],
+   "tendencies": null,
+   "moves": {
+    "n": 0,
+    "through_week": 1,
+    "note": "No completed moves through week 1."
+   },
+   "proposals": [],
+   "fit": {
+    "they_have": [],
+    "they_want": [],
+    "note": "No surplus mismatch in either direction. Every player on both rosters is already worth at least as much where he is."
+   }
+  },
+  {
+   "roster_id": 3,
+   "owner": "kathrynemurray",
+   "user_id": "1268967828023693312",
+   "is_me": false,
+   "draft_slot": 10,
+   "starter_pts": 1909.4,
+   "starter_rank": 12,
+   "vs_league_median": -40.9,
+   "bench_pts": 529.8,
+   "week": {
+    "n": 1,
+    "starter_pts": 126.8,
+    "starter_n": 10,
+    "starter_of": 10,
+    "bench_pts": 37.5,
+    "bench_n": 5,
+    "bench_of": 5
+   },
+   "summary": "12th of 14 in projected starting points (1909), -41 against the league median. QB is the hole — 280 points, 14th, -23 behind. No bench player would start on four other teams, so there is little here to trade from. Week 11 takes 3 starters off the field at once, and five bench spots do not cover that.",
+   "slots": [
+    {
+     "slot": "QB",
+     "player": {
+      "id": "421",
+      "name": "Matthew Stafford",
+      "pos": "QB",
+      "team": "LAR",
+      "pts": 280.2,
+      "round": 7,
+      "week_pts": 16.9,
+      "game": {
+       "week": 1,
+       "opp": "SF",
+       "home": true,
+       "kickoff": "2026-09-11T00:35Z",
+       "date": "2026-09-10",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 11,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 14,
+     "vs_median": -23.4
+    },
+    {
+     "slot": "RB",
+     "player": {
+      "id": "8150",
+      "name": "Kyren Williams",
+      "pos": "RB",
+      "team": "LAR",
+      "pts": 208,
+      "round": 2,
+      "week_pts": 14.4,
+      "game": {
+       "week": 1,
+       "opp": "SF",
+       "home": true,
+       "kickoff": "2026-09-11T00:35Z",
+       "date": "2026-09-10",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 11,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 12,
+     "vs_median": -38.8
+    },
+    {
+     "slot": "RB",
+     "player": {
+      "id": "12481",
+      "name": "Cam Skattebo",
+      "pos": "RB",
+      "team": "NYG",
+      "pts": 201.2,
+      "round": 4,
+      "week_pts": 14,
+      "game": {
+       "week": 1,
+       "opp": "DAL",
+       "home": true,
+       "kickoff": "2026-09-14T00:20Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 8,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 8,
+     "vs_median": -2.4
+    },
+    {
+     "slot": "WR",
+     "player": {
+      "id": "6786",
+      "name": "CeeDee Lamb",
+      "pos": "WR",
+      "team": "DAL",
+      "pts": 270.5,
+      "round": 1,
+      "week_pts": 17.1,
+      "game": {
+       "week": 1,
+       "opp": "NYG",
+       "home": false,
+       "kickoff": "2026-09-14T00:20Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 14,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 5,
+     "vs_median": 21.7
+    },
+    {
+     "slot": "WR",
+     "player": {
+      "id": "6801",
+      "name": "Tee Higgins",
+      "pos": "WR",
+      "team": "CIN",
+      "pts": 224.4,
+      "round": 3,
+      "week_pts": 15.7,
+      "game": {
+       "week": 1,
+       "opp": "TB",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 6,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 5,
+     "vs_median": 1.8
+    },
+    {
+     "slot": "TE",
+     "player": {
+      "id": "10859",
+      "name": "Sam LaPorta",
+      "pos": "TE",
+      "team": "DET",
+      "pts": 196.5,
+      "round": 6,
+      "week_pts": 13.5,
+      "game": {
+       "week": 1,
+       "opp": "NO",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 6,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 5,
+     "vs_median": 23.5
+    },
+    {
+     "slot": "FLEX",
+     "player": {
+      "id": "5846",
+      "name": "DK Metcalf",
+      "pos": "WR",
+      "team": "PIT",
+      "pts": 183.3,
+      "round": 5,
+      "week_pts": 11.9,
+      "game": {
+       "week": 1,
+       "opp": "ATL",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 9,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 4,
+     "vs_median": 7.2
+    },
+    {
+     "slot": "FLEX",
+     "player": {
+      "id": "2449",
+      "name": "Stefon Diggs",
+      "pos": "WR",
+      "team": "WAS",
+      "pts": 157.3,
+      "round": 8,
+      "week_pts": 11.4,
+      "game": {
+       "week": 1,
+       "opp": "PHI",
+       "home": false,
+       "kickoff": "2026-09-13T20:25Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 7,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 12,
+     "vs_median": -11.5
+    },
+    {
+     "slot": "K",
+     "player": {
+      "id": "4227",
+      "name": "Harrison Butker",
+      "pos": "K",
+      "team": "KC",
+      "pts": 96,
+      "round": 12,
+      "week_pts": 6.3,
+      "game": {
+       "week": 1,
+       "opp": "DEN",
+       "home": true,
+       "kickoff": "2026-09-15T00:15Z",
+       "date": "2026-09-14",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": null,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 13,
+     "vs_median": -6
+    },
+    {
+     "slot": "DEF",
+     "player": {
+      "id": "NE",
+      "name": "New England Patriots",
+      "pos": "DEF",
+      "team": "NE",
+      "pts": 92,
+      "round": 10,
+      "week_pts": 5.6,
+      "game": {
+       "week": 1,
+       "opp": "SEA",
+       "home": false,
+       "kickoff": "2026-09-10T00:20Z",
+       "date": "2026-09-09",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 11,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 7,
+     "vs_median": 0
+    }
+   ],
+   "by_pos": [
+    {
+     "pos": "QB",
+     "pts": 280.2,
+     "rank": 14,
+     "vs_median": -23.4,
+     "starters": 1,
+     "rostered": 1
+    },
+    {
+     "pos": "RB",
+     "pts": 409.2,
+     "rank": 11,
+     "vs_median": -63.5,
+     "starters": 2,
+     "rostered": 6
+    },
+    {
+     "pos": "WR",
+     "pts": 835.5,
+     "rank": 4,
+     "vs_median": 50.7,
+     "starters": 4,
+     "rostered": 5
+    },
+    {
+     "pos": "TE",
+     "pts": 196.5,
+     "rank": 6,
+     "vs_median": 20.5,
+     "starters": 1,
+     "rostered": 1
+    },
+    {
+     "pos": "K",
+     "pts": 96,
+     "rank": 13,
+     "vs_median": -6,
+     "starters": 1,
+     "rostered": 1
+    },
+    {
+     "pos": "DEF",
+     "pts": 92,
+     "rank": 7,
+     "vs_median": 0,
+     "starters": 1,
+     "rostered": 1
+    }
+   ],
+   "strengths": [],
+   "weaknesses": [
+    {
+     "pos": "QB",
+     "pts": 280.2,
+     "rank": 14,
+     "vs_median": -23.4,
+     "starters": 1,
+     "rostered": 1
+    },
+    {
+     "pos": "RB",
+     "pts": 409.2,
+     "rank": 11,
+     "vs_median": -63.5,
+     "starters": 2,
+     "rostered": 6
+    }
+   ],
+   "risks": {
+    "bye_stacks": [
+     {
+      "week": 11,
+      "n": 3,
+      "players": [
+       "Matthew Stafford (QB)",
+       "Kyren Williams (RB)",
+       "New England Patriots (DEF)"
+      ]
+     }
+    ],
+    "injured": [],
+    "fragile": [
+     {
+      "name": "Cam Skattebo",
+      "pos": "RB",
+      "score": 0.682,
+      "why": "2025 ankle (8 games); expected full participation early in camp."
+     },
+     {
+      "name": "Stefon Diggs",
+      "pos": "WR",
+      "score": 0.814,
+      "why": null
+     },
+     {
+      "name": "Tee Higgins",
+      "pos": "WR",
+      "score": 0.859,
+      "why": "Recurring soft-tissue history: hamstring (missed 2 to start a season) and a high-ankle sprain (3 games); expected 100% for Week 1. Perennial 'needs better injury luck' profile."
+     }
+    ],
+    "flagged": []
+   },
+   "bench": [
+    {
+     "id": "12533",
+     "name": "Jacory Croskey-Merritt",
+     "pos": "RB",
+     "team": "WAS",
+     "pts": 127.9,
+     "round": 9,
+     "week_pts": 10.8,
+     "game": {
+      "week": 1,
+      "opp": "PHI",
+      "home": false,
+      "kickoff": "2026-09-13T20:25Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 7,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    },
+    {
+     "id": "10213",
+     "name": "Tre Tucker",
+     "pos": "WR",
+     "team": "LV",
+     "pts": 125.9,
+     "round": 15,
+     "week_pts": 9.9,
+     "game": {
+      "week": 1,
+      "opp": "MIA",
+      "home": true,
+      "kickoff": "2026-09-13T20:25Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": null,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    },
+    {
+     "id": "9508",
+     "name": "Tyjae Spears",
+     "pos": "RB",
+     "team": "TEN",
+     "pts": 114.6,
+     "round": 13,
+     "week_pts": 8.1,
+     "game": {
+      "week": 1,
+      "opp": "NYJ",
+      "home": true,
+      "kickoff": "2026-09-13T17:00Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 9,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    },
+    {
+     "id": "13305",
+     "name": "Mike Washington",
+     "pos": "RB",
+     "team": "LV",
+     "pts": 97.5,
+     "round": 11,
+     "week_pts": 5.9,
+     "game": {
+      "week": 1,
+      "opp": "MIA",
+      "home": true,
+      "kickoff": "2026-09-13T20:25Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 13,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    },
+    {
+     "id": "13345",
+     "name": "Jonah Coleman",
+     "pos": "RB",
+     "team": "DEN",
+     "pts": 63.9,
+     "round": 14,
+     "week_pts": 2.8,
+     "game": {
+      "week": 1,
+      "opp": "KC",
+      "home": false,
+      "kickoff": "2026-09-15T00:15Z",
+      "date": "2026-09-14",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 10,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    }
+   ],
+   "unpriced": [],
+   "tendencies": null,
+   "moves": {
+    "n": 0,
+    "through_week": 1,
+    "note": "No completed moves through week 1."
+   },
+   "proposals": [],
+   "fit": {
+    "they_have": [],
+    "they_want": [],
+    "note": "No surplus mismatch in either direction. Every player on both rosters is already worth at least as much where he is."
+   }
+  },
+  {
+   "roster_id": 4,
+   "owner": "chrisroraback",
+   "user_id": "1135744930866970624",
+   "is_me": false,
+   "draft_slot": 13,
+   "starter_pts": 1871,
+   "starter_rank": 14,
+   "vs_league_median": -79.3,
+   "bench_pts": 479.9,
+   "week": {
+    "n": 1,
+    "starter_pts": 115.5,
+    "starter_n": 10,
+    "starter_of": 10,
+    "bench_pts": 33.9,
+    "bench_n": 4,
+    "bench_of": 5
+   },
+   "summary": "14th of 14 in projected starting points (1871), -79 against the league median. Built on QB: 362 starting points, 1st in the league, +58 on the median. TE is the hole — 136 points, 14th, -40 behind. No bench player would start on four other teams, so there is little here to trade from. Week 11 takes 3 starters off the field at once, and five bench spots do not cover that.",
+   "slots": [
+    {
+     "slot": "QB",
+     "player": {
+      "id": "4984",
+      "name": "Josh Allen",
+      "pos": "QB",
+      "team": "BUF",
+      "pts": 361.5,
+      "round": 2,
+      "week_pts": 21.1,
+      "game": {
+       "week": 1,
+       "opp": "HOU",
+       "home": false,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 7,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 1,
+     "vs_median": 57.9
+    },
+    {
+     "slot": "RB",
+     "player": {
+      "id": "3198",
+      "name": "Derrick Henry",
+      "pos": "RB",
+      "team": "BAL",
+      "pts": 246.9,
+      "round": 1,
+      "week_pts": 15.7,
+      "game": {
+       "week": 1,
+       "opp": "IND",
+       "home": false,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 13,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 7,
+     "vs_median": 0.1
+    },
+    {
+     "slot": "RB",
+     "player": {
+      "id": "13286",
+      "name": "Jadarian Price",
+      "pos": "RB",
+      "team": "SEA",
+      "pts": 170,
+      "round": 5,
+      "week_pts": 9.7,
+      "game": {
+       "week": 1,
+       "opp": "NE",
+       "home": true,
+       "kickoff": "2026-09-10T00:20Z",
+       "date": "2026-09-09",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 11,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 10,
+     "vs_median": -33.6
+    },
+    {
+     "slot": "WR",
+     "player": {
+      "id": "7526",
+      "name": "Jaylen Waddle",
+      "pos": "WR",
+      "team": "DEN",
+      "pts": 221,
+      "round": 4,
+      "week_pts": 14.7,
+      "game": {
+       "week": 1,
+       "opp": "KC",
+       "home": false,
+       "kickoff": "2026-09-15T00:15Z",
+       "date": "2026-09-14",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 10,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 14,
+     "vs_median": -27.8
+    },
+    {
+     "slot": "WR",
+     "player": {
+      "id": "2133",
+      "name": "Davante Adams",
+      "pos": "WR",
+      "team": "LAR",
+      "pts": 192.5,
+      "round": 3,
+      "week_pts": 12.3,
+      "game": {
+       "week": 1,
+       "opp": "SF",
+       "home": true,
+       "kickoff": "2026-09-11T00:35Z",
+       "date": "2026-09-10",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 11,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 13,
+     "vs_median": -30.1
+    },
+    {
+     "slot": "TE",
+     "player": {
+      "id": "5022",
+      "name": "Dallas Goedert",
+      "pos": "TE",
+      "team": "PHI",
+      "pts": 136,
+      "round": 7,
+      "week_pts": 9.7,
+      "game": {
+       "week": 1,
+       "opp": "WAS",
+       "home": true,
+       "kickoff": "2026-09-13T20:25Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 10,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 14,
+     "vs_median": -37
+    },
+    {
+     "slot": "FLEX",
+     "player": {
+      "id": "8126",
+      "name": "Wan'Dale Robinson",
+      "pos": "WR",
+      "team": "TEN",
+      "pts": 170.7,
+      "round": 10,
+      "week_pts": 9.9,
+      "game": {
+       "week": 1,
+       "opp": "NYJ",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 9,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 13,
+     "vs_median": -5.4
+    },
+    {
+     "slot": "FLEX",
+     "player": {
+      "id": "13298",
+      "name": "KC Concepcion",
+      "pos": "WR",
+      "team": "CLE",
+      "pts": 156.4,
+      "round": 9,
+      "week_pts": 9.5,
+      "game": {
+       "week": 1,
+       "opp": "JAX",
+       "home": false,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 11,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 13,
+     "vs_median": -12.4
+    },
+    {
+     "slot": "K",
+     "player": {
+      "id": "11533",
+      "name": "Brandon Aubrey",
+      "pos": "K",
+      "team": "DAL",
+      "pts": 112,
+      "round": 6,
+      "week_pts": 6.8,
+      "game": {
+       "week": 1,
+       "opp": "NYG",
+       "home": false,
+       "kickoff": "2026-09-14T00:20Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 14,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 1,
+     "vs_median": 10
+    },
+    {
+     "slot": "DEF",
+     "player": {
+      "id": "HOU",
+      "name": "Houston Texans",
+      "pos": "DEF",
+      "team": "HOU",
+      "pts": 104,
+      "round": 8,
+      "week_pts": 6.1,
+      "game": {
+       "week": 1,
+       "opp": "BUF",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 8,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 2,
+     "vs_median": 12
+    }
+   ],
+   "by_pos": [
+    {
+     "pos": "QB",
+     "pts": 361.5,
+     "rank": 1,
+     "vs_median": 57.9,
+     "starters": 1,
+     "rostered": 2
+    },
+    {
+     "pos": "RB",
+     "pts": 416.9,
+     "rank": 10,
+     "vs_median": -55.8,
+     "starters": 2,
+     "rostered": 4
+    },
+    {
+     "pos": "WR",
+     "pts": 740.6,
+     "rank": 9,
+     "vs_median": -44.2,
+     "starters": 4,
+     "rostered": 6
+    },
+    {
+     "pos": "TE",
+     "pts": 136,
+     "rank": 14,
+     "vs_median": -40,
+     "starters": 1,
+     "rostered": 1
+    },
+    {
+     "pos": "K",
+     "pts": 112,
+     "rank": 1,
+     "vs_median": 10,
+     "starters": 1,
+     "rostered": 1
+    },
+    {
+     "pos": "DEF",
+     "pts": 104,
+     "rank": 2,
+     "vs_median": 12,
+     "starters": 1,
+     "rostered": 1
+    }
+   ],
+   "strengths": [
+    {
+     "pos": "QB",
+     "pts": 361.5,
+     "rank": 1,
+     "vs_median": 57.9,
+     "starters": 1,
+     "rostered": 2
+    }
+   ],
+   "weaknesses": [
+    {
+     "pos": "TE",
+     "pts": 136,
+     "rank": 14,
+     "vs_median": -40,
+     "starters": 1,
+     "rostered": 1
+    },
+    {
+     "pos": "RB",
+     "pts": 416.9,
+     "rank": 10,
+     "vs_median": -55.8,
+     "starters": 2,
+     "rostered": 4
+    },
+    {
+     "pos": "WR",
+     "pts": 740.6,
+     "rank": 9,
+     "vs_median": -44.2,
+     "starters": 4,
+     "rostered": 6
+    }
+   ],
+   "risks": {
+    "bye_stacks": [
+     {
+      "week": 11,
+      "n": 3,
+      "players": [
+       "Jadarian Price (RB)",
+       "Davante Adams (WR)",
+       "KC Concepcion (WR)"
+      ]
+     }
+    ],
+    "injured": [],
+    "fragile": [
+     {
+      "name": "Dallas Goedert",
+      "pos": "TE",
+      "score": 0.807,
+      "why": null
+     },
+     {
+      "name": "Davante Adams",
+      "pos": "WR",
+      "score": 0.818,
+      "why": "Missed time 2024-25 (14/14); age 33. Decline + durability is the compound risk."
+     },
+     {
+      "name": "Derrick Henry",
+      "pos": "RB",
+      "score": 0.85,
+      "why": "Remarkably durable (17/17/17); the flag is age (32), not health."
+     }
+    ],
+    "flagged": []
+   },
+   "bench": [
+    {
+     "id": "3257",
+     "name": "Jacoby Brissett",
+     "pos": "QB",
+     "team": "ARI",
+     "pts": 160,
+     "round": 13,
+     "week_pts": 14.8,
+     "game": {
+      "week": 1,
+      "opp": "LAC",
+      "home": false,
+      "kickoff": "2026-09-13T20:25Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": null,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    },
+    {
+     "id": "6783",
+     "name": "Jerry Jeudy",
+     "pos": "WR",
+     "team": "CLE",
+     "pts": 119.6,
+     "round": 14,
+     "week_pts": 7.4,
+     "game": {
+      "week": 1,
+      "opp": "JAX",
+      "home": false,
+      "kickoff": "2026-09-13T17:00Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 11,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    },
+    {
+     "id": "1479",
+     "name": "Keenan Allen",
+     "pos": "WR",
+     "team": "IND",
+     "pts": 106.8,
+     "round": 11,
+     "week_pts": 7.9,
+     "game": {
+      "week": 1,
+      "opp": "BAL",
+      "home": true,
+      "kickoff": "2026-09-13T17:00Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": null,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    },
+    {
+     "id": "9753",
+     "name": "Zach Charbonnet",
+     "pos": "RB",
+     "team": "SEA",
+     "pts": 67.2,
+     "round": 12,
+     "week_pts": null,
+     "game": {
+      "week": 1,
+      "opp": "NE",
+      "home": true,
+      "kickoff": "2026-09-10T00:20Z",
+      "date": "2026-09-09",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 11,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    },
+    {
+     "id": "7528",
+     "name": "Najee Harris",
+     "pos": "RB",
+     "team": "NYG",
+     "pts": 26.3,
+     "round": 15,
+     "week_pts": 3.8,
+     "game": {
+      "week": 1,
+      "opp": "DAL",
+      "home": true,
+      "kickoff": "2026-09-14T00:20Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 8,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    }
+   ],
+   "unpriced": [],
+   "tendencies": null,
+   "moves": {
+    "n": 0,
+    "through_week": 1,
+    "note": "No completed moves through week 1."
+   },
+   "proposals": [],
+   "fit": {
+    "they_have": [],
+    "they_want": [],
+    "note": "No surplus mismatch in either direction. Every player on both rosters is already worth at least as much where he is."
+   }
+  },
+  {
+   "roster_id": 5,
+   "owner": "sierragrace",
+   "user_id": "1135747783564308480",
+   "is_me": false,
+   "draft_slot": 9,
+   "starter_pts": 1959.2,
+   "starter_rank": 7,
+   "vs_league_median": 8.9,
+   "bench_pts": 684.8,
+   "week": {
+    "n": 1,
+    "starter_pts": 128.9,
+    "starter_n": 10,
+    "starter_of": 10,
+    "bench_pts": 46.5,
+    "bench_n": 5,
+    "bench_of": 5
+   },
+   "summary": "7th of 14 in projected starting points (1959), +9 against the league median. TE is the hole — 171 points, 9th, -5 behind. No bench player would start on four other teams, so there is little here to trade from.",
+   "slots": [
+    {
+     "slot": "QB",
+     "player": {
+      "id": "6904",
+      "name": "Jalen Hurts",
+      "pos": "QB",
+      "team": "PHI",
+      "pts": 310.5,
+      "round": 3,
+      "week_pts": 19.9,
+      "game": {
+       "week": 1,
+       "opp": "WAS",
+       "home": true,
+       "kickoff": "2026-09-13T20:25Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 10,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 4,
+     "vs_median": 6.9
+    },
+    {
+     "slot": "RB",
+     "player": {
+      "id": "6813",
+      "name": "Jonathan Taylor",
+      "pos": "RB",
+      "team": "IND",
+      "pts": 272.3,
+      "round": 1,
+      "week_pts": 19.6,
+      "game": {
+       "week": 1,
+       "opp": "BAL",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 13,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 4,
+     "vs_median": 25.5
+    },
+    {
+     "slot": "RB",
+     "player": {
+      "id": "7543",
+      "name": "Travis Etienne",
+      "pos": "RB",
+      "team": "NO",
+      "pts": 207.7,
+      "round": 4,
+      "week_pts": 15.1,
+      "game": {
+       "week": 1,
+       "opp": "DET",
+       "home": false,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 8,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 6,
+     "vs_median": 4.1
+    },
+    {
+     "slot": "WR",
+     "player": {
+      "id": "8137",
+      "name": "George Pickens",
+      "pos": "WR",
+      "team": "DAL",
+      "pts": 245.7,
+      "round": 2,
+      "week_pts": 16.6,
+      "game": {
+       "week": 1,
+       "opp": "NYG",
+       "home": false,
+       "kickoff": "2026-09-14T00:20Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 14,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 9,
+     "vs_median": -3.1
+    },
+    {
+     "slot": "WR",
+     "player": {
+      "id": "9487",
+      "name": "Parker Washington",
+      "pos": "WR",
+      "team": "JAX",
+      "pts": 212.4,
+      "round": 5,
+      "week_pts": 12,
+      "game": {
+       "week": 1,
+       "opp": "CLE",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 7,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 9,
+     "vs_median": -10.2
+    },
+    {
+     "slot": "TE",
+     "player": {
+      "id": "1466",
+      "name": "Travis Kelce",
+      "pos": "TE",
+      "team": "KC",
+      "pts": 171.4,
+      "round": 7,
+      "week_pts": 11,
+      "game": {
+       "week": 1,
+       "opp": "DEN",
+       "home": true,
+       "kickoff": "2026-09-15T00:15Z",
+       "date": "2026-09-14",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 5,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 9,
+     "vs_median": -1.6
+    },
+    {
+     "slot": "FLEX",
+     "player": {
+      "id": "5045",
+      "name": "Courtland Sutton",
+      "pos": "WR",
+      "team": "DEN",
+      "pts": 174.3,
+      "round": 6,
+      "week_pts": 10.6,
+      "game": {
+       "week": 1,
+       "opp": "KC",
+       "home": false,
+       "kickoff": "2026-09-15T00:15Z",
+       "date": "2026-09-14",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 10,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 9,
+     "vs_median": -1.8
+    },
+    {
+     "slot": "FLEX",
+     "player": {
+      "id": "9754",
+      "name": "Quentin Johnston",
+      "pos": "WR",
+      "team": "LAC",
+      "pts": 163.9,
+      "round": 8,
+      "week_pts": 11.1,
+      "game": {
+       "week": 1,
+       "opp": "ARI",
+       "home": true,
+       "kickoff": "2026-09-13T20:25Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 7,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 11,
+     "vs_median": -4.9
+    },
+    {
+     "slot": "K",
+     "player": {
+      "id": "3451",
+      "name": "Ka'imi Fairbairn",
+      "pos": "K",
+      "team": "HOU",
+      "pts": 109,
+      "round": 10,
+      "week_pts": 6.7,
+      "game": {
+       "week": 1,
+       "opp": "BUF",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 8,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 2,
+     "vs_median": 7
+    },
+    {
+     "slot": "DEF",
+     "player": {
+      "id": "DET",
+      "name": "Detroit Lions",
+      "pos": "DEF",
+      "team": "DET",
+      "pts": 92,
+      "round": 9,
+      "week_pts": 6.3,
+      "game": {
+       "week": 1,
+       "opp": "NO",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 6,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 8,
+     "vs_median": 0
+    }
+   ],
+   "by_pos": [
+    {
+     "pos": "QB",
+     "pts": 310.5,
+     "rank": 4,
+     "vs_median": 6.9,
+     "starters": 1,
+     "rostered": 2
+    },
+    {
+     "pos": "RB",
+     "pts": 480,
+     "rank": 7,
+     "vs_median": 7.3,
+     "starters": 2,
+     "rostered": 3
+    },
+    {
+     "pos": "WR",
+     "pts": 796.3,
+     "rank": 6,
+     "vs_median": 11.5,
+     "starters": 4,
+     "rostered": 5
+    },
+    {
+     "pos": "TE",
+     "pts": 171.4,
+     "rank": 9,
+     "vs_median": -4.6,
+     "starters": 1,
+     "rostered": 2
+    },
+    {
+     "pos": "K",
+     "pts": 109,
+     "rank": 2,
+     "vs_median": 7,
+     "starters": 1,
+     "rostered": 1
+    },
+    {
+     "pos": "DEF",
+     "pts": 92,
+     "rank": 8,
+     "vs_median": 0,
+     "starters": 1,
+     "rostered": 2
+    }
+   ],
+   "strengths": [],
+   "weaknesses": [
+    {
+     "pos": "TE",
+     "pts": 171.4,
+     "rank": 9,
+     "vs_median": -4.6,
+     "starters": 1,
+     "rostered": 2
+    }
+   ],
+   "risks": {
+    "bye_stacks": [],
+    "injured": [],
+    "fragile": [
+     {
+      "name": "Travis Kelce",
+      "pos": "TE",
+      "score": 0.82,
+      "why": "No significant missed time (15/16/17)."
+     },
+     {
+      "name": "Jonathan Taylor",
+      "pos": "RB",
+      "score": 0.856,
+      "why": "Recurring high-ankle sprains (2022 surgery, 2024 re-injury), a documented re-injury pattern; played 17 in 2025, currently healthy."
+     },
+     {
+      "name": "Parker Washington",
+      "pos": "WR",
+      "score": 0.894,
+      "why": null
+     }
+    ],
+    "flagged": []
+   },
+   "bench": [
+    {
+     "id": "5870",
+     "name": "Daniel Jones",
+     "pos": "QB",
+     "team": "IND",
+     "pts": 223.5,
+     "round": 13,
+     "week_pts": 15.9,
+     "game": {
+      "week": 1,
+      "opp": "BAL",
+      "home": true,
+      "kickoff": "2026-09-13T17:00Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 13,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    },
+    {
+     "id": "5001",
+     "name": "Dalton Schultz",
+     "pos": "TE",
+     "team": "HOU",
+     "pts": 150.9,
+     "round": 11,
+     "week_pts": 9.4,
+     "game": {
+      "week": 1,
+      "opp": "BUF",
+      "home": true,
+      "kickoff": "2026-09-13T17:00Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 8,
+     "starts_on": 3,
+     "best_gain": 14.9,
+     "best_team": 4,
+     "own_cost": 0
+    },
+    {
+     "id": "13346",
+     "name": "Denzel Boston",
+     "pos": "WR",
+     "team": "CLE",
+     "pts": 134.7,
+     "round": 12,
+     "week_pts": 7.8,
+     "game": {
+      "week": 1,
+      "opp": "JAX",
+      "home": false,
+      "kickoff": "2026-09-13T17:00Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 11,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    },
+    {
+     "id": "12469",
+     "name": "Dylan Sampson",
+     "pos": "RB",
+     "team": "CLE",
+     "pts": 88.7,
+     "round": 14,
+     "week_pts": 6.7,
+     "game": {
+      "week": 1,
+      "opp": "JAX",
+      "home": false,
+      "kickoff": "2026-09-13T17:00Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 11,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    },
+    {
+     "id": "KC",
+     "name": "Kansas City Chiefs",
+     "pos": "DEF",
+     "team": "KC",
+     "pts": 87,
+     "round": 15,
+     "week_pts": 6.7,
+     "game": {
+      "week": 1,
+      "opp": "DEN",
+      "home": true,
+      "kickoff": "2026-09-15T00:15Z",
+      "date": "2026-09-14",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 5,
+     "starts_on": 3,
+     "best_gain": 3,
+     "best_team": 8,
+     "own_cost": 0
+    }
+   ],
+   "unpriced": [],
+   "tendencies": null,
+   "moves": {
+    "n": 0,
+    "through_week": 1,
+    "note": "No completed moves through week 1."
+   },
+   "proposals": [],
+   "fit": {
+    "they_have": [
+     {
+      "id": "5001",
+      "name": "Dalton Schultz",
+      "pos": "TE",
+      "team": "HOU",
+      "pts": 150.9,
+      "round": 11,
+      "gain": 6.8,
+      "cost": 0,
+      "net": 6.8
+     },
+     {
+      "id": "1466",
+      "name": "Travis Kelce",
+      "pos": "TE",
+      "team": "KC",
+      "pts": 171.4,
+      "round": 7,
+      "gain": 27.3,
+      "cost": 20.5,
+      "net": 6.8
+     },
+     {
+      "id": "KC",
+      "name": "Kansas City Chiefs",
+      "pos": "DEF",
+      "team": "KC",
+      "pts": 87,
+      "round": 15,
+      "gain": 1,
+      "cost": 0,
+      "net": 1
+     },
+     {
+      "id": "DET",
+      "name": "Detroit Lions",
+      "pos": "DEF",
+      "team": "DET",
+      "pts": 92,
+      "round": 9,
+      "gain": 6,
+      "cost": 5,
+      "net": 1
+     }
+    ],
+    "they_want": [],
+    "note": "One-way fit — they hold players worth more to you than to them, but nothing you own is worth more over there. You are the side that has to overpay."
+   }
+  },
+  {
+   "roster_id": 6,
+   "owner": "DrGMoney",
+   "user_id": "1135748334947323904",
+   "is_me": false,
+   "draft_slot": 2,
+   "starter_pts": 1991.9,
+   "starter_rank": 5,
+   "vs_league_median": 41.6,
+   "bench_pts": 728.5,
+   "week": {
+    "n": 1,
+    "starter_pts": 124.4,
+    "starter_n": 10,
+    "starter_of": 10,
+    "bench_pts": 46,
+    "bench_n": 5,
+    "bench_of": 5
+   },
+   "summary": "5th of 14 in projected starting points (1992), +42 against the league median. Built on QB: 321 starting points, 3rd in the league, +17 on the median. TE is the hole — 160 points, 12th, -16 behind. No bench player would start on four other teams, so there is little here to trade from. Week 10 takes 3 starters off the field at once, and five bench spots do not cover that.",
+   "slots": [
+    {
+     "slot": "QB",
+     "player": {
+      "id": "11564",
+      "name": "Drake Maye",
+      "pos": "QB",
+      "team": "NE",
+      "pts": 320.8,
+      "round": 3,
+      "week_pts": 19.7,
+      "game": {
+       "week": 1,
+       "opp": "SEA",
+       "home": false,
+       "kickoff": "2026-09-10T00:20Z",
+       "date": "2026-09-09",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 11,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 3,
+     "vs_median": 17.2
+    },
+    {
+     "slot": "RB",
+     "player": {
+      "id": "9509",
+      "name": "Bijan Robinson",
+      "pos": "RB",
+      "team": "ATL",
+      "pts": 324.9,
+      "round": 1,
+      "week_pts": 21.5,
+      "game": {
+       "week": 1,
+       "opp": "PIT",
+       "home": false,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 11,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 2,
+     "vs_median": 78.1
+    },
+    {
+     "slot": "RB",
+     "player": {
+      "id": "5892",
+      "name": "David Montgomery",
+      "pos": "RB",
+      "team": "HOU",
+      "pts": 206.1,
+      "round": 4,
+      "week_pts": 13.9,
+      "game": {
+       "week": 1,
+       "opp": "BUF",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 8,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 7,
+     "vs_median": 2.5
+    },
+    {
+     "slot": "WR",
+     "player": {
+      "id": "7525",
+      "name": "DeVonta Smith",
+      "pos": "WR",
+      "team": "PHI",
+      "pts": 229.2,
+      "round": 2,
+      "week_pts": 14.9,
+      "game": {
+       "week": 1,
+       "opp": "WAS",
+       "home": true,
+       "kickoff": "2026-09-13T20:25Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 10,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 12,
+     "vs_median": -19.6
+    },
+    {
+     "slot": "WR",
+     "player": {
+      "id": "10222",
+      "name": "Jayden Reed",
+      "pos": "WR",
+      "team": "GB",
+      "pts": 197.6,
+      "round": 9,
+      "week_pts": 13.2,
+      "game": {
+       "week": 1,
+       "opp": "MIN",
+       "home": false,
+       "kickoff": "2026-09-13T20:25Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 11,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 12,
+     "vs_median": -25
+    },
+    {
+     "slot": "TE",
+     "player": {
+      "id": "8110",
+      "name": "Jake Ferguson",
+      "pos": "TE",
+      "team": "DAL",
+      "pts": 159.8,
+      "round": 6,
+      "week_pts": 9.7,
+      "game": {
+       "week": 1,
+       "opp": "NYG",
+       "home": false,
+       "kickoff": "2026-09-14T00:20Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 14,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 12,
+     "vs_median": -13.2
+    },
+    {
+     "slot": "FLEX",
+     "player": {
+      "id": "4983",
+      "name": "DJ Moore",
+      "pos": "WR",
+      "team": "BUF",
+      "pts": 179,
+      "round": 5,
+      "week_pts": 12.1,
+      "game": {
+       "week": 1,
+       "opp": "HOU",
+       "home": false,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 7,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 5,
+     "vs_median": 2.9
+    },
+    {
+     "slot": "FLEX",
+     "player": {
+      "id": "13294",
+      "name": "Makai Lemon",
+      "pos": "WR",
+      "team": "PHI",
+      "pts": 168.5,
+      "round": 7,
+      "week_pts": 6,
+      "game": {
+       "week": 1,
+       "opp": "WAS",
+       "home": true,
+       "kickoff": "2026-09-13T20:25Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 10,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 8,
+     "vs_median": -0.3
+    },
+    {
+     "slot": "K",
+     "player": {
+      "id": "11786",
+      "name": "Cam Little",
+      "pos": "K",
+      "team": "JAX",
+      "pts": 108,
+      "round": 10,
+      "week_pts": 6.5,
+      "game": {
+       "week": 1,
+       "opp": "CLE",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 7,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 3,
+     "vs_median": 6
+    },
+    {
+     "slot": "DEF",
+     "player": {
+      "id": "PHI",
+      "name": "Philadelphia Eagles",
+      "pos": "DEF",
+      "team": "PHI",
+      "pts": 98,
+      "round": 8,
+      "week_pts": 6.9,
+      "game": {
+       "week": 1,
+       "opp": "WAS",
+       "home": true,
+       "kickoff": "2026-09-13T20:25Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 10,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 4,
+     "vs_median": 6
+    }
+   ],
+   "by_pos": [
+    {
+     "pos": "QB",
+     "pts": 320.8,
+     "rank": 3,
+     "vs_median": 17.2,
+     "starters": 1,
+     "rostered": 2
+    },
+    {
+     "pos": "RB",
+     "pts": 531,
+     "rank": 5,
+     "vs_median": 58.3,
+     "starters": 2,
+     "rostered": 3
+    },
+    {
+     "pos": "WR",
+     "pts": 774.3,
+     "rank": 8,
+     "vs_median": -10.5,
+     "starters": 4,
+     "rostered": 6
+    },
+    {
+     "pos": "TE",
+     "pts": 159.8,
+     "rank": 12,
+     "vs_median": -16.2,
+     "starters": 1,
+     "rostered": 1
+    },
+    {
+     "pos": "K",
+     "pts": 108,
+     "rank": 3,
+     "vs_median": 6,
+     "starters": 1,
+     "rostered": 1
+    },
+    {
+     "pos": "DEF",
+     "pts": 98,
+     "rank": 4,
+     "vs_median": 6,
+     "starters": 1,
+     "rostered": 1
+    }
+   ],
+   "strengths": [
+    {
+     "pos": "QB",
+     "pts": 320.8,
+     "rank": 3,
+     "vs_median": 17.2,
+     "starters": 1,
+     "rostered": 2
+    }
+   ],
+   "weaknesses": [
+    {
+     "pos": "TE",
+     "pts": 159.8,
+     "rank": 12,
+     "vs_median": -16.2,
+     "starters": 1,
+     "rostered": 1
+    },
+    {
+     "pos": "WR",
+     "pts": 774.3,
+     "rank": 8,
+     "vs_median": -10.5,
+     "starters": 4,
+     "rostered": 6
+    }
+   ],
+   "risks": {
+    "bye_stacks": [
+     {
+      "week": 10,
+      "n": 3,
+      "players": [
+       "DeVonta Smith (WR)",
+       "Makai Lemon (WR)",
+       "Philadelphia Eagles (DEF)"
+      ]
+     },
+     {
+      "week": 11,
+      "n": 3,
+      "players": [
+       "Drake Maye (QB)",
+       "Bijan Robinson (RB)",
+       "Jayden Reed (WR)"
+      ]
+     }
+    ],
+    "injured": [],
+    "fragile": [
+     {
+      "name": "David Montgomery",
+      "pos": "RB",
+      "score": 0.846,
+      "why": "No significant missed time (14/14/17)."
+     },
+     {
+      "name": "Jayden Reed",
+      "pos": "WR",
+      "score": 0.871,
+      "why": "2025 missed time (7 games); cause not separately verified this pass. Flagged for re-check."
+     }
+    ],
+    "flagged": []
+   },
+   "bench": [
+    {
+     "id": "4892",
+     "name": "Baker Mayfield",
+     "pos": "QB",
+     "team": "TB",
+     "pts": 274.9,
+     "round": 12,
+     "week_pts": 17.3,
+     "game": {
+      "week": 1,
+      "opp": "CIN",
+      "home": false,
+      "kickoff": "2026-09-13T17:00Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 10,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    },
+    {
+     "id": "8121",
+     "name": "Romeo Doubs",
+     "pos": "WR",
+     "team": "NE",
+     "pts": 161.2,
+     "round": 11,
+     "week_pts": 10.6,
+     "game": {
+      "week": 1,
+      "opp": "SEA",
+      "home": false,
+      "kickoff": "2026-09-10T00:20Z",
+      "date": "2026-09-09",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 11,
+     "starts_on": 3,
+     "best_gain": 13.3,
+     "best_team": 8,
+     "own_cost": 0
+    },
+    {
+     "id": "8180",
+     "name": "Jalen Nailor",
+     "pos": "WR",
+     "team": "LV",
+     "pts": 130.6,
+     "round": 15,
+     "week_pts": 9.5,
+     "game": {
+      "week": 1,
+      "opp": "MIA",
+      "home": true,
+      "kickoff": "2026-09-13T20:25Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 13,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    },
+    {
+     "id": "12530",
+     "name": "Travis Hunter",
+     "pos": "DB",
+     "team": "JAX",
+     "pts": 96.6,
+     "round": 13,
+     "week_pts": 3.6,
+     "game": {
+      "week": 1,
+      "opp": "CLE",
+      "home": true,
+      "kickoff": "2026-09-13T17:00Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": null,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    },
+    {
+     "id": "9225",
+     "name": "Tank Bigsby",
+     "pos": "RB",
+     "team": "PHI",
+     "pts": 65.2,
+     "round": 14,
+     "week_pts": 5,
+     "game": {
+      "week": 1,
+      "opp": "WAS",
+      "home": true,
+      "kickoff": "2026-09-13T20:25Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 10,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    }
+   ],
+   "unpriced": [],
+   "tendencies": null,
+   "moves": {
+    "n": 0,
+    "through_week": 1,
+    "note": "No completed moves through week 1."
+   },
+   "proposals": [],
+   "fit": {
+    "they_have": [],
+    "they_want": [],
+    "note": "No surplus mismatch in either direction. Every player on both rosters is already worth at least as much where he is."
+   }
+  },
+  {
+   "roster_id": 7,
+   "owner": "hayhof",
+   "user_id": "1266055804595740672",
+   "is_me": false,
+   "draft_slot": 14,
+   "starter_pts": 1920.8,
+   "starter_rank": 11,
+   "vs_league_median": -29.5,
+   "bench_pts": 681.3,
+   "week": {
+    "n": 1,
+    "starter_pts": 121.1,
+    "starter_n": 10,
+    "starter_of": 10,
+    "bench_pts": 31.4,
+    "bench_n": 4,
+    "bench_of": 5
+   },
+   "summary": "11th of 14 in projected starting points (1921), -30 against the league median. Built on TE: 344 starting points, 2nd in the league, +168 on the median. QB is the hole — 296 points, 12th, -8 behind. No bench player would start on four other teams, so there is little here to trade from.",
+   "slots": [
+    {
+     "slot": "QB",
+     "player": {
+      "id": "6797",
+      "name": "Justin Herbert",
+      "pos": "QB",
+      "team": "LAC",
+      "pts": 295.5,
+      "round": 5,
+      "week_pts": 18.1,
+      "game": {
+       "week": 1,
+       "opp": "ARI",
+       "home": true,
+       "kickoff": "2026-09-13T20:25Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 7,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 12,
+     "vs_median": -8.1
+    },
+    {
+     "slot": "RB",
+     "player": {
+      "id": "12507",
+      "name": "Omarion Hampton",
+      "pos": "RB",
+      "team": "LAC",
+      "pts": 242.9,
+      "round": 2,
+      "week_pts": 15.6,
+      "game": {
+       "week": 1,
+       "opp": "ARI",
+       "home": true,
+       "kickoff": "2026-09-13T20:25Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 7,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 10,
+     "vs_median": -3.9
+    },
+    {
+     "slot": "RB",
+     "player": {
+      "id": "13287",
+      "name": "Jeremiyah Love",
+      "pos": "RB",
+      "team": "ARI",
+      "pts": 211.8,
+      "round": 3,
+      "week_pts": 13.3,
+      "game": {
+       "week": 1,
+       "opp": "LAC",
+       "home": false,
+       "kickoff": "2026-09-13T20:25Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 14,
+      "adp": null,
+      "injury": "Questionable"
+     },
+     "rank": 3,
+     "vs_median": 8.2
+    },
+    {
+     "slot": "WR",
+     "player": {
+      "id": "6794",
+      "name": "Justin Jefferson",
+      "pos": "WR",
+      "team": "MIN",
+      "pts": 250.4,
+      "round": 1,
+      "week_pts": 16.7,
+      "game": {
+       "week": 1,
+       "opp": "GB",
+       "home": true,
+       "kickoff": "2026-09-13T20:25Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 6,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 7,
+     "vs_median": 1.6
+    },
+    {
+     "slot": "WR",
+     "player": {
+      "id": "11620",
+      "name": "Rome Odunze",
+      "pos": "WR",
+      "team": "CHI",
+      "pts": 207.9,
+      "round": 4,
+      "week_pts": 11.5,
+      "game": {
+       "week": 1,
+       "opp": "CAR",
+       "home": false,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 10,
+      "adp": null,
+      "injury": "Questionable"
+     },
+     "rank": 10,
+     "vs_median": -14.7
+    },
+    {
+     "slot": "TE",
+     "player": {
+      "id": "9484",
+      "name": "Tucker Kraft",
+      "pos": "TE",
+      "team": "GB",
+      "pts": 174.4,
+      "round": 6,
+      "week_pts": 10.9,
+      "game": {
+       "week": 1,
+       "opp": "MIN",
+       "home": false,
+       "kickoff": "2026-09-13T20:25Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 11,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 7,
+     "vs_median": 1.4
+    },
+    {
+     "slot": "FLEX",
+     "player": {
+      "id": "4037",
+      "name": "Chris Godwin",
+      "pos": "WR",
+      "team": "TB",
+      "pts": 173.6,
+      "round": 7,
+      "week_pts": 11,
+      "game": {
+       "week": 1,
+       "opp": "CIN",
+       "home": false,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 10,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 10,
+     "vs_median": -2.5
+    },
+    {
+     "slot": "FLEX",
+     "player": {
+      "id": "4217",
+      "name": "George Kittle",
+      "pos": "TE",
+      "team": "SF",
+      "pts": 169.3,
+      "round": 8,
+      "week_pts": 10.1,
+      "game": {
+       "week": 1,
+       "opp": "LAR",
+       "home": false,
+       "kickoff": "2026-09-11T00:35Z",
+       "date": "2026-09-10",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 8,
+      "adp": null,
+      "injury": "Questionable"
+     },
+     "rank": 5,
+     "vs_median": 0.5
+    },
+    {
+     "slot": "K",
+     "player": {
+      "id": "2747",
+      "name": "Jason Myers",
+      "pos": "K",
+      "team": "SEA",
+      "pts": 107,
+      "round": 10,
+      "week_pts": 6.8,
+      "game": {
+       "week": 1,
+       "opp": "NE",
+       "home": true,
+       "kickoff": "2026-09-10T00:20Z",
+       "date": "2026-09-09",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 11,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 4,
+     "vs_median": 5
+    },
+    {
+     "slot": "DEF",
+     "player": {
+      "id": "PIT",
+      "name": "Pittsburgh Steelers",
+      "pos": "DEF",
+      "team": "PIT",
+      "pts": 88,
+      "round": 12,
+      "week_pts": 7.1,
+      "game": {
+       "week": 1,
+       "opp": "ATL",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 9,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 11,
+     "vs_median": -4
+    }
+   ],
+   "by_pos": [
+    {
+     "pos": "QB",
+     "pts": 295.5,
+     "rank": 12,
+     "vs_median": -8.1,
+     "starters": 1,
+     "rostered": 2
+    },
+    {
+     "pos": "RB",
+     "pts": 454.7,
+     "rank": 9,
+     "vs_median": -18,
+     "starters": 2,
+     "rostered": 3
+    },
+    {
+     "pos": "WR",
+     "pts": 631.9,
+     "rank": 12,
+     "vs_median": -152.9,
+     "starters": 3,
+     "rostered": 6
+    },
+    {
+     "pos": "TE",
+     "pts": 343.7,
+     "rank": 2,
+     "vs_median": 167.7,
+     "starters": 2,
+     "rostered": 2
+    },
+    {
+     "pos": "K",
+     "pts": 107,
+     "rank": 4,
+     "vs_median": 5,
+     "starters": 1,
+     "rostered": 1
+    },
+    {
+     "pos": "DEF",
+     "pts": 88,
+     "rank": 11,
+     "vs_median": -4,
+     "starters": 1,
+     "rostered": 1
+    }
+   ],
+   "strengths": [
+    {
+     "pos": "TE",
+     "pts": 343.7,
+     "rank": 2,
+     "vs_median": 167.7,
+     "starters": 2,
+     "rostered": 2
+    }
+   ],
+   "weaknesses": [
+    {
+     "pos": "QB",
+     "pts": 295.5,
+     "rank": 12,
+     "vs_median": -8.1,
+     "starters": 1,
+     "rostered": 2
+    },
+    {
+     "pos": "WR",
+     "pts": 631.9,
+     "rank": 12,
+     "vs_median": -152.9,
+     "starters": 3,
+     "rostered": 6
+    },
+    {
+     "pos": "RB",
+     "pts": 454.7,
+     "rank": 9,
+     "vs_median": -18,
+     "starters": 2,
+     "rostered": 3
+    }
+   ],
+   "risks": {
+    "bye_stacks": [],
+    "injured": [
+     {
+      "name": "Jeremiyah Love",
+      "pos": "RB",
+      "status": "Questionable"
+     },
+     {
+      "name": "Rome Odunze",
+      "pos": "WR",
+      "status": "Questionable"
+     },
+     {
+      "name": "George Kittle",
+      "pos": "TE",
+      "status": "Questionable"
+     }
+    ],
+    "fragile": [
+     {
+      "name": "Omarion Hampton",
+      "pos": "RB",
+      "score": 0.718,
+      "why": "No significant missed time (--/--/9)."
+     },
+     {
+      "name": "Chris Godwin",
+      "pos": "WR",
+      "score": 0.765,
+      "why": "2024 season-ending dislocated/fractured ankle that also delayed and wrecked 2025 (9 PPG over injury-hit games). ~30 games missed across 9 seasons. Reportedly enters 2026 healthy."
+     },
+     {
+      "name": "George Kittle",
+      "pos": "TE",
+      "score": 0.789,
+      "why": "MAJOR: ruptured his Achilles on Jan 11 2026. Activated off Reserve/PUP Aug 23 after practicing alongside McCaffrey, putting the Sept 10 opener vs the Rams in Melbourne in real reach. Turns 33 in October; still watch the practice ramp before assuming a full Week 1 workload."
+     }
+    ],
+    "flagged": []
+   },
+   "bench": [
+    {
+     "id": "6804",
+     "name": "Jordan Love",
+     "pos": "QB",
+     "team": "GB",
+     "pts": 278.5,
+     "round": 11,
+     "week_pts": 17.4,
+     "game": {
+      "week": 1,
+      "opp": "MIN",
+      "home": false,
+      "kickoff": "2026-09-13T20:25Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 11,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    },
+    {
+     "id": "11618",
+     "name": "Jalen McMillan",
+     "pos": "WR",
+     "team": "TB",
+     "pts": 127.4,
+     "round": 15,
+     "week_pts": 7.3,
+     "game": {
+      "week": 1,
+      "opp": "CIN",
+      "home": false,
+      "kickoff": "2026-09-13T17:00Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 10,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    },
+    {
+     "id": "13281",
+     "name": "Jordyn Tyson",
+     "pos": "WR",
+     "team": "NO",
+     "pts": 111,
+     "round": 9,
+     "week_pts": null,
+     "game": {
+      "week": 1,
+      "opp": "DET",
+      "home": false,
+      "kickoff": "2026-09-13T17:00Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 8,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    },
+    {
+     "id": "13413",
+     "name": "Cyrus Allen",
+     "pos": "WR",
+     "team": "KC",
+     "pts": 94.5,
+     "round": 14,
+     "week_pts": 1.7,
+     "game": {
+      "week": 1,
+      "opp": "DEN",
+      "home": true,
+      "kickoff": "2026-09-15T00:15Z",
+      "date": "2026-09-14",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": null,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    },
+    {
+     "id": "8154",
+     "name": "Brian Robinson",
+     "pos": "RB",
+     "team": "ATL",
+     "pts": 69.9,
+     "round": 13,
+     "week_pts": 5,
+     "game": {
+      "week": 1,
+      "opp": "PIT",
+      "home": false,
+      "kickoff": "2026-09-13T17:00Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 11,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    }
+   ],
+   "unpriced": [],
+   "tendencies": null,
+   "moves": {
+    "n": 0,
+    "through_week": 1,
+    "note": "No completed moves through week 1."
+   },
+   "proposals": [],
+   "fit": {
+    "they_have": [],
+    "they_want": [],
+    "note": "No surplus mismatch in either direction. Every player on both rosters is already worth at least as much where he is."
+   }
+  },
+  {
+   "roster_id": 8,
+   "owner": "RBI11",
+   "user_id": "1403515136865505280",
+   "is_me": false,
+   "draft_slot": 1,
+   "starter_pts": 1941.5,
+   "starter_rank": 8,
+   "vs_league_median": -8.8,
+   "bench_pts": 740.7,
+   "week": {
+    "n": 1,
+    "starter_pts": 122.5,
+    "starter_n": 10,
+    "starter_of": 10,
+    "bench_pts": 38.5,
+    "bench_n": 4,
+    "bench_of": 5
+   },
+   "summary": "8th of 14 in projected starting points (1942), -9 against the league median. Built on TE: 373 starting points, 1st in the league, +197 on the median. WR is the hole — 423 points, 14th, -362 behind. No bench player would start on four other teams, so there is little here to trade from. Week 8 takes 3 starters off the field at once, and five bench spots do not cover that.",
+   "slots": [
+    {
+     "slot": "QB",
+     "player": {
+      "id": "4881",
+      "name": "Lamar Jackson",
+      "pos": "QB",
+      "team": "BAL",
+      "pts": 326,
+      "round": 3,
+      "week_pts": 20.8,
+      "game": {
+       "week": 1,
+       "opp": "IND",
+       "home": false,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 13,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 2,
+     "vs_median": 22.4
+    },
+    {
+     "slot": "RB",
+     "player": {
+      "id": "9221",
+      "name": "Jahmyr Gibbs",
+      "pos": "RB",
+      "team": "DET",
+      "pts": 331.4,
+      "round": 1,
+      "week_pts": 23.7,
+      "game": {
+       "week": 1,
+       "opp": "NO",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 6,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 1,
+     "vs_median": 84.6
+    },
+    {
+     "slot": "RB",
+     "player": {
+      "id": "12534",
+      "name": "Kyle Monangai",
+      "pos": "RB",
+      "team": "CHI",
+      "pts": 154.6,
+      "round": 8,
+      "week_pts": 7.4,
+      "game": {
+       "week": 1,
+       "opp": "CAR",
+       "home": false,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 10,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 13,
+     "vs_median": -49
+    },
+    {
+     "slot": "WR",
+     "player": {
+      "id": "11632",
+      "name": "Malik Nabers",
+      "pos": "WR",
+      "team": "NYG",
+      "pts": 236.7,
+      "round": 2,
+      "week_pts": 13.9,
+      "game": {
+       "week": 1,
+       "opp": "DAL",
+       "home": true,
+       "kickoff": "2026-09-14T00:20Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 8,
+      "adp": null,
+      "injury": "Questionable"
+     },
+     "rank": 10,
+     "vs_median": -12.1
+    },
+    {
+     "slot": "WR",
+     "player": {
+      "id": "11628",
+      "name": "Marvin Harrison",
+      "pos": "WR",
+      "team": "ARI",
+      "pts": 186.2,
+      "round": 6,
+      "week_pts": 10.7,
+      "game": {
+       "week": 1,
+       "opp": "LAC",
+       "home": false,
+       "kickoff": "2026-09-13T20:25Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 14,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 14,
+     "vs_median": -36.4
+    },
+    {
+     "slot": "TE",
+     "player": {
+      "id": "12517",
+      "name": "Colston Loveland",
+      "pos": "TE",
+      "team": "CHI",
+      "pts": 215.4,
+      "round": 5,
+      "week_pts": 14.2,
+      "game": {
+       "week": 1,
+       "opp": "CAR",
+       "home": false,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 10,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 3,
+     "vs_median": 42.4
+    },
+    {
+     "slot": "FLEX",
+     "player": {
+      "id": "8131",
+      "name": "Isaiah Likely",
+      "pos": "TE",
+      "team": "NYG",
+      "pts": 157.3,
+      "round": 9,
+      "week_pts": 9.6,
+      "game": {
+       "week": 1,
+       "opp": "DAL",
+       "home": true,
+       "kickoff": "2026-09-14T00:20Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 8,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 14,
+     "vs_median": -18.8
+    },
+    {
+     "slot": "FLEX",
+     "player": {
+      "id": "7594",
+      "name": "Chuba Hubbard",
+      "pos": "RB",
+      "team": "CAR",
+      "pts": 147.9,
+      "round": 7,
+      "week_pts": 10.3,
+      "game": {
+       "week": 1,
+       "opp": "CHI",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 5,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 14,
+     "vs_median": -20.9
+    },
+    {
+     "slot": "K",
+     "player": {
+      "id": "7839",
+      "name": "Evan McPherson",
+      "pos": "K",
+      "team": "CIN",
+      "pts": 102,
+      "round": 14,
+      "week_pts": 6.8,
+      "game": {
+       "week": 1,
+       "opp": "TB",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 6,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 8,
+     "vs_median": 0
+    },
+    {
+     "slot": "DEF",
+     "player": {
+      "id": "SF",
+      "name": "San Francisco 49ers",
+      "pos": "DEF",
+      "team": "SF",
+      "pts": 84,
+      "round": 15,
+      "week_pts": 5.1,
+      "game": {
+       "week": 1,
+       "opp": "LAR",
+       "home": false,
+       "kickoff": "2026-09-11T00:35Z",
+       "date": "2026-09-10",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 8,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 14,
+     "vs_median": -8
+    }
+   ],
+   "by_pos": [
+    {
+     "pos": "QB",
+     "pts": 326,
+     "rank": 2,
+     "vs_median": 22.4,
+     "starters": 1,
+     "rostered": 2
+    },
+    {
+     "pos": "RB",
+     "pts": 633.9,
+     "rank": 3,
+     "vs_median": 161.2,
+     "starters": 3,
+     "rostered": 5
+    },
+    {
+     "pos": "WR",
+     "pts": 422.9,
+     "rank": 14,
+     "vs_median": -361.9,
+     "starters": 2,
+     "rostered": 4
+    },
+    {
+     "pos": "TE",
+     "pts": 372.7,
+     "rank": 1,
+     "vs_median": 196.7,
+     "starters": 2,
+     "rostered": 2
+    },
+    {
+     "pos": "K",
+     "pts": 102,
+     "rank": 8,
+     "vs_median": 0,
+     "starters": 1,
+     "rostered": 1
+    },
+    {
+     "pos": "DEF",
+     "pts": 84,
+     "rank": 14,
+     "vs_median": -8,
+     "starters": 1,
+     "rostered": 1
+    }
+   ],
+   "strengths": [
+    {
+     "pos": "TE",
+     "pts": 372.7,
+     "rank": 1,
+     "vs_median": 196.7,
+     "starters": 2,
+     "rostered": 2
+    },
+    {
+     "pos": "QB",
+     "pts": 326,
+     "rank": 2,
+     "vs_median": 22.4,
+     "starters": 1,
+     "rostered": 2
+    },
+    {
+     "pos": "RB",
+     "pts": 633.9,
+     "rank": 3,
+     "vs_median": 161.2,
+     "starters": 3,
+     "rostered": 5
+    }
+   ],
+   "weaknesses": [
+    {
+     "pos": "WR",
+     "pts": 422.9,
+     "rank": 14,
+     "vs_median": -361.9,
+     "starters": 2,
+     "rostered": 4
+    }
+   ],
+   "risks": {
+    "bye_stacks": [
+     {
+      "week": 8,
+      "n": 3,
+      "players": [
+       "Malik Nabers (WR)",
+       "Isaiah Likely (TE)",
+       "San Francisco 49ers (DEF)"
+      ]
+     }
+    ],
+    "injured": [
+     {
+      "name": "Malik Nabers",
+      "pos": "WR",
+      "status": "Questionable"
+     }
+    ],
+    "fragile": [
+     {
+      "name": "Malik Nabers",
+      "pos": "WR",
+      "score": 0.713,
+      "why": "2025 ACL + meniscus (October) plus a spring scar-tissue cleanup; camp status uncertain (Questionable). Structural. Real Week-1 risk."
+     }
+    ],
+    "flagged": []
+   },
+   "bench": [
+    {
+     "id": "5849",
+     "name": "Kyler Murray",
+     "pos": "QB",
+     "team": "MIN",
+     "pts": 283.1,
+     "round": 12,
+     "week_pts": 17.4,
+     "game": {
+      "week": 1,
+      "opp": "GB",
+      "home": true,
+      "kickoff": "2026-09-13T20:25Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 6,
+     "starts_on": 1,
+     "best_gain": 2.9,
+     "best_team": 3,
+     "own_cost": 0
+    },
+    {
+     "id": "4199",
+     "name": "Aaron Jones",
+     "pos": "RB",
+     "team": "MIN",
+     "pts": 137.1,
+     "round": 10,
+     "week_pts": 9.1,
+     "game": {
+      "week": 1,
+      "opp": "GB",
+      "home": true,
+      "kickoff": "2026-09-13T20:25Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 6,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    },
+    {
+     "id": "13417",
+     "name": "De'Zhaun Stribling",
+     "pos": "WR",
+     "team": "SF",
+     "pts": 128.4,
+     "round": 11,
+     "week_pts": 6.9,
+     "game": {
+      "week": 1,
+      "opp": "LAR",
+      "home": false,
+      "kickoff": "2026-09-11T00:35Z",
+      "date": "2026-09-10",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 8,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    },
+    {
+     "id": "13293",
+     "name": "Ja'Kobi Lane",
+     "pos": "WR",
+     "team": "BAL",
+     "pts": 104.9,
+     "round": 13,
+     "week_pts": 5.1,
+     "game": {
+      "week": 1,
+      "opp": "IND",
+      "home": false,
+      "kickoff": "2026-09-13T17:00Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 13,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    },
+    {
+     "id": "5850",
+     "name": "Josh Jacobs",
+     "pos": "RB",
+     "team": "GB",
+     "pts": 87.2,
+     "round": 4,
+     "week_pts": null,
+     "game": {
+      "week": 1,
+      "opp": "MIN",
+      "home": false,
+      "kickoff": "2026-09-13T20:25Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 11,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    }
+   ],
+   "unpriced": [],
+   "tendencies": null,
+   "moves": {
+    "n": 0,
+    "through_week": 1,
+    "note": "No completed moves through week 1."
+   },
+   "proposals": [],
+   "fit": {
+    "they_have": [],
+    "they_want": [
+     {
+      "id": "7567",
+      "name": "Kenny Gainwell",
+      "pos": "RB",
+      "team": "TB",
+      "pts": 152.3,
+      "round": 8,
+      "gain": 4.4,
+      "cost": 0,
+      "net": 4.4
+     },
+     {
+      "id": "8228",
+      "name": "Jaylen Warren",
+      "pos": "RB",
+      "team": "PIT",
+      "pts": 170.6,
+      "round": 6,
+      "gain": 22.7,
+      "cost": 18.3,
+      "net": 4.4
+     },
+     {
+      "id": "12490",
+      "name": "Bhayshul Tuten",
+      "pos": "RB",
+      "team": "JAX",
+      "pts": 174.8,
+      "round": 5,
+      "gain": 26.9,
+      "cost": 22.5,
+      "net": 4.4
+     },
+     {
+      "id": "8155",
+      "name": "Breece Hall",
+      "pos": "RB",
+      "team": "NYJ",
+      "pts": 211,
+      "round": 3,
+      "gain": 63.1,
+      "cost": 58.7,
+      "net": 4.4
+     },
+     {
+      "id": "8151",
+      "name": "Kenneth Walker",
+      "pos": "RB",
+      "team": "KC",
+      "pts": 244,
+      "round": 2,
+      "gain": 96.1,
+      "cost": 91.7,
+      "net": 4.4
+     }
+    ],
+    "note": "One-way fit the other way — you hold surplus they could use and they hold none you can use. Sell, do not swap. Every name on your side nets the same +4.4 — they all fill the same slot over there, so the one to actually send is the cheapest, Kenny Gainwell."
+   }
+  },
+  {
+   "roster_id": 9,
+   "owner": "haleymegert",
+   "user_id": "1263727930408718336",
+   "is_me": false,
+   "draft_slot": 3,
+   "starter_pts": 2009.5,
+   "starter_rank": 3,
+   "vs_league_median": 59.2,
+   "bench_pts": 729.5,
+   "week": {
+    "n": 1,
+    "starter_pts": 115.2,
+    "starter_n": 9,
+    "starter_of": 10,
+    "bench_pts": 43.2,
+    "bench_n": 5,
+    "bench_of": 5
+   },
+   "summary": "3rd of 14 in projected starting points (2010), +59 against the league median. Built on WR: 967 starting points, 1st in the league, +182 on the median. RB is the hole — 304 points, 14th, -168 behind. No bench player would start on four other teams, so there is little here to trade from. Week 10 takes 3 starters off the field at once, and five bench spots do not cover that.",
+   "slots": [
+    {
+     "slot": "QB",
+     "player": {
+      "id": "4046",
+      "name": "Patrick Mahomes",
+      "pos": "QB",
+      "team": "KC",
+      "pts": 286.7,
+      "round": 8,
+      "week_pts": 17.1,
+      "game": {
+       "week": 1,
+       "opp": "DEN",
+       "home": true,
+       "kickoff": "2026-09-15T00:15Z",
+       "date": "2026-09-14",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 5,
+      "adp": null,
+      "injury": "Questionable"
+     },
+     "rank": 13,
+     "vs_median": -16.9
+    },
+    {
+     "slot": "RB",
+     "player": {
+      "id": "6806",
+      "name": "J.K. Dobbins",
+      "pos": "RB",
+      "team": "DEN",
+      "pts": 160.2,
+      "round": 6,
+      "week_pts": 11,
+      "game": {
+       "week": 1,
+       "opp": "KC",
+       "home": false,
+       "kickoff": "2026-09-15T00:15Z",
+       "date": "2026-09-14",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 10,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 14,
+     "vs_median": -86.6
+    },
+    {
+     "slot": "RB",
+     "player": {
+      "id": "12489",
+      "name": "RJ Harvey",
+      "pos": "RB",
+      "team": "DEN",
+      "pts": 144.1,
+      "round": 7,
+      "week_pts": 10.2,
+      "game": {
+       "week": 1,
+       "opp": "KC",
+       "home": false,
+       "kickoff": "2026-09-15T00:15Z",
+       "date": "2026-09-14",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 10,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 14,
+     "vs_median": -59.5
+    },
+    {
+     "slot": "WR",
+     "player": {
+      "id": "7564",
+      "name": "Ja'Marr Chase",
+      "pos": "WR",
+      "team": "CIN",
+      "pts": 311.1,
+      "round": 1,
+      "week_pts": 19.8,
+      "game": {
+       "week": 1,
+       "opp": "TB",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 6,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 2,
+     "vs_median": 62.3
+    },
+    {
+     "slot": "WR",
+     "player": {
+      "id": "8144",
+      "name": "Chris Olave",
+      "pos": "WR",
+      "team": "NO",
+      "pts": 235.9,
+      "round": 3,
+      "week_pts": 16.2,
+      "game": {
+       "week": 1,
+       "opp": "DET",
+       "home": false,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 8,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 2,
+     "vs_median": 13.3
+    },
+    {
+     "slot": "TE",
+     "player": {
+      "id": "11604",
+      "name": "Brock Bowers",
+      "pos": "TE",
+      "team": "LV",
+      "pts": 253.5,
+      "round": 2,
+      "week_pts": null,
+      "game": {
+       "week": 1,
+       "opp": "MIA",
+       "home": true,
+       "kickoff": "2026-09-13T20:25Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 13,
+      "adp": null,
+      "injury": "Doubtful"
+     },
+     "rank": 1,
+     "vs_median": 80.5
+    },
+    {
+     "slot": "FLEX",
+     "player": {
+      "id": "5927",
+      "name": "Terry McLaurin",
+      "pos": "WR",
+      "team": "WAS",
+      "pts": 213.8,
+      "round": 5,
+      "week_pts": 13.6,
+      "game": {
+       "week": 1,
+       "opp": "PHI",
+       "home": false,
+       "kickoff": "2026-09-13T20:25Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 7,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 1,
+     "vs_median": 37.7
+    },
+    {
+     "slot": "FLEX",
+     "player": {
+      "id": "8148",
+      "name": "Jameson Williams",
+      "pos": "WR",
+      "team": "DET",
+      "pts": 206.2,
+      "round": 4,
+      "week_pts": 13.9,
+      "game": {
+       "week": 1,
+       "opp": "NO",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 6,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 1,
+     "vs_median": 37.4
+    },
+    {
+     "slot": "K",
+     "player": {
+      "id": "8259",
+      "name": "Cameron Dicker",
+      "pos": "K",
+      "team": "LAC",
+      "pts": 102,
+      "round": 10,
+      "week_pts": 7.1,
+      "game": {
+       "week": 1,
+       "opp": "ARI",
+       "home": true,
+       "kickoff": "2026-09-13T20:25Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 7,
+      "adp": null,
+      "injury": "Questionable"
+     },
+     "rank": 9,
+     "vs_median": 0
+    },
+    {
+     "slot": "DEF",
+     "player": {
+      "id": "DEN",
+      "name": "Denver Broncos",
+      "pos": "DEF",
+      "team": "DEN",
+      "pts": 96,
+      "round": 9,
+      "week_pts": 6.3,
+      "game": {
+       "week": 1,
+       "opp": "KC",
+       "home": false,
+       "kickoff": "2026-09-15T00:15Z",
+       "date": "2026-09-14",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 10,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 5,
+     "vs_median": 4
+    }
+   ],
+   "by_pos": [
+    {
+     "pos": "QB",
+     "pts": 286.7,
+     "rank": 13,
+     "vs_median": -16.9,
+     "starters": 1,
+     "rostered": 2
+    },
+    {
+     "pos": "RB",
+     "pts": 304.3,
+     "rank": 14,
+     "vs_median": -168.4,
+     "starters": 2,
+     "rostered": 3
+    },
+    {
+     "pos": "WR",
+     "pts": 967,
+     "rank": 1,
+     "vs_median": 182.2,
+     "starters": 4,
+     "rostered": 6
+    },
+    {
+     "pos": "TE",
+     "pts": 253.5,
+     "rank": 3,
+     "vs_median": 77.5,
+     "starters": 1,
+     "rostered": 2
+    },
+    {
+     "pos": "K",
+     "pts": 102,
+     "rank": 9,
+     "vs_median": 0,
+     "starters": 1,
+     "rostered": 1
+    },
+    {
+     "pos": "DEF",
+     "pts": 96,
+     "rank": 5,
+     "vs_median": 4,
+     "starters": 1,
+     "rostered": 1
+    }
+   ],
+   "strengths": [
+    {
+     "pos": "WR",
+     "pts": 967,
+     "rank": 1,
+     "vs_median": 182.2,
+     "starters": 4,
+     "rostered": 6
+    },
+    {
+     "pos": "TE",
+     "pts": 253.5,
+     "rank": 3,
+     "vs_median": 77.5,
+     "starters": 1,
+     "rostered": 2
+    }
+   ],
+   "weaknesses": [
+    {
+     "pos": "RB",
+     "pts": 304.3,
+     "rank": 14,
+     "vs_median": -168.4,
+     "starters": 2,
+     "rostered": 3
+    },
+    {
+     "pos": "QB",
+     "pts": 286.7,
+     "rank": 13,
+     "vs_median": -16.9,
+     "starters": 1,
+     "rostered": 2
+    }
+   ],
+   "risks": {
+    "bye_stacks": [
+     {
+      "week": 10,
+      "n": 3,
+      "players": [
+       "J.K. Dobbins (RB)",
+       "RJ Harvey (RB)",
+       "Denver Broncos (DEF)"
+      ]
+     }
+    ],
+    "injured": [
+     {
+      "name": "Patrick Mahomes",
+      "pos": "QB",
+      "status": "Questionable"
+     },
+     {
+      "name": "Brock Bowers",
+      "pos": "TE",
+      "status": "Doubtful"
+     },
+     {
+      "name": "Cameron Dicker",
+      "pos": "K",
+      "status": "Questionable"
+     }
+    ],
+    "fragile": [
+     {
+      "name": "J.K. Dobbins",
+      "pos": "RB",
+      "score": 0.662,
+      "why": "Chronically injury-prone: long Achilles history plus a Nov 2025 foot injury that required a second opinion. gp 1/13/10 over three years. Now in a crowded Denver backfield."
+     },
+     {
+      "name": "Chris Olave",
+      "pos": "WR",
+      "score": 0.871,
+      "why": "MAJOR RED FLAG: 4-5 diagnosed concussions (2022-2024; missed 9 games in 2024) PLUS a January-2026 blood clot in the lung, limited in offseason work. Concussion recurrence + clot is the board's most serious availability profile."
+     },
+     {
+      "name": "Terry McLaurin",
+      "pos": "WR",
+      "score": 0.89,
+      "why": "2025 missed time (10 games)."
+     }
+    ],
+    "flagged": [
+     {
+      "name": "Terry McLaurin",
+      "pos": "WR",
+      "notes": [
+       "Live training-camp holdout for a new deal (unresolved as of this research). Fined per day; missed-camp/games risk until settled."
+      ]
+     },
+     {
+      "name": "Jameson Williams",
+      "pos": "WR",
+      "notes": [
+       "Repeat offender: 4-game gambling suspension (2023) + 2-game PED suspension (2024). A PED repeat escalates to a 17-game ban, genuine week-loss exposure. No confirmed 2026 suspension, but documented exposure per the user's 'suspension exposure' flag."
+      ]
+     }
+    ]
+   },
+   "bench": [
+    {
+     "id": "4943",
+     "name": "Sam Darnold",
+     "pos": "QB",
+     "team": "SEA",
+     "pts": 262.7,
+     "round": 13,
+     "week_pts": 17.1,
+     "game": {
+      "week": 1,
+      "opp": "NE",
+      "home": true,
+      "kickoff": "2026-09-10T00:20Z",
+      "date": "2026-09-09",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 11,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    },
+    {
+     "id": "5872",
+     "name": "Deebo Samuel",
+     "pos": "WR",
+     "team": "SF",
+     "pts": 155.7,
+     "round": 11,
+     "week_pts": 10.1,
+     "game": {
+      "week": 1,
+      "opp": "LAR",
+      "home": false,
+      "kickoff": "2026-09-11T00:35Z",
+      "date": "2026-09-10",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 8,
+     "starts_on": 1,
+     "best_gain": 7.8,
+     "best_team": 8,
+     "own_cost": 0
+    },
+    {
+     "id": "13276",
+     "name": "Omar Cooper",
+     "pos": "WR",
+     "team": "NYJ",
+     "pts": 127.1,
+     "round": 15,
+     "week_pts": 3.9,
+     "game": {
+      "week": 1,
+      "opp": "TEN",
+      "home": false,
+      "kickoff": "2026-09-13T17:00Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 13,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    },
+    {
+     "id": "13330",
+     "name": "Kenyon Sadiq",
+     "pos": "TE",
+     "team": "NYJ",
+     "pts": 100.2,
+     "round": 14,
+     "week_pts": 4,
+     "game": {
+      "week": 1,
+      "opp": "TEN",
+      "home": false,
+      "kickoff": "2026-09-13T17:00Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 13,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    },
+    {
+     "id": "12474",
+     "name": "Woody Marks",
+     "pos": "RB",
+     "team": "HOU",
+     "pts": 83.8,
+     "round": 12,
+     "week_pts": 8.1,
+     "game": {
+      "week": 1,
+      "opp": "BUF",
+      "home": true,
+      "kickoff": "2026-09-13T17:00Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 8,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    }
+   ],
+   "unpriced": [],
+   "tendencies": null,
+   "moves": {
+    "n": 0,
+    "through_week": 1,
+    "note": "No completed moves through week 1."
+   },
+   "proposals": [],
+   "fit": {
+    "they_have": [],
+    "they_want": [
+     {
+      "id": "7567",
+      "name": "Kenny Gainwell",
+      "pos": "RB",
+      "team": "TB",
+      "pts": 152.3,
+      "round": 8,
+      "gain": 8.2,
+      "cost": 0,
+      "net": 8.2
+     },
+     {
+      "id": "8228",
+      "name": "Jaylen Warren",
+      "pos": "RB",
+      "team": "PIT",
+      "pts": 170.6,
+      "round": 6,
+      "gain": 26.5,
+      "cost": 18.3,
+      "net": 8.2
+     },
+     {
+      "id": "12490",
+      "name": "Bhayshul Tuten",
+      "pos": "RB",
+      "team": "JAX",
+      "pts": 174.8,
+      "round": 5,
+      "gain": 30.7,
+      "cost": 22.5,
+      "net": 8.2
+     },
+     {
+      "id": "8155",
+      "name": "Breece Hall",
+      "pos": "RB",
+      "team": "NYJ",
+      "pts": 211,
+      "round": 3,
+      "gain": 66.9,
+      "cost": 58.7,
+      "net": 8.2
+     },
+     {
+      "id": "8151",
+      "name": "Kenneth Walker",
+      "pos": "RB",
+      "team": "KC",
+      "pts": 244,
+      "round": 2,
+      "gain": 99.9,
+      "cost": 91.7,
+      "net": 8.2
+     }
+    ],
+    "note": "One-way fit the other way — you hold surplus they could use and they hold none you can use. Sell, do not swap. Every name on your side nets the same +8.2 — they all fill the same slot over there, so the one to actually send is the cheapest, Kenny Gainwell."
+   }
+  },
+  {
+   "roster_id": 10,
+   "owner": "nDabb",
+   "user_id": "1263700898866020352",
+   "is_me": false,
+   "draft_slot": 5,
+   "starter_pts": 2042,
+   "starter_rank": 1,
+   "vs_league_median": 91.7,
+   "bench_pts": 748.8,
+   "week": {
+    "n": 1,
+    "starter_pts": 131.2,
+    "starter_n": 10,
+    "starter_of": 10,
+    "bench_pts": 49.1,
+    "bench_n": 5,
+    "bench_of": 5
+   },
+   "summary": "1st of 14 in projected starting points (2042), +92 against the league median. Built on WR: 941 starting points, 2nd in the league, +156 on the median. RB is the hole — 358 points, 13th, -114 behind. 1 bench player would start on four or more other teams (Mark Andrews) — that is the tradeable surplus. Week 10 takes 3 starters off the field at once, and five bench spots do not cover that.",
+   "slots": [
+    {
+     "slot": "QB",
+     "player": {
+      "id": "11563",
+      "name": "Bo Nix",
+      "pos": "QB",
+      "team": "DEN",
+      "pts": 295.7,
+      "round": 9,
+      "week_pts": 17.9,
+      "game": {
+       "week": 1,
+       "opp": "KC",
+       "home": false,
+       "kickoff": "2026-09-15T00:15Z",
+       "date": "2026-09-14",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 10,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 11,
+     "vs_median": -7.9
+    },
+    {
+     "slot": "RB",
+     "player": {
+      "id": "11584",
+      "name": "Bucky Irving",
+      "pos": "RB",
+      "team": "TB",
+      "pts": 197.3,
+      "round": 4,
+      "week_pts": 12.2,
+      "game": {
+       "week": 1,
+       "opp": "CIN",
+       "home": false,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 10,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 13,
+     "vs_median": -49.5
+    },
+    {
+     "slot": "RB",
+     "player": {
+      "id": "7021",
+      "name": "Rico Dowdle",
+      "pos": "RB",
+      "team": "PIT",
+      "pts": 161.1,
+      "round": 6,
+      "week_pts": 12.5,
+      "game": {
+       "week": 1,
+       "opp": "ATL",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 9,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 11,
+     "vs_median": -42.5
+    },
+    {
+     "slot": "WR",
+     "player": {
+      "id": "9493",
+      "name": "Puka Nacua",
+      "pos": "WR",
+      "team": "LAR",
+      "pts": 312.5,
+      "round": 1,
+      "week_pts": 20.5,
+      "game": {
+       "week": 1,
+       "opp": "SF",
+       "home": true,
+       "kickoff": "2026-09-11T00:35Z",
+       "date": "2026-09-10",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 11,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 1,
+     "vs_median": 63.7
+    },
+    {
+     "slot": "WR",
+     "player": {
+      "id": "8112",
+      "name": "Drake London",
+      "pos": "WR",
+      "team": "ATL",
+      "pts": 250.2,
+      "round": 2,
+      "week_pts": 15.8,
+      "game": {
+       "week": 1,
+       "opp": "PIT",
+       "home": false,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 11,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 1,
+     "vs_median": 27.6
+    },
+    {
+     "slot": "TE",
+     "player": {
+      "id": "8130",
+      "name": "Trey McBride",
+      "pos": "TE",
+      "team": "ARI",
+      "pts": 234.9,
+      "round": 3,
+      "week_pts": 15.6,
+      "game": {
+       "week": 1,
+       "opp": "LAC",
+       "home": false,
+       "kickoff": "2026-09-13T20:25Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 14,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 2,
+     "vs_median": 61.9
+    },
+    {
+     "slot": "FLEX",
+     "player": {
+      "id": "12519",
+      "name": "Luther Burden",
+      "pos": "WR",
+      "team": "CHI",
+      "pts": 209,
+      "round": 5,
+      "week_pts": 13.5,
+      "game": {
+       "week": 1,
+       "opp": "CAR",
+       "home": false,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 10,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 2,
+     "vs_median": 32.9
+    },
+    {
+     "slot": "FLEX",
+     "player": {
+      "id": "5947",
+      "name": "Jakobi Meyers",
+      "pos": "WR",
+      "team": "JAX",
+      "pts": 169.3,
+      "round": 11,
+      "week_pts": 10.4,
+      "game": {
+       "week": 1,
+       "opp": "CLE",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 7,
+      "adp": null,
+      "injury": "Questionable"
+     },
+     "rank": 6,
+     "vs_median": 0.5
+    },
+    {
+     "slot": "K",
+     "player": {
+      "id": "11792",
+      "name": "Will Reichard",
+      "pos": "K",
+      "team": "MIN",
+      "pts": 106,
+      "round": 13,
+      "week_pts": 6.6,
+      "game": {
+       "week": 1,
+       "opp": "GB",
+       "home": true,
+       "kickoff": "2026-09-13T20:25Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 6,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 5,
+     "vs_median": 4
+    },
+    {
+     "slot": "DEF",
+     "player": {
+      "id": "LAR",
+      "name": "Los Angeles Rams",
+      "pos": "DEF",
+      "team": "LAR",
+      "pts": 106,
+      "round": 7,
+      "week_pts": 6.2,
+      "game": {
+       "week": 1,
+       "opp": "SF",
+       "home": true,
+       "kickoff": "2026-09-11T00:35Z",
+       "date": "2026-09-10",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 11,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 1,
+     "vs_median": 14
+    }
+   ],
+   "by_pos": [
+    {
+     "pos": "QB",
+     "pts": 295.7,
+     "rank": 11,
+     "vs_median": -7.9,
+     "starters": 1,
+     "rostered": 2
+    },
+    {
+     "pos": "RB",
+     "pts": 358.4,
+     "rank": 13,
+     "vs_median": -114.3,
+     "starters": 2,
+     "rostered": 4
+    },
+    {
+     "pos": "WR",
+     "pts": 941,
+     "rank": 2,
+     "vs_median": 156.2,
+     "starters": 4,
+     "rostered": 5
+    },
+    {
+     "pos": "TE",
+     "pts": 234.9,
+     "rank": 4,
+     "vs_median": 58.9,
+     "starters": 1,
+     "rostered": 2
+    },
+    {
+     "pos": "K",
+     "pts": 106,
+     "rank": 5,
+     "vs_median": 4,
+     "starters": 1,
+     "rostered": 1
+    },
+    {
+     "pos": "DEF",
+     "pts": 106,
+     "rank": 1,
+     "vs_median": 14,
+     "starters": 1,
+     "rostered": 1
+    }
+   ],
+   "strengths": [
+    {
+     "pos": "WR",
+     "pts": 941,
+     "rank": 2,
+     "vs_median": 156.2,
+     "starters": 4,
+     "rostered": 5
+    }
+   ],
+   "weaknesses": [
+    {
+     "pos": "RB",
+     "pts": 358.4,
+     "rank": 13,
+     "vs_median": -114.3,
+     "starters": 2,
+     "rostered": 4
+    },
+    {
+     "pos": "QB",
+     "pts": 295.7,
+     "rank": 11,
+     "vs_median": -7.9,
+     "starters": 1,
+     "rostered": 2
+    }
+   ],
+   "risks": {
+    "bye_stacks": [
+     {
+      "week": 10,
+      "n": 3,
+      "players": [
+       "Bo Nix (QB)",
+       "Bucky Irving (RB)",
+       "Luther Burden (WR)"
+      ]
+     },
+     {
+      "week": 11,
+      "n": 3,
+      "players": [
+       "Puka Nacua (WR)",
+       "Drake London (WR)",
+       "Los Angeles Rams (DEF)"
+      ]
+     }
+    ],
+    "injured": [
+     {
+      "name": "Jakobi Meyers",
+      "pos": "WR",
+      "status": "Questionable"
+     }
+    ],
+    "fragile": [
+     {
+      "name": "Bucky Irving",
+      "pos": "RB",
+      "score": 0.876,
+      "why": "2025 foot + shoulder injuries wrecked the year (10 games, 588 yds); listed 1A with Gainwell 1B. Camp health is the swing variable."
+     }
+    ],
+    "flagged": []
+   },
+   "bench": [
+    {
+     "id": "3163",
+     "name": "Jared Goff",
+     "pos": "QB",
+     "team": "DET",
+     "pts": 283.5,
+     "round": 12,
+     "week_pts": 18.2,
+     "game": {
+      "week": 1,
+      "opp": "NO",
+      "home": true,
+      "kickoff": "2026-09-13T17:00Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 6,
+     "starts_on": 1,
+     "best_gain": 3.3,
+     "best_team": 3,
+     "own_cost": 0
+    },
+    {
+     "id": "5012",
+     "name": "Mark Andrews",
+     "pos": "TE",
+     "team": "BAL",
+     "pts": 162.5,
+     "round": 10,
+     "week_pts": 10.8,
+     "game": {
+      "week": 1,
+      "opp": "IND",
+      "home": false,
+      "kickoff": "2026-09-13T17:00Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 13,
+     "starts_on": 6,
+     "best_gain": 26.5,
+     "best_team": 4,
+     "own_cost": 0
+    },
+    {
+     "id": "11586",
+     "name": "Blake Corum",
+     "pos": "RB",
+     "team": "LAR",
+     "pts": 135.3,
+     "round": 8,
+     "week_pts": 8.5,
+     "game": {
+      "week": 1,
+      "opp": "SF",
+      "home": true,
+      "kickoff": "2026-09-11T00:35Z",
+      "date": "2026-09-10",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 11,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    },
+    {
+     "id": "9504",
+     "name": "Kayshon Boutte",
+     "pos": "WR",
+     "team": "HOU",
+     "pts": 125.2,
+     "round": 15,
+     "week_pts": 9.6,
+     "game": {
+      "week": 1,
+      "opp": "BUF",
+      "home": true,
+      "kickoff": "2026-09-13T17:00Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 8,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    },
+    {
+     "id": "13414",
+     "name": "Kaelon Black",
+     "pos": "RB",
+     "team": "SF",
+     "pts": 42.3,
+     "round": 14,
+     "week_pts": 2,
+     "game": {
+      "week": 1,
+      "opp": "LAR",
+      "home": false,
+      "kickoff": "2026-09-11T00:35Z",
+      "date": "2026-09-10",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 8,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    }
+   ],
+   "unpriced": [],
+   "tendencies": null,
+   "moves": {
+    "n": 0,
+    "through_week": 1,
+    "note": "No completed moves through week 1."
+   },
+   "proposals": [],
+   "fit": {
+    "they_have": [
+     {
+      "id": "5012",
+      "name": "Mark Andrews",
+      "pos": "TE",
+      "team": "BAL",
+      "pts": 162.5,
+      "round": 10,
+      "gain": 18.4,
+      "cost": 0,
+      "net": 18.4
+     },
+     {
+      "id": "8130",
+      "name": "Trey McBride",
+      "pos": "TE",
+      "team": "ARI",
+      "pts": 234.9,
+      "round": 3,
+      "gain": 90.8,
+      "cost": 72.4,
+      "net": 18.4
+     }
+    ],
+    "they_want": [],
+    "note": "One-way fit — they hold players worth more to you than to them, but nothing you own is worth more over there. You are the side that has to overpay."
+   }
+  },
+  {
+   "roster_id": 11,
+   "owner": "ThatWasButtery",
+   "user_id": "603035152494436352",
+   "is_me": true,
+   "draft_slot": 8,
+   "starter_pts": 1933.6,
+   "starter_rank": 9,
+   "vs_league_median": -16.7,
+   "bench_pts": 606.9,
+   "week": {
+    "n": 1,
+    "starter_pts": 128.5,
+    "starter_n": 10,
+    "starter_of": 10,
+    "bench_pts": 42.8,
+    "bench_n": 5,
+    "bench_of": 5
+   },
+   "summary": "9th of 14 in projected starting points (1934), -17 against the league median. Built on RB: 800 starting points, 1st in the league, +328 on the median. WR is the hole — 509 points, 13th, -276 behind. No bench player would start on four other teams, so there is little here to trade from. Week 7 takes 3 starters off the field at once, and five bench spots do not cover that.",
+   "slots": [
+    {
+     "slot": "QB",
+     "player": {
+      "id": "7523",
+      "name": "Trevor Lawrence",
+      "pos": "QB",
+      "team": "JAX",
+      "pts": 303.4,
+      "round": 7,
+      "week_pts": 17.8,
+      "game": {
+       "week": 1,
+       "opp": "CLE",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 7,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 8,
+     "vs_median": -0.2
+    },
+    {
+     "slot": "RB",
+     "player": {
+      "id": "8151",
+      "name": "Kenneth Walker",
+      "pos": "RB",
+      "team": "KC",
+      "pts": 244,
+      "round": 2,
+      "week_pts": 15.9,
+      "game": {
+       "week": 1,
+       "opp": "DEN",
+       "home": true,
+       "kickoff": "2026-09-15T00:15Z",
+       "date": "2026-09-14",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 5,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 9,
+     "vs_median": -2.8
+    },
+    {
+     "slot": "RB",
+     "player": {
+      "id": "8155",
+      "name": "Breece Hall",
+      "pos": "RB",
+      "team": "NYJ",
+      "pts": 211,
+      "round": 3,
+      "week_pts": 13.9,
+      "game": {
+       "week": 1,
+       "opp": "TEN",
+       "home": false,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 13,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 4,
+     "vs_median": 7.4
+    },
+    {
+     "slot": "WR",
+     "player": {
+      "id": "7547",
+      "name": "Amon-Ra St. Brown",
+      "pos": "WR",
+      "team": "DET",
+      "pts": 280.5,
+      "round": 1,
+      "week_pts": 19.8,
+      "game": {
+       "week": 1,
+       "opp": "NO",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 6,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 4,
+     "vs_median": 31.7
+    },
+    {
+     "slot": "WR",
+     "player": {
+      "id": "9997",
+      "name": "Zay Flowers",
+      "pos": "WR",
+      "team": "BAL",
+      "pts": 228.2,
+      "round": 4,
+      "week_pts": 15.6,
+      "game": {
+       "week": 1,
+       "opp": "IND",
+       "home": false,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 13,
+      "adp": null,
+      "injury": "Questionable"
+     },
+     "rank": 3,
+     "vs_median": 5.6
+    },
+    {
+     "slot": "TE",
+     "player": {
+      "id": "8210",
+      "name": "Chig Okonkwo",
+      "pos": "TE",
+      "team": "WAS",
+      "pts": 144.1,
+      "round": 14,
+      "week_pts": 9.1,
+      "game": {
+       "week": 1,
+       "opp": "PHI",
+       "home": false,
+       "kickoff": "2026-09-13T20:25Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 7,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 13,
+     "vs_median": -28.9
+    },
+    {
+     "slot": "FLEX",
+     "player": {
+      "id": "12490",
+      "name": "Bhayshul Tuten",
+      "pos": "RB",
+      "team": "JAX",
+      "pts": 174.8,
+      "round": 5,
+      "week_pts": 11.3,
+      "game": {
+       "week": 1,
+       "opp": "CLE",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 7,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 8,
+     "vs_median": -1.3
+    },
+    {
+     "slot": "FLEX",
+     "player": {
+      "id": "8228",
+      "name": "Jaylen Warren",
+      "pos": "RB",
+      "team": "PIT",
+      "pts": 170.6,
+      "round": 6,
+      "week_pts": 13.3,
+      "game": {
+       "week": 1,
+       "opp": "ATL",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 9,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 4,
+     "vs_median": 1.8
+    },
+    {
+     "slot": "K",
+     "player": {
+      "id": "12713",
+      "name": "Andy Borregales",
+      "pos": "K",
+      "team": "NE",
+      "pts": 91,
+      "round": 13,
+      "week_pts": 6,
+      "game": {
+       "week": 1,
+       "opp": "SEA",
+       "home": false,
+       "kickoff": "2026-09-10T00:20Z",
+       "date": "2026-09-09",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": null,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 14,
+     "vs_median": -11
+    },
+    {
+     "slot": "DEF",
+     "player": {
+      "id": "DAL",
+      "name": "Dallas Cowboys",
+      "pos": "DEF",
+      "team": "DAL",
+      "pts": 86,
+      "round": 12,
+      "week_pts": 5.8,
+      "game": {
+       "week": 1,
+       "opp": "NYG",
+       "home": false,
+       "kickoff": "2026-09-14T00:20Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 14,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 12,
+     "vs_median": -6
+    }
+   ],
+   "by_pos": [
+    {
+     "pos": "QB",
+     "pts": 303.4,
+     "rank": 8,
+     "vs_median": -0.2,
+     "starters": 1,
+     "rostered": 1
+    },
+    {
+     "pos": "RB",
+     "pts": 800.4,
+     "rank": 1,
+     "vs_median": 327.7,
+     "starters": 4,
+     "rostered": 8
+    },
+    {
+     "pos": "WR",
+     "pts": 508.7,
+     "rank": 13,
+     "vs_median": -276.1,
+     "starters": 2,
+     "rostered": 2
+    },
+    {
+     "pos": "TE",
+     "pts": 144.1,
+     "rank": 13,
+     "vs_median": -31.9,
+     "starters": 1,
+     "rostered": 2
+    },
+    {
+     "pos": "K",
+     "pts": 91,
+     "rank": 14,
+     "vs_median": -11,
+     "starters": 1,
+     "rostered": 1
+    },
+    {
+     "pos": "DEF",
+     "pts": 86,
+     "rank": 12,
+     "vs_median": -6,
+     "starters": 1,
+     "rostered": 1
+    }
+   ],
+   "strengths": [
+    {
+     "pos": "RB",
+     "pts": 800.4,
+     "rank": 1,
+     "vs_median": 327.7,
+     "starters": 4,
+     "rostered": 8
+    }
+   ],
+   "weaknesses": [
+    {
+     "pos": "WR",
+     "pts": 508.7,
+     "rank": 13,
+     "vs_median": -276.1,
+     "starters": 2,
+     "rostered": 2
+    },
+    {
+     "pos": "TE",
+     "pts": 144.1,
+     "rank": 13,
+     "vs_median": -31.9,
+     "starters": 1,
+     "rostered": 2
+    },
+    {
+     "pos": "QB",
+     "pts": 303.4,
+     "rank": 8,
+     "vs_median": -0.2,
+     "starters": 1,
+     "rostered": 1
+    }
+   ],
+   "risks": {
+    "bye_stacks": [
+     {
+      "week": 7,
+      "n": 3,
+      "players": [
+       "Trevor Lawrence (QB)",
+       "Chig Okonkwo (TE)",
+       "Bhayshul Tuten (RB)"
+      ]
+     }
+    ],
+    "injured": [
+     {
+      "name": "Zay Flowers",
+      "pos": "WR",
+      "status": "Questionable"
+     }
+    ],
+    "fragile": [],
+    "flagged": []
+   },
+   "bench": [
+    {
+     "id": "7567",
+     "name": "Kenny Gainwell",
+     "pos": "RB",
+     "team": "TB",
+     "pts": 152.3,
+     "round": 8,
+     "week_pts": 9.5,
+     "game": {
+      "week": 1,
+      "opp": "CIN",
+      "home": false,
+      "kickoff": "2026-09-13T17:00Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 10,
+     "starts_on": 2,
+     "best_gain": 8.2,
+     "best_team": 9,
+     "own_cost": 0
+    },
+    {
+     "id": "11581",
+     "name": "MarShawn Lloyd",
+     "pos": "RB",
+     "team": "GB",
+     "pts": 149,
+     "round": 9,
+     "week_pts": 10.9,
+     "game": {
+      "week": 1,
+      "opp": "MIN",
+      "home": false,
+      "kickoff": "2026-09-13T20:25Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 11,
+     "starts_on": 2,
+     "best_gain": 4.9,
+     "best_team": 9,
+     "own_cost": 0
+    },
+    {
+     "id": "8136",
+     "name": "Rachaad White",
+     "pos": "RB",
+     "team": "WAS",
+     "pts": 128.1,
+     "round": 10,
+     "week_pts": 10.2,
+     "game": {
+      "week": 1,
+      "opp": "PHI",
+      "home": false,
+      "kickoff": "2026-09-13T20:25Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 7,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    },
+    {
+     "id": "12487",
+     "name": "Terrance Ferguson",
+     "pos": "TE",
+     "team": "LAR",
+     "pts": 100.3,
+     "round": 15,
+     "week_pts": 3.7,
+     "game": {
+      "week": 1,
+      "opp": "SF",
+      "home": true,
+      "kickoff": "2026-09-11T00:35Z",
+      "date": "2026-09-10",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 11,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    },
+    {
+     "id": "8132",
+     "name": "Tyler Allgeier",
+     "pos": "RB",
+     "team": "ARI",
+     "pts": 77.2,
+     "round": 11,
+     "week_pts": 8.5,
+     "game": {
+      "week": 1,
+      "opp": "LAC",
+      "home": false,
+      "kickoff": "2026-09-13T20:25Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 14,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    }
+   ],
+   "unpriced": [],
+   "tendencies": null,
+   "moves": {
+    "n": 0,
+    "through_week": 1,
+    "note": "No completed moves through week 1."
+   },
+   "proposals": [],
+   "fit": null
+  },
+  {
+   "roster_id": 12,
+   "owner": "kimberosburn",
+   "user_id": "1005266101674508288",
+   "is_me": false,
+   "draft_slot": 4,
+   "starter_pts": 1997.8,
+   "starter_rank": 4,
+   "vs_league_median": 47.5,
+   "bench_pts": 950.8,
+   "week": {
+    "n": 1,
+    "starter_pts": 121,
+    "starter_n": 9,
+    "starter_of": 10,
+    "bench_pts": 60.4,
+    "bench_n": 5,
+    "bench_of": 5
+   },
+   "summary": "4th of 14 in projected starting points (1998), +48 against the league median. Built on RB: 658 starting points, 2nd in the league, +185 on the median. WR is the hole — 656 points, 11th, -129 behind. 1 bench player would start on four or more other teams (Jaxson Dart) — that is the tradeable surplus. Week 11 takes 4 starters off the field at once, and five bench spots do not cover that.",
+   "slots": [
+    {
+     "slot": "QB",
+     "player": {
+      "id": "11560",
+      "name": "Caleb Williams",
+      "pos": "QB",
+      "team": "CHI",
+      "pts": 299.3,
+      "round": 4,
+      "week_pts": 19.6,
+      "game": {
+       "week": 1,
+       "opp": "CAR",
+       "home": false,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 10,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 10,
+     "vs_median": -4.3
+    },
+    {
+     "slot": "RB",
+     "player": {
+      "id": "4034",
+      "name": "Christian McCaffrey",
+      "pos": "RB",
+      "team": "SF",
+      "pts": 291,
+      "round": 1,
+      "week_pts": 21,
+      "game": {
+       "week": 1,
+       "opp": "LAR",
+       "home": false,
+       "kickoff": "2026-09-11T00:35Z",
+       "date": "2026-09-10",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 8,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 3,
+     "vs_median": 44.2
+    },
+    {
+     "slot": "RB",
+     "player": {
+      "id": "12512",
+      "name": "Quinshon Judkins",
+      "pos": "RB",
+      "team": "CLE",
+      "pts": 196,
+      "round": 5,
+      "week_pts": 12.2,
+      "game": {
+       "week": 1,
+       "opp": "JAX",
+       "home": false,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 11,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 9,
+     "vs_median": -7.6
+    },
+    {
+     "slot": "WR",
+     "player": {
+      "id": "7569",
+      "name": "Nico Collins",
+      "pos": "WR",
+      "team": "HOU",
+      "pts": 262,
+      "round": 2,
+      "week_pts": 17.4,
+      "game": {
+       "week": 1,
+       "opp": "BUF",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 8,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 6,
+     "vs_median": 13.2
+    },
+    {
+     "slot": "WR",
+     "player": {
+      "id": "11635",
+      "name": "Ladd McConkey",
+      "pos": "WR",
+      "team": "LAC",
+      "pts": 228.2,
+      "round": 3,
+      "week_pts": 13.3,
+      "game": {
+       "week": 1,
+       "opp": "ARI",
+       "home": true,
+       "kickoff": "2026-09-13T20:25Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 7,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 4,
+     "vs_median": 5.6
+    },
+    {
+     "slot": "TE",
+     "player": {
+      "id": "12506",
+      "name": "Harold Fannin",
+      "pos": "TE",
+      "team": "CLE",
+      "pts": 180.4,
+      "round": 6,
+      "week_pts": 11.6,
+      "game": {
+       "week": 1,
+       "opp": "JAX",
+       "home": false,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 11,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 6,
+     "vs_median": 7.4
+    },
+    {
+     "slot": "FLEX",
+     "player": {
+      "id": "12529",
+      "name": "TreVeyon Henderson",
+      "pos": "RB",
+      "team": "NE",
+      "pts": 171,
+      "round": 7,
+      "week_pts": null,
+      "game": {
+       "week": 1,
+       "opp": "SEA",
+       "home": false,
+       "kickoff": "2026-09-10T00:20Z",
+       "date": "2026-09-09",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 11,
+      "adp": null,
+      "injury": "Out"
+     },
+     "rank": 12,
+     "vs_median": -5.1
+    },
+    {
+     "slot": "FLEX",
+     "player": {
+      "id": "11646",
+      "name": "Jalen Coker",
+      "pos": "WR",
+      "team": "CAR",
+      "pts": 165.9,
+      "round": 11,
+      "week_pts": 12.1,
+      "game": {
+       "week": 1,
+       "opp": "CHI",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 5,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 10,
+     "vs_median": -2.9
+    },
+    {
+     "slot": "K",
+     "player": {
+      "id": "11539",
+      "name": "Jake Bates",
+      "pos": "K",
+      "team": "DET",
+      "pts": 101,
+      "round": 10,
+      "week_pts": 7.1,
+      "game": {
+       "week": 1,
+       "opp": "NO",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 6,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 11,
+     "vs_median": -1
+    },
+    {
+     "slot": "DEF",
+     "player": {
+      "id": "SEA",
+      "name": "Seattle Seahawks",
+      "pos": "DEF",
+      "team": "SEA",
+      "pts": 103,
+      "round": 9,
+      "week_pts": 6.7,
+      "game": {
+       "week": 1,
+       "opp": "NE",
+       "home": true,
+       "kickoff": "2026-09-10T00:20Z",
+       "date": "2026-09-09",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 11,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 3,
+     "vs_median": 11
+    }
+   ],
+   "by_pos": [
+    {
+     "pos": "QB",
+     "pts": 299.3,
+     "rank": 10,
+     "vs_median": -4.3,
+     "starters": 1,
+     "rostered": 3
+    },
+    {
+     "pos": "RB",
+     "pts": 658,
+     "rank": 2,
+     "vs_median": 185.3,
+     "starters": 3,
+     "rostered": 3
+    },
+    {
+     "pos": "WR",
+     "pts": 656.1,
+     "rank": 11,
+     "vs_median": -128.7,
+     "starters": 3,
+     "rostered": 3
+    },
+    {
+     "pos": "TE",
+     "pts": 180.4,
+     "rank": 7,
+     "vs_median": 4.4,
+     "starters": 1,
+     "rostered": 3
+    },
+    {
+     "pos": "K",
+     "pts": 101,
+     "rank": 11,
+     "vs_median": -1,
+     "starters": 1,
+     "rostered": 1
+    },
+    {
+     "pos": "DEF",
+     "pts": 103,
+     "rank": 3,
+     "vs_median": 11,
+     "starters": 1,
+     "rostered": 2
+    }
+   ],
+   "strengths": [
+    {
+     "pos": "RB",
+     "pts": 658,
+     "rank": 2,
+     "vs_median": 185.3,
+     "starters": 3,
+     "rostered": 3
+    }
+   ],
+   "weaknesses": [
+    {
+     "pos": "WR",
+     "pts": 656.1,
+     "rank": 11,
+     "vs_median": -128.7,
+     "starters": 3,
+     "rostered": 3
+    },
+    {
+     "pos": "QB",
+     "pts": 299.3,
+     "rank": 10,
+     "vs_median": -4.3,
+     "starters": 1,
+     "rostered": 3
+    }
+   ],
+   "risks": {
+    "bye_stacks": [
+     {
+      "week": 11,
+      "n": 4,
+      "players": [
+       "Quinshon Judkins (RB)",
+       "Harold Fannin (TE)",
+       "TreVeyon Henderson (RB)",
+       "Seattle Seahawks (DEF)"
+      ]
+     }
+    ],
+    "injured": [
+     {
+      "name": "TreVeyon Henderson",
+      "pos": "RB",
+      "status": "Out"
+     }
+    ],
+    "fragile": [
+     {
+      "name": "Christian McCaffrey",
+      "pos": "RB",
+      "score": 0.735,
+      "why": "2024 lost 13 games to bilateral Achilles tendinitis (soft-tissue, both legs) + late PCL sprain; answered with a 17-game RB1 season in 2025. Age 30 + Achilles history is the recurrence/decline risk, not a current injury."
+     },
+     {
+      "name": "Jalen Coker",
+      "pos": "WR",
+      "score": 0.788,
+      "why": null
+     },
+     {
+      "name": "TreVeyon Henderson",
+      "pos": "RB",
+      "score": 0.85,
+      "why": "No significant missed time (--/--/17)."
+     }
+    ],
+    "flagged": []
+   },
+   "bench": [
+    {
+     "id": "12508",
+     "name": "Jaxson Dart",
+     "pos": "QB",
+     "team": "NYG",
+     "pts": 296.5,
+     "round": 8,
+     "week_pts": 19.4,
+     "game": {
+      "week": 1,
+      "opp": "DAL",
+      "home": true,
+      "kickoff": "2026-09-14T00:20Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 8,
+     "starts_on": 4,
+     "best_gain": 16.3,
+     "best_team": 3,
+     "own_cost": 0
+    },
+    {
+     "id": "12545",
+     "name": "Tyler Shough",
+     "pos": "QB",
+     "team": "NO",
+     "pts": 270.9,
+     "round": 13,
+     "week_pts": 17.2,
+     "game": {
+      "week": 1,
+      "opp": "DET",
+      "home": false,
+      "kickoff": "2026-09-13T17:00Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 8,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    },
+    {
+     "id": "5844",
+     "name": "T.J. Hockenson",
+     "pos": "TE",
+     "team": "MIN",
+     "pts": 155,
+     "round": 12,
+     "week_pts": 8.4,
+     "game": {
+      "week": 1,
+      "opp": "GB",
+      "home": true,
+      "kickoff": "2026-09-13T20:25Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 6,
+     "starts_on": 3,
+     "best_gain": 19,
+     "best_team": 4,
+     "own_cost": 0
+    },
+    {
+     "id": "11603",
+     "name": "AJ Barner",
+     "pos": "TE",
+     "team": "SEA",
+     "pts": 142.4,
+     "round": 15,
+     "week_pts": 9.3,
+     "game": {
+      "week": 1,
+      "opp": "NE",
+      "home": true,
+      "kickoff": "2026-09-10T00:20Z",
+      "date": "2026-09-09",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 11,
+     "starts_on": 1,
+     "best_gain": 6.4,
+     "best_team": 4,
+     "own_cost": 0
+    },
+    {
+     "id": "GB",
+     "name": "Green Bay Packers",
+     "pos": "DEF",
+     "team": "GB",
+     "pts": 86,
+     "round": 14,
+     "week_pts": 6.1,
+     "game": {
+      "week": 1,
+      "opp": "MIN",
+      "home": false,
+      "kickoff": "2026-09-13T20:25Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 11,
+     "starts_on": 1,
+     "best_gain": 2,
+     "best_team": 8,
+     "own_cost": 0
+    }
+   ],
+   "unpriced": [],
+   "tendencies": null,
+   "moves": {
+    "n": 0,
+    "through_week": 1,
+    "note": "No completed moves through week 1."
+   },
+   "proposals": [],
+   "fit": {
+    "they_have": [
+     {
+      "id": "5844",
+      "name": "T.J. Hockenson",
+      "pos": "TE",
+      "team": "MIN",
+      "pts": 155,
+      "round": 12,
+      "gain": 10.9,
+      "cost": 0,
+      "net": 10.9
+     },
+     {
+      "id": "12506",
+      "name": "Harold Fannin",
+      "pos": "TE",
+      "team": "CLE",
+      "pts": 180.4,
+      "round": 6,
+      "gain": 36.3,
+      "cost": 25.4,
+      "net": 10.9
+     }
+    ],
+    "they_want": [],
+    "note": "One-way fit — they hold players worth more to you than to them, but nothing you own is worth more over there. You are the side that has to overpay."
+   }
+  },
+  {
+   "roster_id": 13,
+   "owner": "BrittAndTheBoys",
+   "user_id": "1004535453195857920",
+   "is_me": false,
+   "draft_slot": 11,
+   "starter_pts": 2012.8,
+   "starter_rank": 2,
+   "vs_league_median": 62.5,
+   "bench_pts": 869.1,
+   "week": {
+    "n": 1,
+    "starter_pts": 129.2,
+    "starter_n": 10,
+    "starter_of": 10,
+    "bench_pts": 56,
+    "bench_n": 5,
+    "bench_of": 5
+   },
+   "summary": "2nd of 14 in projected starting points (2013), +63 against the league median. QB is the hole — 303 points, 9th, -0 behind. 1 bench player would start on four or more other teams (Khalil Shakir) — that is the tradeable surplus. Week 13 takes 4 starters off the field at once, and five bench spots do not cover that.",
+   "slots": [
+    {
+     "slot": "QB",
+     "player": {
+      "id": "8183",
+      "name": "Brock Purdy",
+      "pos": "QB",
+      "team": "SF",
+      "pts": 303.2,
+      "round": 8,
+      "week_pts": 18.8,
+      "game": {
+       "week": 1,
+       "opp": "LAR",
+       "home": false,
+       "kickoff": "2026-09-11T00:35Z",
+       "date": "2026-09-10",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 8,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 9,
+     "vs_median": -0.4
+    },
+    {
+     "slot": "RB",
+     "player": {
+      "id": "8138",
+      "name": "James Cook",
+      "pos": "RB",
+      "team": "BUF",
+      "pts": 260.8,
+      "round": 1,
+      "week_pts": 17.1,
+      "game": {
+       "week": 1,
+       "opp": "HOU",
+       "home": false,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 7,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 5,
+     "vs_median": 14
+    },
+    {
+     "slot": "RB",
+     "player": {
+      "id": "9224",
+      "name": "Chase Brown",
+      "pos": "RB",
+      "team": "CIN",
+      "pts": 255.2,
+      "round": 2,
+      "week_pts": 16.7,
+      "game": {
+       "week": 1,
+       "opp": "TB",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 6,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 1,
+     "vs_median": 51.6
+    },
+    {
+     "slot": "WR",
+     "player": {
+      "id": "8146",
+      "name": "Garrett Wilson",
+      "pos": "WR",
+      "team": "NYJ",
+      "pts": 224.9,
+      "round": 3,
+      "week_pts": 13.5,
+      "game": {
+       "week": 1,
+       "opp": "TEN",
+       "home": false,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 13,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 13,
+     "vs_median": -23.9
+    },
+    {
+     "slot": "WR",
+     "player": {
+      "id": "12514",
+      "name": "Emeka Egbuka",
+      "pos": "WR",
+      "team": "TB",
+      "pts": 224,
+      "round": 4,
+      "week_pts": 11.7,
+      "game": {
+       "week": 1,
+       "opp": "CIN",
+       "home": false,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 10,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 6,
+     "vs_median": 1.4
+    },
+    {
+     "slot": "TE",
+     "player": {
+      "id": "12518",
+      "name": "Tyler Warren",
+      "pos": "TE",
+      "team": "IND",
+      "pts": 201.1,
+      "round": 6,
+      "week_pts": 13.9,
+      "game": {
+       "week": 1,
+       "opp": "BAL",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 13,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 4,
+     "vs_median": 28.1
+    },
+    {
+     "slot": "FLEX",
+     "player": {
+      "id": "13279",
+      "name": "Carnell Tate",
+      "pos": "WR",
+      "team": "TEN",
+      "pts": 177.3,
+      "round": 5,
+      "week_pts": 11.8,
+      "game": {
+       "week": 1,
+       "opp": "NYJ",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 9,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 7,
+     "vs_median": 1.2
+    },
+    {
+     "slot": "FLEX",
+     "player": {
+      "id": "9500",
+      "name": "Josh Downs",
+      "pos": "WR",
+      "team": "IND",
+      "pts": 172.3,
+      "round": 9,
+      "week_pts": 12.6,
+      "game": {
+       "week": 1,
+       "opp": "BAL",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 13,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 2,
+     "vs_median": 3.5
+    },
+    {
+     "slot": "K",
+     "player": {
+      "id": "12711",
+      "name": "Tyler Loop",
+      "pos": "K",
+      "team": "BAL",
+      "pts": 102,
+      "round": 13,
+      "week_pts": 7,
+      "game": {
+       "week": 1,
+       "opp": "IND",
+       "home": false,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 13,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 10,
+     "vs_median": 0
+    },
+    {
+     "slot": "DEF",
+     "player": {
+      "id": "MIN",
+      "name": "Minnesota Vikings",
+      "pos": "DEF",
+      "team": "MIN",
+      "pts": 92,
+      "round": 12,
+      "week_pts": 6.1,
+      "game": {
+       "week": 1,
+       "opp": "GB",
+       "home": true,
+       "kickoff": "2026-09-13T20:25Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 6,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 9,
+     "vs_median": 0
+    }
+   ],
+   "by_pos": [
+    {
+     "pos": "QB",
+     "pts": 303.2,
+     "rank": 9,
+     "vs_median": -0.4,
+     "starters": 1,
+     "rostered": 2
+    },
+    {
+     "pos": "RB",
+     "pts": 516,
+     "rank": 6,
+     "vs_median": 43.3,
+     "starters": 2,
+     "rostered": 4
+    },
+    {
+     "pos": "WR",
+     "pts": 798.5,
+     "rank": 5,
+     "vs_median": 13.7,
+     "starters": 4,
+     "rostered": 5
+    },
+    {
+     "pos": "TE",
+     "pts": 201.1,
+     "rank": 5,
+     "vs_median": 25.1,
+     "starters": 1,
+     "rostered": 2
+    },
+    {
+     "pos": "K",
+     "pts": 102,
+     "rank": 10,
+     "vs_median": 0,
+     "starters": 1,
+     "rostered": 1
+    },
+    {
+     "pos": "DEF",
+     "pts": 92,
+     "rank": 9,
+     "vs_median": 0,
+     "starters": 1,
+     "rostered": 1
+    }
+   ],
+   "strengths": [],
+   "weaknesses": [
+    {
+     "pos": "QB",
+     "pts": 303.2,
+     "rank": 9,
+     "vs_median": -0.4,
+     "starters": 1,
+     "rostered": 2
+    }
+   ],
+   "risks": {
+    "bye_stacks": [
+     {
+      "week": 13,
+      "n": 4,
+      "players": [
+       "Garrett Wilson (WR)",
+       "Tyler Warren (TE)",
+       "Josh Downs (WR)",
+       "Tyler Loop (K)"
+      ]
+     }
+    ],
+    "injured": [],
+    "fragile": [
+     {
+      "name": "Brock Purdy",
+      "pos": "QB",
+      "score": 0.882,
+      "why": "2025 missed time (9 games); cause not separately verified this pass. SF left-guard turnover (protection) is a separate 2026 risk."
+     },
+     {
+      "name": "Garrett Wilson",
+      "pos": "WR",
+      "score": 0.882,
+      "why": "2025 hyperextended knee (November), shut down/IR, only 7 games. One-off structural, targeting full health for 2026; not a chronic pattern."
+     }
+    ],
+    "flagged": []
+   },
+   "bench": [
+    {
+     "id": "8161",
+     "name": "Malik Willis",
+     "pos": "QB",
+     "team": "MIA",
+     "pts": 270.1,
+     "round": 15,
+     "week_pts": 16.9,
+     "game": {
+      "week": 1,
+      "opp": "LV",
+      "home": false,
+      "kickoff": "2026-09-13T20:25Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 6,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    },
+    {
+     "id": "8134",
+     "name": "Khalil Shakir",
+     "pos": "WR",
+     "team": "BUF",
+     "pts": 170.7,
+     "round": 10,
+     "week_pts": 11.3,
+     "game": {
+      "week": 1,
+      "opp": "HOU",
+      "home": false,
+      "kickoff": "2026-09-13T17:00Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 7,
+     "starts_on": 11,
+     "best_gain": 22.8,
+     "best_team": 8,
+     "own_cost": 0
+    },
+    {
+     "id": "11583",
+     "name": "Jonathon Brooks",
+     "pos": "RB",
+     "team": "CAR",
+     "pts": 154.9,
+     "round": 7,
+     "week_pts": 9.4,
+     "game": {
+      "week": 1,
+      "opp": "CHI",
+      "home": true,
+      "kickoff": "2026-09-13T17:00Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 5,
+     "starts_on": 2,
+     "best_gain": 10.8,
+     "best_team": 9,
+     "own_cost": 0
+    },
+    {
+     "id": "7002",
+     "name": "Juwan Johnson",
+     "pos": "TE",
+     "team": "NO",
+     "pts": 140.9,
+     "round": 14,
+     "week_pts": 10.4,
+     "game": {
+      "week": 1,
+      "opp": "DET",
+      "home": false,
+      "kickoff": "2026-09-13T17:00Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 8,
+     "starts_on": 1,
+     "best_gain": 4.9,
+     "best_team": 4,
+     "own_cost": 0
+    },
+    {
+     "id": "10219",
+     "name": "Chris Rodriguez",
+     "pos": "RB",
+     "team": "JAX",
+     "pts": 132.5,
+     "round": 11,
+     "week_pts": 8,
+     "game": {
+      "week": 1,
+      "opp": "CLE",
+      "home": true,
+      "kickoff": "2026-09-13T17:00Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 7,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    }
+   ],
+   "unpriced": [],
+   "tendencies": null,
+   "moves": {
+    "n": 0,
+    "through_week": 1,
+    "note": "No completed moves through week 1."
+   },
+   "proposals": [],
+   "fit": {
+    "they_have": [
+     {
+      "id": "8134",
+      "name": "Khalil Shakir",
+      "pos": "WR",
+      "team": "BUF",
+      "pts": 170.7,
+      "round": 10,
+      "gain": 0.1,
+      "cost": 0,
+      "net": 0.1
+     },
+     {
+      "id": "9500",
+      "name": "Josh Downs",
+      "pos": "WR",
+      "team": "IND",
+      "pts": 172.3,
+      "round": 9,
+      "gain": 1.7,
+      "cost": 1.6,
+      "net": 0.1
+     },
+     {
+      "id": "13279",
+      "name": "Carnell Tate",
+      "pos": "WR",
+      "team": "TEN",
+      "pts": 177.3,
+      "round": 5,
+      "gain": 6.7,
+      "cost": 6.6,
+      "net": 0.1
+     },
+     {
+      "id": "12514",
+      "name": "Emeka Egbuka",
+      "pos": "WR",
+      "team": "TB",
+      "pts": 224,
+      "round": 4,
+      "gain": 53.4,
+      "cost": 53.3,
+      "net": 0.1
+     },
+     {
+      "id": "8146",
+      "name": "Garrett Wilson",
+      "pos": "WR",
+      "team": "NYJ",
+      "pts": 224.9,
+      "round": 3,
+      "gain": 54.3,
+      "cost": 54.2,
+      "net": 0.1
+     }
+    ],
+    "they_want": [],
+    "note": "One-way fit — they hold players worth more to you than to them, but nothing you own is worth more over there. You are the side that has to overpay."
+   }
+  },
+  {
+   "roster_id": 14,
+   "owner": "ChrisHasAfib",
+   "user_id": "1403525306530160640",
+   "is_me": false,
+   "draft_slot": 7,
+   "starter_pts": 1933.5,
+   "starter_rank": 10,
+   "vs_league_median": -16.8,
+   "bench_pts": 696.9,
+   "week": {
+    "n": 1,
+    "starter_pts": 132.2,
+    "starter_n": 10,
+    "starter_of": 10,
+    "bench_pts": 43.3,
+    "bench_n": 5,
+    "bench_of": 5
+   },
+   "summary": "10th of 14 in projected starting points (1934), -17 against the league median. TE is the hole — 161 points, 11th, -15 behind. No bench player would start on four other teams, so there is little here to trade from. Week 7 takes 3 starters off the field at once, and five bench spots do not cover that.",
+   "slots": [
+    {
+     "slot": "QB",
+     "player": {
+      "id": "11566",
+      "name": "Jayden Daniels",
+      "pos": "QB",
+      "team": "WAS",
+      "pts": 308.7,
+      "round": 4,
+      "week_pts": 19,
+      "game": {
+       "week": 1,
+       "opp": "PHI",
+       "home": false,
+       "kickoff": "2026-09-13T20:25Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 7,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 5,
+     "vs_median": 5.1
+    },
+    {
+     "slot": "RB",
+     "player": {
+      "id": "12527",
+      "name": "Ashton Jeanty",
+      "pos": "RB",
+      "team": "LV",
+      "pts": 233.9,
+      "round": 2,
+      "week_pts": 15,
+      "game": {
+       "week": 1,
+       "opp": "MIA",
+       "home": true,
+       "kickoff": "2026-09-13T20:25Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 13,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 11,
+     "vs_median": -12.9
+    },
+    {
+     "slot": "RB",
+     "player": {
+      "id": "7588",
+      "name": "Javonte Williams",
+      "pos": "RB",
+      "team": "DAL",
+      "pts": 212,
+      "round": 3,
+      "week_pts": 15.5,
+      "game": {
+       "week": 1,
+       "opp": "NYG",
+       "home": false,
+       "kickoff": "2026-09-14T00:20Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 14,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 2,
+     "vs_median": 8.4
+    },
+    {
+     "slot": "WR",
+     "player": {
+      "id": "9488",
+      "name": "Jaxon Smith-Njigba",
+      "pos": "WR",
+      "team": "SEA",
+      "pts": 284.6,
+      "round": 1,
+      "week_pts": 19.7,
+      "game": {
+       "week": 1,
+       "opp": "NE",
+       "home": true,
+       "kickoff": "2026-09-10T00:20Z",
+       "date": "2026-09-09",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 11,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 3,
+     "vs_median": 35.8
+    },
+    {
+     "slot": "WR",
+     "player": {
+      "id": "8167",
+      "name": "Christian Watson",
+      "pos": "WR",
+      "team": "GB",
+      "pts": 207.6,
+      "round": 5,
+      "week_pts": 13.7,
+      "game": {
+       "week": 1,
+       "opp": "MIN",
+       "home": false,
+       "kickoff": "2026-09-13T20:25Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 11,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 11,
+     "vs_median": -15
+    },
+    {
+     "slot": "TE",
+     "player": {
+      "id": "9480",
+      "name": "Brenton Strange",
+      "pos": "TE",
+      "team": "JAX",
+      "pts": 161,
+      "round": 11,
+      "week_pts": 8.2,
+      "game": {
+       "week": 1,
+       "opp": "CLE",
+       "home": true,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 7,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 11,
+     "vs_median": -12
+    },
+    {
+     "slot": "FLEX",
+     "player": {
+      "id": "9756",
+      "name": "Jordan Addison",
+      "pos": "WR",
+      "team": "MIN",
+      "pts": 171.7,
+      "round": 7,
+      "week_pts": 11.3,
+      "game": {
+       "week": 1,
+       "opp": "GB",
+       "home": true,
+       "kickoff": "2026-09-13T20:25Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 6,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 11,
+     "vs_median": -4.4
+    },
+    {
+     "slot": "FLEX",
+     "player": {
+      "id": "7611",
+      "name": "Rhamondre Stevenson",
+      "pos": "RB",
+      "team": "NE",
+      "pts": 169,
+      "round": 6,
+      "week_pts": 16.4,
+      "game": {
+       "week": 1,
+       "opp": "SEA",
+       "home": false,
+       "kickoff": "2026-09-10T00:20Z",
+       "date": "2026-09-09",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 11,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 7,
+     "vs_median": 0.2
+    },
+    {
+     "slot": "K",
+     "player": {
+      "id": "5095",
+      "name": "Daniel Carlson",
+      "pos": "K",
+      "team": "NO",
+      "pts": 99,
+      "round": 15,
+      "week_pts": 6.1,
+      "game": {
+       "week": 1,
+       "opp": "DET",
+       "home": false,
+       "kickoff": "2026-09-13T17:00Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 8,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 12,
+     "vs_median": -3
+    },
+    {
+     "slot": "DEF",
+     "player": {
+      "id": "LAC",
+      "name": "Los Angeles Chargers",
+      "pos": "DEF",
+      "team": "LAC",
+      "pts": 86,
+      "round": 13,
+      "week_pts": 7.3,
+      "game": {
+       "week": 1,
+       "opp": "ARI",
+       "home": true,
+       "kickoff": "2026-09-13T20:25Z",
+       "date": "2026-09-13",
+       "status": "STATUS_SCHEDULED"
+      },
+      "bye": 7,
+      "adp": null,
+      "injury": null
+     },
+     "rank": 13,
+     "vs_median": -6
+    }
+   ],
+   "by_pos": [
+    {
+     "pos": "QB",
+     "pts": 308.7,
+     "rank": 5,
+     "vs_median": 5.1,
+     "starters": 1,
+     "rostered": 1
+    },
+    {
+     "pos": "RB",
+     "pts": 614.9,
+     "rank": 4,
+     "vs_median": 142.2,
+     "starters": 3,
+     "rostered": 5
+    },
+    {
+     "pos": "WR",
+     "pts": 663.9,
+     "rank": 10,
+     "vs_median": -120.9,
+     "starters": 3,
+     "rostered": 5
+    },
+    {
+     "pos": "TE",
+     "pts": 161,
+     "rank": 11,
+     "vs_median": -15,
+     "starters": 1,
+     "rostered": 2
+    },
+    {
+     "pos": "K",
+     "pts": 99,
+     "rank": 12,
+     "vs_median": -3,
+     "starters": 1,
+     "rostered": 1
+    },
+    {
+     "pos": "DEF",
+     "pts": 86,
+     "rank": 13,
+     "vs_median": -6,
+     "starters": 1,
+     "rostered": 1
+    }
+   ],
+   "strengths": [],
+   "weaknesses": [
+    {
+     "pos": "TE",
+     "pts": 161,
+     "rank": 11,
+     "vs_median": -15,
+     "starters": 1,
+     "rostered": 2
+    },
+    {
+     "pos": "WR",
+     "pts": 663.9,
+     "rank": 10,
+     "vs_median": -120.9,
+     "starters": 3,
+     "rostered": 5
+    }
+   ],
+   "risks": {
+    "bye_stacks": [
+     {
+      "week": 7,
+      "n": 3,
+      "players": [
+       "Jayden Daniels (QB)",
+       "Brenton Strange (TE)",
+       "Los Angeles Chargers (DEF)"
+      ]
+     },
+     {
+      "week": 11,
+      "n": 3,
+      "players": [
+       "Jaxon Smith-Njigba (WR)",
+       "Christian Watson (WR)",
+       "Rhamondre Stevenson (RB)"
+      ]
+     }
+    ],
+    "injured": [],
+    "fragile": [
+     {
+      "name": "Christian Watson",
+      "pos": "WR",
+      "score": 0.8,
+      "why": "20 games missed over 4 seasons, but the recurring hamstrings were tied to a biomechanical asymmetry reportedly corrected ~2 years ago, and his ACL was a 'clean' tear. Enters 2026 fully healthy for the first time in a while."
+     },
+     {
+      "name": "Jayden Daniels",
+      "pos": "QB",
+      "score": 0.824,
+      "why": "2025 missed significant time (7 games); cause not separately verified this pass. Flagged for the final-weeks re-check."
+     },
+     {
+      "name": "Rhamondre Stevenson",
+      "pos": "RB",
+      "score": 0.829,
+      "why": "No significant missed time (12/15/14)."
+     }
+    ],
+    "flagged": []
+   },
+   "bench": [
+    {
+     "id": "11624",
+     "name": "Xavier Worthy",
+     "pos": "WR",
+     "team": "KC",
+     "pts": 161.5,
+     "round": 10,
+     "week_pts": 9.8,
+     "game": {
+      "week": 1,
+      "opp": "DEN",
+      "home": true,
+      "kickoff": "2026-09-15T00:15Z",
+      "date": "2026-09-14",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 5,
+     "starts_on": 3,
+     "best_gain": 13.6,
+     "best_team": 8,
+     "own_cost": 0
+    },
+    {
+     "id": "8408",
+     "name": "Jordan Mason",
+     "pos": "RB",
+     "team": "MIN",
+     "pts": 153.7,
+     "round": 9,
+     "week_pts": 9.1,
+     "game": {
+      "week": 1,
+      "opp": "GB",
+      "home": true,
+      "kickoff": "2026-09-13T20:25Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 6,
+     "starts_on": 2,
+     "best_gain": 9.6,
+     "best_team": 9,
+     "own_cost": 0
+    },
+    {
+     "id": "3214",
+     "name": "Hunter Henry",
+     "pos": "TE",
+     "team": "NE",
+     "pts": 153.5,
+     "round": 8,
+     "week_pts": 9.4,
+     "game": {
+      "week": 1,
+      "opp": "SEA",
+      "home": false,
+      "kickoff": "2026-09-10T00:20Z",
+      "date": "2026-09-09",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 11,
+     "starts_on": 3,
+     "best_gain": 17.5,
+     "best_team": 4,
+     "own_cost": 0
+    },
+    {
+     "id": "11610",
+     "name": "Malik Washington",
+     "pos": "WR",
+     "team": "MIA",
+     "pts": 131.3,
+     "round": 12,
+     "week_pts": 8.4,
+     "game": {
+      "week": 1,
+      "opp": "LV",
+      "home": false,
+      "kickoff": "2026-09-13T20:25Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": null,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    },
+    {
+     "id": "9511",
+     "name": "Keaton Mitchell",
+     "pos": "RB",
+     "team": "LAC",
+     "pts": 96.9,
+     "round": 14,
+     "week_pts": 6.6,
+     "game": {
+      "week": 1,
+      "opp": "ARI",
+      "home": true,
+      "kickoff": "2026-09-13T20:25Z",
+      "date": "2026-09-13",
+      "status": "STATUS_SCHEDULED"
+     },
+     "bye": 7,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    }
+   ],
+   "unpriced": [],
+   "tendencies": null,
+   "moves": {
+    "n": 0,
+    "through_week": 1,
+    "note": "No completed moves through week 1."
+   },
+   "proposals": [],
+   "fit": {
+    "they_have": [
+     {
+      "id": "3214",
+      "name": "Hunter Henry",
+      "pos": "TE",
+      "team": "NE",
+      "pts": 153.5,
+      "round": 8,
+      "gain": 9.4,
+      "cost": 0,
+      "net": 9.4
+     },
+     {
+      "id": "9480",
+      "name": "Brenton Strange",
+      "pos": "TE",
+      "team": "JAX",
+      "pts": 161,
+      "round": 11,
+      "gain": 16.9,
+      "cost": 7.5,
+      "net": 9.4
+     }
+    ],
+    "they_want": [],
+    "note": "One-way fit — they hold players worth more to you than to them, but nothing you own is worth more over there. You are the side that has to overpay."
+   }
+  }
+ ]
+}

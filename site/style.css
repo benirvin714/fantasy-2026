@@ -1562,3 +1562,70 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
   .pn-body { max-height: calc(92vh - 62px); }
   .pn-close { min-height: 44px; min-width: 44px; }
 }
+
+/* ===========================================================================================
+   Week columns on the roster table (site/roster-table.js with opts.week)
+   -------------------------------------------------------------------------------------------
+   Appended as a whole block, base rules and their own media query together, because equal-
+   specificity selectors resolve by source order and a media query placed above a later plain rule
+   loses to it. See the same note on every other block down here.
+
+   The table this lands on is the HQ "My roster" panel, which is about 560px wide and now carries
+   six columns instead of five. The space comes from the two columns that were carrying slack:
+   Pos loses its padding (it is three characters and a team code) and the name column absorbs the
+   rest, since it is the only cell whose content varies in length.
+   =========================================================================================== */
+.rr-rtab-wk td, .rr-rtab-wk th { padding-left: 6px; padding-right: 6px; }
+/* A two-word header on a narrow column is the first thing to wrap, and a "Wk" over a "1"
+   doubles the height of every header row on the panel. */
+.rr-rtab-wk th { white-space: nowrap; }
+.rr-rtab-wk .rr-slot { width: 34px; }
+.rr-rtab-wk .rr-pt { font-size: 10.5px; }
+
+/* The kickoff cell. Tabular figures so a column of times lines up on the colon rather than
+   drifting with the width of a 1 against a 7. */
+.rr-gmc { white-space: nowrap; width: 84px; }
+.rr-gm {
+  font-family: var(--font-data); font-size: 11px; color: var(--dim);
+  font-variant-numeric: tabular-nums;
+}
+/* Kicked off already. Dimmed rather than hidden: the game is still the answer to "when does he
+   play", and the projection beside it was published before the ball was snapped. */
+.rr-gm-past { color: var(--faint); opacity: .6; }
+/* A bye and a canceled game are different facts and get different colours. Amber is this
+   dashboard's "something needs your attention" and a starter on a bye is exactly that; a called-off
+   game is rarer, stranger, and gets the neutral treatment so it reads as an oddity to go look at. */
+.rr-gm-bye {
+  font-family: var(--font-data); font-size: 10px; letter-spacing: .06em; color: var(--warn);
+  border: 1px solid rgba(201,180,88,.45); border-radius: var(--radius-sm); padding: 0 4px;
+}
+.rr-gm-off {
+  font-family: var(--font-data); font-size: 10px; letter-spacing: .06em; color: var(--faint);
+  border: 1px dashed var(--border); border-radius: var(--radius-sm); padding: 0 4px;
+}
+
+/* The week's points. Brighter than the season column was, because on this panel it is the number
+   the reader is here for; the season figure has a whole page of its own in the roster room. */
+.rr-wkpts { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
+
+.rr-wknote {
+  margin: 8px 0 0; font-size: 11.5px; line-height: 1.5; color: var(--warn);
+  border-left: 2px solid rgba(201,180,88,.45); padding-left: 8px;
+}
+
+/* Narrow phones: six columns will not fit honestly, so the game cell drops to the day alone and
+   the position cell drops the team code it duplicates from the roster row above it. Nothing is
+   hidden that is not recoverable from a tap-and-hold on the cell's own title. */
+@media (max-width: 460px) {
+  .rr-rtab-wk td, .rr-rtab-wk th { padding-left: 3px; padding-right: 3px; font-size: 12px; }
+  .rr-rtab-wk .rr-slot { width: 30px; }
+  .rr-rtab-wk .rr-pt .faint { display: none; }
+  .rr-rtab-wk .rr-gmc { width: 58px; }
+  .rr-rtab-wk .rr-gm { font-size: 10px; }
+  /* Every pixel taken off the five fixed columns goes to the name, which is the only cell whose
+     content this table cannot shorten. Below about 12px the names start wrapping onto a second
+     line and the rows stop being the same height, which is worse to scan than a smaller face. */
+  .rr-rtab-wk .rr-nm { font-size: 12px; }
+  .rr-rtab-wk .rr-slotrk, .rr-rtab-wk .rr-starts { font-size: 10.5px; }
+  .rr-rtab-wk .rr-vs { margin-left: 3px; }
+}

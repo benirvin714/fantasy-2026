@@ -1249,6 +1249,70 @@ in `app.js`, `rosters.js`, `player-news.js`, `roster-table.js`; `league-profile-
 argument in `.claude/commands/waivers.md` and `brief.md`; steps 8-9 of the `nfl-daily-events` task,
 which now loops both leagues and took over from the retired standalone `nfl-waivers` task.
 
+### 1.27 The week on My roster - kickoff and week points - 2026-09-09
+
+Everything the roster room computes is a **season** number, and that is the right basis for the
+question it was built to answer: is this team good, is that bench player surplus, does this trade
+raise both lineups. It is the wrong basis for the question the front page gets asked on a Thursday.
+A season projection cannot tell you your WR2 is on a bye, and it flattens a Thursday kickoff and a
+Monday night one into the same cell.
+
+So HQ's **My roster** panel now runs on the week: a **Game** column right of Pos, and the Proj
+column replaced by that week's projected points, headed `Wk N`.
+
+**Both come from the build, not the browser.** The kickoff could have been a client-side fetch - the
+page already fetches the standings live - but the projection could not: a week number has to be
+re-scored in *this* league's settings, and doing that in the page would put a second copy of the
+scoring engine in the front end and break the rule that the page renders and never computes. Since
+the projection had to be built, the schedule was built alongside it, and the panel stays a pure
+renderer.
+
+**Two sources for one schedule, because neither is sufficient alone.** Sleeper's schedule endpoint
+carries the pairings and the week but only a **date** - and a date cannot answer "Sunday early or
+Sunday night", which is the whole point of the column. ESPN's public scoreboard carries the kickoff
+instant. Measured across all 18 weeks of 2026 on 2026-09-09: **272 ESPN games, 273 Sleeper games,
+zero pairing disagreements** once `WSH` is read as `WAS` (the only abbreviation that differs across
+all 32 teams). The one extra Sleeper row is a **canceled** DAL-SEA in week 6 that ESPN correctly
+omits, and that row is why the two are merged rather than ESPN simply read: Sleeper is the pairing
+authority and the one that still answers when ESPN does not, ESPN supplies the time, and every ESPN
+game is checked against Sleeper's week before its kickoff is trusted. A game that fails that check
+drops to date-only rather than printing a real time against a possibly-wrong opponent.
+
+**The cell has five states and they are deliberately not the same blank.** A real kickoff (`Sun
+12:00p`, dimmed once it has passed), a **bye** (amber chip - a starter on a bye is exactly the thing
+this column exists to catch), a **canceled** game (`off`, dashed - not a bye, the game was called
+off), a game whose time is missing but whose date is not (the day alone, and the tooltip says why),
+and `?` for a team with neither a game nor a bye in the schedule, which is a gap in the source and
+should look like one. The time is formatted **in the browser from the ISO instant**, never baked
+into the JSON: a formatted string would freeze one timezone into the data and go wrong twice a year
+when the offset moves under it.
+
+**A null week projection is a dash, never a zero.** Sleeper still publishes a row for a player it
+has as out or on a bye - the row just holds nothing but an ADP field, which prices to 0.0 and would
+read on the page as a forecast of nothing. `gp` is present on every row carrying a real stat line
+and absent on every row that is not, so it is the gate. Week 1, 2026: 146 of 151 HBGBs players and
+177 of 181 Pit players had one; the misses were the players Sleeper lists Out, PUP, Doubtful or IR,
+which is exactly the population where a fabricated 0.0 would have been most misleading. The panel
+meta counts what it summed (`107.3 starting over 9 of 10`) and a line under the table names the gap.
+
+**The Rk column stays season-based, and now says so in its tooltip.** Ranking the slot by one week
+was tempting and is wrong: the optimal lineup those slots come from is *chosen* on season points, so
+re-ranking it weekly would measure something the lineup was never built to answer.
+
+**The roster room did not change.** The week is opt-in (`opts.week` on the shared table) and only HQ
+passes it. Those expanded rows sit under season-based ranks and a week number beneath a season rank
+invites reading one as the other. The table falls back to the season view on its own when a league's
+`roster-room.json` predates the `week` block, so an older cached file renders as it always did
+rather than painting a column of dashes.
+
+**League-agnostic by construction.** Nothing in `scripts/lib/nfl-week.mjs` knows a league; the
+caller re-scores with its own settings. A league added to the registry gets both columns with no
+further work, Couples Clash included.
+
+Files: `scripts/lib/nfl-week.mjs` (new); the week block, per-player `game`/`week_pts` and per-team
+`week` totals in `build-roster-room.mjs`; `opts.week` in `site/roster-table.js`; the My-roster call
+in `site/app.js`; the `.rr-gm*` / `.rr-wkpts` / `.rr-wknote` block appended to `site/style.css`.
+
 ## 2. Challenge 2 — `scouting_brief` (public commentary)
 
 ### 2.1 What it is
