@@ -1181,13 +1181,24 @@ which fields are "about a player" rather than "about a format" got it wrong a th
 whose name contains the format (`adp.half_ppr`) is not league-agnostic no matter how it is grouped.
 
 **Red costs something, and the cost is paid in one token.** The Pit's navy could leave `--neg` alone
-because "bad is red" did not collide with a blue accent. It collides head-on with a red one: an injury
-tag, a fading target and a losing streak would sit a few degrees of hue from the colour that means
-"this league, good, active". So in this palette **only**, `--neg` moves to violet - ~120 degrees off
-the accent, ~60 off the Pit's blue, nowhere near the HBGBs green. That gives up a real convention to
-buy back the ability to tell a gain from a loss at a glance, which is what the convention was for.
-`--warn` stays amber; caution never conflicted with anything. `--blue` (the bargain highlight) goes
-teal, so it cannot read as Panther Pit chrome that leaked onto the wrong page.
+because "bad is red" did not collide with a blue accent. It collides head-on with a red one, and the
+measurement is blunter than the argument: the shared `--neg` (`#d06a5c`) sits at **hue 7** and this
+accent at **hue 359**, so an injury tag, a fading target and a losing streak would land **eight
+degrees** from the colour meaning "this league, good, active". At 12px on a chip that is the wrong
+reading, not a subtle one. So in this palette **only**, `--neg` moves.
+
+It moved to violet first, on the reasoning that further from the accent is strictly better. Ben vetoed
+that and chose **orange**, and he was right: violet reads as "flagged" rather than "bad", and orange
+keeps the warm-is-bad half of the convention the whole exercise existed to encode. Maximising hue
+distance optimised the wrong thing - the constraint was never "be far from the accent", it was "stay
+legible as a loss while being far enough from the accent".
+
+`#f0843c` is picked rather than eyeballed: **hue 24, which is 25 degrees off the accent and 25 off
+`--warn`'s gold** - the balanced midpoint between the two colours it has to stay distinct from - at
+7.1:1 on `--surface` and 6.6:1 on `--surface-2`, past AA and better than the accent's own 5.2. Nearer
+the accent trades legibility for nothing; nearer `--warn` starts reading as caution instead of loss.
+`--warn` itself stays amber; caution never conflicted with anything. `--blue` (the bargain highlight)
+goes teal, so it cannot read as Panther Pit chrome that leaked onto the wrong page.
 
 **The same tokenisation trap, again, one token over.** §1.25 had to tokenise eleven longhand
 `rgba(99,191,90,...)` accent literals before a palette override could work. `--neg` had **seven** of

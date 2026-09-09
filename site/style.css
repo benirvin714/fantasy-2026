@@ -85,15 +85,20 @@
 
    RED COSTS SOMETHING HERE AND THIS IS WHERE IT IS PAID. Green and navy could both leave --neg
    alone, because "bad is red" did not collide with either accent. It collides head-on with this
-   one: an injury tag, a fading target and a losing streak would all be within a few degrees of hue
-   of the colour that means "this league, good, active". At 12px on a chip that is not a subtle
-   confusion, it is the wrong reading.
+   one: the shared --neg (#d06a5c) sits at hue 7 and this accent at hue 359, so an injury tag, a
+   fading target and a losing streak would all land EIGHT DEGREES from the colour that means "this
+   league, good, active". At 12px on a chip that is not a subtle confusion, it is the wrong reading.
 
-   So in THIS league only, --neg moves to violet. Violet is ~120 degrees off the accent, ~60 off the
-   Pit's blue, and nowhere near the HBGBs green, so it cannot be misread as any league's "good".
-   It gives up the "red means bad" convention, which is a real loss, and buys back the ability to
-   tell a gain from a loss at a glance, which is the thing the convention existed to provide.
-   --warn stays amber: caution never conflicted with anything.
+   So in THIS league only, --neg moves to orange. It was violet first, on the reasoning that the
+   further from the accent the better; Ben vetoed that and chose orange, which is the better call -
+   violet reads as "flagged" rather than "bad", and orange keeps the warm-is-bad half of the
+   convention that the whole thing existed to encode.
+
+   #f0843c is picked, not eyeballed: hue 24, which is 25 degrees off the accent AND 25 off --warn's
+   gold - the balanced midpoint between the two colours it has to stay distinct from. Contrast is
+   7.1:1 on --surface and 6.6:1 on --surface-2, comfortably past AA and better than the accent's own
+   5.2. Anything nearer the accent trades legibility for nothing; anything nearer --warn starts
+   reading as caution instead of loss. --warn itself stays amber: caution never conflicted.
 
    --blue (the value-vs-ADP bargain highlight) goes teal rather than staying blue. It is a highlight
    with no good/bad meaning, and leaving it blue would have it read as a Panther Pit accent that had
@@ -110,8 +115,8 @@
   --accent-rgb: 239, 77, 81;
   --accent-press: #e05356;
   --moss: #e08a7d;         /* the second-string accent follows the primary, as it does in the Pit */
-  --neg: #b57ce8;          /* violet - see the note above; this is the one palette that moves it */
-  --neg-rgb: 181, 124, 232;
+  --neg: #f0843c;          /* orange - see the note above; this is the one palette that moves it */
+  --neg-rgb: 240, 132, 60;
   --blue: #63cfc4;
   --grad-panel: linear-gradient(180deg, #241215 0%, #1b0d0f 100%);
   --grad-raise: linear-gradient(180deg, #2e181b 0%, #200f12 100%);
