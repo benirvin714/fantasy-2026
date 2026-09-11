@@ -25,7 +25,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { resolveLeague, ordinal as ORD_N, spell } from "./lib/leagues.mjs";
-import { weekSchedule, gameFor, weekProjections, hasWeekLine } from "./lib/nfl-week.mjs";
+import { weekSchedule, gameFor, weekProjections, weekActuals, hasWeekLine } from "./lib/nfl-week.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const L = resolveLeague();
@@ -210,8 +210,10 @@ const WEEK = Math.max(1, +state.display_week || +state.week || 1);
 console.log(`\nWeek ${WEEK}: fetching the schedule and this week's projections...`);
 const sched = await weekSchedule(state.season, WEEK);
 const wproj = await weekProjections(state.season, WEEK);
+const wact = await weekActuals(LEAGUE_ID, WEEK);
 for (const w of sched.warnings) console.warn(`  ! ${w}`);
 if (wproj.error) console.warn(`  ! week ${WEEK} projections unavailable (${wproj.error}) — every player's week number will be null and the page will say so.`);
+if (wact.error) console.warn(`  ! week ${WEEK} results unavailable (${wact.error}) — finished games will keep showing their kickoff rather than a score.`);
 
 const weekPts = new Map();
 for (const id of rosteredIds) {
@@ -220,11 +222,25 @@ for (const id of rosteredIds) {
   const p = byId.get(id);
   weekPts.set(id, rescore(row, p ? p.pos : null));
 }
+/* What he actually scored, attached only once his game is over.
+   `game.completed` is ESPN's own boolean and is the gate, NOT the presence of a number: every
+   rostered player carries a players_points entry from kickoff onward, and it reads 0 until he does
+   something. Gating on the number would turn "has not played yet" and "played and scored nothing"
+   into the same cell, and those are the two readings a lineup decision most needs kept apart.
+
+   A game in progress at build time is reported as such rather than as a result. The build runs
+   twice a day, so an afternoon run lands mid-window on a Sunday: the number is real but partial,
+   and the page labels it instead of presenting half a game as a final score. */
 const weekOf = (id) => {
   const p = byId.get(id);
+  const game = gameFor(sched, p ? p.team : null, p ? p.bye : null);
+  const live = !!game && !game.completed && game.status === "STATUS_IN_PROGRESS";
+  const done = !!game && game.completed === true;
+  const scored = wact.pts.has(id) ? wact.pts.get(id) : null;
   return {
     week_pts: weekPts.has(id) ? weekPts.get(id) : null,
-    game: gameFor(sched, p ? p.team : null, p ? p.bye : null),
+    week_actual: (done || live) && scored != null ? { pts: scored, final: done } : null,
+    game,
   };
 };
 {
@@ -232,7 +248,10 @@ const weekOf = (id) => {
     const g = weekOf(id).game;
     return g && g.status === "unknown";
   });
+  const scored = rosteredIds.filter((id) => weekOf(id).week_actual != null);
+  const finals = [...sched.byTeam.values()].filter((g) => g.completed).length;
   console.log(`  ${sched.teams_playing}/32 teams play in week ${WEEK} · ${weekPts.size}/${rosteredIds.length} rostered players have a week-${WEEK} projection`);
+  console.log(`  ${finals} of those teams have finished · ${scored.length} rostered player(s) carry a result (league-scored by Sleeper, not recomputed here)`);
   if (sched.canceled.length) console.log(`  canceled: ${sched.canceled.join("; ")}`);
   /* Not a bye and not a game: either the schedule is short a row or a player is on a team code the
      schedule does not carry. Named rather than swallowed, because the page renders it as an honest
@@ -659,12 +678,23 @@ for (const t of teams) {
     week: (() => {
       const s = t.lineup.map((x) => x.player && weekPts.get(x.player.id)).filter((v) => v != null);
       const b = t.bench.map((p) => weekPts.get(p.id)).filter((v) => v != null);
+      /* What the lineup on THIS PANEL has scored so far. Deliberately not Sleeper's own team total
+         for the week: that one is over the lineup Ben actually set, and these slots are the optimal
+         lineup this build computed. The two are usually the same and occasionally are not, and
+         printing Sleeper's number under a table of different players would be quietly wrong. Only
+         finished games count, so this figure never mixes a final score with half of one. */
+      const done = t.lineup
+        .map((x) => x.player && weekOf(x.player.id).week_actual)
+        .filter((a) => a && a.final)
+        .map((a) => a.pts);
       return {
         n: WEEK,
         starter_pts: +s.reduce((a, v) => a + v, 0).toFixed(1),
         starter_n: s.length, starter_of: t.lineup.length,
         bench_pts: +b.reduce((a, v) => a + v, 0).toFixed(1),
         bench_n: b.length, bench_of: t.bench.length,
+        scored_pts: +done.reduce((a, v) => a + v, 0).toFixed(1),
+        scored_n: done.length,
       };
     })(),
     summary: summarize(t, strengths, weaknesses, r),
@@ -734,8 +764,16 @@ const payload = {
     projection_source: wproj.error
       ? null
       : `Sleeper week-${WEEK} projected stat lines re-scored with ${L.name}'s exact scoring_settings — the same arithmetic as the season column, over a different stat line.`,
+    /* Results are read, never computed. See the note on weekActuals in scripts/lib/nfl-week.mjs. */
+    result_source: wact.error
+      ? null
+      : `${L.name}'s own week-${WEEK} matchup rows — Sleeper's scoring of each player in this league's settings, read as published rather than recomputed here.`,
+    games_final: [...sched.byTeam.values()].filter((g) => g.completed).length,
+    results: rosteredIds.filter((id) => weekOf(id).week_actual != null).length,
     canceled: sched.canceled,
-    warnings: [...sched.warnings, ...(wproj.error ? [`week ${WEEK} projections unavailable: ${wproj.error}`] : [])],
+    warnings: [...sched.warnings,
+      ...(wproj.error ? [`week ${WEEK} projections unavailable: ${wproj.error}`] : []),
+      ...(wact.error ? [`week ${WEEK} results unavailable: ${wact.error}`] : [])],
   },
   coverage: {
     rostered: rosteredIds.length,

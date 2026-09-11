@@ -1,9 +1,12 @@
-/* nfl-week.mjs — the two facts a roster needs about the week in front of it: when each team plays,
- * and what each player is projected to do in that one week rather than across the season.
+/* nfl-week.mjs — the three facts a roster needs about the week it is in: when each team plays, what
+ * each player is projected to do in that one week, and once a game is over, what he actually did.
  *
- * Both are league-agnostic. A kickoff is a kickoff and a projected stat line is a projected stat
- * line; what varies by league is the scoring applied to that line, which is the caller's job (see
- * rescore() in build-roster-room.mjs). So this file fetches and validates, and prices nothing.
+ * The first two are league-agnostic. A kickoff is a kickoff and a projected stat line is a
+ * projected stat line; what varies by league is the scoring applied to that line, which is the
+ * caller's job (see rescore() in build-roster-room.mjs). The third is not, and is handled the
+ * opposite way: `weekActuals` takes a league id and reads that league's own scored result rather
+ * than computing one. See the note on it for why a second opinion about a finished game is worse
+ * than no opinion. So this file fetches and validates, and prices nothing.
  *
  * WHY TWO SOURCES FOR ONE SCHEDULE. Sleeper's schedule endpoint carries the pairings and the week
  * but no kickoff time, only a date — and a date alone cannot answer "Sunday early or Sunday night",
@@ -68,7 +71,15 @@ export async function weekSchedule(season, week) {
       const c = e.competitions[0];
       const home = c.competitors.find((x) => x.homeAway === "home")?.team?.abbreviation;
       const away = c.competitors.find((x) => x.homeAway === "away")?.team?.abbreviation;
-      return { home: sl(home), away: sl(away), kickoff: e.date, status: e.status?.type?.name ?? null };
+      /* `completed` is ESPN's own boolean and is the only honest gate for "this game is over".
+         Do NOT infer it from the clock: a kickoff three hours in the past is usually a finished
+         game and sometimes a delayed one, and the difference decides whether a number on the page
+         is a final score or half of one. */
+      return {
+        home: sl(home), away: sl(away), kickoff: e.date,
+        status: e.status?.type?.name ?? null,
+        completed: e.status?.type?.completed === true,
+      };
     }).filter((g) => g.home && g.away);
     if (!espnGames.length) throw new Error(`no events returned for week ${week}`);
   } catch (e) {
@@ -99,8 +110,8 @@ export async function weekSchedule(season, week) {
     for (const g of espnGames) trusted.set(pairKey(g.home, g.away), g);
   }
 
-  const put = (team, opp, home, kickoff, date, status) => {
-    out.byTeam.set(team, { opp, home, kickoff: kickoff ?? null, date: date ?? null, status });
+  const put = (team, opp, home, kickoff, date, status, completed = false) => {
+    out.byTeam.set(team, { opp, home, kickoff: kickoff ?? null, date: date ?? null, status, completed });
   };
 
   if (slGames) {
@@ -111,8 +122,8 @@ export async function weekSchedule(season, week) {
     for (const g of slGames) {
       if (g.status === "canceled") continue;
       const e = trusted.get(pairKey(g.home, g.away));
-      put(g.home, g.away, true, e?.kickoff, g.date, e?.status ?? g.status ?? "scheduled");
-      put(g.away, g.home, false, e?.kickoff, g.date, e?.status ?? g.status ?? "scheduled");
+      put(g.home, g.away, true, e?.kickoff, g.date, e?.status ?? g.status ?? "scheduled", !!e?.completed);
+      put(g.away, g.home, false, e?.kickoff, g.date, e?.status ?? g.status ?? "scheduled", !!e?.completed);
     }
     for (const g of slGames) {
       if (g.status !== "canceled") continue;
@@ -131,8 +142,8 @@ export async function weekSchedule(season, week) {
   } else {
     // ESPN alone. Pairings unverified, so say that rather than presenting them as cross-checked.
     for (const g of espnGames) {
-      put(g.home, g.away, true, g.kickoff, g.kickoff ? g.kickoff.slice(0, 10) : null, g.status);
-      put(g.away, g.home, false, g.kickoff, g.kickoff ? g.kickoff.slice(0, 10) : null, g.status);
+      put(g.home, g.away, true, g.kickoff, g.kickoff ? g.kickoff.slice(0, 10) : null, g.status, g.completed);
+      put(g.away, g.home, false, g.kickoff, g.kickoff ? g.kickoff.slice(0, 10) : null, g.status, g.completed);
     }
     out.source = "ESPN's public scoreboard only (Sleeper's schedule was unreachable, so pairings are uncross-checked)";
   }
@@ -148,9 +159,9 @@ export async function weekSchedule(season, week) {
 export function gameFor(sched, team, bye) {
   if (!team) return null;
   const g = sched.byTeam.get(team);
-  if (g) return { week: sched.week, opp: g.opp, home: g.home, kickoff: g.kickoff, date: g.date, status: g.status };
-  if (bye != null && bye === sched.week) return { week: sched.week, opp: null, home: null, kickoff: null, date: null, status: "bye" };
-  return { week: sched.week, opp: null, home: null, kickoff: null, date: null, status: "unknown" };
+  if (g) return { week: sched.week, opp: g.opp, home: g.home, kickoff: g.kickoff, date: g.date, status: g.status, completed: !!g.completed };
+  if (bye != null && bye === sched.week) return { week: sched.week, opp: null, home: null, kickoff: null, date: null, status: "bye", completed: false };
+  return { week: sched.week, opp: null, home: null, kickoff: null, date: null, status: "unknown", completed: false };
 }
 
 /* ------------------------------------------------------------------ this week's projections
@@ -170,3 +181,34 @@ export async function weekProjections(season, week) {
    published". `gp` is present on every row carrying a real projected stat line and absent on every
    row that is not, so it is the gate. */
 export const hasWeekLine = (row) => !!row && row.gp != null;
+
+/* ------------------------------------------------------------------ what actually happened
+   The one function here that takes a league id, because the answer genuinely is per-league: this
+   reads the league's OWN matchup rows, whose `players_points` is Sleeper scoring each player in
+   that league's settings. Measured week 1 2026: A.J. Brown is 4.1 in the half-PPR HBGBs and 5.6 in
+   full-PPR Couples Clash, same player, same game.
+
+   Nothing here re-derives a score, and that is the point. Re-scoring raw stat lines works for a
+   projection because a projection has no other home, but an actual result is already computed by
+   the league that owns it, and computing a second version would mean a number on the page that can
+   disagree with the number in the Sleeper app. The defensive scoring alone would make that likely:
+   points-allowed tiers arrive as bucket flags (`pts_allow_7_13: 1`) that the projection feed never
+   carries, so the projection path has no code for them at all.
+
+   Every rostered player appears, starters and bench alike, and a player whose game has not kicked
+   off appears as 0. So this map answers "how many points" and is NOT evidence of "has he played" -
+   that question is the schedule's, via `completed`. */
+export async function weekActuals(leagueId, week) {
+  try {
+    const rows = await get(`https://api.sleeper.app/v1/league/${leagueId}/matchups/${week}`);
+    const pts = new Map();
+    for (const r of rows ?? []) {
+      for (const [pid, v] of Object.entries(r.players_points ?? {})) {
+        if (typeof v === "number") pts.set(pid, v);
+      }
+    }
+    return { pts, error: null, n: pts.size };
+  } catch (e) {
+    return { pts: new Map(), error: e.message, n: 0 };
+  }
+}

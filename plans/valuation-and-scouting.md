@@ -1258,7 +1258,8 @@ A season projection cannot tell you your WR2 is on a bye, and it flattens a Thur
 Monday night one into the same cell.
 
 So HQ's **My roster** panel now runs on the week: a **Game** column right of Pos, and the Proj
-column replaced by that week's projected points, headed `Wk N`.
+column replaced by that week's projected points, headed `Wk N`. (The Game column gained a second
+job two days later - once a game is over it shows what the player actually scored. See §1.28.)
 
 **Both come from the build, not the browser.** The kickoff could have been a client-side fetch - the
 page already fetches the standings live - but the projection could not: a week number has to be
@@ -1278,8 +1279,8 @@ authority and the one that still answers when ESPN does not, ESPN supplies the t
 game is checked against Sleeper's week before its kickoff is trusted. A game that fails that check
 drops to date-only rather than printing a real time against a possibly-wrong opponent.
 
-**The cell has five states and they are deliberately not the same blank.** A real kickoff (`Sun
-12:00p`, dimmed once it has passed), a **bye** (amber chip - a starter on a bye is exactly the thing
+**The cell has five pre-kickoff states and they are deliberately not the same blank.** A real
+kickoff (`Sun 12:00p`, dimmed once it has passed), a **bye** (amber chip - a starter on a bye is exactly the thing
 this column exists to catch), a **canceled** game (`off`, dashed - not a bye, the game was called
 off), a game whose time is missing but whose date is not (the day alone, and the tooltip says why),
 and `?` for a team with neither a game nor a bye in the schedule, which is a gap in the source and
@@ -1312,6 +1313,64 @@ further work, Couples Clash included.
 Files: `scripts/lib/nfl-week.mjs` (new); the week block, per-player `game`/`week_pts` and per-team
 `week` totals in `build-roster-room.mjs`; `opts.week` in `site/roster-table.js`; the My-roster call
 in `site/app.js`; the `.rr-gm*` / `.rr-wkpts` / `.rr-wknote` block appended to `site/style.css`.
+
+### 1.28 The same cell, after the game - what he actually scored - 2026-09-11
+
+§1.27 put a kickoff in the Game column. The time a game started is the most useful thing that cell
+can hold right up until the game ends, and the least useful thing immediately after. So once a
+game is final the result takes the cell: `12.8` where `Wed 7:20p` was.
+
+**The result is read, never computed, and that is the whole design.** It comes from the league's own
+matchup rows - `players_points` on `/league/<id>/matchups/<week>` - which is Sleeper scoring each
+player in that league's settings. Measured week 1 2026: A.J. Brown is **4.1 in the half-PPR HBGBs
+and 5.6 in full-PPR Couples Clash**, same player, same game, and neither number was derived here.
+
+Re-scoring raw stat lines the way the projection path does would have been the obvious move and is
+the wrong one. A projection has no other home, so re-scoring it is the only way to get it into this
+league's format. A finished game already has a score, computed by the league that owns it, and a
+second opinion about it is strictly worse than no opinion: it can disagree with what the Sleeper app
+shows, and a dashboard that quietly contradicts the source of record is worse than one that omits
+the number. The defensive scoring makes that concrete - points-allowed arrives in the stats feed as
+bucket flags (`pts_allow_7_13: 1`) that the projection feed never carries, so the re-scoring path
+has no code for them at all and a DEF would have come out tens of points light.
+
+**"Has he played" is the schedule's question, not the score's.** Every rostered player carries a
+`players_points` entry from kickoff onward and it reads 0 until he does something, so gating on the
+presence of a number would collapse *has not played yet* and *played and scored nothing* into one
+cell. Those are the two readings a lineup decision most needs kept apart. The gate is ESPN's own
+`status.type.completed` boolean, and it is not inferred from the clock either: a kickoff three hours
+past is usually a finished game and occasionally a delayed one. Week 1 verified both halves at once
+- Romeo Doubs came back **0, final**, and TreVeyon Henderson came back **0 final against a `—`
+projection**, Sleeper having published no week line for a player it had as Out.
+
+**A game in progress at build time is labelled, not presented as a result.** The build runs twice a
+day, so a 4:05pm Sunday run lands mid-window: the early games are final, the late ones are live. A
+live figure is real and partial, so it renders in amber with a trailing dot and says so on hover,
+where a final renders in the league's accent. That colour split is doing work a label cannot: the
+cell now sits immediately left of the projection column, two numbers meaning opposite things, and
+"final" is not a word that fits 84px without shrinking the name column.
+
+**The panel meta follows the table.** Once any starter's game is final it leads with the result:
+`week 1: 35.0 scored, 3 of 10 played · 104.2 projected · 35.2 on the bench`. The count is
+load-bearing; a bare 35.0 beside a 104.2 reads as a catastrophe rather than as a third of a week.
+That total is summed over **this panel's optimal lineup**, not Sleeper's own team total, because
+the slots on screen are the lineup this build computed and Sleeper's number is over the lineup Ben
+actually set. The two are usually equal and occasionally are not, and printing one under a table of
+the other would be quietly wrong. The projection's "priced over N of 10" caveat drops out of the
+line while a score is showing - two different counts of ten side by side read as one - and stays in
+the note under the table, which carries it as a full sentence.
+
+**What this does not do: live scoring.** The figure is as fresh as the last build, twice a day. A
+Sunday-afternoon game finishing at 3:15pm shows a score at the 4:05pm run, and a Sunday-night game
+not until 4:05am. The dimmed kickoff in the meantime is the honest state and its tooltip says so.
+Making it live would mean the page fetching and scoring on its own, which is the thing this whole
+dashboard is built not to do - and for the actual use, reading Monday morning what the roster did,
+twice a day is enough.
+
+Files: `weekActuals` and the `completed` flag in `scripts/lib/nfl-week.mjs`; `week_actual` per
+player and `scored_pts`/`scored_n` per team in `build-roster-room.mjs`; the result branch of
+`kickoffCell` and the scored `meta` in `site/roster-table.js`; `.rr-gm-fin` / `.rr-gm-live` in
+`site/style.css`.
 
 ## 2. Challenge 2 — `scouting_brief` (public commentary)
 

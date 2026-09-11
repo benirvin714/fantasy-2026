@@ -1629,3 +1629,32 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
   .rr-rtab-wk .rr-slotrk, .rr-rtab-wk .rr-starts { font-size: 10.5px; }
   .rr-rtab-wk .rr-vs { margin-left: 3px; }
 }
+
+/* ===========================================================================================
+   Results in the Game column (site/roster-table.js, once a game is final)
+   -------------------------------------------------------------------------------------------
+   Appended as its own block for the usual source-order reason.
+
+   The design problem here is that the cell now holds a number sitting immediately left of another
+   number that means the opposite thing: what he scored, beside what he was projected to score.
+   Unstyled they read as one pair of figures. So the result is the only value in the row rendered
+   in the accent, and the projection beside it stays in the body colour - colour carries the
+   distinction, not a label, because a label wide enough to read ("final") does not fit a 84px
+   column without shrinking the name.
+   =========================================================================================== */
+.rr-gm-fin {
+  font-family: var(--font-data); font-size: 12px; font-weight: 600;
+  color: var(--accent); font-variant-numeric: tabular-nums;
+}
+/* In progress when the build ran, so the number is real and partial. Amber is this dashboard's
+   "true but provisional" and the trailing dot is there to be noticed and hovered; presenting half
+   a game in the same accent as a final score is the one thing this cell must not do. */
+.rr-gm-live {
+  font-family: var(--font-data); font-size: 12px; font-weight: 600;
+  color: var(--warn); font-variant-numeric: tabular-nums;
+}
+.rr-gm-dot { margin-left: 2px; opacity: .8; }
+
+@media (max-width: 460px) {
+  .rr-rtab-wk .rr-gm-fin, .rr-rtab-wk .rr-gm-live { font-size: 11px; }
+}

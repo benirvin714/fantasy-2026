@@ -21,7 +21,9 @@
    TWO BASES, and which one a table is on is the caller's choice. Without `opts.week` every number
    is a season projection, which is the basis a trade or a roster-strength read wants. With it, the
    table grows a Game column and the projection column becomes that week's points - the basis a
-   Sunday lineup wants. HQ's My roster passes the week; the roster room's expanded rows do not,
+   Sunday lineup wants. The Game column is itself two things over the life of a week: the kickoff
+   before the game, the result after it, because the time a finished game started is the least
+   useful fact the cell could hold. HQ's My roster passes the week; the roster room's expanded rows do not,
    because the ranks in those rows are computed from season projections and a week number sitting
    under a season rank invites reading one as the other. The Rk column stays season-based in both
    and says so, because the optimal lineup itself is chosen on season points: re-ranking that lineup
@@ -56,7 +58,26 @@
   /* Rendered from the kickoff instant, in the reader's own timezone, every time the table paints.
      Deliberately not a formatted string baked into the JSON: that would freeze one timezone into
      the data, and it would go wrong twice a year when the offset moves under it. */
-  const kickoffCell = (g) => {
+  const kickoffCell = (g, p) => {
+    /* Once a game is over the time it started is the least interesting thing about it, so the
+       result takes the cell. `week_actual` is only attached by the build when the schedule says
+       the game is done (or in progress), never when a points value merely exists - every rostered
+       player carries a 0 from kickoff onward, and a 0 that means "has not played" and a 0 that
+       means "played and did nothing" are the two readings a lineup decision most needs apart. */
+    const a = p && p.week_actual;
+    if (a && a.pts != null) {
+      const proj = p.week_pts;
+      const vs = proj != null
+        ? ` Projected ${proj.toFixed(1)}, so ${Math.abs(a.pts - proj).toFixed(1)} ${a.pts >= proj ? "over" : "under"}.`
+        : " No week projection was published for him, so there is nothing to compare it against.";
+      const where = g && g.opp ? `${g.home ? "vs " : "at "}${g.opp}` : "";
+      const when = g && g.kickoff
+        ? new Date(g.kickoff).toLocaleString(undefined, { weekday: "long", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })
+        : "";
+      return a.final
+        ? `<span class="rr-gm-fin" title="Final${where ? ` ${esc(where)}` : ""}${when ? ` · ${esc(when)}` : ""} · ${a.pts.toFixed(1)} points in this league's own scoring, read from its Sleeper matchup rather than recomputed here.${esc(vs)}">${num(a.pts, 1)}</span>`
+        : `<span class="rr-gm-live" title="IN PROGRESS when this page's data was built${where ? `, ${esc(where)}` : ""} · ${a.pts.toFixed(1)} points so far, not a final score. Rebuild the roster room for a current figure.${esc(vs)}">${num(a.pts, 1)}<span class="rr-gm-dot">·</span></span>`;
+    }
     if (!g) return `<span class="faint" title="No week in this build. Rebuild the roster room to attach one.">—</span>`;
     if (g.status === "bye") return `<span class="rr-gm-bye" title="On bye in week ${g.week} — no game, and no projection to show beside it.">BYE</span>`;
     if (g.status === "canceled") {
@@ -80,7 +101,7 @@
     const past = d.getTime() < Date.now();
     const full = d.toLocaleString(undefined, { weekday: "long", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
     return `<span class="rr-gm${past ? " rr-gm-past" : ""}" title="${esc(where)} · ${esc(full)}${
-      past ? " — already kicked off, so the projection beside it was published before the game" : ""}">${esc(day)} ${esc(time)}</span>`;
+      past ? " — kicked off already. No result here yet: this page's data is rebuilt twice a day, so a score appears at the next build after the game ends" : ""}">${esc(day)} ${esc(time)}</span>`;
   };
 
   // The projection cell, on whichever basis this render is using. A null week number is a dash, not
@@ -92,7 +113,7 @@
         : num(p.week_pts, 1)}</td>`
     : `<td class="num">${num(p.pts, 1)}</td>`;
 
-  const gameCell = (p) => WK ? `<td class="rr-gmc">${kickoffCell(p.game)}</td>` : "";
+  const gameCell = (p) => WK ? `<td class="rr-gmc">${kickoffCell(p.game, p)}</td>` : "";
 
   const startRow = (s) => {
     const p = s.player;
@@ -124,7 +145,7 @@
     ? `<th class="num" title="Projected points in week ${WK.n} only, in this league's scoring. ${esc(WK.projection_source ?? "Source unavailable.")}">Wk ${WK.n}</th>`
     : `<th class="num">Proj</th>`;
   const gameTh = () => WK
-    ? `<th title="Kickoff for this player's week-${WK.n} game, shown in your timezone. ${esc(WK.schedule_source ?? "")}">Game</th>`
+    ? `<th title="Before kickoff, when this player's week-${WK.n} game starts, in your timezone (${esc(WK.schedule_source ?? "source unavailable")}). Once it is over, what he actually scored${WK.result_source ? ` — ${esc(WK.result_source)}` : ""}.">Game</th>`
     : "";
 
   const unpriced = (t) => t.unpriced.length
@@ -200,6 +221,16 @@
   const meta = (t, opts = {}) => {
     if (opts.week && opts.week.n && t.week) {
       const w = t.week;
+      /* Once any starter's game is final, what happened outranks what was forecast, so the scored
+         figure leads and the projection follows it. The count is load-bearing: "35.0 scored, 3 of
+         10 played" cannot be mistaken for a finished week the way a bare 35.0 beside a 104.2 could.
+         The projection's own "priced over N" caveat drops out of this line while a score is
+         showing - two different counts of ten, side by side, read as one - and stays in the note
+         under the table, which carries it in a full sentence. */
+      if (w.scored_n > 0) {
+        return `week ${w.n}: ${w.scored_pts.toFixed(1)} scored, ${w.scored_n} of ${w.starter_of} played · ` +
+          `${w.starter_pts.toFixed(1)} projected · ${w.bench_pts.toFixed(1)} on the bench`;
+      }
       const over = w.starter_n < w.starter_of ? ` over ${w.starter_n} of ${w.starter_of}` : "";
       return `week ${w.n}: ${w.starter_pts.toFixed(1)} starting${over} · ${w.bench_pts.toFixed(1)} on the bench`;
     }
