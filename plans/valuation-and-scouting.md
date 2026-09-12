@@ -1371,6 +1371,56 @@ Files: `weekActuals` and the `completed` flag in `scripts/lib/nfl-week.mjs`; `we
 player and `scored_pts`/`scored_n` per team in `build-roster-room.mjs`; the result branch of
 `kickoffCell` and the scored `meta` in `site/roster-table.js`; `.rr-gm-fin` / `.rr-gm-live` in
 `site/style.css`.
+### 1.29 The refresh iterates the registry - 2026-09-11
+
+§1.26 added a third league and every *page* picked it up for free, because `site/league-switch.js`
+and `scripts/lib/leagues.mjs` both iterate. The thing that feeds those pages did not. The twice-daily
+`nfl-daily-events` task carried a hand-written league list, so three consecutive refreshes
+(`68c54c9`, `c8d9277`, `4921d73`) rebuilt the HBGBs and the Pit and silently skipped Couples Clash.
+Nothing errored. Two thirds of the dashboard moved and the third sat at its build date.
+
+**The defect is not the missing name, it is where the list lives.** A list of leagues kept somewhere
+a person adding a league would not think to look will go stale every single time, and the failure is
+invisible by construction: a loop over two of three things completes successfully. So the fix is not
+"add clash to the list" - it is to delete the list.
+
+- **`scripts/build-leagues.mjs`** (`npm run build:leagues`) runs the roster room then the player news
+  for every key in the registry, in that order because the dossiers read what the room writes. One
+  line in the task, no league names.
+- A **post-draft guard refusal is a `skipped`, not a `FAILED`**, and only a real failure sets the exit
+  code. The roster-room build refuses until every roster has players, which is correct and which every
+  league hits between renewal and its draft. Conflating that with a crash would either red-line the
+  summary every spring or, worse, teach the reader to ignore a red line. The two are told apart by
+  matching `Refusing to build:` on captured stderr rather than by exit code, because the guard and a
+  genuine throw both exit non-zero.
+
+Then the same bug reappeared one step later, and quieter. Step 11a staged a hand-written nine-path
+`git add` list that omitted `data/site/clash/*`: the builds now ran, wrote correct files to disk, and
+the commit simply did not carry them. **`scripts/stage-publish.mjs`** (`npm run stage:publish`)
+derives the per-league half from the same registry and names only the five genuinely shared files. A
+path that does not exist yet is skipped rather than fatal (a `git add` on a missing path aborts the
+whole command, and a new league has no published files until its first build), and anything already
+staged that this run did not ask for is **warned about** rather than swept into the commit. Each
+league's `waivers.json` and `latest-brief.json` are deliberately excluded: `/waivers` and `/brief`
+commit their own output, and staging them here would sweep a half-written board into someone else's
+commit.
+
+**What still names leagues, on purpose:** steps 9 and 10, the `/waivers` and `/brief` calls. Each run
+is a judgment pass rather than a script - the Clash's board has to be valued at 1.0 per reception
+against 84 startable slots, which reorders archetypes rather than rescaling them - so it cannot
+iterate. Those two lines are the one place a fourth league still has to be written down, and the task
+says so where a reader will be standing when they need to know.
+
+**Verified 2026-09-12.** `Daily refresh 2026-09-12` (`8377d15`) carries all three leagues'
+`roster-room.json` and `player-news.json` in one commit, preceded by one `/waivers` commit per
+league. The run before it - 4:05pm CT on 2026-09-11, the first under the rewritten task file -
+committed **nothing at all** and reported no error, which is the failure mode worth remembering:
+this task fails by silence, so the signal to watch is the absence of a `Daily refresh` commit, not a
+red line in a summary.
+
+Files: `scripts/build-leagues.mjs`, `scripts/stage-publish.mjs`, the `build:leagues` / `stage:publish`
+entries in `package.json`. The task itself is **outside the repo**
+(`~/.claude/scheduled-tasks/nfl-daily-events/SKILL.md`).
 
 ## 2. Challenge 2 — `scouting_brief` (public commentary)
 

@@ -5,10 +5,14 @@ window.HQ_CONFIG = {
      active (see league-switch.js); everything else on this object is shared by both, because it is
      a fact about the NFL rather than about a league.
 
-     `data` is the published-JSON directory, and it is the only thing that decides which league's
-     numbers a panel shows. `pages` gates the parts one league has and the other does not: the Pit
-     has no draft page (its draft is done and it never had a board) and no brief until /brief learns
-     to write one per league. */
+     `data` is the published-JSON directory, and it is the only thing on a league entry that decides
+     what a panel shows. Nothing here gates UI. The HBGBs-only draft page is removed by
+     `[data-league-only="hbgbs"]` in the markup, and a panel whose JSON does not exist yet - a
+     first-season league before its first /brief - renders its own honest empty state and needs no
+     flag to be told to. There was a `pages: {draft, brief}` object on each entry until 2026-09-12
+     that read as the gate for exactly those two things and was never read by anything; it is gone
+     rather than wired up, because the two mechanisms already doing the work are the right ones and a
+     third would only be a second place to forget. */
   LEAGUES: {
     hbgbs: {
       key: "hbgbs",
@@ -18,7 +22,6 @@ window.HQ_CONFIG = {
       my_roster_id: 10,
       playoff_teams: 6,
       data: "/data/site",
-      pages: { draft: true, brief: true },
     },
     pit: {
       key: "pit",
@@ -28,7 +31,6 @@ window.HQ_CONFIG = {
       my_roster_id: 1,
       playoff_teams: 6,
       data: "/data/site/pit",
-      pages: { draft: false, brief: false },
     },
     clash: {
       key: "clash",
@@ -42,7 +44,6 @@ window.HQ_CONFIG = {
          treat the playoff cut line on the standings table as provisional. */
       playoff_teams: 6,
       data: "/data/site/clash",
-      pages: { draft: false, brief: false },
     },
   },
   DEFAULT_LEAGUE: "hbgbs",
