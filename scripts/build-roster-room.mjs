@@ -603,8 +603,16 @@ function risks(t) {
 /* ------------------------------------- the summary, assembled from numbers rather than written
    Every clause restates something this script computed. No adjective appears that is not a direct
    restatement of a rank. If a team is unremarkable it says so rather than reaching for colour. */
-const ORD = (n) => ["", "1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th", "9th", "10th"][n] || `${n}th`;
+const ORD = ORD_N;
 const signed = (x, d = 0) => `${x >= 0 ? "+" : ""}${x.toFixed(d)}`;
+/* Grading thresholds scaled to the league size, and identical to the page's colours (rosters.js and
+   roster-table.js) so the prose and the table can never disagree. Top third a strength, bottom third
+   a weakness: 3/8 in ten teams, 4/9 in twelve, 5/10 in fourteen. A bench player is surplus when he
+   would start on the ten-team share of 4 of 9 other lineups: 4 of 9, 5 of 11, 6 of 13. */
+const THIRD = Math.max(1, Math.round(TEAMS / 3));
+const isStrength = (rank) => rank <= THIRD;
+const isWeakness = (rank) => rank > TEAMS - THIRD;
+const SURPLUS_STARTS = Math.ceil((TEAMS - 1) * 4 / 9);
 
 function summarize(t, strengths, weaknesses, r) {
   const s = [];
@@ -618,14 +626,14 @@ function summarize(t, strengths, weaknesses, r) {
     const w = weaknesses[0];
     s.push(`${w.pos} is the hole — ${w.pts.toFixed(0)} points, ${ORD(w.rank)}, ${w.vs_median.toFixed(0)} behind.`);
   } else {
-    s.push("Nothing sits in the bottom three, which is its own problem: no deficit to fix and no surplus to sell.");
+    s.push(`Nothing sits in the bottom ${spell(THIRD)}, which is its own problem: no deficit to fix and no surplus to sell.`);
   }
-  const dep = t.bench.filter((p) => p._surplus.starts_on >= 4);
+  const dep = t.bench.filter((p) => p._surplus.starts_on >= SURPLUS_STARTS);
   if (dep.length) {
-    s.push(`${dep.length} bench player${dep.length === 1 ? "" : "s"} would start on four or more other teams ` +
+    s.push(`${dep.length} bench player${dep.length === 1 ? "" : "s"} would start on ${spell(SURPLUS_STARTS)} or more other teams ` +
       `(${dep.slice(0, 3).map((p) => p.name).join(", ")}) — that is the tradeable surplus.`);
   } else {
-    s.push("No bench player would start on four other teams, so there is little here to trade from.");
+    s.push(`No bench player would start on ${spell(SURPLUS_STARTS)} other teams, so there is little here to trade from.`);
   }
   if (r.bye_stacks.length) {
     const b = r.bye_stacks[0];
@@ -659,8 +667,8 @@ for (const t of teams) {
   // K and DEF are streaming positions in this format; a rank at either says nothing about roster
   // quality, so they are reported but never called a strength or a weakness.
   const gradable = posRows.filter((p) => p.pos !== "K" && p.pos !== "DEF");
-  const strengths = gradable.filter((p) => p.rank <= 3).sort((a, b) => a.rank - b.rank);
-  const weaknesses = gradable.filter((p) => p.rank >= 8).sort((a, b) => b.rank - a.rank);
+  const strengths = gradable.filter((p) => isStrength(p.rank)).sort((a, b) => a.rank - b.rank);
+  const weaknesses = gradable.filter((p) => isWeakness(p.rank)).sort((a, b) => b.rank - a.rank);
 
   const r = risks(t);
   const d = dossiers.get(t.roster_id) || {};

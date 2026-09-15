@@ -670,7 +670,11 @@ its band word, landing at **323px**.
 
 **Deliberately not built.** No Claude-written narrative layer. The summary paragraph is assembled
 from numbers this script computed, clause by clause, and says "nothing sits in the bottom three,
-which is its own problem" when that is the case rather than reaching for colour. A prose layer
+which is its own problem" when that is the case rather than reaching for colour. (Since 2026-09-15
+the grading scales with league size and matches the page's colours: strength is the top third,
+weakness the bottom third, surplus a bench player who would start on 4 of 9 other lineups held as a
+share. That is 3/8 and four in the HBGBs, 4/9 and five in the Pit, 5/10 and six in the Clash, and
+the sentence names the scaled number.) A prose layer
 would be the natural Phase 2 (same shape as the on-deck panel's, §1.16) and it is not here.
 
 Files: `scripts/build-roster-room.mjs` -> `data/site/roster-room.json`; `site/rosters.html`;
