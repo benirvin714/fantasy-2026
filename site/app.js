@@ -119,39 +119,113 @@
     paintEvents();
   }
 
-  /* ---------- waiver board (published by /waivers) ---------- */
+  /* ---------- waiver board (published by /waivers) ----------
+     Collapsed by default so 15+ targets fit in the panel (§1.29). Each target is a two-line button:
+     rank, name, verdict, confidence and price on top, a one-line hook and the drop name beneath.
+     Everything else (the bid rationale, why, asset, impact, competition, the drop's reason) opens in
+     place on click, one row at a time or all at once from the panel head. The order is
+     the file's order, which /waivers step 7 now fixes by rule; this page does not re-sort. */
+  const wOpen = new Set();   // "<league>:<player>" — survives a refresh, not a reload
   async function renderWaivers() {
     $("#waivers-body").innerHTML = skel(4);
+    $("#waivers-expand").hidden = true;
     let d;
     try { d = await fetchJSON(A.WAIVERS_JSON); }
     catch { return err("#waivers-body", `No published waiver board for ${esc(A.name)}. Run /waivers in Claude Code — it writes ${esc(A.data)}/waivers.json.`); }
-    $("#waivers-meta").textContent = `generated ${d.generated} · ${d.mode}`;
+    $("#waivers-meta").textContent = `generated ${d.generated} · ${d.mode} · ${d.targets.length} targets`;
     const age = (Date.now() - new Date(d.generated).getTime()) / 864e5;
     const stale = age > 7 ? `<div class="stale-warn">This board is ${Math.floor(age)} days old — re-run /waivers for current suggestions.</div>` : "";
     const confDots = { high: "●●●", med: "●●○", low: "●○○" };
-    /* `bid` started life as a price ("$5") and /waivers now writes either that or a full
-       recommendation sentence into it. Only the price shape belongs in the right-aligned chip on
-       the name row; a sentence gets its own line below. 24 characters clears the longest real price
-       string ("$18 (frenzy price)") without letting prose through. */
-    const isChipBid = (b) => b != null && String(b).trim().length > 0 && String(b).length <= 24;
     const edgeCls = (e) => e === "value" ? "edge-value" : e === "overpay" ? "edge-over" : "edge-fair";
-    $("#waivers-body").innerHTML = stale + d.targets.map((t) => `
-      <div class="wtarget">
-        <div class="row1">
-          <span class="rank">${t.rank}.</span>
-          <span class="name">${esc(t.player)}</span>
-          <span class="pos">${esc(t.pos)} · ${esc(t.team)}</span>
-          ${t.verdict ? `<span class="verdict verdict-${esc(t.verdict)}">${esc(t.verdict)}</span>` : ""}
-          ${t.confidence ? `<span class="wconf conf-${esc(t.confidence)}" title="rec-confidence: ${esc(t.confidence)}${t.confidence_why ? " — " + esc(t.confidence_why) : ""}">${confDots[t.confidence] ?? ""}</span>` : ""}
-          ${isChipBid(t.bid) ? `<span class="bid">${esc(t.bid)}</span>` : ""}
+    /* The price on the collapsed row. `bid_amount` is the field /waivers writes for exactly this;
+       boards published before it existed only have `bid`, which is a sentence, so fall back to its
+       leading number ("2 dollars -- ...", "$18 (frenzy price)"). No number means no bid, and the
+       verdict and the sentence say which kind: AVOID is a pass, the Pit and the Clash are unpriced
+       by design, anything else is a hold. */
+    const price = (t, v) => {
+      const n = Number.isFinite(t.bid_amount) ? t.bid_amount
+        : +(String(t.bid ?? "").match(/^\s*\$?(\d+)(?=\s*(?:dollars\b|\(|$|\s*--))/i)?.[1] ?? NaN);
+      if (Number.isFinite(n)) return { txt: `$${n}`, cls: "wprice-num" };
+      if (v === "avoid") return { txt: "pass", cls: "" };
+      if (/^\s*unpriced/i.test(t.bid ?? "")) return { txt: "unpriced", cls: "" };
+      return { txt: "no bid", cls: "" };
+    };
+    // Boards before `hook` existed: the first sentence of `why`, which CSS truncates to one line.
+    const hookOf = (t) => t.hook || String(t.why ?? "").split(/(?<=\.)\s/)[0];
+    /* The drop on the collapsed row is a name, not the sentence. `drop_player` is written for this;
+       older boards only have `drop` ("Mike Washington -- Jeanty has no injury designation..."), so
+       take what precedes the first " -- ", comma, parenthesis or period. Anything longer than a name
+       could plausibly be is dropped rather than shown half-parsed, and "n/a" means no drop at all. */
+    const dropOf = (t) => {
+      if (t.drop_player !== undefined) return t.drop_player || null;
+      const s = String(t.drop ?? "").trim();
+      if (!s || /^(n\/?a|none)\b/i.test(s)) return null;
+      const name = s.split(/\s+--\s+|,|\s\(|\.\s/)[0].trim();
+      return name.length <= 28 ? name : null;
+    };
+    $("#waivers-body").innerHTML = stale + `<div class="wlist">` + d.targets.map((t, i) => {
+      // /waivers writes the verdict in capitals and the CSS classes are lowercase; class selectors
+      // are case-sensitive, so the uncoerced value never matched its color.
+      const v = String(t.verdict ?? "").toLowerCase();
+      const key = `${A.key}:${t.player}`;
+      const isOpen = wOpen.has(key);
+      const p = price(t, v);
+      const dropName = dropOf(t);
+      return `
+      <div class="wtarget${isOpen ? " open" : ""}">
+        <button class="wrow" data-wkey="${esc(key)}" aria-expanded="${isOpen}" aria-controls="wd-${i}">
+          <span class="rank">${esc(t.rank)}</span>
+          <span class="wwho"><span class="name">${esc(t.player)}</span><span class="pos">${esc(t.pos)} · ${esc(t.team)}</span></span>
+          ${v ? `<span class="verdict verdict-${esc(v)}">${esc(v)}</span>` : "<span></span>"}
+          ${t.confidence ? `<span class="wconf conf-${esc(t.confidence)}" aria-label="confidence ${esc(t.confidence)}">${confDots[t.confidence] ?? ""}</span>` : "<span></span>"}
+          <span class="wprice ${p.cls}">${esc(p.txt)}</span>
+          <span class="wchev" aria-hidden="true">›</span>
+          <span class="wline2">
+            <span class="whook"><span class="wpos-m">${esc(t.pos)} · ${esc(t.team)} · </span>${esc(hookOf(t))}</span>
+            ${dropName ? `<span class="wdrop">drop <b>${esc(dropName)}</b></span>` : ""}
+          </span>
+        </button>
+        <div class="wdetail" id="wd-${i}"${isOpen ? "" : " hidden"}>
+          ${t.bid ? `<div class="bid-long"><b>bid:</b> ${esc(t.bid)}</div>` : ""}
+          <div class="why">${esc(t.why)}</div>
+          ${t.asset ? `<div class="wasset"><b>asset:</b> ${esc(t.asset)}${t.rate_basis ? ` <span class="faint">(${esc(t.rate_basis)})</span>` : ""}${t.edge ? ` · <b class="${edgeCls(t.edge)}">${esc(t.edge)}</b>` : ""}${t.worth != null && t.worth !== "" ? ` · worth <b>${esc(t.worth)}</b>` : ""}</div>` : ""}
+          ${t.my_team_impact ? `<div class="impact">↳ ${esc(t.my_team_impact)}</div>` : ""}
+          ${t.confidence_why ? `<div class="sub"><b>confidence ${esc(t.confidence ?? "")}:</b> ${esc(t.confidence_why)}</div>` : ""}
+          <div class="sub"><b>competition:</b> ${t.pressure ? `<span class="pressure pressure-${esc(t.pressure)}">${esc(t.pressure).toUpperCase()}</span> — ` : ""}${esc(t.competition)} &nbsp;·&nbsp; <b>drop:</b> ${esc(t.drop)}</div>
         </div>
-        ${t.bid && !isChipBid(t.bid) ? `<div class="bid-long"><b>bid:</b> ${esc(t.bid)}</div>` : ""}
-        <div class="why">${esc(t.why)}</div>
-        ${t.asset ? `<div class="wasset"><b>asset:</b> ${esc(t.asset)}${t.rate_basis ? ` <span class="faint">(${esc(t.rate_basis)})</span>` : ""}${t.edge ? ` · <b class="${edgeCls(t.edge)}">${esc(t.edge)}</b>` : ""}${t.worth ? ` · worth <b>${esc(t.worth)}</b>` : ""}</div>` : ""}
-        ${t.my_team_impact ? `<div class="impact">↳ ${esc(t.my_team_impact)}</div>` : ""}
-        <div class="sub"><b>competition:</b> ${t.pressure ? `<span class="pressure pressure-${esc(t.pressure)}">${esc(t.pressure).toUpperCase()}</span> — ` : ""}${esc(t.competition)} &nbsp;·&nbsp; <b>drop:</b> ${esc(t.drop)}</div>
-      </div>`).join("") + (d.note ? `<p class="sub" style="color:var(--faint);font-size:12px;margin:10px 0 0">${esc(d.note)}</p>` : "");
+      </div>`;
+    }).join("") + `</div>` + (d.note ? `<p class="sub" style="color:var(--faint);font-size:12px;margin:10px 0 0">${esc(d.note)}</p>` : "");
+    syncExpandAll();
   }
+  const setWOpen = (btn, open) => {
+    btn.setAttribute("aria-expanded", String(open));
+    btn.parentElement.classList.toggle("open", open);
+    document.getElementById(btn.getAttribute("aria-controls")).hidden = !open;
+    open ? wOpen.add(btn.dataset.wkey) : wOpen.delete(btn.dataset.wkey);
+  };
+  /* Expand all / collapse all. The label follows the rows rather than its own last click: open the
+     last closed row by hand and it flips to "collapse all", which is the action it would then take.
+     Hidden whenever there are no rows (loading, the error state, an empty board). */
+  const syncExpandAll = () => {
+    const btn = $("#waivers-expand");
+    const rows = [...document.querySelectorAll("#waivers-body .wrow")];
+    btn.hidden = rows.length === 0;
+    const allOpen = rows.length > 0 && rows.every((r) => r.getAttribute("aria-expanded") === "true");
+    btn.textContent = allOpen ? "collapse all" : "expand all";
+    btn.dataset.expand = String(!allOpen);
+  };
+  // Delegated listeners, bound once: the panel body is re-rendered on every refresh.
+  $("#waivers-body").addEventListener("click", (e) => {
+    const btn = e.target.closest(".wrow");
+    if (!btn) return;
+    setWOpen(btn, btn.getAttribute("aria-expanded") !== "true");
+    syncExpandAll();
+  });
+  $("#waivers-expand").addEventListener("click", (e) => {
+    const open = e.currentTarget.dataset.expand === "true";
+    document.querySelectorAll("#waivers-body .wrow").forEach((r) => setWOpen(r, open));
+    syncExpandAll();
+  });
 
   /* ---------- brief panel (published by /brief) ---------- */
   async function renderBrief() {

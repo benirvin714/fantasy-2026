@@ -1,6 +1,6 @@
 # HBGBs — Progress & Handoff
 
-_Last updated: 2026-09-11. Live dashboard: **https://hbgbs.irvinfamily.com/site/** (roster room at `/site/rosters.html`, draft board at `/site/draft.html`). The old `hbgbs-hq.pages.dev` address still resolves and is still gated, but the custom domain is the canonical one._
+_Last updated: 2026-09-15. Live dashboard: **https://hbgbs.irvinfamily.com/site/** (roster room at `/site/rosters.html`, draft board at `/site/draft.html`). The old `hbgbs-hq.pages.dev` address still resolves and is still gated, but the custom domain is the canonical one._
 _Second host, phone only: **https://draft.irvinfamily.com** - the Draft Aid (§1.23). A tiered board with live Sleeper sync, built for **a different league's draft, not the HBGBs**: three scoring formats, no league id, no dependency on this project's board. Separate Pages project, separate Access app, same repo._
 _Design of record: [`plans/valuation-and-scouting.md`](plans/valuation-and-scouting.md) — §1 is the **current** valuation algorithm._
 _**Keep this file honest**: the stamp above and the "Next steps" list are load-bearing for a reader picking the project up cold. Move both in the same commit as the work they describe — see the doc-freshness rule in [`CLAUDE.md`](CLAUDE.md)._
@@ -61,6 +61,7 @@ The draft board runs a **3-layer valuation model** (asset → scarcity → aucti
 
 ### Waivers
 - `/waivers` applies the same 3-layer model against the **FAAB market** (`data/faab-market.json` bands + rival `price_to_beat` + pressure): asset → worth → edge → PURSUE/WATCH/AVOID + rec-confidence. `waivers.json` schema + the dashboard waiver panel carry the new fields (graceful fallback for old data); the preseason board is migrated as a worked example.
+- **Fixed sort, 15 targets, collapsed rows (2026-09-15, §1.29).** Step 7 of `/waivers` now fixes the order (verdict, worth, confidence, pressure, name) instead of leaving `rank` to the session, and asks for at least 15 targets without padding (it had never published more than 6). The panel shows each as a 44px two-line row (rank, name, verdict, confidence, price, then a one-line `hook` and the drop name) that expands in place to the full case, one at a time or via **expand all** in the panel head. New schema fields `hook`, `bid_amount` and `drop_player` feed the collapsed row; older boards fall back to `why`, `bid` and `drop`.
 
 ### Scouting brief (evidence layer)
 - `scouting_brief` = prose (analyst/coach/player sentiment + scheme fit) + `{role_stability, scheme_fit, override_flag}`, retrieval-grounded-or-null. `role_stability` feeds `confidence()` (worst-of with the historical-usage read); scheme_fit is descriptive + an override trigger. **Never moves value.**

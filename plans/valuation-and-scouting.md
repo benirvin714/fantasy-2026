@@ -1372,6 +1372,62 @@ player and `scored_pts`/`scored_n` per team in `build-roster-room.mjs`; the resu
 `kickoffCell` and the scored `meta` in `site/roster-table.js`; `.rr-gm-fin` / `.rr-gm-live` in
 `site/style.css`.
 
+### 1.29 The waiver board - a fixed sort, 15 targets, collapsed rows - 2026-09-15
+
+**Nothing ranked the board before this.** `/waivers` is a judgment pass, not a script, and step 7
+asked for "a ranked table" without saying ranked by what. `rank` was whatever number the session
+wrote, and the page renders the file's order without sorting. With the routine running each league
+twice a day in a fresh session, that let the order reshuffle between runs on unchanged inputs.
+
+**The sort is now a rule in step 7:** verdict (PURSUE, WATCH, AVOID), then `worth` descending
+(skipped in the Pit and the Clash, where worth is unpriced), then confidence, then pressure, then
+player name as the last tiebreak. A session that thinks a player belongs higher has to say so
+through his worth, verdict or confidence, where the reason is visible, instead of through a
+hand-placed rank. The page still does not re-sort; one owner of the order is enough.
+
+**At least 15 targets, never padded.** Across the 24 HBGBs publishes before this the board held
+3 to 6. Step 7 now reads further down Sleeper's trending adds and keeps every verified-unrostered
+name the news pass surfaces, AVOIDs included, with full research on the PURSUE/WATCH contenders and
+briefer (but real) fields on the tail. A pool that honestly yields fewer ships fewer and says so in
+`note`. This makes each run heavier, three leagues twice a day.
+
+**Collapsed rows.** Each target is one `<button aria-expanded>` of two lines, 44px tall, so 15 fit
+in about 675px, roughly what four expanded cards took. Top line: rank, name, position and team,
+verdict chip, confidence dots, price, chevron. Second line: the `hook`, then `drop <name>` at the
+right. Click opens everything else in place: the bid rationale, why, asset/edge/worth, my-team
+impact, the confidence reason (which used to live only in a tooltip), competition and the drop's
+reason. Several can be open at once, and open rows survive the refresh button.
+
+**The drop is on the collapsed row** because it is the other half of the decision: a PURSUE at a
+price means nothing until you know who leaves. On line two the hook truncates first and the drop
+name keeps up to half the line. The hook's flex basis is 0 rather than `auto`; with `auto` its full
+sentence became the basis, and proportional shrinking squeezed the drop to ~30px while the hook
+kept 370. At 375px, with position prefixed to the hook, a row with a drop leaves the hook about
+90px, so on a phone the hook is a glance and the drop is the read.
+
+**Expand all / collapse all** sits in the panel head. Its label follows the rows rather than its
+own last click: close one row of a fully open board by hand and it reads "expand all" again,
+because that is what it would now do. It is hidden while loading, on the error state and on an
+empty board.
+
+Three schema fields exist only for that row. `hook` (60 characters max) is the reason he's on the
+board, because a name and a verdict don't tell you why you're looking at him. `bid_amount` is the
+bid as a bare integer or null. It was needed because `bid` had become a sentence on every target,
+so the old 24-character price chip never rendered at all. Boards published before either field
+existed still render: the price falls back to `bid`'s leading number, and the hook to the first
+sentence of `why`, truncated. `drop_player` is the drop's bare name or null; without it the name is
+whatever precedes the first " -- ", comma or parenthesis in `drop`, and a parse longer than 28
+characters is not shown rather than shown half-wrong. A row with no number shows `pass` (AVOID), `unpriced` (the Pit and
+the Clash) or `no bid`.
+
+Measured at 375px, the position chip left the name about 67px and truncated every one, so under
+480px position moves to the front of the hook line. Also fixed in passing: `/waivers` writes the
+verdict in capitals and the classes are lowercase, and class selectors are case-sensitive, so the
+verdict chip had never been colored. The renderer lowercases it.
+
+Files: steps 7 and 8 of `.claude/commands/waivers.md`; `renderWaivers` and its delegated listener in
+`site/app.js`; the waiver block in `site/style.css`.
+
 ## 2. Challenge 2 — `scouting_brief` (public commentary)
 
 ### 2.1 What it is
