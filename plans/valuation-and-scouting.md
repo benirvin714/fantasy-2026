@@ -1399,6 +1399,27 @@ makes for it), never on a WATCH fallback for the same slot, or the backup would 
 claim. "Empty" means nobody rostered can play the slot this week: a `0` in `starters`, or every
 eligible player Out, IR or on bye.
 
+**The rules are enforced, not just written.** Every step-7/8 rule above was an instruction to a
+session that runs unattended twice a day, and the morning run that prompted all of this published a
+player already on a rival's roster. `scripts/validate-waivers.mjs --league=<key>` now sits between
+writing the board and committing it. It reads the league's live rosters (cache-busted) and exits 1
+on: a target on any roster, a `drop_player` not on mine, a target that doesn't resolve to exactly
+one Sleeper player (matched on name and team, since "DeVonta Smith" is both an Eagles WR and a
+Panthers CB), the step-7 order or `rank` numbering broken, a bad enum, a hook over 60 characters,
+a price in a league whose registry entry has `faab_model: null`, or a `0` in my `starters` with
+no `fills_empty_slot` claim. Exit 2 is Sleeper unreachable, and it blocks too, because the roster
+check is the point. Judgment calls are warnings: fewer than 15 targets (step 7 allows a thin pool),
+a stale `generated`, and a flagged empty slot the rosters endpoint can't confirm (a bye or injury
+hole has no `0` to find).
+
+This is the opposite contract to `validate-events.mjs`, which quarantines item by item and always
+exits 0 so a 4am run never wedges. That is right for a news feed, where one bad item shouldn't hold
+back twenty good ones. It is wrong here: a waiver board is a set of recommendations, and one
+recommendation you can't act on is enough reason to leave the previous board up. Proven before
+wiring: injected a rostered player, a swapped pair, a 70-character hook, a price in the Pit and an
+unflagged empty Clash slot, and the gate named all five and exited 1. `nfl-daily-events` also runs
+`--all` once after the last league, as a backstop for a session that skipped its own gate.
+
 **At least 15 targets, never padded.** Across the 24 HBGBs publishes before this the board held
 3 to 6. Step 7 now reads further down Sleeper's trending adds and keeps every verified-unrostered
 name the news pass surfaces, AVOIDs included, with full research on the PURSUE/WATCH contenders and

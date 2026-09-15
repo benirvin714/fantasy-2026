@@ -26,6 +26,8 @@ export const LEAGUES = {
     board_scored: true,
     dossiers: "league-tendencies.md",
     trade_archive: { from: 2020, to: 2025 },
+    // FAAB pricing for /waivers. Null means the board ships unpriced (waivers.md step 6a).
+    faab_model: "data/faab-market.json",
     profile: "league-profile.md",
   },
   pit: {
@@ -41,6 +43,7 @@ export const LEAGUES = {
        reading another league's history and calling it this league's. */
     dossiers: null,
     trade_archive: null,
+    faab_model: null,
     profile: "league-profile-pit.md",
   },
   clash: {
@@ -59,6 +62,7 @@ export const LEAGUES = {
     /* Year one, and eleven of the fourteen owners have never appeared in this repo. */
     dossiers: null,
     trade_archive: null,
+    faab_model: null,
     profile: "league-profile-clash.md",
   },
 };
