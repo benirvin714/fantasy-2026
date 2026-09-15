@@ -34,7 +34,19 @@
   const num = (n, d = 0) => n == null ? "—" : Number(n).toFixed(d);
   const sign = (n, d = 0) => n == null ? "—" : `${n >= 0 ? "+" : ""}${Number(n).toFixed(d)}`;
   const signCls = (n) => n == null ? "" : n > 0 ? "rr-pos" : n < 0 ? "rr-neg" : "rr-zero";
-  const rankCls = (r) => r <= 3 ? "rr-r-good" : r >= 8 ? "rr-r-bad" : "rr-r-mid";
+  /* Top third good, bottom third bad, the middle uncoloured, scaled off the league size the same way
+     rosters.js does it. "8th or worse is bad" was the ten-team answer: it painted 8th of 12 red, and
+     in a fourteen-team league it flagged the literal middle of the table as a weakness. Reads OTHERS
+     at call time, so it follows whichever league the last html() call was rendering. */
+  const rankCls = (r) => {
+    const teams = OTHERS + 1;
+    const third = Math.max(1, Math.round(teams / 3));
+    return r <= third ? "rr-r-good" : r > teams - third ? "rr-r-bad" : "rr-r-mid";
+  };
+  /* Bench "would start on N" colour. Good is the ten-team threshold of 4 of 9 held as a share, so
+     it reads as "a real slice of the league wants him" at any size: 4 of 9, 5 of 11, 6 of 13. Bad
+     stays an absolute zero, because nobody starting him means the same thing in every league. */
+  const startsCls = (n) => n >= Math.ceil(OTHERS * 4 / 9) ? "rr-r-good" : n === 0 ? "rr-r-bad" : "rr-r-mid";
   // Falls back to a plain name if player-news.js isn't on the page, so this file can't break a
   // roster table by being loaded without its companion.
   const name = (p) => window.HBGB_PlayerNews ? window.HBGB_PlayerNews.link(p) : esc(p.name);
@@ -134,7 +146,7 @@
     <td class="rr-pt">${esc(p.pos)}<span class="faint"> ${esc(p.team ?? "—")}</span></td>
     ${gameCell(p)}
     ${projCell(p)}
-    <td class="num rr-starts ${p.starts_on >= 4 ? "rr-r-good" : p.starts_on === 0 ? "rr-r-bad" : "rr-r-mid"}"
+    <td class="num rr-starts ${startsCls(p.starts_on)}"
         title="Would start on ${p.starts_on} of the other ${spell(OTHERS)} teams, measured by recomputing each of their optimal lineups with him inserted over the full season. Best single gain: ${sign(p.best_gain, 1)} points.">${p.starts_on}/${OTHERS}</td>
   </tr>`;
 
