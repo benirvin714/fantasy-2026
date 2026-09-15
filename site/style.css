@@ -283,6 +283,14 @@ ul.events { list-style: none; margin: 0; padding: 0; }
 .tag-role { color: var(--moss); border-color: var(--moss); }
 .tag-coach { color: var(--warn); border-color: var(--warn); }
 .tag-market { color: var(--accent); border-color: var(--accent); }
+/* A confirmed return to availability (§1.30). The one tag colour NOT taken from a palette token, on
+   purpose: the four above all move when a league swaps palette, and in the Pit its --blue sits 9 ΔE
+   from --accent, so "cleared" would have read as "market". This teal was chosen by measurement to
+   stay clear of all four tag colours in all three palettes - nearest neighbour ΔE 39 in the HBGBs
+   (role), 50 in the Pit (role), 64 in the Clash (coach), against a just-noticeable ~2.3 - at about
+   9.8:1 on every league's --surface. It is also the one tag that reads as good news, and the red
+   injury tag it replaces on these items was reading as the opposite. */
+.tag-cleared { color: #4fd1c5; border-color: #4fd1c5; }
 
 /* ---------- filters ---------- */
 .filters { display: flex; gap: 8px; margin-left: auto; flex-wrap: wrap; }

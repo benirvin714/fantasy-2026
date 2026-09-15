@@ -1433,6 +1433,68 @@ verdict chip had never been colored. The renderer lowercases it.
 Files: steps 7 and 8 of `.claude/commands/waivers.md`; `renderWaivers` and its delegated listener in
 `site/app.js`; the waiver block in `site/style.css`.
 
+### 1.30 A "cleared" tag in the NFL updates - 2026-09-15
+
+The feed had four tags and the health lane owned one of them, so everything about a player's body
+was `injury`: a torn ACL, a Questionable tag, and Patrick Mahomes coming off the injury report
+entirely for his season debut all printed the same red chip. On the 2026-09-15 feed, 19 of 23
+items were `injury` and three of those nineteen were good news. A reader scanning the column for
+what just went wrong had to open each one to find out which kind it was.
+
+Now a **confirmed return to availability** is tagged `cleared`, in teal, with its own filter
+button beside "injuries". `injury` is reserved for new injuries, designations, diagnoses and
+recovery-timeline updates.
+
+**The line is confirmed versus forecast, and the optimistic forecasts stay `injury`.** That is the
+call that needed making, because the tempting reading of "players coming back" sweeps in every
+hopeful update. "Expected to play Week 2", "trending toward a return", "a real chance to return",
+"full practice two straight days but still Questionable" are all `injury`: nobody has cleared
+anything, and a chip that says CLEARED on a game-time decision would be the most expensive mistake
+this tag could make. The test written into the routines is whether a lineup can be set on the item
+as a fact. Mahomes with no designation on the final report, yes. Carolina's Brooks off the report
+with "no limitations", yes. Rome Odunze on the active list after a Questionable week, yes - the
+borderline one, since he was never off the field, but the actionable fact is identical: he is
+playing. Brian Thomas Jr. "expected to play", no, and Brock Bowers's "real chance", no.
+
+**Health only.** A suspension ending is `role`. The tag answers "is his body available", and a
+reinstated player's body was never the question.
+
+**Retag on development, in both directions.** A Questionable that resolves to Active becomes
+`cleared` in place; a cleared player who re-aggravates it goes back to `injury`. The gameday and
+final-designations routines both update items in place, and in-place updates had always preserved
+the type, which is exactly how a resolved-to-Active item would have stayed red.
+
+**Three writers, one rule.** `nfl-daily-events`, `nfl-gameday` and `nfl-final-designations` all
+write this feed, and each carried its own copy of the type enum. The same rule block is now in all
+three, word for word, so no routine can file identical news under a different tag than another.
+
+**The validator catches the habit, and only flags.** An LLM writer that has tagged every health item
+`injury` for months will keep doing it. `validate-events.mjs` now rejects an unknown type
+structurally, and prints a `TYPE` line for an `injury` headline that reports a clearance
+("cleared", "activated", "off the injury report", "no designation", "active vs.") or a `cleared`
+headline that reads as a forecast. It never retags on its own: "cleared" inside "not yet cleared" is
+the opposite fact, and the negation guard is a pattern, not comprehension. Measured before this
+feed was retagged, it flagged exactly the three clearances and none of the other nineteen, and
+fourteen synthetic headlines covering negations, possessive injury reports and the reverse
+direction all came out right.
+
+**The colour is not a palette token, on purpose.** Every other tag moves when a league swaps
+palette, and in the Pit `--blue` sits 9 ΔE from `--accent`, which would have made "cleared" read as
+"market". `#4fd1c5` was picked by measuring candidates against all four tag colours in all three
+palettes: nearest neighbour ΔE 39 in the HBGBs (role), 50 in the Pit (role), 64 in the Clash
+(coach), against a just-noticeable difference of about 2.3, at roughly 9.8:1 on every league's
+surface.
+
+**The dossier dialog carries a copy.** `player-news.json` embeds each event, type included, so a
+retag in the feed does not reach the click-a-name dialog until that file is rebuilt. Caught in
+verification with Odunze's item still red there after the feed was fixed; the three dossier files
+were rebuilt and differ from their previous versions in the retagged `type` fields and nothing else.
+
+Files: `data/site/nfl-events.json` (three items retagged); `TYPES`, `CLEAR_WORDS` and the
+`type_review` flags in `scripts/validate-events.mjs`; the filter button in `site/index.html`;
+`.tag-cleared` in `site/style.css`; all three `player-news.json` files; outside the repo, the type
+rule in the `nfl-daily-events`, `nfl-gameday` and `nfl-final-designations` task files.
+
 ## 2. Challenge 2 — `scouting_brief` (public commentary)
 
 ### 2.1 What it is

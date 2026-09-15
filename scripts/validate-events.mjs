@@ -158,22 +158,47 @@ const flags = {
   mode: CHECK_ONLY ? "check" : "enforce",
   net: !NO_NET,
   universe: universeStatus,
-  summary: { events: events.length, dropped: 0, tags_stripped: 0, tags_flagged: 0, cross_team: 0, urls_inconclusive: 0, structural: 0 },
+  summary: { events: events.length, dropped: 0, tags_stripped: 0, tags_flagged: 0, cross_team: 0, type_review: 0, urls_inconclusive: 0, structural: 0 },
   dropped: [],
   stripped_tags: [],
   flagged_tags: [],
   cross_team: [],
+  type_review: [],
   inconclusive_urls: [],
   structural: [],
 };
 
 // ---- structural checks (subsumes every old ad-hoc node -e check) --------------------
 const REQUIRED = ["date", "type", "headline", "detail", "so_what", "source"];
+/* `cleared` joined the four lanes' tags on 2026-09-15 (§1.30). It comes out of the injury lane but is a
+   different fact: a CONFIRMED return to availability, where `injury` is a new injury, a designation,
+   or any recovery-timeline update including an optimistic one. An unknown type still renders (the
+   page prints whatever string it gets) but it gets no colour and no filter button, so it is
+   structural rather than cosmetic. */
+const TYPES = new Set(["injury", "cleared", "role", "coach", "market"]);
+/* The cleared/injury line is a judgment call made by whichever routine wrote the item, and the
+   easy failure is habit: the injury lane produced every health item for months, so a clearance
+   gets filed as `injury` because that is what health news has always been. These patterns look
+   only at the HEADLINE, which is where a writer states what the item is, and they are FLAG-ONLY -
+   the call stays with a reader, because "cleared" inside "not yet cleared" is the opposite fact.
+   Measured against the 2026-09-15 feed before it was retagged: the three items that were
+   clearances (Mahomes, Brooks, Odunze) all hit, and none of the nineteen that were not did. */
+const CLEAR_WORDS = /\b(cleared|activated|reinstated from (ir|pup|nfi)|off (the )?([a-z.]+['’]s? )?injury report|no (injury )?designation|removed from (the )?injury report|active (vs|against|for|at)\b)/i;
+const NOT_CLEAR = /\b(not|yet to be|awaiting|hasn't been|has not been|isn't|not yet)\s+(been\s+)?cleared\b|\bclearance\b/i;
+const FORECAST_WORDS = /\b(expected to|trending|could|chance|likely|hopeful|questionable|doubtful|game-time|day-to-day|week-to-week|limited)\b/i;
 let prevDate = null, sortOk = true;
 const seenHeadline = new Set();
 events.forEach((e, idx) => {
   const miss = REQUIRED.filter((k) => !e[k]);
   if (!e.source || !e.source.url) miss.push("source.url");
+  if (e.type && !TYPES.has(e.type)) flags.structural.push({ index: idx, headline: e.headline || "(no headline)", problem: `unknown type "${e.type}" (expected ${[...TYPES].join("|")})` });
+  const hl = e.headline || "";
+  if (e.type === "injury" && CLEAR_WORDS.test(hl) && !NOT_CLEAR.test(hl)) {
+    flags.type_review.push({ date: e.date, headline: hl, type: e.type, suggest: "cleared", reason: "headline reports a confirmed clearance, which is tagged `cleared`, not `injury`" });
+  }
+  if (e.type === "cleared" && FORECAST_WORDS.test(hl) && !CLEAR_WORDS.test(hl)) {
+    flags.type_review.push({ date: e.date, headline: hl, type: e.type, suggest: "injury", reason: "headline reads as a forecast or a designation, and nobody has cleared anything yet" });
+  }
   if (!Array.isArray(e.players)) miss.push("players[]");
   if (miss.length) flags.structural.push({ index: idx, headline: e.headline || "(no headline)", problem: `missing ${miss.join(", ")}` });
   if (e.headline) {
@@ -280,11 +305,12 @@ flags.summary.dropped = flags.dropped.length;
 flags.summary.tags_stripped = flags.stripped_tags.length;
 flags.summary.tags_flagged = flags.flagged_tags.length;
 flags.summary.cross_team = flags.cross_team.length;
+flags.summary.type_review = flags.type_review.length;
 flags.summary.urls_inconclusive = flags.inconclusive_urls.length;
 flags.summary.structural = flags.structural.length;
 
 // ---- write flags (always) + cleaned feed (enforce mode, only if changed) ------------
-// cross_team is FLAG-ONLY and never counts as a change: it never mutates the feed.
+// cross_team and type_review are FLAG-ONLY and never count as a change: they never mutate the feed.
 fs.writeFileSync(FLAGS_PATH, JSON.stringify(flags, null, 2) + "\n");
 const changed = flags.dropped.length > 0 || flags.stripped_tags.length > 0;
 if (!CHECK_ONLY && changed) {
@@ -295,12 +321,13 @@ if (!CHECK_ONLY && changed) {
 const s = flags.summary;
 const mode = CHECK_ONLY ? "CHECK (no mutation)" : changed ? "ENFORCE (file cleaned)" : "ENFORCE (no changes)";
 console.log(`validate-events [${mode}]  net=${!NO_NET}  universe=${universeStatus}`);
-console.log(`  events=${s.events}  dropped=${s.dropped}  tags_stripped=${s.tags_stripped}  tags_flagged=${s.tags_flagged}  cross_team=${s.cross_team}  urls_inconclusive=${s.urls_inconclusive}  structural=${s.structural}`);
+console.log(`  events=${s.events}  dropped=${s.dropped}  tags_stripped=${s.tags_stripped}  tags_flagged=${s.tags_flagged}  cross_team=${s.cross_team}  type_review=${s.type_review}  urls_inconclusive=${s.urls_inconclusive}  structural=${s.structural}`);
 for (const d of flags.dropped) console.log(`  DROP   ${d.date}  ${d.reason}  ${d.headline?.slice(0, 70)}`);
 for (const t of flags.stripped_tags) console.log(`  STRIP  "${t.tag}"  ${t.reason}  <- ${t.headline?.slice(0, 55)}`);
 for (const t of flags.flagged_tags) console.log(`  FLAG   "${t.tag}"  ${t.reason}${t.suggestion ? "  [did you mean: " + t.suggestion + "]" : ""}  <- ${t.headline?.slice(0, 50)}`);
 for (const c of flags.cross_team) console.log(`  XTEAM  [${c.severity}] ${JSON.stringify(c.teams)}  ${c.reason}  <- ${(c.headline || "").slice(0, 45)}`);
+for (const t of flags.type_review) console.log(`  TYPE   ${t.type} -> ${t.suggest}?  ${t.reason}  <- ${(t.headline || "").slice(0, 55)}`);
 for (const u of flags.inconclusive_urls) console.log(`  URL?   ${u.code}  ${u.url}`);
 for (const st of flags.structural) console.log(`  STRUCT ${st.problem}  ${st.headline?.slice(0, 60)}`);
-if (!s.dropped && !s.tags_stripped && !s.tags_flagged && !s.cross_team && !s.urls_inconclusive && !s.structural) console.log("  clean.");
+if (!s.dropped && !s.tags_stripped && !s.tags_flagged && !s.cross_team && !s.type_review && !s.urls_inconclusive && !s.structural) console.log("  clean.");
 console.log(`  flags -> ${path.relative(ROOT, FLAGS_PATH)}`);
