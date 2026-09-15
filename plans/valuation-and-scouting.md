@@ -1405,6 +1405,11 @@ sentence became the basis, and proportional shrinking squeezed the drop to ~30px
 kept 370. At 375px, with position prefixed to the hook, a row with a drop leaves the hook about
 90px, so on a phone the hook is a glance and the drop is the read.
 
+**The `note` paragraph is no longer rendered.** It had grown to 500-900 characters under the list,
+restating what the rows already said, and in the Pit and the Clash it opened with the same
+"unpriced, year one" caveat every row's price carries. It stays in `waivers.json` as a one- or
+two-sentence record (pool size, anything that failed), and the panel meta already shows the count.
+
 **Expand all / collapse all** sits in the panel head. Its label follows the rows rather than its
 own last click: close one row of a fully open board by hand and it reads "expand all" again,
 because that is what it would now do. It is hidden while loading, on the error state and on an

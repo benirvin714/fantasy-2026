@@ -194,7 +194,9 @@
           <div class="sub"><b>competition:</b> ${t.pressure ? `<span class="pressure pressure-${esc(t.pressure)}">${esc(t.pressure).toUpperCase()}</span> — ` : ""}${esc(t.competition)} &nbsp;·&nbsp; <b>drop:</b> ${esc(t.drop)}</div>
         </div>
       </div>`;
-    }).join("") + `</div>` + (d.note ? `<p class="sub" style="color:var(--faint);font-size:12px;margin:10px 0 0">${esc(d.note)}</p>` : "");
+    }).join("") + `</div>`;
+    // `note` is deliberately not rendered (§1.29): it had grown into a paragraph that restated what
+    // the rows already say, led in the Pit and the Clash by the same "unpriced" caveat every row carries.
     syncExpandAll();
   }
   const setWOpen = (btn, open) => {
