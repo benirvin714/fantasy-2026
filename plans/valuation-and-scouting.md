@@ -1379,11 +1379,21 @@ asked for "a ranked table" without saying ranked by what. `rank` was whatever nu
 wrote, and the page renders the file's order without sorting. With the routine running each league
 twice a day in a fresh session, that let the order reshuffle between runs on unchanged inputs.
 
-**The sort is now a rule in step 7:** verdict (PURSUE, WATCH, AVOID), then `worth` descending
+**The sort is now a rule in step 7:** an empty-slot claim first (below), then verdict (PURSUE, WATCH, AVOID), then `worth` descending
 (skipped in the Pit and the Clash, where worth is unpriced), then confidence, then pressure, then
 player name as the last tiebreak. A session that thinks a player belongs higher has to say so
 through his worth, verdict or confidence, where the reason is visible, instead of through a
 hand-placed rank. The page still does not re-sort; one owner of the order is enough.
+
+**An empty starting slot sorts ahead of everything** (added the same day). The first regenerated
+Couples Clash board had its WR2 slot empty (`0` in Sleeper's `starters`, Flowers on IR, St. Brown
+the only other WR), and the add that filled it ranked 4th: it was a low-confidence PURSUE, and ties
+broke alphabetically behind a TE, a DEF stream and another WR. The order was faithful to the keys
+and wrong about what mattered, because a slot that scores zero outweighs any confidence read. So
+`fills_empty_slot` is now key one. It goes on **one PURSUE per empty slot** (the claim the bid plan
+makes for it), never on a WATCH fallback for the same slot, or the backup would outrank every real
+claim. "Empty" means nobody rostered can play the slot this week: a `0` in `starters`, or every
+eligible player Out, IR or on bye.
 
 **At least 15 targets, never padded.** Across the 24 HBGBs publishes before this the board held
 3 to 6. Step 7 now reads further down Sleeper's trending adds and keeps every verified-unrostered
