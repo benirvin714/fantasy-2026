@@ -1721,3 +1721,35 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
 @media (max-width: 460px) {
   .rr-rtab-wk .rr-gm-fin, .rr-rtab-wk .rr-gm-live { font-size: 11px; }
 }
+
+
+/* ===========================================================================================
+   Start/sit on My roster (site/roster-table.js with opts.week, §1.31)
+   -------------------------------------------------------------------------------------------
+   Green name = in this week's optimal lineup, red = not. Both are literals rather than palette
+   tokens, for the reason the cleared tag is: --accent is green in the HBGBs, blue in the Pit and
+   red in the Clash, so a token would make "start" mean three different colours and would collide
+   with "sit" outright in the Clash. Measured: these two sit 106 ΔE apart, 59-70 from every
+   league's body text, and 41 from the teal final-score figure they share a row with, at 9.2:1 and
+   6.5:1 on surface.
+
+   Weight is the second channel. Red against green is the one pairing a red-green colourblind
+   reader cannot separate on hue, and this is a start/sit call, so it should not depend on hue at
+   all: a start is heavier than the body text around it, a sit is lighter.
+   =========================================================================================== */
+.rr-nm .rr-start { color: #46d17a; font-weight: 700; }
+.rr-nm .rr-sit { color: #f4736f; font-weight: 500; }
+/* Inside the close band the projection is ordering two players it cannot actually separate, so the
+   call is still made (something has to be in the lineup) but it is marked as the coin flip it is.
+   Dotted rather than dimmed: a dimmed red would read as a weaker sit, which is the wrong axis. */
+.rr-nm .rr-call-close { text-decoration: underline dotted; text-underline-offset: 3px; }
+
+.rr-swap {
+  margin: 8px 0 0; font-size: 12px; line-height: 1.5; color: var(--dim);
+  border-left: 2px solid #46d17a; padding-left: 8px;
+}
+.rr-swap b { color: var(--text); font-weight: 600; }
+
+@media (max-width: 460px) {
+  .rr-swap { font-size: 11.5px; }
+}

@@ -49,7 +49,22 @@
   const startsCls = (n) => n >= Math.ceil(OTHERS * 4 / 9) ? "rr-r-good" : n === 0 ? "rr-r-bad" : "rr-r-mid";
   // Falls back to a plain name if player-news.js isn't on the page, so this file can't break a
   // roster table by being loaded without its companion.
-  const name = (p) => window.HBGB_PlayerNews ? window.HBGB_PlayerNews.link(p) : esc(p.name);
+  /* Start/sit, from the week lineup the build computed (§1.31). Green means he is in this week's
+     optimal lineup, red means he is not, and neither renders on a season-basis table: the roster
+     room shows other people's teams, where a start/sit call is not yours to make.
+
+     Two channels, not one. Red against green is the single pairing a red-green colourblind reader
+     cannot separate, so weight carries it as well: a start is heavier than the body text, a sit is
+     lighter. A call inside the close band gets a dotted underline, which is the third state nobody
+     asked for and the data insists on: see CLOSE_PTS in scripts/build-roster-room.mjs. */
+  const callCls = (p) => {
+    const c = WK && p.week_call;
+    if (!c) return "";
+    return (c.start ? "rr-start" : "rr-sit") + (c.close ? " rr-call-close" : "");
+  };
+  const name = (p) => window.HBGB_PlayerNews
+    ? window.HBGB_PlayerNews.link(p, callCls(p), WK && p.week_call ? p.week_call.why : "")
+    : `<span class="${callCls(p)}">${esc(p.name)}</span>`;
   const WORDS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
     "ten", "eleven", "twelve", "thirteen", "fourteen"];
   const spell = (n) => WORDS[n] ?? String(n);
@@ -173,7 +188,26 @@
         <tbody>${t.slots.map(startRow).join("")}
           <tr class="rr-div"><td colspan="${WK ? 6 : 5}"><div class="cutlabel">bench · 5 spots, and that is the whole margin</div></td></tr>
           ${t.bench.map((p) => benchRow(p, true)).join("")}</tbody></table>
-      ${unpriced(t)}${weekNote(t)}`;
+      ${swapNote(t)}${unpriced(t)}${weekNote(t)}`;
+  }
+
+  /* The recommendation in words, because a reader should not have to diff two colours down a
+     fifteen-row table to find the two names that changed. Silent when the season lineup and the week
+     lineup agree, which is the common case and the right amount to say about it. */
+  function swapNote(t) {
+    const c = WK && t.week && t.week.changes;
+    if (!c || (!c.in.length && !c.out.length)) return "";
+    const list = (a) => a.map((n) => `<b>${esc(n)}</b>`).join(", ");
+    const bits = [];
+    if (c.in.length) bits.push(`${list(c.in)} in`);
+    if (c.out.length) bits.push(`${list(c.out)} out`);
+    const why = c.unavailable.length ? ` ${esc(c.unavailable.join(", "))} cannot play.` : "";
+    const gap = c.unfilled && c.unfilled.length
+      ? ` No eligible replacement on the bench for ${esc(c.unfilled.join(", "))}, so that slot stays empty.`
+      : "";
+    const flip = c.close ? ` ${c.close} of these ${c.close === 1 ? "is" : "are"} inside the coin-flip band.` : "";
+    return `<p class="rr-swap">Week ${WK.n} against the season lineup: ${bits.join(" · ")}. Worth
+      ${c.gain >= 0 ? "+" : ""}${c.gain.toFixed(1)} projected points.${why}${gap}${flip}</p>`;
   }
 
   /* The week's caveats, once under the table rather than repeated per row. Only the ones that are
@@ -186,6 +220,7 @@
       bits.push(`${w.starter_of - w.starter_n} of your ${w.starter_of} starters ${w.starter_of - w.starter_n === 1 ? "has" : "have"} no week-${WK.n} projection, so the total is over ${w.starter_n}`);
     }
     if (WK.canceled && WK.canceled.length) bits.push(`canceled this week: ${WK.canceled.join("; ")}`);
+    if (WK.rolled_forward) bits.push(`week ${WK.display_week} is over, so this panel is on week ${WK.n}`);
     for (const warn of WK.warnings ?? []) bits.push(warn);
     if (!bits.length) return "";
     // A source warning arrives as a finished sentence; the counts above do not. Only punctuate the

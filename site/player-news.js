@@ -216,8 +216,10 @@
      listener that depends on it. */
   window.HBGB_PlayerNews = {
     open,
-    link: (p, cls = "") =>
+    /* `why` is appended to the tooltip rather than hung on the cell around the button: the button
+       is the hover target, so a title on the cell would only show in the padding beside it. */
+    link: (p, cls = "", why = "") =>
       `<button type="button" class="pn-link ${cls}" data-pid="${esc(p.id)}" data-pname="${esc(p.name)}"
-        title="Latest on ${esc(p.name)}">${esc(p.name)}</button>`,
+        title="${why ? esc(why) + " · " : ""}Latest on ${esc(p.name)}">${esc(p.name)}</button>`,
   };
 })();

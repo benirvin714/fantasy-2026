@@ -206,9 +206,24 @@ if (offBoard.length) {
    A missing week number is null, never zero. A player on a bye still has a projection row - it
    just holds nothing but an ADP field, which prices to 0.0 and would read on the page as
    "projected to score nothing" when the truth is "no projection was published". */
-const WEEK = Math.max(1, +state.display_week || +state.week || 1);
+/* WHICH WEEK. Sleeper's display_week lags by design: it still read 1 at midday on Tuesday
+   2026-09-15, with all 32 of week 1's games final and week 2 four days away. That is correct for
+   the Sleeper app, which is still showing you last week's box scores, and wrong for this panel,
+   which exists to tell you who to play. So the week is chosen from the schedule rather than from
+   either state field: start at display_week, and if every one of its games is already complete,
+   roll forward to the next week that has any. Derived from what the games did rather than from what
+   a field is supposed to mean, so it cannot drift when Sleeper changes when that field flips. */
+let WEEK = Math.max(1, +state.display_week || +state.week || 1);
+let sched = await weekSchedule(state.season, WEEK);
+if (WEEK < 18 && sched.teams_playing > 0 && [...sched.byTeam.values()].every((g) => g.completed)) {
+  const next = await weekSchedule(state.season, WEEK + 1);
+  if (next.teams_playing > 0) {
+    console.log(`  week ${WEEK} is complete (all ${sched.teams_playing} teams played) — the panel rolls to week ${WEEK + 1}, which is the one still to play.`);
+    WEEK += 1;
+    sched = next;
+  }
+}
 console.log(`\nWeek ${WEEK}: fetching the schedule and this week's projections...`);
-const sched = await weekSchedule(state.season, WEEK);
 const wproj = await weekProjections(state.season, WEEK);
 const wact = await weekActuals(LEAGUE_ID, WEEK);
 for (const w of sched.warnings) console.warn(`  ! ${w}`);
@@ -231,6 +246,12 @@ for (const id of rosteredIds) {
    A game in progress at build time is reported as such rather than as a result. The build runs
    twice a day, so an afternoon run lands mid-window on a Sunday: the number is real but partial,
    and the page labels it instead of presenting half a game as a final score. */
+const DESIGNATED_OUT = new Set(["Out", "Doubtful", "IR", "PUP", "NFI", "Sus", "DNR", "COV"]);
+const outFor = (p) => {
+  const d = p && p.availability ? p.availability.current_injury_status : null;
+  return d && DESIGNATED_OUT.has(d) ? d : null;
+};
+
 const weekOf = (id) => {
   const p = byId.get(id);
   const game = gameFor(sched, p ? p.team : null, p ? p.bye : null);
@@ -251,6 +272,9 @@ const weekOf = (id) => {
   const scored = rosteredIds.filter((id) => weekOf(id).week_actual != null);
   const finals = [...sched.byTeam.values()].filter((g) => g.completed).length;
   console.log(`  ${sched.teams_playing}/32 teams play in week ${WEEK} · ${weekPts.size}/${rosteredIds.length} rostered players have a week-${WEEK} projection`);
+  const gated = rosteredIds.filter((id) => outFor(byId.get(id)) && weekPts.has(id));
+  if (gated.length) console.log(`  ${gated.length} player(s) held out of every week-${WEEK} lineup on their Sleeper designation despite carrying a projection: ` +
+    gated.map((id) => `${byId.get(id).name} (${outFor(byId.get(id))}, ${weekPts.get(id)} pts)`).join(", "));
   console.log(`  ${finals} of those teams have finished · ${scored.length} rostered player(s) carry a result (league-scored by Sleeper, not recomputed here)`);
   if (sched.canceled.length) console.log(`  canceled: ${sched.canceled.join("; ")}`);
   /* Not a bye and not a game: either the schedule is short a row or a player is on a team code the
@@ -355,11 +379,15 @@ const SLOTS = ["QB", "RB", "RB", "WR", "WR", "TE", "FLEX", "FLEX", "K", "DEF"];
 const FLEX_OK = new Set(["RB", "WR", "TE"]);
 const ptsOf = (p) => (p && p.projection && p.projection.pts != null ? p.projection.pts : null);
 
-function assignLineup(ids) {
-  const pool = ids.map((id) => byId.get(id)).filter((p) => p && ptsOf(p) != null);
+/* `score` is a parameter so the week lineup reuses this greedy rather than growing a second copy of
+   it. The optimality proof is a property of the slot shape (eligibility nests: every QB slot taker
+   is a QB, every FLEX taker is an RB/WR/TE), not of which number is being maximised, so it holds
+   for any scorer. Season is the default and that path is unchanged. */
+function assignLineup(ids, score = ptsOf) {
+  const pool = ids.map((id) => byId.get(id)).filter((p) => p && score(p) != null);
   const byPos = {};
   for (const p of pool) (byPos[p.pos] = byPos[p.pos] || []).push(p);
-  for (const k in byPos) byPos[k].sort((a, b) => ptsOf(b) - ptsOf(a));
+  for (const k in byPos) byPos[k].sort((a, b) => score(b) - score(a));
   const used = new Set(), lineup = [];
   const take = (arr) => {
     const p = (arr || []).find((x) => !used.has(x.id));
@@ -369,13 +397,13 @@ function assignLineup(ids) {
   for (const slot of SLOTS) {
     if (slot === "FLEX") {
       const cands = pool.filter((p) => FLEX_OK.has(p.pos) && !used.has(p.id))
-        .sort((a, b) => ptsOf(b) - ptsOf(a));
+        .sort((a, b) => score(b) - score(a));
       lineup.push({ slot, player: take(cands) });
     } else lineup.push({ slot, player: take(byPos[slot]) });
   }
-  const bench = pool.filter((p) => !used.has(p.id)).sort((a, b) => ptsOf(b) - ptsOf(a));
-  const unpriced = ids.filter((id) => ptsOf(byId.get(id)) == null);
-  const total = +lineup.reduce((a, s) => a + (ptsOf(s.player) || 0), 0).toFixed(1);
+  const bench = pool.filter((p) => !used.has(p.id)).sort((a, b) => score(b) - score(a));
+  const unpriced = ids.filter((id) => score(byId.get(id)) == null);
+  const total = +lineup.reduce((a, s) => a + (score(s.player) || 0), 0).toFixed(1);
   return { lineup, bench, unpriced, total };
 }
 const lineupPts = (ids) => assignLineup(ids).total;
@@ -427,6 +455,100 @@ for (const t of teams) {
     };
   }
 }
+
+/* ------------------------------------------- this week's lineup, and how close each call is
+   The `lineup` above is the SEASON optimum, which is the right basis for judging a roster and the
+   wrong one for setting a lineup on Sunday. Rerunning the same greedy over week_pts gives the week
+   optimum, and the difference between the two is the start/sit advice: who the season lineup would
+   have you play that this week's numbers would not.
+
+   HOW CLOSE the call is matters as much as which way it goes, and it is the half a colour alone
+   cannot carry. Measured over weeks 2-8 of 2026 across 200 skill players with a real line, a
+   player's own weekly projection moves with a median coefficient of variation of 7.8% - about 0.8
+   points on a 10-point player - so the gap between two players wobbles by roughly 1.1 points
+   (0.8 x sqrt 2) from nothing but the projection being refreshed. A 0.2-point edge is therefore not
+   an edge, and CLOSE_PTS marks the band where this file is ordering names it cannot actually
+   separate. It is NOT a claim about forecast accuracy against reality, which is far wider; it is
+   the narrower and checkable claim that below this gap the projection is not even self-consistent.
+
+   Availability is decided before points and is not a judgment: no published week line (Sleeper
+   omits one for a player it has Out, PUP, Doubtful or IR) and a bye both mean he cannot be in the
+   lineup, so he is marked `sit` with that as the stated reason rather than with a number. */
+const CLOSE_PTS = 1.5;
+
+/* AVAILABILITY IS DECIDED BEFORE POINTS, and it needs its own gate rather than leaning on a missing
+   projection. §1.27 observed that Sleeper publishes no weekly stat line for a player it lists Out,
+   and that is true of the week in progress and NOT true of the week ahead: on 2026-09-15, with week
+   1 finished, TreVeyon Henderson and Zay Flowers were both live-listed Out and both carried a full
+   week-2 projection (8.4 and 14.4). Ranking on points alone would have put two players the league
+   lists as unavailable into the recommended lineup, in green, which is the one mistake a start/sit
+   panel cannot make.
+
+   Doubtful is gated with Out: the designation means the team expects him not to play. Questionable
+   is NOT gated - it resolves to active far more often than not, and benching every Questionable
+   player would empty half a lineup every week.
+
+   The designations on the board are refreshed by the daily draft-board build from Sleeper's live
+   player records, so this self-corrects: the Tuesday leftovers from last week's report clear when
+   the new week's report lands, and the next build flips the call back. The projection itself is
+   still published and still shown in the Wk column, because it is a real number about the player;
+   what changes is only whether he can be in the lineup. */
+const weekScore = (p) => (p && weekPts.has(p.id) && !outFor(p) ? weekPts.get(p.id) : null);
+
+for (const t of teams) {
+  const wk = assignLineup(t.ids, weekScore);
+  const inWeek = new Set(wk.lineup.map((s) => s.player && s.player.id).filter(Boolean));
+  t.week_lineup = wk;
+  t.week_call = new Map();
+  for (const id of t.ids) {
+    const p = byId.get(id);
+    const g = weekOf(id).game;
+    if (weekScore(p) == null) {
+      const out = outFor(p);
+      t.week_call.set(id, {
+        start: false, margin: null, close: false,
+        why: g && g.status === "bye"
+          ? `On bye in week ${WEEK}.`
+          : out
+            ? `Sleeper lists him ${out}${weekPts.has(id) ? `, so he is out of the lineup whatever his ${weekPts.get(id)}-point projection says` : ""}. Availability is decided before points. If the designation clears, the next build puts him back.`
+            : `No week-${WEEK} projection published. Not a judgment about him, just nothing to rank.`,
+      });
+      continue;
+    }
+    if (inWeek.has(id)) {
+      /* What the lineup loses if he sits: the week optimum minus the best lineup available without
+         him. That is the real cost of the swap, not a raw points difference, because his
+         replacement may cascade through the FLEX slots. */
+      const without = assignLineup(t.ids.filter((x) => x !== id), weekScore).total;
+      const margin = +(wk.total - without).toFixed(1);
+      t.week_call.set(id, {
+        start: true, margin, close: margin < CLOSE_PTS,
+        why: margin < CLOSE_PTS
+          ? `In the week-${WEEK} lineup, but only by ${margin} — inside the ${CLOSE_PTS}-point band where the projection cannot separate two players. Treat it as a coin flip.`
+          : `In the week-${WEEK} lineup. Benching him costs ${margin} projected points.`,
+      });
+    } else {
+      /* What he would add: the best single slot he could take, against the man holding it. Zero or
+         negative for everyone on a correctly optimal bench, so it is reported as how far short. */
+      let best = -Infinity, over = null;
+      for (const s of wk.lineup) {
+        if (!s.player || !(s.slot === "FLEX" ? FLEX_OK.has(p.pos) : s.slot === p.pos)) continue;
+        const d = weekScore(p) - weekScore(s.player);
+        if (d > best) { best = d; over = s.player; }
+      }
+      const short = best === -Infinity ? null : +(-best).toFixed(1);
+      t.week_call.set(id, {
+        start: false, margin: short, close: short != null && short < CLOSE_PTS,
+        why: short == null
+          ? `No slot he is eligible for in week ${WEEK}.`
+          : short < CLOSE_PTS
+            ? `Out of the week-${WEEK} lineup by ${short}, against ${over.name} — inside the ${CLOSE_PTS}-point band where the projection cannot separate two players. Treat it as a coin flip.`
+            : `${short} short of ${over.name}, the weakest starter he could replace in week ${WEEK}.`,
+      });
+    }
+  }
+}
+
 const posTable = {};
 for (const pos of POSES) {
   const vals = teams.map((t) => ({ rid: t.roster_id, pts: t.starting_by_pos[pos].pts }));
@@ -648,6 +770,7 @@ for (const t of teams) {
     player: s.player ? {
       ...label(s.player.id),
       ...weekOf(s.player.id),
+      week_call: t.week_call.get(s.player.id) ?? null,
       bye: s.player.bye != null ? s.player.bye : null,
       adp: s.player.adp && s.player.adp.half_ppr != null ? s.player.adp.half_ppr : null,
       injury: s.player.availability ? s.player.availability.current_injury_status || null : null,
@@ -703,11 +826,40 @@ for (const t of teams) {
         bench_n: b.length, bench_of: t.bench.length,
         scored_pts: +done.reduce((a, v) => a + v, 0).toFixed(1),
         scored_n: done.length,
+        /* The season lineup against the week lineup: who comes in, who goes out, and what the whole
+           change is worth. Reported as two GROUPS rather than as pairs, because there is no pairing
+           to report: both are unordered sets, and lining them up by index invents a swap ("A in for
+           B") out of two positions in two lists. The gain is the honest one, the week optimum
+           against what the season lineup would produce on this week's numbers, with a player the
+           league lists unavailable counted at zero, which is what starting him actually returns.
+           Empty when the two lineups agree, which is the common case and should read as silence. */
+        optimal_pts: t.week_lineup.total,
+        changes: (() => {
+          const season = t.lineup.map((x) => x.player).filter(Boolean);
+          const seasonIds = new Set(season.map((p) => p.id));
+          const week = t.week_lineup.lineup.map((x) => x.player).filter(Boolean);
+          const weekIds = new Set(week.map((p) => p.id));
+          const inn = week.filter((p) => !seasonIds.has(p.id));
+          const out = season.filter((p) => !weekIds.has(p.id));
+          if (!inn.length && !out.length) return null;
+          const seasonOnWeek = season.reduce((a, p) => a + (weekScore(p) ?? 0), 0);
+          return {
+            in: inn.map((p) => p.name),
+            out: out.map((p) => p.name),
+            gain: +(t.week_lineup.total - seasonOnWeek).toFixed(1),
+            close: [...inn, ...out].filter((p) => (t.week_call.get(p.id) || {}).close === true).length,
+            unavailable: out.filter((p) => outFor(p)).map((p) => `${p.name} (${outFor(p)})`),
+            /* A slot the roster cannot fill at all. Couples Clash week 2: two WRs rostered, one of
+               them Out, so WR2 stays empty and the change list is two out against one in. Counted
+               rather than left to be inferred from a list that does not balance. */
+            unfilled: t.week_lineup.lineup.filter((x) => !x.player).map((x) => x.slot),
+          };
+        })(),
       };
     })(),
     summary: summarize(t, strengths, weaknesses, r),
     slots, by_pos: posRows, strengths, weaknesses, risks: r,
-    bench: t.bench.map((p) => ({ ...label(p.id), ...weekOf(p.id), bye: p.bye != null ? p.bye : null, ...p._surplus })),
+    bench: t.bench.map((p) => ({ ...label(p.id), ...weekOf(p.id), week_call: t.week_call.get(p.id) ?? null, bye: p.bye != null ? p.bye : null, ...p._surplus })),
     unpriced: t.unpriced.map((id) => ({
       id, name: byId.get(id) ? byId.get(id).name : id,
       note: "no 2026 projection — excluded from every total on this page",
@@ -765,8 +917,11 @@ const payload = {
      A page that shows a time has to be able to say where the time came from. */
   week: {
     n: WEEK,
+    display_week: +state.display_week || null,
+    rolled_forward: WEEK !== Math.max(1, +state.display_week || +state.week || 1),
     teams_playing: sched.teams_playing,
     projected: weekPts.size,
+    close_band: CLOSE_PTS,
     of_rostered: rosteredIds.length,
     schedule_source: sched.source,
     projection_source: wproj.error

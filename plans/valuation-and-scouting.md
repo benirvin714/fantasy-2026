@@ -1530,6 +1530,89 @@ Files: `data/site/nfl-events.json` (three items retagged); `TYPES`, `CLEAR_WORDS
 `.tag-cleared` in `site/style.css`; all three `player-news.json` files; outside the repo, the type
 rule in the `nfl-daily-events`, `nfl-gameday` and `nfl-final-designations` task files.
 
+### 1.31 Start/sit on My roster, and what the call is actually made of - 2026-09-15
+
+The panel could say what each player was projected to score this week. It could not say what to do
+about it. Now every name on My roster is green if he is in this week's optimal lineup and red if he
+is not, with a line underneath naming the changes against the season lineup.
+
+**The question that had to be settled first was what should drive the call**, since "rank by
+projected points" and "read the matchup" are different products. Three measurements settled it.
+
+**1. The weekly projection already contains the matchup.** Teammates share an opponent every week,
+so if the opponent moved the number, teammates would move together. Over weeks 2-8 of 2026, across
+200 skill players carrying a real line, week-over-week changes correlate at **r = 0.75 between
+teammates and r = 0.05 between random pairs**. A separate scheme or defense layer would mostly be
+re-deriving something already priced in.
+
+**2. The matchup component is small.** A player's own weekly projection moves with a median
+coefficient of variation of **7.8%**, about 0.8 points on a 10-point player. Week 1 aside (where
+role changes dominate), a projection is close to rate times games, nudged by the game environment.
+
+**3. The decisions that matter are near-ties, and they are tighter than the number is stable.**
+Recomputed on week-2 numbers, the contested slots came in at gaps of **0.1 to 1.0 points**. Two
+players 0.3 apart are not distinguishable by a number whose own week-to-week wobble is around 1.1
+points (0.8 x sqrt 2 for a difference of two). So the panel orders by weekly projection, and marks
+the band where it is ordering names it cannot actually separate.
+
+**What was built, in priority order.**
+
+- **Availability gates the lineup before points do.** A player Sleeper lists Out, Doubtful, IR, PUP,
+  NFI, Sus, DNR or COV is excluded from the optimisation whatever his projection says, and the cell
+  states the designation as the reason. Questionable is deliberately NOT gated: it resolves to
+  active far more often than not, and gating it would empty half a lineup every week.
+- **Ordering by weekly projection** for everyone who clears that gate, through the same greedy
+  assignment the season lineup uses. `assignLineup` took a `score` parameter rather than growing a
+  second copy: the optimality proof is a property of the slot shape (eligibility nests), not of
+  which number is being maximised.
+- **A close band at 1.5 points**, rendered as a dotted underline. This is not a claim about forecast
+  accuracy against reality, which is far wider; it is the narrower checkable claim that below this
+  gap the projection is not even self-consistent from one refresh to the next.
+- **The change list in words** under the table, as two groups rather than pairs. Pairing "in" with
+  "out" by index invents a swap out of two unordered sets, and it priced one by subtracting an
+  unavailable player's gated projection, which read as a +8.3 gain from a man who is Out.
+
+**Two corrections to §1.27 and §1.28, which were right about the week in progress and wrong about
+the week ahead.**
+
+- §1.27 said Sleeper omits a weekly line for anyone it lists Out, and used that as the availability
+  signal. That holds for the week being played and **not** for the week ahead. On 2026-09-15, with
+  week 1 complete, TreVeyon Henderson and Zay Flowers were both live-listed Out and both carried
+  full week-2 projections (8.4 and 14.4). Ranking on points alone would have put two players the
+  league lists as unavailable into the recommended lineup, in green. Hence the explicit gate; the
+  missing-line check remains as a second, independent signal.
+- The panel took its week from `display_week`, which lags by design: it still read 1 at midday on
+  the Tuesday after week 1 finished, with week 2 four days out. Correct for the Sleeper app, which
+  is still showing last week's box scores, and wrong for a panel whose job is to tell you who to
+  play. **The week is now chosen from the schedule**: start at `display_week`, and if every one of
+  its games is complete, roll to the next week that has any. Derived from what the games did rather
+  than from what a field is supposed to mean, so it cannot drift when Sleeper changes when that
+  field flips.
+
+**Colour, and why it is not only colour.** Green `#46d17a` and red `#f4736f` are literals, not
+palette tokens, for the reason the cleared tag is: `--accent` is green in the HBGBs, blue in the Pit
+and red in the Clash, so a token would make "start" mean three colours and would collide with "sit"
+outright in the Clash. Measured 106 ΔE apart, 59-70 from every league's body text and 41 from the
+teal final-score figure sharing the row, at 9.2:1 and 6.5:1 on surface. Red against green is also
+the one pairing a red-green colourblind reader cannot separate on hue, and this is a start/sit call,
+so **weight carries it too**: a start is heavier than the body text, a sit is lighter.
+
+**Scoped to My roster.** The roster room shows other people's teams, where a start/sit call is not
+yours to make, so the colours ride the same `opts.week` flag the Game column does and never appear
+there.
+
+**What this is not.** It is not a matchup engine. There is no defense-vs-position data in this repo,
+and adding one would be a new external source duplicating most of what the projection already has.
+The honest tiebreak for a coin-flip call is not a matchup hunch: it is role certainty, and the
+material for it already exists unused in `role_stability` on the scouting brief and `ceiling`
+(spike-week rate) on the draft board. Neither is carried into `roster-room.json` today. That is the
+next thing worth building here, and it is a build change, not a guess.
+
+Files: `assignLineup(ids, score)`, `DESIGNATED_OUT`/`outFor`, `CLOSE_PTS`, the per-player
+`week_call` and per-team `week.changes` in `scripts/build-roster-room.mjs`; `callCls`/`swapNote` in
+`site/roster-table.js`; the `why` argument on `HBGB_PlayerNews.link` in `site/player-news.js`;
+`.rr-start`/`.rr-sit`/`.rr-call-close`/`.rr-swap` in `site/style.css`.
+
 ## 2. Challenge 2 — `scouting_brief` (public commentary)
 
 ### 2.1 What it is
