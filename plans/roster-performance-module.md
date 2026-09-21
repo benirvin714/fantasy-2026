@@ -25,7 +25,7 @@ how my roster is doing relative to the league, why, and which existing action ad
 | Q5 | A bye triggers only when the replacement-aware loss (best bench player OR best current free agent at that position) exceeds a threshold set from the league's own distribution (e.g. p75 of replacement-aware bye losses, computed at build). Streamable K/DEF/QB byes stay quiet. Accepted: this can un-pin Week 13 if the wire genuinely covers it. |
 | Q6 | Recommendations are routed, never generated: up to 3, each naming the gap it closes and pulling the best existing action (top matching `waivers.json` target, or top `roster-room.json` trade proposal). If nothing addresses a gap, say so explicitly. |
 | Q7 | Deterministic. Built inside the twice-daily `npm run build:leagues`; no LLM. |
-| Q10 | Follow-up, separate: narrow `/brief` to NFL landscape + rival leverage and drop its my-roster lines. |
+| Q10 | Follow-up, separate: narrow `/brief` to NFL landscape + rival leverage and drop its my-roster lines. **Done 2026-09-21**: a Scope section in `.claude/commands/brief.md`, and the HQ panel renamed "Around the league". |
 | Q15 | **Waiver-board blind spots are named, never recommended.** When a free agent the waiver board does not list at all (any verdict) beats the best routed action for the same gap by 5+ season points, the panel says so as a diagnostic about the board. Positional gaps only: a flagged bye is already measured after the best free pickup. Raised by Bo Nix, a free agent projecting above Mahomes. As built it compares gains, not costs, so on 2026-09-21 it stays quiet on Nix (+9) against Tuten-for-Hurts (+23.8) even though the trade costs the roster's one trade chip; that is a known limit, left as agreed. |
 
 ## Build status

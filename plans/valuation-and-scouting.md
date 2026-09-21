@@ -1680,8 +1680,13 @@ to Tuten for Hurts (+23.8 season points) while Bo Nix sits on the wire at +9. Th
 quiet, but the trade costs the roster's one trade chip and Nix costs nothing, and the rule does not
 price that.
 
-**Not built here.** `/brief` still carries my-roster lines that this panel now owns; narrowing it to
-the NFL landscape and rival leverage is a separate follow-up.
+**`/brief` narrowed to match (same day).** Its "So what" section had become a weekly, LLM-written
+second answer to the question this panel answers live. `.claude/commands/brief.md` now has a Scope
+section: landscape (league-wide value shifts in this format) and rival leverage (how news moves a
+rival's need or price, naming one of my players only as the counterpart), and explicitly no
+add/drop/bid advice for my roster, no read on my lineup or health, and no housekeeping. The HQ panel
+is renamed from "Latest brief - so what" to **Around the league**. The command is called by name from
+the scheduled task, so the task itself did not change.
 
 Files: `scripts/lib/performance.mjs` (pure: `optimal`, `teamByes`, `weeklyResults`, `standings`,
 `rankBy`, `byeLoss`); the roster-performance section and `payload.performance` in
