@@ -55,10 +55,15 @@
      teams; what belongs on the front page is the lineup, because that is the object every other
      panel here is about. The table itself is site/roster-table.js, shared with the roster room, so
      the slot ranks and the "would start on N of 9" bench read are identical in both places. */
+  /* One fetch of roster-room.json per load, shared by My roster and Performance. Reset in loadAll so
+     the refresh button still reads the file fresh. */
+  let roomP = null;
+  const room = () => (roomP ??= fetchJSON(A.ROSTER_ROOM_JSON));
+
   async function renderMyRoster() {
     $("#myroster-body").innerHTML = skel(8);
     let d;
-    try { d = await fetchJSON(A.ROSTER_ROOM_JSON); }
+    try { d = await room(); }
     catch {
       return err("#myroster-body",
         `No published roster room for ${esc(A.name)}. Run <code>node scripts/build-roster-room.mjs --league=${esc(A.key)}</code> — it writes ${esc(A.data)}/roster-room.json. It refuses to run until every roster has players, so before a draft this panel is empty by design.`);
@@ -79,6 +84,147 @@
         timezone. Every other team is in the <a href="rosters.html">roster room</a>, with the standings,
         the season projections and the trade search.</p>`;
   }
+
+  /* ---------- performance (published by scripts/build-roster-room.mjs) ----------
+     Design of record: plans/roster-performance-module.md. Standing and strength are shown side by
+     side and never blended; everything else is evidence for the gap between them. Nothing here is
+     computed in the page - it renders the build's numbers and sentences, and routes each action to
+     the panel that owns it. */
+  const ORD = (n) => (n == null ? "–" : `${n}${n % 100 >= 11 && n % 100 <= 13 ? "th" : ({ 1: "st", 2: "nd", 3: "rd" }[n % 10] || "th")}`);
+  const sgn = (x) => (x == null ? "–" : `${x > 0 ? "+" : ""}${x}`);
+  // Top third reads green and bottom third red, the same cut the roster room grades on.
+  const grade = (rank, n) => {
+    if (rank == null) return "";
+    const third = Math.max(1, Math.round(n / 3));
+    return rank <= third ? "rr-pos" : rank > n - third ? "rr-neg" : "";
+  };
+  const perfOpen = new Set();   // open disclosures; survives a refresh, resets on reload
+
+  function perfSection(key, label, value, body) {
+    const open = perfOpen.has(key);
+    return `<div class="dsect${open ? " open" : ""}">
+      <button class="dsect-btn" data-psect="${key}" aria-expanded="${open}" aria-controls="ps-${key}">
+        <span class="dsect-caret" aria-hidden="true">${open ? "▾" : "▸"}</span>${esc(label)} <span class="pv">${value}</span>
+      </button>
+      <div class="dsect-body" id="ps-${key}"${open ? "" : " hidden"}>${body}</div>
+    </div>`;
+  }
+
+  async function renderPerformance() {
+    $("#perf-body").innerHTML = skel(4);
+    let d;
+    try { d = await room(); }
+    catch {
+      return err("#perf-body", `No published roster room for ${esc(A.name)}, so there is nothing to measure yet. Run <code>node scripts/build-roster-room.mjs --league=${esc(A.key)}</code>.`);
+    }
+    const P = d.performance;
+    if (!P) {
+      return err("#perf-body", `This ${esc(A.name)} roster room predates the performance block. Rebuild it: <code>node scripts/build-roster-room.mjs --league=${esc(A.key)}</code>.`);
+    }
+    const N = P.strength.of;
+    const nFinal = P.final_weeks.length;
+    $("#perf-meta").textContent = nFinal
+      ? `through week ${P.final_weeks[nFinal - 1]}${P.partial ? ` · week ${P.partial.week} in progress` : ""}`
+      : P.partial ? `week ${P.partial.week} in progress · nothing final yet` : "no week played yet";
+
+    /* Standing and strength, side by side. */
+    const S = P.standing;
+    const rec = S ? `${S.w}-${S.l}${S.t ? `-${S.t}` : ""}` : "";
+    let line = "";
+    if (S && S.line && S.line.games != null) {
+      const g = Math.abs(S.line.games), gs = `${g % 1 ? g.toFixed(1) : g} game${g === 1 ? "" : "s"}`;
+      line = S.line.inside
+        ? (S.line.games === 0 ? `level with ${ORD(S.line.vs_seed)}, in on points` : `${gs} clear of ${ORD(S.line.vs_seed)}`)
+        : `${gs} behind ${ORD(S.line.vs_seed)}`;
+      line = `<span class="${S.line.inside ? "rr-pos" : "rr-neg"}">${esc(line)}</span>`;
+    }
+    const cut = P.playoff_teams ? `top ${P.playoff_teams} make it` : "";
+    const twoUp = `<div class="perf-two">
+      <div class="perf-read">
+        <div class="perf-label">Standing <span class="faint">· results</span></div>
+        <div class="perf-big ${S ? grade(S.seed, N) : ""}">${S ? `${ORD(S.seed)}<span class="perf-of"> of ${N}</span>` : "–"}</div>
+        <div class="perf-sub">${S ? `${esc(rec)}${line ? ` · ${line}` : ""}` : "no week final yet"}${cut ? `<span class="faint"> · ${esc(cut)}</span>` : ""}</div>
+      </div>
+      <div class="perf-read">
+        <div class="perf-label">Strength <span class="faint">· projection</span></div>
+        <div class="perf-big ${grade(P.strength.rank, N)}">${ORD(P.strength.rank)}<span class="perf-of"> of ${N}</span></div>
+        <div class="perf-sub">${Math.round(P.strength.starter_pts)} projected starter points</div>
+      </div>
+    </div>`;
+
+    /* The week in progress: shown, never scored (Q12). */
+    let partial = "";
+    if (P.partial) {
+      const x = P.partial;
+      const lead = x.opp_pts == null ? "" : x.my_pts > x.opp_pts ? "rr-pos" : x.my_pts < x.opp_pts ? "rr-neg" : "";
+      const left = x.my_left === 0 && x.opp_left === 0
+        ? "every starter on both sides has played; final when the last game ends"
+        : `${x.my_left} left to play for you, ${x.opp_left ?? "–"} for them`;
+      partial = `<div class="perf-live"><span class="tag tag-live">live</span> Week ${x.week}: <b class="${lead}">${x.my_pts}</b> to ${x.opp_pts ?? "–"}${x.opp_owner ? ` vs ${esc(x.opp_owner)}` : ""} <span class="faint">· ${esc(left)}. Not counted until final.</span></div>`;
+    }
+
+    /* The metric row. Each button carries its league rank; opening it shows the weeks behind it. */
+    const M = P.metrics, W = P.weeks;
+    const none = `<div class="faint">No final week yet.</div>`;
+    const tbl = (head, rows) => rows.length
+      ? `<table class="perf-tbl"><thead><tr>${head.map((h) => `<th>${h}</th>`).join("")}</tr></thead><tbody>${rows.join("")}</tbody></table>`
+      : none;
+    const rk = (r) => `<span class="${grade(r, N)}">${ORD(r)}</span>`;
+    const metrics = nFinal ? `<div class="dsects perf-metrics">
+      ${perfSection("pf", "Points for", `${M.pf.per_game}/g · ${rk(M.pf.rank)}`,
+        tbl(["Wk", "You", "Opp", ""], W.map((w) => `<tr><td>${w.w}</td><td>${w.pts}</td><td>${w.opp_pts ?? "–"}${w.opp_owner ? ` <span class="faint">${esc(w.opp_owner)}</span>` : ""}</td><td class="${w.result === "W" ? "rr-pos" : w.result === "L" ? "rr-neg" : ""}">${w.result ?? ""}</td></tr>`)))}
+      ${perfSection("ap", "All-play", `${M.all_play.w}-${M.all_play.l}${M.all_play.t ? `-${M.all_play.t}` : ""} · ${rk(M.all_play.rank)}`,
+        `<div>That scoring earns <b>${M.all_play.exp_wins}</b> wins against the whole league; you have <b>${M.record.w}</b> (${sgn(M.all_play.luck_wins)} from the schedule).</div>` +
+        tbl(["Wk", "All-play", "Result"], W.map((w) => `<tr><td>${w.w}</td><td>${w.ap.w}-${w.ap.l}${w.ap.t ? `-${w.ap.t}` : ""}</td><td>${w.result ?? ""}</td></tr>`)))}
+      ${perfSection("gap", "vs projection", `${sgn(M.proj_gap.per_game)}/g · ${rk(M.proj_gap.rank)}`,
+        `<div class="faint">Skill starters (QB/RB/WR/TE) only: DEF points-allowed never projects.</div>` +
+        tbl(["Wk", "Scored", "Projected", "Gap"], W.map((w) => `<tr><td>${w.w}</td><td>${w.act_skill ?? "–"}</td><td>${w.proj_skill ?? "–"}</td><td class="${w.gap > 0 ? "rr-pos" : w.gap < 0 ? "rr-neg" : ""}">${sgn(w.gap)}</td></tr>`)))}
+      ${perfSection("eff", "Left on bench", `${M.efficiency.per_game}/g · ${rk(M.efficiency.rank)}`,
+        tbl(["Wk", "Lost", "Better lineup"], W.map((w) => `<tr><td>${w.w}</td><td>${w.lost}</td><td>${w.swap ? `in ${esc(w.swap.in.join(", "))} <span class="faint">for</span> ${esc(w.swap.out.join(", "))}` : `<span class="faint">you started the best lineup</span>`}</td></tr>`)))}
+    </div>` : "";
+
+    /* Byes: only the ones that cost something the wire cannot give back (Q3-Q5). */
+    const byes = P.byes.flagged.map((b) => `<li class="perf-bye">
+      <span class="tag ${b.why === "post_deadline" ? "tag-pin" : "tag-injury"}">${b.why === "post_deadline" ? "pinned" : "bye"}</span>
+      <b>Week ${b.week}</b>: ${esc(b.off.map((o) => `${o.name} (${o.pos})`).join(", "))} off. <b class="rr-neg">${b.loss}</b> a game short
+      ${b.fix ? `even after the best pickup (${esc(b.fix.name)}, ${esc(b.fix.pos)})` : "with no free agent to cover it"}.
+      ${b.why === "post_deadline" && P.trade_deadline ? `<span class="faint">After the week-${P.trade_deadline} trade deadline, so a fix by trade has to happen first.</span>` : ""}
+    </li>`).join("");
+
+    /* Routed actions, each pointing at the panel that owns it (Q6), then any waiver-board blind spot (Q15). */
+    const where = { waivers: `<a href="#waivers-h">waiver board</a>`, rosters: `<a href="rosters.html">roster room</a>`, myroster: `<a href="#myroster-h">my roster</a>` };
+    const acts = P.actions.map((a) => `<li class="perf-act${a.kind ? "" : " perf-none"}">
+      <div class="perf-gap">${esc(a.gaps.join(" · "))}</div>
+      <div>${a.kind ? `<span class="tag tag-${esc(a.kind)}">${esc(a.kind)}</span> ` : ""}${esc(a.text)}${a.panel && where[a.panel] ? ` <span class="faint">→ ${where[a.panel]}</span>` : ""}</div>
+    </li>`).join("");
+    const blind = (P.blind_spots || []).map((b) => `<li class="perf-blind">${esc(b.text)}</li>`).join("");
+
+    const wv = P.sources.waivers;
+    const basis = perfSection("basis", "How this is built", "",
+      Object.values(P.basis).map((t) => `<div>${esc(t)}</div>`).join("") +
+      `<div class="faint">Waiver board: ${wv ? `generated ${esc(wv.generated)}` : "none published"} · trades: ${esc(P.sources.trades)}</div>`);
+
+    $("#perf-body").innerHTML =
+      staleBanner(d.generated, "This read", 3) +
+      (wv && wv.stale ? `<div class="stale-warn">The waiver board it routes from is ${wv.age_days} days old, so waiver actions may be stale.</div>` : "") +
+      twoUp +
+      `<p class="perf-headline">${esc(P.headline)}</p>` +
+      partial + metrics +
+      (byes ? `<ul class="perf-list">${byes}</ul>` : "") +
+      (acts || blind ? `<div class="perf-label perf-label-sp">What to do</div><ol class="perf-list perf-acts">${acts}</ol>${blind ? `<ul class="perf-list">${blind}</ul>` : ""}` : "") +
+      `<div class="dsects perf-basis">${basis}</div>`;
+  }
+  // Delegated, bound once: the body is re-rendered on every refresh.
+  $("#perf-body").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-psect]");
+    if (!b) return;
+    const k = b.dataset.psect, open = !perfOpen.has(k);
+    open ? perfOpen.add(k) : perfOpen.delete(k);
+    b.setAttribute("aria-expanded", String(open));
+    b.parentElement.classList.toggle("open", open);
+    b.querySelector(".dsect-caret").textContent = open ? "▾" : "▸";
+    document.getElementById(`ps-${k}`).hidden = !open;
+  });
 
   /* ---------- NFL updates (published by the daily nfl-events routine) ----------
      The feed itself is shared by every league: an injury is an injury. `so_what` is the format read
@@ -262,6 +408,8 @@
     $("#asof").textContent = `as of ${t}`;
   }
   function loadAll() {
+    roomP = null;
+    renderPerformance();
     renderNFLUpdates();
     renderWaivers();
     renderBrief();

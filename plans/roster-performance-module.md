@@ -1,7 +1,9 @@
-# Roster performance module (HQ) - design of record
+# Roster performance module (HQ) - decision log
 
-_Agreed in a grilling session, 2026-09-21. Not yet built. When it ships, this becomes a numbered
-subsection of `plans/valuation-and-scouting.md` and this file is folded in or deleted._
+_Agreed in a grilling session, 2026-09-21, and shipped the same day. **What shipped is described in
+`plans/valuation-and-scouting.md` §1.32, which is the design of record.** This file is kept as the
+record of why each call went the way it did, including the two that were reversed (Q2 and Q11), so
+the next person does not relitigate them from scratch._
 
 ## What it is
 A panel at the top of in-season HQ's left column, above NFL updates, in all three leagues. It says
@@ -24,10 +26,12 @@ how my roster is doing relative to the league, why, and which existing action ad
 | Q6 | Recommendations are routed, never generated: up to 3, each naming the gap it closes and pulling the best existing action (top matching `waivers.json` target, or top `roster-room.json` trade proposal). If nothing addresses a gap, say so explicitly. |
 | Q7 | Deterministic. Built inside the twice-daily `npm run build:leagues`; no LLM. |
 | Q10 | Follow-up, separate: narrow `/brief` to NFL landscape + rival leverage and drop its my-roster lines. |
+| Q15 | **Waiver-board blind spots are named, never recommended.** When a free agent the waiver board does not list at all (any verdict) beats the best routed action for the same gap by 5+ season points, the panel says so as a diagnostic about the board. Positional gaps only: a flagged bye is already measured after the best free pickup. Raised by Bo Nix, a free agent projecting above Mahomes. As built it compares gains, not costs, so on 2026-09-21 it stays quiet on Nix (+9) against Tuten-for-Hurts (+23.8) even though the trade costs the roster's one trade chip; that is a known limit, left as agreed. |
 
 ## Build status
 - **Step 1 (k calibration): done 2026-09-21.** `scripts/calibrate-perf-k.mjs` -> `data/perf-k.json`, with the history it read cached in `data/raw/matchups-YYYY.json` and `data/raw/proj-weekly-YYYY.json` (~1.7MB total). Outcome is Q14.
-- Step 2 (the `roster-room.json` block), step 3 (HQ panel), step 4 (docs + commit): not started. The Pit's and the Clash's playoff-team counts are needed for "games from the playoff line" and are read live; `data/raw/league-clash-2026.json` deliberately omits `playoff_teams`.
+- **Steps 2-4 done 2026-09-21**: the `performance` block in each league's `roster-room.json` (`scripts/lib/performance.mjs` + the build), the HQ panel, and the docs. Verified in the browser for all three leagues and at 375px. Playoff counts and deadlines are read from the live league object: HBGBs 6/10 and week 12, Pit 6/12 and week 12, Clash 7/14 and no deadline.
+- **Unexercised path:** the no-final-week state (week 1 before kickoff) is coded but could not be seen live, since every league was past it at ship time.
 
 ## Build-time calls (not re-asked)
 - Output lives in a new block in each league's `roster-room.json` (that build already holds week data, optimal lineups and proposals).

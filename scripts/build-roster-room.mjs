@@ -26,6 +26,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { resolveLeague, ordinal as ORD_N, spell } from "./lib/leagues.mjs";
 import { weekSchedule, gameFor, weekProjections, weekActuals, hasWeekLine } from "./lib/nfl-week.mjs";
+import * as PERF from "./lib/performance.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const L = resolveLeague();
@@ -150,11 +151,14 @@ const rosteredIds = [...new Set(rosters.flatMap((r) => r.players))];
 const offBoard = L.board_scored
   ? rosteredIds.filter((id) => !byId.has(id))
   : rosteredIds;
+/* Kept at file scope: the performance section below needs the same two feeds (positions for
+   dropped players, and prices for the free-agent pool), and fetching 5MB twice is not free. */
+let allPlayers = null, proj = null;
 if (offBoard.length) {
   console.log(L.board_scored
     ? `${offBoard.length} rostered player(s) outside the board pool — pricing from Sleeper directly.`
     : `Re-pricing all ${offBoard.length} rostered players in ${L.name}'s own scoring.`);
-  const [allPlayers, proj] = await Promise.all([
+  [allPlayers, proj] = await Promise.all([
     get("https://api.sleeper.app/v1/players/nfl"),
     get("https://api.sleeper.app/v1/projections/nfl/regular/2026"),
   ]);
@@ -885,6 +889,439 @@ for (const t of teams) {
   };
 }
 
+/* ------------------------------------------------------ roster performance (the HQ module)
+   Design of record: plans/roster-performance-module.md. The arithmetic lives in
+   scripts/lib/performance.mjs; this section fetches, prices and routes.
+
+   Two readings, deliberately not blended (Q14): STANDING, which results decide, and STRENGTH,
+   which the projection predicts. Around them sit the two luck checks (all-play for the schedule,
+   scored-vs-projected for the players), lineup efficiency, a bye look-ahead, and up to three
+   actions ROUTED from the waiver board and the trade search - this section never invents a
+   candidate of its own (Q6), and says so when nothing on either list addresses a gap. */
+console.log("\nRoster performance...");
+const lset = league.settings || {};
+const REG_WEEKS = Math.max(1, (+lset.playoff_week_start || 15) - 1);
+const PLAYOFF_TEAMS = +lset.playoff_teams || null;
+const DEADLINE = lset.trade_deadline != null ? +lset.trade_deadline : null;   // 99 = no deadline
+if (!allPlayers) allPlayers = await get("https://api.sleeper.app/v1/players/nfl");
+if (!proj) proj = await get(`https://api.sleeper.app/v1/projections/nfl/regular/${league.season}`);
+const posOf = (id) => /^[A-Z]{2,3}$/.test(id) ? "DEF" : (byId.get(id)?.pos ?? allPlayers[id]?.position ?? null);
+const teamOf = (id) => /^[A-Z]{2,3}$/.test(id) ? id : (byId.get(id)?.team ?? allPlayers[id]?.team ?? null);
+const nameOfPlayer = (id) => byId.get(id)?.name ?? (allPlayers[id] ? `${allPlayers[id].first_name} ${allPlayers[id].last_name}`.trim() : id);
+const r1 = (x) => (x == null ? null : +x.toFixed(1));
+
+/* A week counts only once every game in it is final (Q12). WEEK already rolled forward past a
+   fully finished week, so everything before it is final by construction; WEEK itself counts only
+   as a partial, shown but never scored. Capped at the regular season: playoff weeks do not move a
+   standing. */
+const FINAL = [];
+for (let w = 1; w <= Math.min(WEEK - 1, REG_WEEKS); w++) FINAL.push(w);
+const started = [...sched.byTeam.values()].some((g) => g.completed || g.status === "STATUS_IN_PROGRESS");
+const allDone = sched.teams_playing > 0 && [...sched.byTeam.values()].every((g) => g.completed);
+
+/* Past weeks' projections are immutable once the week is played, so each is fetched once and kept
+   in a local, uncommitted cache (data/raw/cache/, gitignored), slimmed to the lines that carry a
+   real projection and the keys rescore() reads. The full feed is several MB a week. */
+const PCACHE = path.join(ROOT, "data", "raw", "cache");
+const KEEP_KEYS = new Set([...SKILL_KEYS, ...K_KEYS, ...DEF_KEYS, ...MISS_KEYS, "fgm_50p", "gp"]);
+async function pastWeekProj(w) {
+  const f = path.join(PCACHE, `proj-${league.season}-w${w}.json`);
+  if (fs.existsSync(f)) return JSON.parse(fs.readFileSync(f, "utf8"));
+  const wp = await weekProjections(league.season, w);
+  if (wp.error) { console.warn(`  ! week ${w} projections unavailable (${wp.error}) — that week's scored-vs-projected is left out.`); return null; }
+  const slim = {};
+  for (const [id, row] of Object.entries(wp.rows)) {
+    if (!hasWeekLine(row)) continue;
+    const s = {};
+    for (const [k, v] of Object.entries(row)) if (KEEP_KEYS.has(k) && v) s[k] = v;
+    slim[id] = s;
+  }
+  fs.mkdirSync(PCACHE, { recursive: true });
+  fs.writeFileSync(f, JSON.stringify(slim));
+  return slim;
+}
+
+const finalWeeks = [];
+for (const w of FINAL) {
+  const rows = await get(`https://api.sleeper.app/v1/league/${LEAGUE_ID}/matchups/${w}`);
+  finalWeeks.push({ w, rows, proj: await pastWeekProj(w) });
+}
+const results = PERF.weeklyResults(finalWeeks.map(({ w, rows }) => ({
+  w, rows: rows.map((r) => ({ roster_id: r.roster_id, matchup_id: r.matchup_id, pts: r.custom_points ?? r.points ?? 0 })),
+})));
+
+/* Per team, per final week: the two luck checks and the efficiency read.
+   - scored vs projected covers SKILL starters only (QB/RB/WR/TE). DEF points-allowed tiers never
+     project (see basis.caveat) and kicker misses only half do, so including either would book a
+     structural projection gap as "luck" every single week.
+   - efficiency is the hindsight optimum over everyone rostered that week, scored by Sleeper,
+     against what the started lineup actually scored. Hindsight on purpose: it measures the points
+     that were on the roster and not in the lineup, which is the one gap a manager owns. */
+const perTeam = new Map();
+for (const t of teams) {
+  const weeks = [];
+  for (const { w, rows, proj: pw } of finalWeeks) {
+    const row = rows.find((r) => r.roster_id === t.roster_id);
+    const res = (results.get(t.roster_id) || []).find((x) => x.w === w);
+    if (!row || !res) continue;
+    const starters = row.starters || [], sp = row.starters_points || [];
+    let act = 0, pr = 0, skill = 0;
+    starters.forEach((id, i) => {
+      const pos = posOf(id);
+      if (!id || id === "0" || !PERF.SKILL.has(pos)) return;
+      skill++;
+      act += sp[i] ?? 0;
+      pr += pw && pw[id] ? rescore(pw[id], pos) : 0;
+    });
+    const pp = row.players_points || {};
+    const opt = PERF.optimal((row.players || []).map((id) => ({ id, pos: posOf(id), pts: pp[id] ?? 0 })));
+    const startedSet = new Set(starters.filter((x) => x && x !== "0"));
+    const optSet = new Set(opt.starters.map((p) => p.id));
+    weeks.push({
+      w, pts: r1(res.pts), result: res.result, ap: res.ap,
+      opp: res.opp, opp_pts: r1(res.opp_pts),
+      proj_skill: pw ? r1(pr) : null, act_skill: r1(act), gap: pw ? r1(act - pr) : null,
+      optimal: r1(opt.total), lost: r1(Math.max(0, opt.total - res.pts)),
+      swap: optSet.size && [...optSet].some((id) => !startedSet.has(id)) ? {
+        in: [...optSet].filter((id) => !startedSet.has(id)).map(nameOfPlayer),
+        out: [...startedSet].filter((id) => !optSet.has(id)).map(nameOfPlayer),
+      } : null,
+    });
+  }
+  const g = weeks.length;
+  const rec = { w: 0, l: 0, t: 0 }, ap = { w: 0, l: 0, t: 0 };
+  let pf = 0, exp = 0, gap = 0, gapN = 0, lost = 0;
+  for (const x of weeks) {
+    if (x.result === "W") rec.w++; else if (x.result === "L") rec.l++; else if (x.result === "T") rec.t++;
+    ap.w += x.ap.w; ap.l += x.ap.l; ap.t += x.ap.t;
+    exp += (x.ap.w + x.ap.t / 2) / Math.max(1, TEAMS - 1);
+    pf += x.pts; lost += x.lost;
+    if (x.gap != null) { gap += x.gap; gapN++; }
+  }
+  perTeam.set(t.roster_id, {
+    roster_id: t.roster_id, owner: t.owner, is_me: t.is_me, g, weeks,
+    ...rec, pf: r1(pf), pf_pg: g ? r1(pf / g) : null,
+    ap, ap_pct: ap.w + ap.l + ap.t ? +((ap.w + ap.t / 2) / (ap.w + ap.l + ap.t)).toFixed(3) : null,
+    exp_wins: r1(exp), luck_wins: r1(rec.w + rec.t / 2 - exp),
+    gap_pg: gapN ? r1(gap / gapN) : null, lost_pg: g ? r1(lost / g) : null, lost: r1(lost),
+    strength_rank: t.starter_rank, starter_pts: t.total,
+  });
+}
+const perfRows = [...perTeam.values()];
+const table = PLAYOFF_TEAMS ? PERF.standings(perfRows, PLAYOFF_TEAMS) : perfRows;
+const RK = {
+  pf: PERF.rankBy(perfRows, "pf_pg"), ap: PERF.rankBy(perfRows, "ap_pct"),
+  gap: PERF.rankBy(perfRows, "gap_pg"), eff: PERF.rankBy(perfRows, "lost_pg", false),
+};
+
+/* Cross-check against Sleeper's own standings, but only when both describe the same weeks: the
+   roster record updates on Sleeper's schedule, not ESPN's, so a mismatch mid-Tuesday is timing. */
+for (const r of rosters) {
+  const s = r.settings || {}, m = perTeam.get(r.roster_id);
+  const games = (s.wins || 0) + (s.losses || 0) + (s.ties || 0);
+  if (m && games === m.g && (s.wins !== m.w || s.losses !== m.l)) {
+    console.warn(`  ! record mismatch for roster ${r.roster_id}: computed ${m.w}-${m.l}, Sleeper ${s.wins}-${s.losses}`);
+  }
+}
+
+/* The week in progress, if there is one: my score, the opponent's, and who is left to play on
+   each side. Nothing derived from it (Q12) - it is shown, marked in progress, and that is all. */
+let partial = null;
+if (WEEK <= REG_WEEKS && started && !allDone) {
+  const rows = await get(`https://api.sleeper.app/v1/league/${LEAGUE_ID}/matchups/${WEEK}`);
+  const mine = rows.find((r) => r.roster_id === MY_ROSTER);
+  const opp = mine && rows.find((r) => r.roster_id !== MY_ROSTER && r.matchup_id != null && r.matchup_id === mine.matchup_id);
+  const left = (row) => (row?.starters || []).filter((id) => {
+    if (!id || id === "0") return false;
+    const g = gameFor(sched, teamOf(id), null);
+    return g && !g.completed && g.status !== "bye" && g.status !== "canceled" && g.status !== "unknown";
+  }).length;
+  if (mine) partial = {
+    week: WEEK,
+    my_pts: r1(mine.custom_points ?? mine.points ?? 0), my_left: left(mine),
+    opp_owner: opp ? (teams.find((t) => t.roster_id === opp.roster_id)?.owner ?? null) : null,
+    opp_pts: opp ? r1(opp.custom_points ?? opp.points ?? 0) : null, opp_left: opp ? left(opp) : null,
+  };
+}
+
+/* ------------------------------------------------ byes: rolling window + post-deadline pins
+   Byes come from the season schedule, per team, not from the board's per-player field: a player
+   off the draft board has no `bye` there, and a missing bye silently reads as "never idle". */
+const seasonSched = await get(`https://api.sleeper.app/schedule/nfl/regular/${league.season}`);
+const byesOf = PERF.teamByes(seasonSched);
+const FIRST_OPEN = started ? WEEK + 1 : WEEK;
+const WINDOW = [0, 1, 2].map((i) => FIRST_OPEN + i).filter((w) => w <= REG_WEEKS);
+/* A bye after the trade deadline is pinned from now until the deadline passes (Q4): once it has,
+   the wire is the only fix left, so the warning has to arrive while a trade is still possible. */
+const PINNABLE = DEADLINE != null && WEEK <= DEADLINE && DEADLINE < REG_WEEKS
+  ? Array.from({ length: REG_WEEKS - DEADLINE }, (_, i) => DEADLINE + 1 + i).filter((w) => w >= FIRST_OPEN)
+  : [];
+const PG = 17;   // season projections are 17-game totals; per game keeps the numbers readable
+const rowFor = (id) => {
+  const p = byId.get(id);
+  const pts = ptsOf(p);
+  return pts == null ? null : { id, pos: p.pos, pts: pts / PG, team: p.team ?? teamOf(id), name: p.name };
+};
+const ROSTERED = new Set(rosteredIds);
+const FA = [];
+for (const [id, sp] of Object.entries(allPlayers)) {
+  if (ROSTERED.has(id)) continue;
+  const pos = /^[A-Z]{2,3}$/.test(id) ? "DEF" : sp.position;
+  if (!["QB", "RB", "WR", "TE", "K", "DEF"].includes(pos) || !(sp.team || pos === "DEF")) continue;
+  if (sp.injury_status && DESIGNATED_OUT.has(sp.injury_status)) continue;
+  const pts = rescore(proj[id], pos);
+  if (!pts || pts <= 0) continue;
+  FA.push({ id, pos, pts: pts / PG, team: pos === "DEF" ? id : sp.team, name: pos === "DEF" ? `${sp.first_name ?? ""} ${sp.last_name ?? id}`.trim() : `${sp.first_name} ${sp.last_name}`.trim() });
+}
+const rosterRows = (ids) => ids.map(rowFor).filter(Boolean);
+
+/* The trigger threshold comes from this league's own distribution (Q5): every team's
+   replacement-aware loss in every remaining bye week, 75th percentile, floored at the same 1.5-point
+   band below which this build already says a projection cannot separate two players. */
+const lossPool = [];
+for (const t of teams) {
+  const rr = rosterRows(t.ids);
+  for (let w = FIRST_OPEN; w <= REG_WEEKS; w++) {
+    const x = PERF.byeLoss(rr, FA, byesOf, w);
+    if (x.off.length) lossPool.push(x.loss);
+  }
+}
+const BYE_THRESHOLD = Math.max(CLOSE_PTS, PERF.quantile(lossPool, 0.75) ?? CLOSE_PTS);
+const myRows = rosterRows(me.ids);
+const byeFlags = [], byeQuiet = [];
+for (const w of [...new Set([...WINDOW, ...PINNABLE])].sort((a, b) => a - b)) {
+  const x = PERF.byeLoss(myRows, FA, byesOf, w);
+  if (!x.off.length) continue;
+  const why = WINDOW.includes(w) ? "window" : "post_deadline";
+  const entry = {
+    week: w, why,
+    off: x.off.map((p) => ({ name: p.name, pos: p.pos })),
+    loss: r1(x.loss), bench_loss: r1(x.bench_loss),
+    fix: x.fix ? { name: x.fix.name, pos: x.fix.pos, team: x.fix.team, gain: r1(x.fix.gain) } : null,
+  };
+  if (x.loss >= BYE_THRESHOLD) byeFlags.push(entry);
+  else if (why === "window") byeQuiet.push(entry);
+}
+
+/* --------------------------------------------------------------- routed actions (Q6)
+   Every action is lifted from a list that already exists: the published waiver board (this
+   league's waivers.json) or the trade search above. A waiver target is re-checked against the live
+   rosters by player id, because the board is written by a different job and can lag a claim. */
+const WPATH = path.join(ROOT, ...L.out_dir.split("/"), "waivers.json");
+let waiverBoard = null;
+if (fs.existsSync(WPATH)) {
+  try { waiverBoard = JSON.parse(fs.readFileSync(WPATH, "utf8")); } catch { waiverBoard = null; }
+}
+const norm = (s) => String(s || "").toLowerCase().replace(/[^a-z]/g, "");
+const idByNameTeam = new Map();
+for (const [id, sp] of Object.entries(allPlayers)) {
+  if (!sp.full_name && !sp.last_name) continue;
+  idByNameTeam.set(`${norm(sp.full_name || `${sp.first_name}${sp.last_name}`)}|${sp.team}`, id);
+}
+const boardIds = new Set((waiverBoard?.targets || []).map((x) => idByNameTeam.get(`${norm(x.player)}|${x.team}`)).filter(Boolean));
+const waiverCands = (waiverBoard?.targets || [])
+  .filter((x) => x.verdict === "pursue" || x.verdict === "watch")
+  .map((x) => {
+    const id = idByNameTeam.get(`${norm(x.player)}|${x.team}`) || null;
+    const pts = id ? rescore(proj[id], x.pos) : null;
+    return { ...x, id, row: id && pts ? { id, pos: x.pos, pts: pts / PG, team: x.team, name: x.player } : null };
+  })
+  .filter((x) => x.id && x.row && !ROSTERED.has(x.id));
+const waiverAge = waiverBoard?.generated ? Math.floor((new Date(TODAY) - new Date(waiverBoard.generated)) / 864e5) : null;
+
+const totalOf = (rows, w = null) => PERF.optimal(w == null ? rows : rows.filter((p) => !(byesOf.get(p.team) || new Set()).has(w))).total;
+const baseSeason = totalOf(myRows);
+const allProposals = teams.filter((t) => !t.is_me).flatMap((t) => (t.out.proposals || []).map((p) => ({ ...p, owner: t.owner })));
+const afterTrade = (p) => rosterRows([...me.ids.filter((id) => !p.give.some((g) => g.id === id)), ...p.get.map((g) => g.id)]);
+const tradeOpen = DEADLINE == null || WEEK <= DEADLINE;
+
+function bestFor(gain) {
+  /* Pursue beats watch on the waiver side; the larger gain wins across the two sources, with a
+     waiver preferred on a tie because it costs a claim rather than a player. */
+  let best = null;
+  const consider = (c) => { if (c.gain > 0.05 && (!best || c.gain > best.gain + 1e-9)) best = c; };
+  for (const verdict of ["pursue", "watch"]) {
+    for (const c of waiverCands.filter((x) => x.verdict === verdict)) consider({ kind: "waiver", gain: gain.waiver(c), c });
+    if (best) break;
+  }
+  if (tradeOpen) for (const p of allProposals) consider({ kind: "trade", gain: gain.trade(p), c: p });
+  return best;
+}
+const tradeText = (p) => `${p.give.map((g) => g.name).join(" + ")} to ${p.owner} for ${p.get.map((g) => g.name).join(" + ")}`;
+const waiverText = (c) => `claim ${c.player} (${c.pos} ${c.team})${c.bid_amount != null ? `, ${c.bid_amount} dollars` : ""}${c.drop_player ? `, dropping ${c.drop_player}` : ""}`;
+
+/* Waiver-board blind spots (Q15). The module routes only from the published board and the trade
+   list, so a free agent /waivers never listed cannot become an action here - but it can be named.
+   A blind spot is a free agent NOT on the board (any verdict: one the board looked at and rejected
+   is a judgment, not a gap) who beats the best routed action for the same gap by at least the trade
+   search's own noise bar. A diagnostic about the board, never a recommendation of its own.
+   Positional gaps only: a flagged bye is already measured after the best free pickup and names
+   him, so a blind spot there would repeat the bye line with a smaller number. */
+const BLIND_MARGIN = GAIN_1 / PG;   // 5 season points, as a per-game gain
+const blindSpots = [];
+function blindSpot(gapLabel, faGain, routedGain) {
+  let best = null;
+  for (const f of FA) {
+    if (boardIds.has(f.id)) continue;
+    const g = faGain(f);
+    if (g > 0.05 && (!best || g > best.gain)) best = { f, gain: g };
+  }
+  /* Logged either way, so a blind spot that did NOT fire is visible in the build output rather
+     than inferred from its absence. */
+  if (best) console.log(`  best unlisted free agent for ${gapLabel}: ${best.f.name} +${r1(best.gain * PG)} season pts vs routed +${r1((routedGain || 0) * PG)} -> ${best.gain >= (routedGain || 0) + BLIND_MARGIN ? "blind spot" : "no blind spot"}`);
+  if (best && best.gain >= (routedGain || 0) + BLIND_MARGIN) {
+    blindSpots.push({ gap: gapLabel, player: best.f.name, pos: best.f.pos, team: best.f.team, gain: best.gain, routed_gain: routedGain || 0 });
+  }
+}
+
+const actions = [];
+for (const b of byeFlags) {
+  const base = totalOf(myRows, b.week);
+  const pick = bestFor({
+    waiver: (c) => totalOf([...myRows, c.row], b.week) - base,
+    trade: (p) => totalOf(afterTrade(p), b.week) - base,
+  });
+  /* Short on purpose: the bye itself is described in full on the line above the actions, so the
+     label only has to say which gap this action is for. */
+  const gap = `Week ${b.week} bye (${b.loss} a game short)`;
+  actions.push(pick
+    ? { gap, kind: pick.kind, panel: pick.kind === "waiver" ? "waivers" : "rosters", gain: r1(pick.gain),
+        text: `${pick.kind === "waiver" ? waiverText(pick.c) : tradeText(pick.c)} — worth ${r1(pick.gain)} a game in week ${b.week}.` }
+    : { gap, kind: null, panel: null, gain: null,
+        text: `Nothing on the waiver board or the trade list covers week ${b.week}.${b.why === "post_deadline" && tradeOpen ? " A trade has to happen by week " + DEADLINE + "; none of the current proposals does it." : ""}` });
+}
+for (const wk of me.out.weaknesses) {
+  const pick = bestFor({
+    waiver: (c) => c.pos === wk.pos ? totalOf([...myRows, c.row]) - baseSeason : 0,
+    trade: (p) => p.get.some((g) => g.pos === wk.pos) ? totalOf(afterTrade(p)) - baseSeason : 0,
+  });
+  blindSpot(wk.pos, (f) => f.pos === wk.pos ? totalOf([...myRows, f]) - baseSeason : 0, pick ? pick.gain : 0);
+  const gap = `${wk.pos} is ${ORD(wk.rank)} of ${TEAMS} in projected starting points.`;
+  actions.push(pick
+    ? { gap, kind: pick.kind, panel: pick.kind === "waiver" ? "waivers" : "rosters", gain: r1(pick.gain * PG),
+        text: `${pick.kind === "waiver" ? waiverText(pick.c) : tradeText(pick.c)} — +${r1(pick.gain * PG)} projected season points.` }
+    : { gap, kind: null, panel: null, gain: null, text: `Nothing on the waiver board or the trade list improves ${wk.pos}.` });
+}
+const myPerf = perTeam.get(MY_ROSTER);
+const effRank = RK.eff.get(MY_ROSTER);
+if (myPerf.g && effRank != null && isWeakness(effRank)) {
+  const ch = me.out.week.changes;
+  const gap = `${myPerf.lost_pg} points a game left on the bench, ${ORD(effRank)} of ${TEAMS}.`;
+  actions.push(ch && ch.gain > 0
+    ? { gap, kind: "lineup", panel: "myroster", gain: ch.gain,
+        text: `Set the week-${WEEK} lineup the projection prefers: in ${ch.in.join(", ")}, out ${ch.out.join(", ")} (+${ch.gain}).` }
+    : { gap, kind: null, panel: null, gain: null, text: `The week-${WEEK} lineup already matches the projection; the points left on the bench so far were not visible in advance.` });
+}
+/* Merge actions that route to the same move, so one waiver claim that fixes both a bye and a
+   positional hole reads as one line closing two gaps rather than as two recommendations. */
+const merged = [];
+for (const a of actions) {
+  const same = a.kind && merged.find((m) => m.kind === a.kind && m.text.split(" — ")[0] === a.text.split(" — ")[0]);
+  if (same) same.gaps.push(a.gap); else merged.push({ ...a, gaps: [a.gap] });
+}
+const ROUTED = merged.slice(0, 3).map(({ gap, ...rest }) => rest);
+
+/* ----------------------------------------------------------------------- the one sentence
+   Standing against strength, and then the single largest measurable reason for any gap between
+   them. Every clause is a restatement of a number above. */
+function headline(m, seedRow) {
+  if (!m.g) return `No week is final yet, so there is no standing to read. On paper: ${ORD(m.strength_rank)} of ${TEAMS} in projected starters.`;
+  const seed = seedRow ? seedRow.seed : null;
+  const s = [];
+  const standing = seed != null ? `${ORD(seed)} in the standings` : `${m.w}-${m.l}${m.t ? `-${m.t}` : ""}`;
+  const diff = seed != null ? seed - m.strength_rank : 0;   // positive = standing worse than roster
+  if (Math.abs(diff) <= 1) s.push(`${standing[0].toUpperCase()}${standing.slice(1)} and ${ORD(m.strength_rank)} on paper: the results and the roster agree.`);
+  else s.push(`${standing[0].toUpperCase()}${standing.slice(1)} but ${ORD(m.strength_rank)} on paper.`);
+  /* Candidate reasons, each with a direction and a size. Schedule luck in wins; player luck and
+     bench points in points per game, ranked against the league so a size means the same thing
+     in a ten-team and a fourteen-team league. */
+  const why = [];
+  if (Math.abs(m.luck_wins) >= 0.75) why.push({ dir: Math.sign(m.luck_wins),
+    cause: "the schedule", text: `a ${m.ap.w}-${m.ap.l} all-play record says that scoring earns ${m.exp_wins} wins, not ${m.w}`, size: Math.abs(m.luck_wins) });
+  const gr = RK.gap.get(m.roster_id);
+  if (m.gap_pg != null && gr != null && (isStrength(gr) || isWeakness(gr))) why.push({ dir: Math.sign(m.gap_pg),
+    cause: "the players", text: `skill starters are running ${Math.abs(m.gap_pg)} a game ${m.gap_pg >= 0 ? "over" : "under"} projection (${ORD(gr)} of ${TEAMS})`, size: Math.abs(m.gap_pg) / 10 });
+  const er = RK.eff.get(m.roster_id);
+  if (er != null && isWeakness(er)) why.push({ dir: -1, cause: "the lineup", text: `${m.lost_pg} a game left on the bench (${ORD(er)} of ${TEAMS})`, size: m.lost_pg / 10 });
+  const wanted = diff > 1 ? -1 : diff < -1 ? 1 : 0;
+  const pick = why.filter((x) => !wanted || x.dir === wanted).sort((a, b) => b.size - a.size)[0];
+  if (pick) s.push(wanted ? `Most of the gap is ${pick.cause}: ${pick.text}.` : `Worth knowing: ${pick.text}.`);
+  else if (wanted) s.push("No single cause stands out.");
+  if (m.g < 4) s.push(`${spell(m.g)[0].toUpperCase()}${spell(m.g).slice(1)} week${m.g === 1 ? "" : "s"} in: the standing counts for seeding, but it says almost nothing yet about the roster.`);
+  return s.join(" ");
+}
+const mySeed = table.find((r) => r.roster_id === MY_ROSTER);
+const perfK = (() => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", "perf-k.json"), "utf8")); } catch { return null; } })();
+
+const performance = {
+  final_weeks: FINAL,
+  regular_weeks: REG_WEEKS,
+  playoff_teams: PLAYOFF_TEAMS,
+  trade_deadline: DEADLINE != null && DEADLINE < REG_WEEKS ? DEADLINE : null,
+  headline: headline(myPerf, mySeed),
+  standing: mySeed && mySeed.seed ? {
+    seed: mySeed.seed, of: TEAMS, w: myPerf.w, l: myPerf.l, t: myPerf.t,
+    line: PLAYOFF_TEAMS ? {
+      inside: mySeed.line.inside, games: mySeed.line.games, vs_seed: mySeed.line.vs_seed,
+      vs_owner: mySeed.line.vs_roster != null ? perTeam.get(mySeed.line.vs_roster)?.owner ?? null : null,
+    } : null,
+  } : null,
+  strength: { rank: myPerf.strength_rank, of: TEAMS, starter_pts: myPerf.starter_pts },
+  metrics: {
+    record: { w: myPerf.w, l: myPerf.l, t: myPerf.t },
+    pf: { total: myPerf.pf, per_game: myPerf.pf_pg, rank: RK.pf.get(MY_ROSTER) },
+    all_play: { ...myPerf.ap, rank: RK.ap.get(MY_ROSTER), exp_wins: myPerf.exp_wins, luck_wins: myPerf.luck_wins },
+    proj_gap: { per_game: myPerf.gap_pg, rank: RK.gap.get(MY_ROSTER) },
+    efficiency: { lost: myPerf.lost, per_game: myPerf.lost_pg, rank: effRank },
+  },
+  weeks: myPerf.weeks.map((x) => ({
+    ...x, opp_owner: x.opp != null ? perTeam.get(x.opp)?.owner ?? null : null,
+  })),
+  partial,
+  league: table.map((r) => ({
+    roster_id: r.roster_id, owner: r.owner, is_me: r.is_me, seed: r.seed ?? null,
+    w: r.w, l: r.l, t: r.t, pf: r.pf, all_play: r.ap, strength_rank: r.strength_rank,
+    pf_rank: RK.pf.get(r.roster_id), ap_rank: RK.ap.get(r.roster_id),
+    gap_pg: r.gap_pg, gap_rank: RK.gap.get(r.roster_id), lost_pg: r.lost_pg, eff_rank: RK.eff.get(r.roster_id),
+  })),
+  byes: {
+    threshold: r1(BYE_THRESHOLD), window: WINDOW, pinned: PINNABLE,
+    flagged: byeFlags, covered: byeQuiet,
+  },
+  actions: ROUTED,
+  /* Worded per gap type, because the units differ: a positional hole is judged over the season, a
+     bye over one week. */
+  blind_spots: blindSpots.slice(0, 2).map((b) => {
+    const week = b.gap.startsWith("week ");
+    const size = week ? `+${r1(b.gain)} a game in ${b.gap}` : `+${r1(b.gain * PG)} projected season points at ${b.gap}`;
+    return {
+      gap: b.gap, player: b.player, pos: b.pos, team: b.team,
+      gain: week ? r1(b.gain) : r1(b.gain * PG), unit: week ? "per_game" : "season",
+      text: `Waiver board blind spot: ${b.player} (${b.pos} ${b.team}) is a free agent worth ${size}, more than anything the board or the trade list offers there, and the board does not list him.`,
+    };
+  }),
+  sources: {
+    waivers: waiverBoard ? { generated: waiverBoard.generated, age_days: waiverAge, stale: waiverAge != null && waiverAge > 7 } : null,
+    trades: tradeOpen ? `${allProposals.length} proposal(s) from this build's trade search` : `trade deadline (week ${DEADLINE}) has passed`,
+  },
+  basis: {
+    standing: `Results from ${L.name}'s own weekly matchup rows, final weeks only (every game marked complete by ESPN). Seeded by wins, then points for${PLAYOFF_TEAMS ? `; ${PLAYOFF_TEAMS} of ${TEAMS} make the playoffs` : ""}.`,
+    strength: "Rank of the optimal starting lineup on season projections, the same number the roster room grades.",
+    no_blend: perfK ? `Standing and strength are read separately, never blended. On HBGBs 2020-25, results added almost nothing to the projection as a predictor of rest-of-season scoring (leakage-free k = ${perfK.k_leakage_free}; see data/perf-k.json).` : "Standing and strength are read separately, never blended (see plans/roster-performance-module.md, Q14).",
+    all_play: "Your record had you played every other team each week: the schedule-luck check.",
+    proj_gap: "Skill starters' (QB/RB/WR/TE) scored points against their pre-week projections in this league's scoring. K and DEF are left out: DEF points-allowed tiers never project, so they would book a structural gap as luck.",
+    efficiency: "Hindsight-optimal lineup from everyone rostered that week, scored by Sleeper, against what the started lineup scored.",
+    byes: `Replacement-aware: the loss after the better of your bench and one free-agent pickup, per game on season projections. Flagged at or above ${r1(BYE_THRESHOLD)} a game, this league's 75th percentile. Window: the next ${WINDOW.length} unplayed week(s)${PINNABLE.length ? `, plus weeks ${PINNABLE[0]}-${PINNABLE[PINNABLE.length - 1]} pinned until the week-${DEADLINE} deadline` : ""}. Availability designations are not applied to future weeks.`,
+    actions: "Routed, never generated: each one is lifted from this league's published waiver board or this build's trade search. When neither addresses a gap, the line says so.",
+    blind_spots: `A free agent the waiver board does not list at all, beating the best routed action for the same gap by at least ${GAIN_1} season points (${r1(BLIND_MARGIN)} a game). Named as a gap in the board, not recommended.`,
+  },
+};
+console.log(`  final weeks: ${FINAL.length ? FINAL.join(", ") : "none"}${partial ? ` · week ${WEEK} in progress (${partial.my_pts} to ${partial.opp_pts})` : ""}`);
+console.log(`  ${performance.headline}`);
+console.log(`  byes: threshold ${performance.byes.threshold}/g · flagged ${byeFlags.map((b) => `wk${b.week}(${b.loss})`).join(" ") || "none"} · ${FA.length} free agents priced`);
+for (const a of ROUTED) console.log(`  action [${a.kind ?? "none"}] ${a.text}`);
+for (const b of performance.blind_spots) console.log(`  ${b.text}`);
+
 /* ------------------------------------------------------------------------------- write */
 const payload = {
   generated: TODAY,
@@ -950,6 +1387,9 @@ const payload = {
     ? { total: trades.total, seasons: trades.seasons, by_year: trades.years, per_roster: trades.per }
     : null,
   season_moves: moves,
+  /* HQ's roster performance module (plans/roster-performance-module.md). Mine only, but every
+     rank inside it is against the whole league, and `league` carries the table it was ranked on. */
+  performance,
   teams: teams.map((t) => t.out),
 };
 

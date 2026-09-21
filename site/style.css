@@ -1753,3 +1753,53 @@ a.navlink:hover { color: var(--text); border-color: var(--dim); text-decoration:
 @media (max-width: 460px) {
   .rr-swap { font-size: 11.5px; }
 }
+
+/* ---------- performance (HQ, top of the left column) ----------
+   Standing and strength as two equal reads, never one number (plans/roster-performance-module.md,
+   Q14). Colours are the roster room's grading (.rr-pos / .rr-neg, top and bottom third) and the tags
+   reuse palette tokens, so all of it follows the league palette swap without a per-league rule. */
+.perf-two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 4px 0 10px; }
+.perf-read {
+  padding: 10px 12px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+}
+.perf-label {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dim);
+}
+.perf-label .faint { text-transform: none; letter-spacing: 0; font-weight: 400; }
+.perf-label-sp { margin: 14px 0 4px; }
+.perf-big { font-family: var(--font-data); font-size: 28px; font-weight: 600; line-height: 1.15; margin-top: 4px; color: var(--text); }
+.perf-of { font-size: 13px; font-weight: 400; color: var(--faint); }
+.perf-sub { font-size: 12.5px; color: var(--dim); margin-top: 2px; }
+.perf-headline { margin: 0 0 10px; font-size: 14px; line-height: 1.5; color: var(--text); }
+.perf-live { font-size: 13px; color: var(--dim); margin: 0 0 8px; }
+.perf-live b { font-family: var(--font-data); }
+.perf-metrics { margin-top: 0; padding-top: 10px; }
+.dsect-btn .pv { font-family: var(--font-data); font-weight: 500; color: var(--text); margin-left: 4px; }
+.perf-tbl { width: 100%; border-collapse: collapse; margin-top: 6px; font-size: 12.5px; }
+.perf-tbl th { text-align: left; font-weight: 600; color: var(--faint); padding: 3px 8px 3px 0; border-bottom: 1px solid var(--border); }
+.perf-tbl td { padding: 4px 8px 4px 0; border-bottom: 1px dashed var(--border); color: var(--dim); vertical-align: top; }
+.perf-tbl td:first-child, .perf-tbl td:nth-child(2) { font-family: var(--font-data); white-space: nowrap; }
+.perf-list { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.perf-list li { font-size: 13px; line-height: 1.5; color: var(--text); }
+.perf-list .tag { margin-right: 4px; }
+ol.perf-acts { margin-top: 0; }
+.perf-gap { font-size: 12px; color: var(--faint); }
+.perf-none > div:last-child { color: var(--dim); }
+.perf-blind { color: var(--warn); font-size: 12.5px; }
+.perf-basis { margin-top: 12px; }
+.tag-live { color: var(--warn); border-color: var(--warn); }
+.tag-pin { color: var(--neg); border-color: var(--neg); }
+.tag-waiver { color: var(--accent); border-color: var(--accent); }
+.tag-trade { color: var(--moss); border-color: var(--moss); }
+.tag-lineup { color: var(--blue); border-color: var(--blue); }
+@media (max-width: 460px) {
+  .perf-two { gap: 8px; }
+  .perf-read { padding: 8px 10px; }
+  .perf-big { font-size: 24px; }
+}
+/* .perf-big sets a colour after .rr-pos/.rr-neg at equal specificity, so the grade needs the pair. */
+.perf-big.rr-pos { color: var(--accent); }
+.perf-big.rr-neg { color: var(--neg); }
+.perf-tbl td.rr-pos { color: var(--accent); }
+.perf-tbl td.rr-neg { color: var(--neg); }

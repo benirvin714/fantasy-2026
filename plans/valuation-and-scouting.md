@@ -1613,6 +1613,83 @@ Files: `assignLineup(ids, score)`, `DESIGNATED_OUT`/`outFor`, `CLOSE_PTS`, the p
 `site/roster-table.js`; the `why` argument on `HBGB_PlayerNews.link` in `site/player-news.js`;
 `.rr-start`/`.rr-sit`/`.rr-call-close`/`.rr-swap` in `site/style.css`.
 
+### 1.32 Roster performance on HQ: standing, strength, and what to do - 2026-09-21
+
+A panel at the top of HQ's left column, above NFL updates, in all three leagues. It answers "how is
+my team doing against the league, why, and what addresses it". Designed in a grilling session; the
+fifteen decisions and their reasoning are kept in `plans/roster-performance-module.md`, and this
+section is what shipped.
+
+**Two readings, never blended.** The design started as one verdict that leaned on the projection
+early in the season and on results later, with the weight `g / (g + k)` and k measured rather than
+picked. Measuring it killed the idea. `scripts/calibrate-perf-k.mjs` rebuilt HBGBs 2020-25 from
+Sleeper's pre-week projections (dated before kickoff, so no hindsight), re-scored in each season's
+settings through the same greedy lineup, and asked at every checkpoint which blend of results and
+projection best predicts each team's rest-of-season scoring. Over 760 team-checkpoints the
+leakage-free answer is **k = 51**: results carry 7% of the weight at week 4 and 20% at week 13. Against
+a rest-of-season projection the optimum is **projection alone** in all six leave-one-season-out fits.
+Rest-of-season error is 15.6 points a game from results alone against 11.8 and 10.1 from projection.
+Two reasons: a team's weekly score swings with a standard deviation of about 22.6 points against a
+true spread between teams of about 6.1, and Sleeper's in-season projections are already updated from
+play to date, so results would count the same evidence twice.
+
+So a blended rank would be the projection rank with noise stirred in. The panel instead gives each
+signal the question it can answer. **Standing** is results: record, seed, games from the playoff
+line, because wins decide who gets in whatever their predictive value. **Strength** is the
+projected starter rank the roster room already grades. The headline sentence names the gap between
+them and its largest measurable cause. k survives as a documented finding in `data/perf-k.json`, not
+an input.
+
+**The luck checks, and what each one blames.**
+- **All-play** (your record had you played everyone each week) blames the schedule. `luck_wins` is
+  actual wins minus what the all-play rate earns.
+- **Scored vs projected** blames the players. Skill starters only (QB/RB/WR/TE): DEF points-allowed
+  tiers never project and kicker misses only half do, so including either would book a structural
+  projection gap as luck every week. Measured week 1 across all three leagues, the single-week gap
+  has a mean near zero and a standard deviation of 23-27 points, which matches the calibration's
+  weekly noise; a +42.7 in the Clash is one monster week, not a bug.
+- **Lineup efficiency** blames the manager: the hindsight-optimal lineup over everyone rostered that
+  week, scored by Sleeper, against what the started lineup scored.
+
+**Weeks count only when final.** Every week before the roster room's `WEEK` is final by
+construction (§1.31's roll-forward); `WEEK` itself shows as a live line (my score, the opponent's,
+players left on each side) and feeds nothing. Records are computed from the league's own matchup
+rows and cross-checked against Sleeper's roster standings whenever both cover the same weeks.
+
+**Byes, replacement-aware.** The loss a bye costs is measured after the best free fix: the better of
+the bench and one free-agent pickup. That keeps a kicker, a defense and usually a quarterback bye
+quiet (Mahomes' week 5 comes out at -0.5: Bo Nix is a free agent and projects slightly higher) and
+keeps a paired-RB bye loud (Taylor and Jeanty in week 13, 10.5 a game short even after Pollard).
+The trigger is this league's own 75th percentile of that loss across every team's remaining bye
+weeks, floored at the 1.5-point close band. The window is the next three unplayed weeks, plus
+**any week after the trade deadline, pinned from now until the deadline passes**, because after it
+the wire is the only fix left. Couples Clash (`trade_deadline: 99`) never pins. Byes come from the
+season schedule per team, not the board's per-player field, which is null for anyone off the board.
+
+**Actions are routed, never generated.** Up to three, each naming the gap it closes (a flagged bye,
+a bottom-third position, or bottom-third efficiency) and lifted from the league's published
+`waivers.json` or this build's trade search. Waiver targets are resolved to Sleeper ids and
+re-checked against the live rosters, because the board is written by a different job. When neither
+list addresses a gap, the line says so. One diagnostic sits beside them: a **waiver-board blind
+spot** fires when a free agent the board does not list at all beats the best routed action for the
+same gap by the trade search's own 5-point bar. Positional gaps only; a flagged bye is already
+measured after the best pickup and names him. It is a note about the board, not a recommendation.
+
+**Known limit of the blind-spot rule.** It compares gains, not costs. On 2026-09-21 the QB gap routes
+to Tuten for Hurts (+23.8 season points) while Bo Nix sits on the wire at +9. The rule correctly stays
+quiet, but the trade costs the roster's one trade chip and Nix costs nothing, and the rule does not
+price that.
+
+**Not built here.** `/brief` still carries my-roster lines that this panel now owns; narrowing it to
+the NFL landscape and rival leverage is a separate follow-up.
+
+Files: `scripts/lib/performance.mjs` (pure: `optimal`, `teamByes`, `weeklyResults`, `standings`,
+`rankBy`, `byeLoss`); the roster-performance section and `payload.performance` in
+`scripts/build-roster-room.mjs`; `scripts/calibrate-perf-k.mjs` -> `data/perf-k.json`, with its inputs
+cached in `data/raw/matchups-YYYY.json` and `data/raw/proj-weekly-YYYY.json`; past 2026 weeks'
+projections cached locally in `data/raw/cache/` (gitignored); `renderPerformance` in `site/app.js`;
+`.perf*` and the `tag-live/pin/waiver/trade/lineup` tags in `site/style.css`.
+
 ## 2. Challenge 2 — `scouting_brief` (public commentary)
 
 ### 2.1 What it is
