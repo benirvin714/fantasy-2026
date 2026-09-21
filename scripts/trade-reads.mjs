@@ -100,7 +100,9 @@ for (const k of keys) {
     if (later.length) { pruned.push(`${r.partner}: ${r.give?.join(" + ")} for ${r.get?.join(" + ")} (news ${later[0].date}: ${later[0].headline})`); continue; }
     kept[key] = r;
   }
-  if (pruned.length || Object.keys(kept).length !== Object.keys(reads.reads ?? {}).length) {
+  /* Written even when empty: a league with a roster room always has this file, so the page's fetch
+     is a 200 with no reads rather than a 404 logged in the console on every Pit and Clash load. */
+  if (!fs.existsSync(file) || pruned.length || Object.keys(kept).length !== Object.keys(reads.reads ?? {}).length) {
     fs.writeFileSync(file, JSON.stringify({ ...reads, league: k, reads: kept }, null, 1) + "\n");
   }
   const todo = [...current].filter(([key]) => !kept[key]);

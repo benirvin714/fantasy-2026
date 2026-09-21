@@ -36,11 +36,10 @@ window.HQ_CONFIG = {
       short: "Couples Clash",
       league_id: "1403499370376179712", // year one; 14 teams; drafted 2026-09-08
       my_roster_id: 11,
-      /* Not verified. Sleeper's league object carries playoff_teams, but the only read available
-         when this was added did not return it, and six is the shape of the other two leagues rather
-         than evidence about this one. Confirm against the live object before week 15, and until then
-         treat the playoff cut line on the standings table as provisional. */
-      playoff_teams: 6,
+      /* Verified 2026-09-21 against the live Sleeper league object and data/raw/league-clash-2026.json:
+         7 of 14 make it. The 6 that sat here was a placeholder copied from the other two leagues, and
+         it drew the roster room's cut line one seed short while the Performance panel read 7. */
+      playoff_teams: 7,
       data: "/data/site/clash",
       pages: { draft: false, brief: false },
     },
