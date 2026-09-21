@@ -582,6 +582,11 @@ const rows = [...skill, ...kickers, ...defs].map(([id, p]) => {
   const name = pos === "DEF" ? `${p.first_name} ${p.last_name}` : p.full_name;
   const pts = rescore(pr, pos);
   const adp = pr?.adp_half_ppr && pr.adp_half_ppr < 900 ? pr.adp_half_ppr : null;
+  /* The other two formats ride along from the same projection row (§1.36): no extra fetch. The board
+     itself still values, sorts and edges on half_ppr, which is the HBGBs' market; ppr and std exist
+     so a league scored differently can show its own market instead of none. 999 is Sleeper's "no
+     ADP" sentinel, same filter as above. */
+  const adpOf = (v) => (v && v < 900 ? v : null);
   const avail = availability(id, pos, p.age, p.injury_status, p.years_exp);
   // DynastyProcess ID crosswalk + draft capital (null for DEF/unmatched). ids = the clean join key
   // for future ID-based sources; rookie_capital fills a context gap straight from the crosswalk.
@@ -621,7 +626,7 @@ const rows = [...skill, ...kickers, ...defs].map(([id, p]) => {
     availability: avail,
     situation: { modifier: null, facts: situationFacts(name, pos, id) }, // modifier set by analysis pass, from facts only
     risk_flags: rx.risk_flags ?? { suspension: null, contract: null, legal: null, researched: false, notes: [] },
-    adp: { half_ppr: adp, updated: TODAY },
+    adp: { half_ppr: adp, ppr: adpOf(pr?.adp_ppr), std: adpOf(pr?.adp_std), updated: TODAY },
     adp_commentary: rx.adp_commentary ?? null,
     scouting_brief: rx.scouting_brief ?? null, // evidence layer: what analysts/coaches/players say + scheme fit; null = not scouted (overlay-merged, survives rebuilds)
     fftiers: fftMap.get(normName(name)) ?? null, // Boris Chen half-PPR consensus rank+tier; null = not in his top-200

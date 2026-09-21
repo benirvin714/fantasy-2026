@@ -24,7 +24,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { resolveLeague, ordinal as ORD_N, spell } from "./lib/leagues.mjs";
+import { resolveLeague, ordinal as ORD_N, spell, adpFormat, ADP_LABEL } from "./lib/leagues.mjs";
 import { weekSchedule, gameFor, weekProjections, weekActuals, hasWeekLine } from "./lib/nfl-week.mjs";
 import * as PERF from "./lib/performance.mjs";
 
@@ -120,26 +120,26 @@ function rescore(p, pos) {
    that the rest is league-agnostic. That was true while every league was half PPR. It is not true
    any more, and the two exceptions are easy to miss because neither one announces itself:
 
-     - `adp` is literally `{ half_ppr: <n> }` - Sleeper publishes adp_std / adp_half_ppr / adp_ppr
-       and build-draft-board.mjs reads the half. In a full-PPR league that number is another
-       format's market, and pass-catchers are exactly where the two markets disagree.
+     - `adp` WAS literally `{ half_ppr: <n> }`. Since §1.36 the board carries all three of
+       Sleeper's formats (`{ half_ppr, ppr, std }`, each named), so it is kept and each consumer
+       reads this league's own format through adpFormat(); nothing is relabelled.
      - `fftiers` is Boris Chen's weekly-ALL-HALF-PPR.csv. He publishes a -PPR file too (the phone
        Draft Aid already fetches all three); the desktop board bakes in the half.
 
-   Rather than ship either one under the wrong league's label, a league whose reception value does
-   not match the board's drops both and says so in `basis`. The scouting brief, availability, bye
-   week and risk flags genuinely are format-agnostic and are kept. The better fix is for
-   build-draft-board.mjs to carry all three formats the way build-draft-aid.mjs does; until it
-   does, dropping beats guessing. */
+   So a league whose reception value does not match the board's still drops the half-PPR tiers (and
+   the owner-naming ADP commentary), and says so in `basis`. Tiers were left half-PPR-only on
+   purpose in §1.36: nothing outside the HBGBs draft page reads them. The scouting brief,
+   availability, bye week and risk flags genuinely are format-agnostic and are kept. */
 const BOARD_REC = 0.5;                       // build-draft-board.mjs: adp_half_ppr + weekly-ALL-HALF-PPR
 const REC_MATCHES = (scoring.rec ?? 0) === BOARD_REC;
+const ADP_FMT = adpFormat(scoring.rec ?? 0);
 const boardMarket = (rec) => {
   if (REC_MATCHES) return rec;
-  const { adp, adp_commentary, fftiers, ...rest } = rec;
+  const { adp_commentary, fftiers, ...rest } = rec;
   return rest;
 };
 if (!REC_MATCHES) {
-  console.log(`${L.name} scores receptions at ${scoring.rec}, the board at ${BOARD_REC} — dropping the board's half-PPR ADP and Boris Chen tiers rather than relabelling them.`);
+  console.log(`${L.name} scores receptions at ${scoring.rec}, the board at ${BOARD_REC} — dropping the board's half-PPR Boris Chen tiers; ADP comes from the board's ${ADP_FMT ? ADP_LABEL[ADP_FMT] : "(no matching format)"} market.`);
 }
 
 const rosteredIds = [...new Set(rosters.flatMap((r) => r.players))];
@@ -776,7 +776,7 @@ for (const t of teams) {
       ...weekOf(s.player.id),
       week_call: t.week_call.get(s.player.id) ?? null,
       bye: s.player.bye != null ? s.player.bye : null,
-      adp: s.player.adp && s.player.adp.half_ppr != null ? s.player.adp.half_ppr : null,
+      adp: ADP_FMT && s.player.adp && s.player.adp[ADP_FMT] != null ? s.player.adp[ADP_FMT] : null,
       injury: s.player.availability ? s.player.availability.current_injury_status || null : null,
     } : null,
     rank: slotTable[i].rank[t.roster_id],
@@ -1397,7 +1397,7 @@ const payload = {
       : `Sleeper 2026 projected stat lines re-scored with ${L.name}'s exact scoring_settings (${L.scoring_snapshot}). NOT the draft board's numbers: the board is scored in the HBGBs' settings.`,
     market: REC_MATCHES
       ? "ADP and Boris Chen tiers come from the shared draft board, which is built in this league's reception value."
-      : `Omitted. The shared draft board's ADP and Boris Chen tiers are half-PPR; ${L.name} scores receptions at ${scoring.rec}, so they are another format's market and are dropped rather than shown under this league's name.`,
+      : `ADP is Sleeper's ${ADP_FMT ? ADP_LABEL[ADP_FMT] : "matching"} market, one of the three formats the shared draft board carries. Boris Chen tiers are omitted: the board carries them in half PPR only, and ${L.name} scores receptions at ${scoring.rec}.`,
     lineup: `Optimal lineup under ${SLOTS.join("/")}, five bench. Greedy is optimal here because slot eligibility nests.`,
     strength: `Per-slot and per-position rank against the other ${spell(TEAMS - 1)} teams. K and DEF are reported but never graded — they are streaming positions in this format.`,
     surplus: `A bench player's "starts on N" is measured by recomputing each of the other ${spell(TEAMS - 1)} optimal lineups with him inserted.`,

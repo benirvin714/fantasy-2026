@@ -99,7 +99,12 @@
       facts.push(`<span class="pn-fact"><b>${p.projection.pts.toFixed(1)}</b> projected
         ${p.projection.ppg != null ? `<span class="faint">${p.projection.ppg.toFixed(1)}/wk</span>` : ""}</span>`);
     }
-    if (p.adp) facts.push(`<span class="pn-fact">ADP <b>${p.adp.half_ppr.toFixed(1)}</b></span>`);
+    /* ADP is per scoring format (§1.36). Newer dossiers carry {value, format, label}; older ones only
+       half_ppr. The format is printed so a PPR league's number never reads as the half-PPR market. */
+    if (p.adp) {
+      const v = p.adp.value ?? p.adp.half_ppr;
+      if (v != null) facts.push(`<span class="pn-fact">ADP <b>${v.toFixed(1)}</b>${p.adp.label ? ` <span class="faint">${esc(p.adp.label)}</span>` : ""}</span>`);
+    }
     // A team defense doesn't miss games, so the availability model has nothing to say about one and
     // printing "1.00 · 17.0 games" against the Seahawks is noise dressed as a measurement.
     if (p.availability?.score != null && p.pos !== "DEF") {

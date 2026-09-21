@@ -1837,6 +1837,38 @@ Files: `scripts/trade-reads.mjs` (work order + `--check` gate); `.claude/command
 `readKey` and `readHTML` in `site/rosters.js`; `.rr-read` and `.rr-verdict` in `site/style.css`;
 `PER_LEAGUE` in `scripts/stage-publish.mjs`.
 
+### 1.36 The board carries all three ADP formats - 2026-09-21
+
+§1.26 stopped the board's half-PPR ADP and tiers from being shown under a full-PPR league's name,
+by dropping both for any league whose reception value differs. That was right, and it left Couples
+Clash with no market data at all. The backlog item to fix it asked for all three formats of both.
+
+**Only ADP was built, and on purpose.** Checking what actually reads the board's market data showed
+the payoff of the full item was mostly imaginary: Boris Chen tiers are rendered **only** on the HBGBs
+draft day page, and the phone Draft Aid already carries its own three-format tiers. The one
+market fact a non-HBGBs league renders is the ADP line in the player dialog. So:
+- **ADP**: Sleeper's projection feed, which the board already downloads, carries `adp_ppr` and
+  `adp_std` beside `adp_half_ppr`. The board now keeps all three,
+  `adp: {half_ppr, ppr, std, updated}`, at no extra fetch. It still values, sorts and edges on
+  `half_ppr`, the HBGBs' market, so the draft page is unchanged.
+- **Tiers**: still half-PPR only, and still dropped for a league scored differently. Three more
+  daily downloads with no in-season reader would be code with no user; add them when one exists.
+
+**One mapping, one place.** `adpFormat(rec)` in `scripts/lib/leagues.mjs` maps a league's reception
+value to its format (0.5 half_ppr, 1 ppr, 0 std, anything else null, because no market beats another
+format's market under this league's name). The roster room and the player dossiers both read through
+it, and the dossier carries `{value, format, label}` so the dialog prints "ADP 102.1 PPR" and a PPR
+number can never read as the half-PPR market.
+
+**The markets really do disagree where §1.26 said they would.** On 2026-09-21: Derrick Henry 13.1
+half-PPR against 18.9 PPR, Puka Nacua 6.4 against 4.1. Couples Clash dossiers went from 0 of 213 with
+ADP to 193, all in PPR; the HBGBs and the Pit are unchanged in half PPR. 246 of the board's 248 players
+have a PPR ADP and 243 a standard one.
+
+Files: `adpOf` and the `adp` field in `scripts/build-draft-board.mjs`; `adpFormat`/`ADP_LABEL` in
+`scripts/lib/leagues.mjs`; `ADP_FMT` in `scripts/build-roster-room.mjs` and
+`scripts/build-player-news.mjs`; the ADP fact in `site/player-news.js` (v4).
+
 ## 2. Challenge 2 — `scouting_brief` (public commentary)
 
 ### 2.1 What it is

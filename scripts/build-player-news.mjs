@@ -27,7 +27,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { resolveLeague } from "./lib/leagues.mjs";
+import { resolveLeague, adpFormat, ADP_LABEL } from "./lib/leagues.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const L = resolveLeague();
@@ -54,8 +54,11 @@ const board = read("data/site/draft-board.json");
    `adp_half_ppr`, so the answer is "only if this league scores receptions at 0.5". See the note on
    `adp` below, and the matching block in build-roster-room.mjs. */
 const BOARD_REC = 0.5;
-const REC_MATCHES = (JSON.parse(fs.readFileSync(path.join(ROOT, ...L.scoring_snapshot.split("/")), "utf8"))
-  .scoring_settings.rec ?? 0) === BOARD_REC;
+const LEAGUE_REC = JSON.parse(fs.readFileSync(path.join(ROOT, ...L.scoring_snapshot.split("/")), "utf8")).scoring_settings.rec ?? 0;
+const REC_MATCHES = LEAGUE_REC === BOARD_REC;
+/* §1.36: the board now carries all three Sleeper ADP formats, so a league scored differently gets its
+   own market rather than none. REC_MATCHES still gates what is genuinely half-PPR-only. */
+const ADP_FMT = adpFormat(LEAGUE_REC);
 const events = read("data/site/nfl-events.json");
 
 /* Name matching is the one join here that isn't an id, because the events feed is written by a
@@ -140,7 +143,7 @@ for (const [id, r] of rostered) {
        the two disagree - so it is gated on reception value rather than on `board_scored`, which would
        wrongly strip the Panther Pit's perfectly good half-PPR ADP too. Same rule as
        build-roster-room.mjs: drop it rather than relabel it. */
-    adp: (REC_MATCHES && b?.adp?.half_ppr != null) ? { half_ppr: b.adp.half_ppr, updated: b.adp.updated ?? null } : null,
+    adp: (ADP_FMT && b?.adp?.[ADP_FMT] != null) ? { value: b.adp[ADP_FMT], format: ADP_FMT, label: ADP_LABEL[ADP_FMT], updated: b.adp.updated ?? null } : null,
     /* ADP COMMENTARY is not a market fact at all: it is draft-room prose written through one league's
        dynamics, and it names that league's owners ("ENOTS, a QB-punter, won't chase him";
        "bwalsh89/Stipe and your own TE-hunter history all compete here"). Shipping it to another league

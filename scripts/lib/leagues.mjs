@@ -84,6 +84,13 @@ export function resolveLeague(argv = process.argv.slice(2)) {
   return L;
 }
 
+/* Which of the board's three ADP formats is THIS league's market (§1.36). Keyed on the reception
+   value, the one scoring setting Sleeper's ADP formats differ by. Anything else (a 0.25 PPR league,
+   say) has no matching market and gets null: no ADP beats another format's ADP under this league's
+   name. */
+export const adpFormat = (rec) => (rec === 0.5 ? "half_ppr" : rec === 1 ? "ppr" : rec === 0 ? "std" : null);
+export const ADP_LABEL = { half_ppr: "half PPR", ppr: "PPR", std: "standard" };
+
 /* Team-count-derived wording, so no string on a 12-team page says "the other nine". */
 export const ordinal = (n) =>
   ["", "1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th", "9th", "10th", "11th", "12th",
