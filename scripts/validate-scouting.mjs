@@ -33,6 +33,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { LEAGUES } from "./lib/leagues.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
@@ -297,28 +298,55 @@ for (const e of rescout.slice(0, RESCOUT_SHOW))
   console.log(`    #${e.rank ?? "-"} ${e.pos ?? "?"} ${e.name}  adp=${e.adp ?? "-"}  [${e.reason} ${e.trigger_date}]  ${e.detail}`);
 if (rescout.length > RESCOUT_SHOW) console.log(`    ... +${rescout.length - RESCOUT_SHOW} more (full list in rescout-queue.json)`);
 
-// --drip N: the bounded nightly work order. Deliberately computed here rather than left to the
+/* ---- in-season stake (§1.34) ---------------------------------------------------------------
+   The drip was built for the draft run-up, so it drained by ADP. In season that is the wrong order:
+   on 2026-09-21, 10 of Ben's starters across the three leagues had open news triggers, and ADP order
+   put Mahomes' 2026-09-12 news 56th in line, about ten days out. What matters now is whose lineup the
+   brief feeds, so once any league has a roster room the drip orders by STAKE:
+     0 my starter   (season lineup, or this week's lineup, in any league)
+     1 my bench
+     2 rostered by a rival (trade leverage, and the dossiers they open)
+     3 unrostered
+   and within a stake, news before ADP drift before the calendar backstop, newest trigger first, ADP
+   rank only as the last tiebreak. News on MY STARTERS is uncapped: every such player is re-scouted in
+   the run the news lands, and DRIP more come from everything else. The ADP rank cap applies only to
+   unrostered players, because a rostered player past rank 180 is anything but waiver fodder.
+   Before any roster room exists (pre-draft, or a fresh renewal) the draft ordering below still runs. */
+function loadStakes() {
+  const my = new Map(), rostered = new Set();
+  let leagues = 0;
+  for (const L of Object.values(LEAGUES)) {
+    let r;
+    try { r = JSON.parse(fs.readFileSync(path.join(ROOT, ...L.out_dir.split("/"), "roster-room.json"), "utf8")); }
+    catch { continue; }
+    if (!Array.isArray(r.teams) || !r.teams.length) continue;
+    leagues++;
+    for (const t of r.teams) {
+      const season = (t.slots ?? []).map((x) => x.player && x.player.id).filter(Boolean);
+      const bench = (t.bench ?? []).map((p) => p.id);
+      const starts = new Set([...season, ...(t.bench ?? []).filter((p) => p.week_call && p.week_call.start).map((p) => p.id)]);
+      for (const id of [...season, ...bench]) {
+        rostered.add(id);
+        if (!t.is_me) continue;
+        const m = my.get(id) ?? { starter: false, leagues: [] };
+        m.starter = m.starter || starts.has(id);
+        if (!m.leagues.includes(L.key)) m.leagues.push(L.key);
+        my.set(id, m);
+      }
+    }
+  }
+  return { leagues, my, rostered };
+}
+
+// --drip N: the bounded work order for this run. Deliberately computed here rather than left to the
 // routine's judgement, so "which players tonight" is deterministic and reviewable.
 if (DRIP) {
   // One slot per PLAYER, not per trigger. A player can legitimately hold several open entries
   // (news AND stale_backstop, say) because each clears independently, but re-scouting him once
-  // resolves all of them, and letting him take two of three nightly slots wastes the budget.
+  // resolves all of them, and letting him take two slots wastes the budget.
   const REASON_RANK = { news: 0, adp_drift: 1, stale_backstop: 2, thin_source: 3 };
-  // Targets jump the queue and bypass the rank cap. Then time-sensitive reasons (news, adp,
-  // stale) drain by rank, and the pre-draft thin_source quality sweep fills only the leftover
-  // capacity, so a hot news item is never starved by the sourcing upgrade.
-  const eligible = rescout
-    .filter((e) => isTarget(e.id) || (e.rank ?? 9999) <= DRIP_MAX_RANK)
-    .sort((a, b) =>
-      (isTarget(a.id) ? 0 : 1) - (isTarget(b.id) ? 0 : 1)
-      || (a.reason === "thin_source" ? 1 : 0) - (b.reason === "thin_source" ? 1 : 0)
-      || (a.rank ?? 9999) - (b.rank ?? 9999)
-      || (REASON_RANK[a.reason] ?? 9) - (REASON_RANK[b.reason] ?? 9));
   const reasonsById = new Map();
-  for (const e of eligible) reasonsById.set(e.id, [...(reasonsById.get(e.id) ?? []), e.reason]);
-  // Reserve a slot or two for the thin_source quality sweep so it makes steady progress even on
-  // busy news days: news fills the rest, and a player who is BOTH drains once (as news) and clears both.
-  const RESERVE = Math.min(THIN_RESERVE, DRIP);
+  for (const e of rescout) reasonsById.set(e.id, [...(reasonsById.get(e.id) ?? []), e.reason]);
   const seen = new Set();
   const take = (list, n) => {
     const out = [];
@@ -329,16 +357,53 @@ if (DRIP) {
     }
     return out;
   };
-  const main = take(eligible, DRIP - RESERVE);                                   // news-first (demotion sort)
-  const thin = take(eligible.filter((e) => e.reason === "thin_source"), RESERVE); // guaranteed quality slots
-  const drip = [...main, ...thin];
-  const tgtInQueue = rescout.filter((e) => isTarget(e.id)).length;
-  console.log(`  DRIP  re-scout these ${drip.length} this run (cap ${DRIP}${RESERVE ? `, ${RESERVE} reserved for the thin_source quality sweep` : ""}, ADP rank <= ${DRIP_MAX_RANK}${targetIds.size ? `; ${targetIds.size} shortlist targets float first + bypass the cap` : ""}; ${rescout.length} open across ${new Set(rescout.map((e) => e.id)).size} players${tgtInQueue ? `, ${tgtInQueue} on your shortlist` : ""}):`);
+  const S = loadStakes();
+  const inSeason = S.leagues > 0;
+  const STAKE = ["your starter", "your bench", "rival rostered", "unrostered"];
+  const stakeOf = (id) => S.my.get(id)?.starter ? 0 : S.my.has(id) ? 1 : S.rostered.has(id) ? 2 : 3;
+  let drip, head;
+
+  if (inSeason) {
+    const eligible = rescout
+      .filter((e) => stakeOf(e.id) < 3 || (e.rank ?? 9999) <= DRIP_MAX_RANK)
+      .sort((a, b) =>
+        stakeOf(a.id) - stakeOf(b.id)
+        || (REASON_RANK[a.reason] ?? 9) - (REASON_RANK[b.reason] ?? 9)
+        || String(b.trigger_date).localeCompare(String(a.trigger_date))
+        || (a.rank ?? 9999) - (b.rank ?? 9999));
+    const urgent = take(eligible.filter((e) => stakeOf(e.id) === 0 && e.reason === "news"), Infinity);
+    const rest = take(eligible, DRIP);
+    drip = [...urgent, ...rest];
+    const byStake = [0, 1, 2, 3].map((k) => new Set(rescout.filter((e) => stakeOf(e.id) === k).map((e) => e.id)).size);
+    head = `  DRIP  re-scout these ${drip.length} this run: ${urgent.length} UNCAPPED (news on your starters) + ${rest.length} of up to ${DRIP} more by stake (in-season order across ${S.leagues} league roster rooms; ${rescout.length} open across ${new Set(rescout.map((e) => e.id)).size} players: ${byStake.map((n, k) => `${n} ${STAKE[k]}`).join(", ")}):`;
+  } else {
+    // PRE-DRAFT: targets jump the queue and bypass the rank cap; time-sensitive reasons drain by rank;
+    // the thin_source quality sweep holds a reserved slot so a hot news day cannot starve it.
+    const eligible = rescout
+      .filter((e) => isTarget(e.id) || (e.rank ?? 9999) <= DRIP_MAX_RANK)
+      .sort((a, b) =>
+        (isTarget(a.id) ? 0 : 1) - (isTarget(b.id) ? 0 : 1)
+        || (a.reason === "thin_source" ? 1 : 0) - (b.reason === "thin_source" ? 1 : 0)
+        || (a.rank ?? 9999) - (b.rank ?? 9999)
+        || (REASON_RANK[a.reason] ?? 9) - (REASON_RANK[b.reason] ?? 9));
+    const RESERVE = Math.min(THIN_RESERVE, DRIP);
+    const main = take(eligible, DRIP - RESERVE);
+    const thin = take(eligible.filter((e) => e.reason === "thin_source"), RESERVE);
+    /* A reserved slot the thin_source sweep cannot use goes back to the main queue. Before this, an
+       empty sweep silently left the run one short: 2 re-scouts a run, not 3. */
+    const topUp = take(eligible, DRIP - main.length - thin.length);
+    drip = [...main, ...thin, ...topUp];
+    const tgtInQueue = rescout.filter((e) => isTarget(e.id)).length;
+    head = `  DRIP  re-scout these ${drip.length} this run (cap ${DRIP}${RESERVE ? `, ${RESERVE} reserved for the thin_source quality sweep` : ""}, ADP rank <= ${DRIP_MAX_RANK}${targetIds.size ? `; ${targetIds.size} shortlist targets float first + bypass the cap` : ""}; ${rescout.length} open across ${new Set(rescout.map((e) => e.id)).size} players${tgtInQueue ? `, ${tgtInQueue} on your shortlist` : ""}):`;
+  }
+
+  console.log(head);
   if (!drip.length) console.log("    none. Queue is empty or everything left is outside the draftable range. Do NOT scout anything.");
   for (const e of drip) {
     const all = reasonsById.get(e.id) ?? [e.reason];
     const also = all.length > 1 ? `  (also: ${all.filter((r) => r !== e.reason).join(", ")}; one re-scout clears all)` : "";
-    console.log(`    ${isTarget(e.id) ? "★ " : ""}id=${e.id} #${e.rank} ${e.pos} ${e.name}  [${e.reason} ${e.trigger_date}]  ${e.detail}${also}`);
+    const tag = inSeason ? `{${STAKE[stakeOf(e.id)]}${S.my.has(e.id) ? `: ${S.my.get(e.id).leagues.join("/")}` : ""}} ` : isTarget(e.id) ? "★ " : "";
+    console.log(`    ${tag}id=${e.id} #${e.rank} ${e.pos} ${e.name}  [${e.reason} ${e.trigger_date}]  ${e.detail}${also}`);
   }
 }
 if (WORKLIST) {

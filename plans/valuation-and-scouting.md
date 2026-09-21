@@ -1754,6 +1754,43 @@ Files: `scripts/build-usage-recent.mjs`; the usage-risers section and `payload.u
 `scripts/stage-publish.mjs`; `USAGE_JSON` in `site/config.js`; `usageLine` in `site/app.js`;
 `.wusage` in `site/style.css`; steps 3, 4 and 6 of `.claude/commands/waivers.md`.
 
+### 1.34 Event-driven re-scouting: the drip orders by stake in season - 2026-09-21
+
+The backlog item said the routine should "re-scout a player in the same run the news lands, rather
+than waiting for the drip", and that this was an edit to the scheduled task. Measuring it showed
+both halves were slightly wrong.
+
+**The news already reaches the queue in the same run.** Step 1 writes the event, step 6's board
+build files it onto the player, and `validate-scouting.mjs` queues him, all before the drip picks
+anyone. Nothing waits. The drip simply picked the wrong players: it still ordered by **draft ADP**,
+which is the right order for a draft run-up and the wrong one in season. On 2026-09-21, 10 of Ben's
+starters across the three leagues had open news triggers, and ADP order put Mahomes' 2026-09-12 news
+56th in line and Chig Okonkwo's 80th, roughly ten and fourteen days out at six re-scouts a day, while
+55 of the 77 open news entries belonged to rivals.
+
+**So the fix is the ordering, in the repo.** Once any league has a roster room, the drip orders by
+**stake**: Ben's starters (season lineup or this week's, in any league), then his bench, then
+rivals' rostered players, then unrostered. Within a stake, news beats ADP drift beats the calendar
+backstop, newer beats older, and ADP rank only breaks ties. The ADP rank cap (`--drip-rank`, a
+draft-era "past ~150 is waiver fodder" saver) now applies only to unrostered players.
+
+**News on Ben's starters is uncapped** (his call over a stake-ordered cap of three): every one is
+re-scouted the run the news lands, plus up to three more by stake. The first run under it names 13
+(10 uncapped, then three more starters with briefs over 21 days old), and a heavy injury Sunday can
+make a Monday run long; that cost was accepted for briefs that are never more than a run behind the
+lineups they describe. This one change did need the scheduled task edited, because its step 7 said
+"never more than 3 in a single run": it now re-scouts exactly the list the script prints, whatever
+its length, and never adds to or trims it.
+
+**A bug fixed on the way.** The pre-draft path reserved one of the three slots for the thin_source
+quality sweep, and when that sweep had nothing left (it has had 0 open entries) the slot went unused:
+the drip had been re-scouting 2 players a run, not 3. An unusable reserved slot now goes back to the
+main queue. The pre-draft ordering is otherwise unchanged and still runs whenever no roster room
+exists; it was not exercised live on 2026-09-21, since all three leagues had one.
+
+Files: `loadStakes` and the `--drip` block in `scripts/validate-scouting.mjs`; step 7 of
+`~/.claude/scheduled-tasks/nfl-daily-events/SKILL.md` (outside the repo).
+
 ## 2. Challenge 2 — `scouting_brief` (public commentary)
 
 ### 2.1 What it is
