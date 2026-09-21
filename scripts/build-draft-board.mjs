@@ -632,7 +632,12 @@ const rows = [...skill, ...kickers, ...defs].map(([id, p]) => {
     fftiers: fftMap.get(normName(name)) ?? null, // Boris Chen half-PPR consensus rank+tier; null = not in his top-200
     ceiling: ceilingById.get(id) ?? null, // weekly spike-week rate; null = thin sample (rookie) or fetch failure
     usage: usageById.get(id) ?? null, // historical share/efficiency + gated trends; null = rookie/K/DEF (no NFL usage) — EVIDENCE + confidence only, never a value input
-    context: { contract_year: null, rookie_capital: rookieCap, team_win_total: null, playoff_sos: null },
+    /* rookie_capital is the one context field anything reads (the draft page's R1.03 badge). The other
+       three were dropped 2026-09-21 rather than left null forever: contract_year needs scraping
+       Spotrac/OTC for a weak signal, team_win_total already ships per team in the offensive-environment
+       layer (§1.19), and playoff strength of schedule is a backlog entry timed for week 8, when the
+       defensive samples can carry it and it arrives with a reader rather than as another empty field. */
+    context: { rookie_capital: rookieCap },
   };
 });
 
@@ -658,10 +663,7 @@ const board = {
     { field: "availability.score (rookies)", status: "null by design", fill: "no NFL history exists; page shows no-data" },
     { field: "situation.modifier", status: "unset", fill: "analysis pass over stored facts (facts only, no invented context)" },
     { field: "risk_flags.*", status: "researched for top ~35 (overlay); rest still null", fill: "extend the overlay; re-verify suspensions/holdouts in the final 2 weeks" },
-    { field: "context.contract_year", status: "missing", fill: "web (Spotrac/OTC), mostly static once pulled" },
     { field: "context.rookie_capital", status: "filled for rookies from DynastyProcess db_playerids (NFL draft capital); null = veteran or unmatched", fill: "auto from the ID crosswalk" },
-    { field: "context.team_win_total", status: "missing", fill: "Vegas win totals (web), refresh occasionally" },
-    { field: "context.playoff_sos", status: "missing", fill: "derive after 2026 schedule pull + win totals land" },
     { field: "projection (DEF)", status: "low confidence", fill: "points-allowed tiers unprojectable; DEF is a streaming position here anyway" },
   ],
   players: rows,
