@@ -27,6 +27,13 @@
 
   // `openRid` not `open`: a module-scope `open` shadows window.open for the whole IIFE.
   let DATA = null, sel = null, openRid = null;
+  /* Trade reads (§1.35): per proposal, whether the owner is likely to accept and how to pitch it,
+     written by /trade-reads. Optional, loaded beside the room and never waited on: a proposal with no
+     read renders exactly as it did before this layer existed. Keyed the way scripts/trade-reads.mjs
+     keys them, partner roster + the sorted ids each side sends. */
+  let READS = {};
+  const readKey = (rid, p) => `${rid}|${p.give.map((x) => x.id).sort().join("+")}>${p.get.map((x) => x.id).sort().join("+")}`;
+  const VERDICT = { likely: "likely", coin_flip: "coin flip", long_shot: "long shot" };
   /* Standings arrive separately and may not arrive at all. `state` is the honest three-way: we
      haven't asked yet, we asked and Sleeper answered, we asked and it didn't. Each one changes what
      the table is sorted by, and the panel says which. */
@@ -255,7 +262,17 @@
 
     const chip = (p) => `<span class="rr-pl">${window.HBGB_PlayerNews.link(p, "pn-strong")} <span class="faint">${esc(p.pos)}${p.team ? " " + esc(p.team) : ""}</span> <span class="mono">${num(p.pts, 0)}</span></span>`;
 
-    const deals = ps.length ? ps.map((p) => `
+    /* Proposals with a read sort likely first, so the ones worth sending lead; unread ones keep the
+       search's own order at the end of their group. */
+    const vRank = (p) => ({ likely: 0, coin_flip: 1, long_shot: 2 })[READS[readKey(t.roster_id, p)]?.verdict] ?? 1;
+    const ordered = [...ps].sort((a, b) => vRank(a) - vRank(b));
+    const readHTML = (p) => {
+      const r = READS[readKey(t.roster_id, p)];
+      if (!r) return "";
+      return `<div class="rr-read"><span class="rr-verdict rr-v-${esc(r.verdict)}">${esc(VERDICT[r.verdict] ?? r.verdict)}</span> ${esc(r.text)}
+        ${r.evidence ? `<span class="rr-read-ev">${esc(r.evidence)} · as of ${esc(r.as_of)}</span>` : `<span class="rr-read-ev">as of ${esc(r.as_of)}</span>`}</div>`;
+    };
+    const deals = ps.length ? ordered.map((p) => `
       <div class="rr-deal">
         <div class="rr-drow">
           <span class="rr-kind rr-kind-${p.kind === "2-for-1" ? "cons" : "even"}">${esc(p.kind)}</span>
@@ -270,6 +287,7 @@
           <span class="faint">projected starting points over the season</span>
           ${p.frees_bench ? `<span class="rr-frees" title="Two out, one in — and with only five bench spots, that spare slot is real value in this format.">frees a bench spot</span>` : ""}
         </div>
+        ${readHTML(p)}
       </div>`).join("")
       : `<div class="rr-nodeal">Nothing here raises <em>both</em> optimal lineups by the threshold, so nothing is
          proposed. That's the common case after a draft — it doesn't mean there's no conversation, it means any
@@ -383,6 +401,10 @@
       return;
     }
     DATA = d;
+    try {
+      const rr = await fetch(A.TRADE_READS_JSON, { cache: "no-store" });
+      if (rr.ok) READS = (await rr.json()).reads ?? {};
+    } catch { READS = {}; }
 
     const age = (Date.now() - new Date(d.generated).getTime()) / 864e5;
     $("#rr-meta").textContent = `${d.league.name} · ${d.league.season} · built ${d.generated}`;

@@ -43,7 +43,9 @@ const SHARED = [
   "data/site/usage-recent.json",  // step 8, the shared first step of build:leagues (§1.33)
 ];
 /* Per league, from its out_dir. Both are written by `npm run build:leagues` in step 8. */
-const PER_LEAGUE = ["roster-room.json", "player-news.json"];
+/* trade-reads.json is written by /trade-reads (§1.35) inside the routine, after build:leagues and
+   before this step, so it publishes with the refresh rather than committing itself. */
+const PER_LEAGUE = ["roster-room.json", "player-news.json", "trade-reads.json"];
 
 const wanted = [
   ...SHARED,

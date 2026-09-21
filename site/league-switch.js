@@ -56,6 +56,8 @@
     PLAYER_NEWS_JSON: `${L.data}/player-news.json`,
     WAIVERS_JSON: `${L.data}/waivers.json`,
     BRIEF_JSON: `${L.data}/latest-brief.json`,
+    // Claude-written reads on the roster room's trade proposals (§1.35). Optional: absent is normal.
+    TRADE_READS_JSON: `${L.data}/trade-reads.json`,
   };
 
   /* Switching reloads rather than re-rendering in place. Every panel on these pages is an async

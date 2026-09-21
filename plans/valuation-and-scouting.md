@@ -1791,6 +1791,52 @@ exists; it was not exercised live on 2026-09-21, since all three leagues had one
 Files: `loadStakes` and the `--drip` block in `scripts/validate-scouting.mjs`; step 7 of
 `~/.claude/scheduled-tasks/nfl-daily-events/SKILL.md` (outside the repo).
 
+### 1.35 Trade reads: will this owner accept it, and how to pitch it - 2026-09-21
+
+The roster room's trade search (§1.20) finds deals where both optimal lineups rise, and it is
+exhaustive and honest about that. What it cannot say is whether the other owner would say yes, and
+that is where judgment changes an action: the Performance panel (§1.32) routes a QB fix straight to
+these proposals. So the narrative layer §1.20 left for later is a read **per proposal**, not per team:
+a per-team paragraph would mostly re-word the room's own summary and the dossier, and projection-gap
+calls overlap the scouting briefs, which the drip now keeps current (§1.34).
+
+**Shape.** A coarse verdict, **likely / coin flip / long shot**, then one or two sentences on how he
+takes it and how and when to pitch it, then the evidence line and an as-of date. A label earns its
+place here where it did not in §1.32: there is no number underneath acceptance odds, and three bins
+are honest about how coarse the judgment is where a percentage would pretend otherwise.
+
+**The evidence rule, enforced by a gate rather than by trust.** `likely` and `long_shot` must cite
+what the owner has actually done (trade count, a dossier line, standing, a visible roster need), or the
+verdict is `coin_flip`. In a league with no owner history they are allowed only for a partner who
+has made a move this season. `node scripts/trade-reads.mjs --check` rejects anything else, along
+with a bad enum, text over 320 characters, and a read whose proposal no longer exists. It was tested
+by breaking a read four ways; each was caught and it exited 1.
+
+**Written incrementally, twice a day.** Proposals change with every rebuild, so a read is keyed to
+its exact proposal (partner roster plus the sorted ids each side sends) and carried forward while the
+proposal survives. The work order (`node scripts/trade-reads.mjs`) removes a read whose proposal is
+gone or that a news event on one of its players has overtaken (tested by backdating the Flowers read
+behind a real 2026-09-19 item: removed and re-queued), and lists only what needs writing, so a run
+costs what changed. The page shows no read before it shows one that predates the news on its players,
+and a proposal without a read renders exactly as it did before this layer.
+
+**Current data beats the dossier.** The dossiers were written before the season and some "current
+roster" lines have already aged (one called a 5th-seeded team the league's worst roster; another
+quoted last season's 4-10). Trade HISTORY transfers; a read of a roster or standing comes from the
+work order, which prints each partner's standing, strength rank and weak spots beside the dossier.
+
+**First run, 2026-09-21, HBGBs (8 proposals; the Pit and the Clash had none).** Two likely:
+DiaperDutyDaddy (the league's trade hub, holding two starting QBs) for Dart, and bwalsh89 (the
+habitual backup-QB drafter, RB his bottom slot) for Lawrence. Two deliberate coin flips on the same
+owners' BETTER QB (Purdy, Hurts), because each owner has a cheaper version of the deal that pays his
+own lineup more, so the likely outcome is a counter. Three long shots on owners with one or two trades
+in six seasons. The page sorts likely first, so the offer worth sending leads.
+
+Files: `scripts/trade-reads.mjs` (work order + `--check` gate); `.claude/commands/trade-reads.md`;
+`<out_dir>/trade-reads.json` per league; `TRADE_READS_JSON` in `site/league-switch.js`; `READS`,
+`readKey` and `readHTML` in `site/rosters.js`; `.rr-read` and `.rr-verdict` in `site/style.css`;
+`PER_LEAGUE` in `scripts/stage-publish.mjs`.
+
 ## 2. Challenge 2 — `scouting_brief` (public commentary)
 
 ### 2.1 What it is
