@@ -40,6 +40,7 @@ const SHARED = [
   "data/adp-history.json",        // step 6, appended
   "data/rescout-queue.json",      // step 6
   "data/draft-research.json",     // step 7, the drip's rewritten briefs
+  "data/site/usage-recent.json",  // step 8, the shared first step of build:leagues (§1.33)
 ];
 /* Per league, from its out_dir. Both are written by `npm run build:leagues` in step 8. */
 const PER_LEAGUE = ["roster-room.json", "player-news.json"];

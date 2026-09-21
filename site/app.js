@@ -279,6 +279,16 @@
     try { d = await fetchJSON(A.WAIVERS_JSON); }
     catch { return err("#waivers-body", `No published waiver board for ${esc(A.name)}. Run /waivers in Claude Code — it writes ${esc(A.data)}/waivers.json.`); }
     $("#waivers-meta").textContent = `generated ${d.generated} · ${d.mode} · ${d.targets.length} targets`;
+    /* Recent usage (§1.33), measured rather than paraphrased: one deterministic line per target from
+       the shared usage-recent.json, which the twice-daily build keeps newer than this board. Matched
+       by name + team, the only keys /waivers writes. Optional: without the file the rows render as
+       before and nothing says otherwise, because the board itself is still complete. */
+    let usage = null;
+    try {
+      const u = await fetchJSON(C.USAGE_JSON);
+      const idx = new Map(u.players.map((p) => [`${nkey(p.name)}|${p.team}`, p]));
+      usage = { u, find: (t) => idx.get(`${nkey(t.player)}|${t.team}`) || null };
+    } catch { usage = null; }
     const age = (Date.now() - new Date(d.generated).getTime()) / 864e5;
     const stale = age > 7 ? `<div class="stale-warn">This board is ${Math.floor(age)} days old — re-run /waivers for current suggestions.</div>` : "";
     const confDots = { high: "●●●", med: "●●○", low: "●○○" };
@@ -332,6 +342,7 @@
           </span>
         </button>
         <div class="wdetail" id="wd-${i}"${isOpen ? "" : " hidden"}>
+          ${usage ? usageLine(usage, t) : ""}
           ${t.bid ? `<div class="bid-long"><b>bid:</b> ${esc(t.bid)}</div>` : ""}
           <div class="why">${esc(t.why)}</div>
           ${t.asset ? `<div class="wasset"><b>asset:</b> ${esc(t.asset)}${t.rate_basis ? ` <span class="faint">(${esc(t.rate_basis)})</span>` : ""}${t.edge ? ` · <b class="${edgeCls(t.edge)}">${esc(t.edge)}</b>` : ""}${t.worth != null && t.worth !== "" ? ` · worth <b>${esc(t.worth)}</b>` : ""}</div>` : ""}
@@ -344,6 +355,30 @@
     // `note` is deliberately not rendered (§1.29): it had grown into a paragraph that restated what
     // the rows already say, led in the Pit and the Clash by the same "unpriced" caveat every row carries.
     syncExpandAll();
+  }
+  const nkey = (s) => String(s || "").toLowerCase().replace(/[^a-z]/g, "");
+  const pct = (x) => (x == null ? "–" : `${Math.round(x * 100)}%`);
+  /* One line, the measure that decides a riser first (target share for WR/TE, touch share for RB,
+     snap share for QB), then snaps. "Last week" and the window are both shown once they differ. */
+  function usageLine({ u, find }, t) {
+    // K and DEF have no snap/target usage to measure, so they get no line rather than a misleading "no snaps".
+    if (!["QB", "RB", "WR", "TE"].includes(String(t.pos).toUpperCase())) return "";
+    const p = find(t);
+    if (!p) {
+      return `<div class="wusage"><b>usage:</b> <span class="faint">no snaps in a final week of ${esc(u.season)}${u.final_weeks.length ? ` (through week ${u.final_weeks[u.final_weeks.length - 1]})` : ""}</span></div>`;
+    }
+    const one = (x) => {
+      if (!x) return "–";
+      const lead = p.metric === "target_share" ? `tgt ${pct(x.target_share)} (${x.tgt_pg}/g)`
+        : p.metric === "touch_share" ? `touch ${pct(x.touch_share)} (${x.touch_pg}/g)`
+        : `${x.pa_pg} att/g`;
+      return `snap ${pct(x.snap_share)} · ${lead}${x.rz ? ` · ${x.rz} RZ` : ""}`;
+    };
+    const multi = p.window.weeks.length > 1;
+    const lastTxt = p.last ? `wk ${p.last.w}: ${one(p.last)}` : `<span class="faint">did not play week ${u.final_weeks[u.final_weeks.length - 1]}</span>`;
+    const winTxt = multi ? ` <span class="faint">·</span> wks ${p.window.weeks[0]}-${p.window.weeks[p.window.weeks.length - 1]}: ${one(p.window)}` : "";
+    const jump = p.jump && p.jump.claimed ? ` <span class="rr-pos">▲ jump ${pct(p.jump.from)}→${pct(p.jump.to)}</span>` : "";
+    return `<div class="wusage"><b>usage:</b> ${lastTxt}${winTxt}${jump}</div>`;
   }
   const setWOpen = (btn, open) => {
     btn.setAttribute("aria-expanded", String(open));

@@ -1695,6 +1695,65 @@ cached in `data/raw/matchups-YYYY.json` and `data/raw/proj-weekly-YYYY.json`; pa
 projections cached locally in `data/raw/cache/` (gitignored); `renderPerformance` in `site/app.js`;
 `.perf*` and the `tag-live/pin/waiver/trade/lineup` tags in `site/style.css`.
 
+### 1.33 The waiver-side usage lens: measured usage and league-relative risers - 2026-09-21
+
+`/waivers` step 6 has always asked for a "recent snap/route/target trend" as a target's rate basis,
+and nothing computed one: the numbers came out of articles, paraphrased and a week late, and the pool
+came from national add counts. This builds the trend from Sleeper's own weekly stats and uses it
+twice, once to measure and once to discover.
+
+**What the backlog item got wrong.** It said "the same usage pipeline exists at build time". The
+*method* does (the draft board's share definitions and its per-week team-snap fingerprint for team
+totals) but the *data* does not: the board reads 2023-25 for the top-200 pool, which is exactly
+where waiver candidates are not. So this is a second, small pipeline over 2026 that reuses the method.
+
+**The lens** (`scripts/build-usage-recent.mjs` -> `data/site/usage-recent.json`, shared by every
+league because snaps and targets do not depend on scoring). Every skill player with a 2026 snap in a
+**final** week (every game complete, the same rule as §1.32), with his last final week and his last
+three final weeks: snap share, target share, touch share, targets and touches per game, red-zone
+looks, air yards, pass attempts. Shares are summed then divided, so a 2-target week and a 12-target
+week are not averaged as equals. A jump (last week against the weeks before it in the window, with at
+least two of them) is flagged at twice the board's multi-year direction threshold. That size is a
+chosen tunable, not a measured one, and it only labels a riser; it never makes one. **No routes**:
+Sleeper publishes none, so snap share is the stand-in and everything says snaps. The file keeps only
+the window, which holds it near 190KB all season.
+
+**Risers, per league** (in `build-roster-room.mjs`, published as `usage_risers`). Decided in four
+questions:
+- **Discover, not just measure.** The lens emits a third source for the `/waivers` pool, and the
+  only one measured on this league's own unrostered players rather than on hype.
+- **Level against the league's own rostered median.** A riser is an unrostered RB/WR/TE at or above
+  the median rostered player at his position in *this* league, on target share (WR/TE) or touch share
+  (RB). A fixed bar would be a made-up number that means different things at 60, 72 and 84 startable
+  slots. The median moves with depth: on week 1 the owned-TE median is 0.20 in the HBGBs and 0.14 in
+  the Clash, so more tight ends clear in the thinner league, which is correct.
+- **Either window clears it, labelled.** Last week OR the three-week window. A three-week mean alone
+  would dilute Adonai Mitchell's new role into his old one and miss the exact case waivers exist for.
+  The label (`last_week`, `window`, `both`, or `one_week` while only one final week exists)
+  feeds `/waivers`' confidence: a one-game read caps at low.
+- **No QBs.** In a one-QB league about twenty NFL starters sit unrostered, so the level test passed
+  all of them and produced a pass-volume sort of known starters. Ben makes QB calls himself.
+Capped at six per position by margin over the median. Out/IR players are excluded.
+
+**On the waiver board**, every skill-position target's expanded row now opens on a measured line,
+`usage: wk 1: snap 56% · tgt 17% (6/g)`, plus the window and a jump arrow once they exist. Matched by
+name and team, the only keys `/waivers` writes; all 18 targets on the 2026-09-21 board matched. K and
+DEF get no line. It paid for itself on the first look: the board's two pursues, Bigsby and Wilson,
+played 11% and 6% of week-1 snaps, so their whole case is week 2, and the row now shows it.
+
+**`/waivers` reads it.** Risers are the first pool source; usage numbers come from the file rather
+than articles (web search is for *why* the usage moved); `rate_basis` quotes the file's numbers so
+they can be checked against the line printed beside them; the riser label sets the confidence ceiling.
+
+**Wiring.** `build:leagues` runs the lens once, before the per-league loop, and still builds every
+league if it fails (each roster room reports no usage file). `stage:publish` carries
+`usage-recent.json` as a shared file. `npm run build:usage` runs it alone.
+
+Files: `scripts/build-usage-recent.mjs`; the usage-risers section and `payload.usage_risers` in
+`scripts/build-roster-room.mjs`; `SHARED_STEPS` in `scripts/build-leagues.mjs`; `SHARED` in
+`scripts/stage-publish.mjs`; `USAGE_JSON` in `site/config.js`; `usageLine` in `site/app.js`;
+`.wusage` in `site/style.css`; steps 3, 4 and 6 of `.claude/commands/waivers.md`.
+
 ## 2. Challenge 2 — `scouting_brief` (public commentary)
 
 ### 2.1 What it is

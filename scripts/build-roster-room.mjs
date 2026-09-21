@@ -1322,6 +1322,64 @@ console.log(`  byes: threshold ${performance.byes.threshold}/g · flagged ${byeF
 for (const a of ROUTED) console.log(`  action [${a.kind ?? "none"}] ${a.text}`);
 for (const b of performance.blind_spots) console.log(`  ${b.text}`);
 
+/* ------------------------------------------------------ usage risers (the waiver-side lens)
+   §1.33. data/site/usage-recent.json is league-agnostic; who counts as a riser is not, because it
+   depends on who is rostered HERE. A riser is an unrostered player whose recent usage clears the
+   median rostered player at his position in this league, on EITHER his last completed week or his
+   last-three-week window (a new role shows up in one, a steady one in the other), with the label
+   saying which. The median is the league's own answer to "what does an owned player's role look
+   like", so it moves with depth: the Clash's median owned WR is used less than the HBGBs'. */
+const USAGE_PATH = path.join(ROOT, "data", "site", "usage-recent.json");
+const RISER_CAP = 6;   // per position, ranked by margin over the median
+const RISER_POS = ["RB", "WR", "TE"];
+let usageRisers = null;
+if (fs.existsSync(USAGE_PATH)) {
+  const U = JSON.parse(fs.readFileSync(USAGE_PATH, "utf8"));
+  const multiWeek = U.window_weeks.length > 1;
+  const medians = {}, risers = [];
+  /* No QBs. In a one-QB league about twenty NFL starters sit unrostered, so "used like an owned QB"
+     is true of all of them and the list would be a pass-volume sort of known starters. Ben makes QB
+     calls himself (§1.33); QBs keep their usage line on the waiver board. */
+  for (const pos of RISER_POS) {
+    const metric = U.metric_by_pos[pos];
+    const inPos = U.players.filter((p) => p.pos === pos);
+    const owned = inPos.filter((p) => ROSTERED.has(p.id));
+    const vals = (k) => owned.map((p) => p[k] && p[k][metric]).filter((v) => v != null);
+    const mLast = PERF.quantile(vals("last"), 0.5), mWin = PERF.quantile(vals("window"), 0.5);
+    medians[pos] = { metric, last: mLast, window: mWin, rostered_with_usage: owned.length };
+    const cands = [];
+    for (const p of inPos) {
+      if (ROSTERED.has(p.id) || (p.injury && DESIGNATED_OUT.has(p.injury))) continue;
+      const l = p.last ? p.last[metric] : null, w = p.window[metric];
+      const byLast = l != null && mLast != null && l >= mLast;
+      const byWin = multiWeek && w != null && mWin != null && w >= mWin;
+      if (!byLast && !byWin) continue;
+      /* With one final week the two windows are the same week, so the label says so rather than
+         claiming a "sustained" read off a single game. */
+      const reason = !multiWeek ? "one_week" : byLast && byWin ? "both" : byLast ? "last_week" : "window";
+      const margin = Math.max(byLast ? l - mLast : -Infinity, byWin ? w - mWin : -Infinity);
+      cands.push({
+        id: p.id, name: p.name, pos, team: p.team, injury: p.injury, metric,
+        last: p.last ? { w: p.last.w, share: l, snap_share: p.last.snap_share, tgt: p.last.tgt_pg, touch: p.last.touch_pg } : null,
+        window: { weeks: p.window.weeks, share: w, snap_share: p.window.snap_share },
+        reason, margin: +margin.toFixed(3),
+        jump: p.jump && p.jump.claimed ? { from: p.jump.from, to: p.jump.to } : null,
+      });
+    }
+    cands.sort((a, b) => b.margin - a.margin || a.name.localeCompare(b.name));
+    risers.push(...cands.slice(0, RISER_CAP));
+  }
+  usageRisers = {
+    generated: U.generated, weeks: U.window_weeks, medians, risers,
+    basis: `Unrostered in ${L.name}, not listed Out/IR, and at or above this league's median rostered player at his position (${RISER_POS.map((p) => `${p} ${U.metric_by_pos[p].replace("_", " ")}`).join(", ")}; QBs are left to judgment, since most starters go unrostered in a one-QB league) on his last completed week or his last-${U.window_weeks.length > 1 ? U.window_weeks.length : "N"}-week window. Top ${RISER_CAP} per position by margin over that median. ${multiWeek ? "" : "Only one final week so far, so every riser is a one-week read. "}Snap share stands in for routes, which Sleeper does not publish.`,
+  };
+  const byPos = {};
+  for (const r of risers) byPos[r.pos] = (byPos[r.pos] || 0) + 1;
+  console.log(`  usage risers (week${U.window_weeks.length === 1 ? "" : "s"} ${U.window_weeks.join(", ")}): ${Object.entries(byPos).map(([p, n]) => `${p} ${n}`).join(" · ") || "none"} · medians ${Object.entries(medians).map(([p, m]) => `${p} ${m.last}`).join(" ")}`);
+} else {
+  console.warn(`  ! ${path.relative(ROOT, USAGE_PATH)} not found — no usage risers. Run node scripts/build-usage-recent.mjs first.`);
+}
+
 /* ------------------------------------------------------------------------------- write */
 const payload = {
   generated: TODAY,
@@ -1390,6 +1448,9 @@ const payload = {
   /* HQ's roster performance module (plans/roster-performance-module.md). Mine only, but every
      rank inside it is against the whole league, and `league` carries the table it was ranked on. */
   performance,
+  /* §1.33: unrostered players used like this league's rostered median. A third source for the
+     /waivers pool; the waiver board's usage line reads the shared usage-recent.json directly. */
+  usage_risers: usageRisers,
   teams: teams.map((t) => t.out),
 };
 

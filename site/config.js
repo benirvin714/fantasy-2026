@@ -54,6 +54,9 @@ window.HQ_CONFIG = {
 
   /* Shared across every league — none of it depends on scoring or on who is rostered where. */
   EVENTS_JSON: "/data/site/nfl-events.json",
+  // Shared by every league: recent snap/target usage, league-agnostic (§1.33). The waiver board's
+  // usage line reads it; each league's risers are computed from it in that league's roster room.
+  USAGE_JSON: "/data/site/usage-recent.json",
   DRAFT_BOARD_JSON: "/data/site/draft-board.json",
   TEAM_ENV_JSON: "/data/site/team-environment.json",
 

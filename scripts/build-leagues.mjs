@@ -16,6 +16,11 @@
  * ORDER MATTERS WITHIN A LEAGUE, not across them. build-player-news joins the roster room's output,
  * so it runs second for each league. Leagues are independent.
  *
+ * ONE SHARED STEP RUNS FIRST. build-usage-recent writes data/site/usage-recent.json, which is
+ * league-agnostic (snaps and targets do not depend on scoring) and which every league's roster room
+ * reads to find its own usage risers (§1.33). It runs once, before the loop. If it fails, the leagues
+ * still build - each roster room says it found no usage file - and the run reports the failure.
+ *
  * A REFUSAL IS NOT A FAILURE. build-roster-room deliberately exits 1 with "Refusing to build:" when
  * a league's rosters are not full - it is a post-draft tool, so it refuses on every scheduled run
  * between a renewal and that season's draft. That is correct behaviour and must not fail the whole
@@ -63,6 +68,18 @@ const run = (script, key) => spawnSync(process.execPath, [path.join(ROOT, "scrip
   encoding: "utf8",
 });
 
+/* The shared step. Not skipped by --only: a single league's risers still need a current file. */
+const SHARED_STEPS = [{ script: "build-usage-recent.mjs", label: "recent usage (shared)" }];
+let sharedFailed = null;
+for (const s of SHARED_STEPS) {
+  console.log(`
+=== ${s.label} ===`);
+  if (dryRun) { console.log(`  would run: node scripts/${s.script}`); continue; }
+  const r = spawnSync(process.execPath, [path.join(ROOT, "scripts", s.script)], { cwd: ROOT, stdio: ["ignore", "inherit", "pipe"], encoding: "utf8" });
+  if (r.stderr) process.stderr.write(r.stderr);
+  if (r.status !== 0) sharedFailed = `${s.script} exited ${r.status ?? "on a signal"}`;
+}
+
 const results = [];
 for (const key of keys) {
   const L = LEAGUES[key];
@@ -97,6 +114,7 @@ console.log("\n---------------------------------------------------------------")
 for (const r of results) {
   console.log(`  ${r.status.padEnd(8)} ${r.name}${r.note ? `  — ${r.note}` : ""}`);
 }
+if (sharedFailed) results.push({ key: "shared", name: "recent usage (shared)", status: "FAILED", note: sharedFailed });
 const failed = results.filter((r) => r.status === "FAILED");
 const skipped = results.filter((r) => r.status === "skipped");
 if (skipped.length) {
