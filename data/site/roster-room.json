@@ -29,9 +29,9 @@
   "display_week": 4,
   "rolled_forward": false,
   "teams_playing": 32,
-  "projected": 140,
+  "projected": 137,
   "close_band": 1.5,
-  "of_rostered": 154,
+  "of_rostered": 155,
   "schedule_source": "pairings from Sleeper's regular-season schedule, kickoff times from ESPN's public scoreboard",
   "projection_source": "Sleeper week-4 projected stat lines re-scored with The HBGBs's exact scoring_settings — the same arithmetic as the season column, over a different stat line.",
   "result_source": "The HBGBs's own week-4 matchup rows — Sleeper's scoring of each player in this league's settings, read as published rather than recomputed here.",
@@ -41,8 +41,8 @@
   "warnings": []
  },
  "coverage": {
-  "rostered": 154,
-  "priced": 154,
+  "rostered": 155,
+  "priced": 155,
   "off_board_priced": 6,
   "league_median_starters": 1837
  },
@@ -623,8 +623,8 @@
    {
     "kind": "waiver",
     "panel": "waivers",
-    "gain": 0.7,
-    "text": "claim Jakobi Meyers (WR JAX) — worth 0.7 a game in week 13.",
+    "gain": 0.3,
+    "text": "claim Brenton Strange (TE JAX) — worth 0.3 a game in week 13.",
     "gaps": [
      "Week 13 bye (10.6 a game short)"
     ]
@@ -642,8 +642,8 @@
   "blind_spots": [],
   "sources": {
    "waivers": {
-    "generated": "2026-10-01",
-    "age_days": 1,
+    "generated": "2026-10-02",
+    "age_days": 0,
     "stale": false
    },
    "trades": "12 proposal(s) from this build's trade search"
@@ -677,8 +677,8 @@
    "WR": {
     "metric": "target_share",
     "last": 0.23,
-    "window": 0.24,
-    "rostered_with_usage": 52
+    "window": 0.23,
+    "rostered_with_usage": 53
    },
    "TE": {
     "metric": "target_share",
@@ -716,36 +716,6 @@
     "jump": {
      "from": 0.135,
      "to": 0.3
-    }
-   },
-   {
-    "id": "5947",
-    "name": "Jakobi Meyers",
-    "pos": "WR",
-    "team": "JAX",
-    "injury": "Questionable",
-    "metric": "target_share",
-    "last": {
-     "w": 3,
-     "share": 0.296,
-     "snap_share": 0.806,
-     "tgt": 8,
-     "touch": 8
-    },
-    "window": {
-     "weeks": [
-      1,
-      2,
-      3
-     ],
-     "share": 0.143,
-     "snap_share": 0.787
-    },
-    "reason": "last_week",
-    "margin": 0.066,
-    "jump": {
-     "from": 0.06,
-     "to": 0.296
     }
    },
    {
@@ -941,26 +911,29 @@
    "bench_pts": 587.1,
    "week": {
     "n": 4,
-    "starter_pts": 107.6,
-    "starter_n": 9,
+    "starter_pts": 93.8,
+    "starter_n": 8,
     "starter_of": 10,
-    "bench_pts": 39.6,
+    "bench_pts": 42.4,
     "bench_n": 4,
     "bench_of": 4,
     "scored_pts": 22.1,
     "scored_n": 2,
-    "optimal_pts": 126.3,
+    "optimal_pts": 120,
     "changes": {
      "in": [
-      "Tyler Shough"
+      "Tyler Shough",
+      "Romeo Doubs"
      ],
      "out": [
-      "Caleb Williams"
+      "Caleb Williams",
+      "Justin Jefferson"
      ],
-     "gain": 18.7,
+     "gain": 26.2,
      "close": 0,
      "unavailable": [
-      "Caleb Williams (Doubtful)"
+      "Caleb Williams (Out)",
+      "Justin Jefferson (Out)"
      ],
      "unfilled": []
     }
@@ -991,11 +964,11 @@
        "start": false,
        "margin": null,
        "close": false,
-       "why": "Sleeper lists him Doubtful. Availability is decided before points. If the designation clears, the next build puts him back."
+       "why": "Sleeper lists him Out. Availability is decided before points. If the designation clears, the next build puts him back."
       },
       "bye": 10,
       "adp": 74.6,
-      "injury": "Doubtful"
+      "injury": "Out"
      },
      "rank": 9,
      "vs_median": -8.1
@@ -1022,9 +995,9 @@
       },
       "week_call": {
        "start": true,
-       "margin": 11.1,
+       "margin": 10.5,
        "close": false,
-       "why": "In the week-4 lineup. Benching him costs 11.1 projected points."
+       "why": "In the week-4 lineup. Benching him costs 10.5 projected points."
       },
       "bye": 13,
       "adp": 14.8,
@@ -1055,9 +1028,9 @@
       },
       "week_call": {
        "start": true,
-       "margin": 5.8,
+       "margin": 5.2,
        "close": false,
-       "why": "In the week-4 lineup. Benching him costs 5.8 projected points."
+       "why": "In the week-4 lineup. Benching him costs 5.2 projected points."
       },
       "bye": 14,
       "adp": 30.1,
@@ -1075,7 +1048,7 @@
       "team": "MIN",
       "pts": 205.4,
       "round": 2,
-      "week_pts": 13.6,
+      "week_pts": null,
       "week_actual": null,
       "game": {
        "week": 4,
@@ -1087,14 +1060,14 @@
        "completed": false
       },
       "week_call": {
-       "start": true,
-       "margin": 6.2,
+       "start": false,
+       "margin": null,
        "close": false,
-       "why": "In the week-4 lineup. Benching him costs 6.2 projected points."
+       "why": "Sleeper lists him Out. Availability is decided before points. If the designation clears, the next build puts him back."
       },
       "bye": 6,
       "adp": 12.8,
-      "injury": "Questionable"
+      "injury": "Out"
      },
      "rank": 8,
      "vs_median": -15.9
@@ -1121,9 +1094,9 @@
       },
       "week_call": {
        "start": true,
-       "margin": 0.3,
-       "close": true,
-       "why": "In the week-4 lineup, but only by 0.3 — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
+       "margin": 7.7,
+       "close": false,
+       "why": "In the week-4 lineup. Benching him costs 7.7 projected points."
       },
       "bye": 9,
       "adp": 122.6,
@@ -1141,7 +1114,7 @@
       "team": "CHI",
       "pts": 173.4,
       "round": 6,
-      "week_pts": 8.5,
+      "week_pts": 8.3,
       "week_actual": null,
       "game": {
        "week": 4,
@@ -1154,9 +1127,9 @@
       },
       "week_call": {
        "start": true,
-       "margin": 0.7,
+       "margin": 0.5,
        "close": true,
-       "why": "In the week-4 lineup, but only by 0.7 — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
+       "why": "In the week-4 lineup, but only by 0.5 — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
       },
       "bye": 10,
       "adp": 43.9,
@@ -1187,9 +1160,9 @@
       },
       "week_call": {
        "start": true,
-       "margin": 6.8,
+       "margin": 6.2,
        "close": false,
-       "why": "In the week-4 lineup. Benching him costs 6.8 projected points."
+       "why": "In the week-4 lineup. Benching him costs 6.2 projected points."
       },
       "bye": 14,
       "adp": 27.7,
@@ -1223,9 +1196,9 @@
       },
       "week_call": {
        "start": true,
-       "margin": 9.1,
+       "margin": 8.5,
        "close": false,
-       "why": "In the week-4 lineup. Benching him costs 9.1 projected points."
+       "why": "In the week-4 lineup. Benching him costs 8.5 projected points."
       },
       "bye": 9,
       "adp": 67.6,
@@ -1406,26 +1379,32 @@
      {
       "name": "Caleb Williams",
       "pos": "QB",
-      "status": "Doubtful"
+      "status": "Out"
      },
      {
       "name": "Justin Jefferson",
       "pos": "WR",
-      "status": "Questionable"
+      "status": "Out"
      }
     ],
     "fragile": [
+     {
+      "name": "Justin Jefferson",
+      "pos": "WR",
+      "score": 0.78,
+      "why": "2023 hamstring (IR, soft-tissue, reinjury-prone class); durable since (17/17). Annual hamstring-flare watch."
+     },
+     {
+      "name": "Caleb Williams",
+      "pos": "QB",
+      "score": 0.85,
+      "why": "No significant missed time (--/17/17)."
+     },
      {
       "name": "Derrick Henry",
       "pos": "RB",
       "score": 0.85,
       "why": "Remarkably durable (17/17/17); the flag is age (32), not health."
-     },
-     {
-      "name": "Justin Jefferson",
-      "pos": "WR",
-      "score": 0.89,
-      "why": "2023 hamstring (IR, soft-tissue, reinjury-prone class); durable since (17/17). Annual hamstring-flare watch."
      }
     ],
     "flagged": []
@@ -1468,7 +1447,7 @@
      "team": "NE",
      "pts": 132.7,
      "round": 14,
-     "week_pts": 7.4,
+     "week_pts": 7.5,
      "week_actual": null,
      "game": {
       "week": 4,
@@ -1480,10 +1459,10 @@
       "completed": false
      },
      "week_call": {
-      "start": false,
-      "margin": 0.3,
-      "close": true,
-      "why": "Out of the week-4 lineup by 0.3, against Wan'Dale Robinson — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
+      "start": true,
+      "margin": 7.5,
+      "close": false,
+      "why": "In the week-4 lineup. Benching him costs 7.5 projected points."
      },
      "bye": 11,
      "starts_on": 0,
@@ -1511,9 +1490,9 @@
      },
      "week_call": {
       "start": false,
-      "margin": 0.7,
+      "margin": 0.5,
       "close": true,
-      "why": "Out of the week-4 lineup by 0.7, against Colston Loveland — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
+      "why": "Out of the week-4 lineup by 0.5, against Colston Loveland — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
      },
      "bye": 13,
      "starts_on": 2,
@@ -1528,7 +1507,7 @@
      "team": "SEA",
      "pts": 51,
      "round": null,
-     "week_pts": 5.7,
+     "week_pts": 8.4,
      "week_actual": null,
      "game": {
       "week": 4,
@@ -1541,9 +1520,9 @@
      },
      "week_call": {
       "start": false,
-      "margin": 7.9,
+      "margin": 5.2,
       "close": false,
-      "why": "7.9 short of Javonte Williams, the weakest starter he could replace in week 4."
+      "why": "5.2 short of Javonte Williams, the weakest starter he could replace in week 4."
      },
      "bye": 11,
      "starts_on": 0,
@@ -1711,26 +1690,28 @@
    "bench_pts": 597.8,
    "week": {
     "n": 4,
-    "starter_pts": 108.2,
+    "starter_pts": 107.2,
     "starter_n": 9,
     "starter_of": 10,
-    "bench_pts": 35.3,
+    "bench_pts": 36,
     "bench_n": 4,
     "bench_of": 6,
     "scored_pts": 0,
     "scored_n": 0,
-    "optimal_pts": 117.6,
+    "optimal_pts": 118.6,
     "changes": {
      "in": [
       "Alvin Kamara",
-      "Jordan Addison"
+      "Jordan Addison",
+      "Dontayvion Wicks"
      ],
      "out": [
       "Travis Etienne",
+      "Terry McLaurin",
       "Tony Pollard"
      ],
-     "gain": 9.4,
-     "close": 3,
+     "gain": 11.4,
+     "close": 4,
      "unavailable": [
       "Travis Etienne (IR)"
      ],
@@ -1748,7 +1729,7 @@
       "team": "SF",
       "pts": 303.2,
       "round": 12,
-      "week_pts": 20,
+      "week_pts": 20.1,
       "week_actual": null,
       "game": {
        "week": 4,
@@ -1761,9 +1742,9 @@
       },
       "week_call": {
        "start": true,
-       "margin": 20,
+       "margin": 20.1,
        "close": false,
-       "why": "In the week-4 lineup. Benching him costs 20 projected points."
+       "why": "In the week-4 lineup. Benching him costs 20.1 projected points."
       },
       "bye": 8,
       "adp": 127.1,
@@ -1781,7 +1762,7 @@
       "team": "PHI",
       "pts": 228.2,
       "round": 2,
-      "week_pts": 13.7,
+      "week_pts": 13.8,
       "week_actual": null,
       "game": {
        "week": 4,
@@ -1794,9 +1775,9 @@
       },
       "week_call": {
        "start": true,
-       "margin": 5.1,
+       "margin": 5.2,
        "close": false,
-       "why": "In the week-4 lineup. Benching him costs 5.1 projected points."
+       "why": "In the week-4 lineup. Benching him costs 5.2 projected points."
       },
       "bye": 10,
       "adp": 10.9,
@@ -1860,9 +1841,9 @@
       },
       "week_call": {
        "start": true,
-       "margin": 6.5,
+       "margin": 6.6,
        "close": false,
-       "why": "In the week-4 lineup. Benching him costs 6.5 projected points."
+       "why": "In the week-4 lineup. Benching him costs 6.6 projected points."
       },
       "bye": 6,
       "adp": 7,
@@ -1880,7 +1861,7 @@
       "team": "WAS",
       "pts": 176.8,
       "round": 5,
-      "week_pts": 9.9,
+      "week_pts": 8.4,
       "week_actual": null,
       "game": {
        "week": 4,
@@ -1892,14 +1873,14 @@
        "completed": false
       },
       "week_call": {
-       "start": true,
-       "margin": 1.2,
+       "start": false,
+       "margin": 0.3,
        "close": true,
-       "why": "In the week-4 lineup, but only by 1.2 — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
+       "why": "Out of the week-4 lineup by 0.3, against Dontayvion Wicks — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
       },
       "bye": 7,
       "adp": 55,
-      "injury": null
+      "injury": "Questionable"
      },
      "rank": 7,
      "vs_median": -9.4
@@ -1946,7 +1927,7 @@
       "team": "BUF",
       "pts": 147.5,
       "round": 6,
-      "week_pts": 11.8,
+      "week_pts": 12,
       "week_actual": null,
       "game": {
        "week": 4,
@@ -1959,13 +1940,13 @@
       },
       "week_call": {
        "start": true,
-       "margin": 3.1,
+       "margin": 3.4,
        "close": false,
-       "why": "In the week-4 lineup. Benching him costs 3.1 projected points."
+       "why": "In the week-4 lineup. Benching him costs 3.4 projected points."
       },
       "bye": 7,
       "adp": 49.4,
-      "injury": "Questionable"
+      "injury": null
      },
      "rank": 10,
      "vs_median": -36
@@ -1992,9 +1973,9 @@
       },
       "week_call": {
        "start": false,
-       "margin": 0.2,
+       "margin": 0.1,
        "close": true,
-       "why": "Out of the week-4 lineup by 0.2, against Alvin Kamara — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
+       "why": "Out of the week-4 lineup by 0.1, against Dontayvion Wicks — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
       },
       "bye": 9,
       "adp": 76.6,
@@ -2045,7 +2026,7 @@
       "team": "GB",
       "pts": 86,
       "round": null,
-      "week_pts": 6.5,
+      "week_pts": 6.6,
       "week_actual": null,
       "game": {
        "week": 4,
@@ -2058,9 +2039,9 @@
       },
       "week_call": {
        "start": true,
-       "margin": 6.5,
+       "margin": 6.6,
        "close": false,
-       "why": "In the week-4 lineup. Benching him costs 6.5 projected points."
+       "why": "In the week-4 lineup. Benching him costs 6.6 projected points."
       },
       "bye": 11,
       "adp": 210.6,
@@ -2157,7 +2138,7 @@
       "status": "IR"
      },
      {
-      "name": "DJ Moore",
+      "name": "Terry McLaurin",
       "pos": "WR",
       "status": "Questionable"
      }
@@ -2170,16 +2151,16 @@
       "why": "No significant missed time (17/15/17)."
      },
      {
+      "name": "Terry McLaurin",
+      "pos": "WR",
+      "score": 0.837,
+      "why": "2025 missed time (10 games)."
+     },
+     {
       "name": "Saquon Barkley",
       "pos": "RB",
       "score": 0.856,
       "why": "Durable recently (14/16/16), no chronic pattern; the flag is age (29) not health."
-     },
-     {
-      "name": "Terry McLaurin",
-      "pos": "WR",
-      "score": 0.863,
-      "why": "2025 missed time (10 games)."
      }
     ],
     "flagged": [
@@ -2230,7 +2211,7 @@
      "team": "CHI",
      "pts": 143.1,
      "round": 10,
-     "week_pts": 8.6,
+     "week_pts": 7.6,
      "week_actual": null,
      "game": {
       "week": 4,
@@ -2243,9 +2224,9 @@
      },
      "week_call": {
       "start": false,
-      "margin": 0.2,
+      "margin": 1.1,
       "close": true,
-      "why": "Out of the week-4 lineup by 0.2, against Alvin Kamara — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
+      "why": "Out of the week-4 lineup by 1.1, against Dontayvion Wicks — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
      },
      "bye": 10,
      "starts_on": 1,
@@ -2260,7 +2241,7 @@
      "team": "MIN",
      "pts": 141.7,
      "round": 9,
-     "week_pts": 9.2,
+     "week_pts": 10.9,
      "week_actual": null,
      "game": {
       "week": 4,
@@ -2273,9 +2254,9 @@
      },
      "week_call": {
       "start": true,
-      "margin": 0.5,
-      "close": true,
-      "why": "In the week-4 lineup, but only by 0.5 — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
+      "margin": 2.3,
+      "close": false,
+      "why": "In the week-4 lineup. Benching him costs 2.3 projected points."
      },
      "bye": 6,
      "starts_on": 2,
@@ -2332,10 +2313,10 @@
       "completed": false
      },
      "week_call": {
-      "start": false,
-      "margin": 0.5,
+      "start": true,
+      "margin": 0.1,
       "close": true,
-      "why": "Out of the week-4 lineup by 0.5, against Jordan Addison — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
+      "why": "In the week-4 lineup, but only by 0.1 — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
      },
      "bye": null,
      "starts_on": 0,
@@ -2461,18 +2442,18 @@
    "starter_pts": 1751.5,
    "starter_rank": 10,
    "vs_league_median": -85.5,
-   "bench_pts": 611.7,
+   "bench_pts": 690.7,
    "week": {
     "n": 4,
-    "starter_pts": 107.8,
+    "starter_pts": 108.3,
     "starter_n": 9,
     "starter_of": 10,
-    "bench_pts": 51.5,
-    "bench_n": 5,
-    "bench_of": 5,
+    "bench_pts": 57.1,
+    "bench_n": 6,
+    "bench_of": 6,
     "scored_pts": 0,
     "scored_n": 0,
-    "optimal_pts": 121.4,
+    "optimal_pts": 121.2,
     "changes": {
      "in": [
       "Bryce Young",
@@ -2484,10 +2465,10 @@
       "Breece Hall",
       "J.K. Dobbins"
      ],
-     "gain": 13.6,
+     "gain": 12.9,
      "close": 4,
      "unavailable": [
-      "Breece Hall (Doubtful)"
+      "Breece Hall (Out)"
      ],
      "unfilled": []
     }
@@ -2503,7 +2484,7 @@
       "team": "NE",
       "pts": 320.8,
       "round": 7,
-      "week_pts": 18.2,
+      "week_pts": 18.7,
       "week_actual": null,
       "game": {
        "week": 4,
@@ -2516,9 +2497,9 @@
       },
       "week_call": {
        "start": false,
-       "margin": 0.7,
+       "margin": 0.1,
        "close": true,
-       "why": "Out of the week-4 lineup by 0.7, against Bryce Young — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
+       "why": "Out of the week-4 lineup by 0.1, against Bryce Young — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
       },
       "bye": 11,
       "adp": 52.8,
@@ -2551,11 +2532,11 @@
        "start": false,
        "margin": null,
        "close": false,
-       "why": "Sleeper lists him Doubtful. Availability is decided before points. If the designation clears, the next build puts him back."
+       "why": "Sleeper lists him Out. Availability is decided before points. If the designation clears, the next build puts him back."
       },
       "bye": 13,
       "adp": 31.2,
-      "injury": "Doubtful"
+      "injury": "Out"
      },
      "rank": 10,
      "vs_median": -49.4
@@ -2602,7 +2583,7 @@
       "team": "SEA",
       "pts": 235.1,
       "round": 1,
-      "week_pts": 18.9,
+      "week_pts": 19.1,
       "week_actual": null,
       "game": {
        "week": 4,
@@ -2615,9 +2596,9 @@
       },
       "week_call": {
        "start": true,
-       "margin": 11.3,
+       "margin": 11.5,
        "close": false,
-       "why": "In the week-4 lineup. Benching him costs 11.3 projected points."
+       "why": "In the week-4 lineup. Benching him costs 11.5 projected points."
       },
       "bye": 11,
       "adp": 9.7,
@@ -2668,7 +2649,7 @@
       "team": "IND",
       "pts": 159.6,
       "round": 6,
-      "week_pts": 9.9,
+      "week_pts": 9.7,
       "week_actual": null,
       "game": {
        "week": 4,
@@ -2681,9 +2662,9 @@
       },
       "week_call": {
        "start": true,
-       "margin": 9.9,
+       "margin": 9.7,
        "close": false,
-       "why": "In the week-4 lineup. Benching him costs 9.9 projected points."
+       "why": "In the week-4 lineup. Benching him costs 9.7 projected points."
       },
       "bye": 13,
       "adp": 50,
@@ -2813,9 +2794,9 @@
       },
       "week_call": {
        "start": true,
-       "margin": 6.7,
-       "close": false,
-       "why": "In the week-4 lineup. Benching him costs 6.7 projected points."
+       "margin": 0.9,
+       "close": true,
+       "why": "In the week-4 lineup, but only by 0.9 — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
       },
       "bye": 10,
       "adp": 216,
@@ -2872,7 +2853,7 @@
      "rank": 9,
      "vs_median": -8.5,
      "starters": 1,
-     "rostered": 1
+     "rostered": 2
     }
    ],
    "strengths": [
@@ -2911,7 +2892,7 @@
      {
       "name": "Breece Hall",
       "pos": "RB",
-      "status": "Doubtful"
+      "status": "Out"
      }
     ],
     "fragile": [
@@ -2920,6 +2901,12 @@
       "pos": "RB",
       "score": 0.662,
       "why": "Chronically injury-prone: long Achilles history plus a Nov 2025 foot injury that required a second opinion. gp 1/13/10 over three years. Now in a crowded Denver backfield."
+     },
+     {
+      "name": "Breece Hall",
+      "pos": "RB",
+      "score": 0.83,
+      "why": "No significant missed time (17/16/16)."
      },
      {
       "name": "Tee Higgins",
@@ -2938,7 +2925,7 @@
      "team": "CAR",
      "pts": 235.6,
      "round": null,
-     "week_pts": 18.9,
+     "week_pts": 18.8,
      "week_actual": null,
      "game": {
       "week": 4,
@@ -2951,9 +2938,9 @@
      },
      "week_call": {
       "start": true,
-      "margin": 0.7,
+      "margin": 0.1,
       "close": true,
-      "why": "In the week-4 lineup, but only by 0.7 — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
+      "why": "In the week-4 lineup, but only by 0.1 — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
      },
      "bye": 5,
      "starts_on": 0,
@@ -3022,6 +3009,36 @@
      "own_cost": 0
     },
     {
+     "id": "CIN",
+     "name": "Cincinnati Bengals",
+     "pos": "DEF",
+     "team": "CIN",
+     "pts": 79,
+     "round": null,
+     "week_pts": 5.8,
+     "week_actual": null,
+     "game": {
+      "week": 4,
+      "opp": "JAX",
+      "home": true,
+      "kickoff": "2026-10-04T17:00Z",
+      "date": "2026-10-04",
+      "status": "STATUS_SCHEDULED",
+      "completed": false
+     },
+     "week_call": {
+      "start": false,
+      "margin": 0.9,
+      "close": true,
+      "why": "Out of the week-4 lineup by 0.9, against Chicago Bears — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
+     },
+     "bye": 6,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
+     "own_cost": 0
+    },
+    {
      "id": "13414",
      "name": "Kaelon Black",
      "pos": "RB",
@@ -3058,7 +3075,7 @@
      "team": "NYJ",
      "pts": 47.2,
      "round": null,
-     "week_pts": 12,
+     "week_pts": 11.9,
      "week_actual": null,
      "game": {
       "week": 4,
@@ -3071,9 +3088,9 @@
      },
      "week_call": {
       "start": true,
-      "margin": 4.8,
+      "margin": 4.7,
       "close": false,
-      "why": "In the week-4 lineup. Benching him costs 4.8 projected points."
+      "why": "In the week-4 lineup. Benching him costs 4.7 projected points."
      },
      "bye": 13,
      "starts_on": 0,
@@ -3309,15 +3326,15 @@
    "bench_pts": 987,
    "week": {
     "n": 4,
-    "starter_pts": 110.4,
+    "starter_pts": 109.7,
     "starter_n": 9,
     "starter_of": 10,
-    "bench_pts": 46.3,
-    "bench_n": 4,
+    "bench_pts": 38.1,
+    "bench_n": 3,
     "bench_of": 6,
     "scored_pts": 10.2,
     "scored_n": 1,
-    "optimal_pts": 127.8,
+    "optimal_pts": 127.1,
     "changes": {
      "in": [
       "Jared Goff"
@@ -3327,7 +3344,9 @@
      ],
      "gain": 17.4,
      "close": 0,
-     "unavailable": [],
+     "unavailable": [
+      "Jayden Daniels (Out)"
+     ],
      "unfilled": []
     }
    },
@@ -3357,11 +3376,11 @@
        "start": false,
        "margin": null,
        "close": false,
-       "why": "No week-4 projection published. Not a judgment about him, just nothing to rank."
+       "why": "Sleeper lists him Out. Availability is decided before points. If the designation clears, the next build puts him back."
       },
       "bye": 7,
       "adp": 71.1,
-      "injury": "Questionable"
+      "injury": "Out"
      },
      "rank": 5,
      "vs_median": 1.3
@@ -3388,9 +3407,9 @@
       },
       "week_call": {
        "start": true,
-       "margin": 12.4,
+       "margin": 19.9,
        "close": false,
-       "why": "In the week-4 lineup. Benching him costs 12.4 projected points."
+       "why": "In the week-4 lineup. Benching him costs 19.9 projected points."
       },
       "bye": 11,
       "adp": 2.3,
@@ -3408,7 +3427,7 @@
       "team": "NE",
       "pts": 154.5,
       "round": 6,
-      "week_pts": 11.2,
+      "week_pts": 11.4,
       "week_actual": null,
       "game": {
        "week": 4,
@@ -3421,9 +3440,9 @@
       },
       "week_call": {
        "start": true,
-       "margin": 3.7,
+       "margin": 11.4,
        "close": false,
-       "why": "In the week-4 lineup. Benching him costs 3.7 projected points."
+       "why": "In the week-4 lineup. Benching him costs 11.4 projected points."
       },
       "bye": 11,
       "adp": 69.2,
@@ -3454,9 +3473,9 @@
       },
       "week_call": {
        "start": true,
-       "margin": 2.6,
+       "margin": 2.9,
        "close": false,
-       "why": "In the week-4 lineup. Benching him costs 2.6 projected points."
+       "why": "In the week-4 lineup. Benching him costs 2.9 projected points."
       },
       "bye": 11,
       "adp": 22.1,
@@ -3474,7 +3493,7 @@
       "team": "BAL",
       "pts": 187.7,
       "round": 4,
-      "week_pts": 15,
+      "week_pts": 14.1,
       "week_actual": null,
       "game": {
        "week": 4,
@@ -3487,13 +3506,13 @@
       },
       "week_call": {
        "start": true,
-       "margin": 4.1,
+       "margin": 3.5,
        "close": false,
-       "why": "In the week-4 lineup. Benching him costs 4.1 projected points."
+       "why": "In the week-4 lineup. Benching him costs 3.5 projected points."
       },
       "bye": 13,
       "adp": 39.8,
-      "injury": null
+      "injury": "Questionable"
      },
      "rank": 3,
      "vs_median": 1.5
@@ -3556,9 +3575,9 @@
       },
       "week_call": {
        "start": true,
-       "margin": 0.8,
+       "margin": 1.1,
        "close": true,
-       "why": "In the week-4 lineup, but only by 0.8 — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
+       "why": "In the week-4 lineup, but only by 1.1 — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
       },
       "bye": 5,
       "adp": 38.1,
@@ -3589,9 +3608,9 @@
       },
       "week_call": {
        "start": true,
-       "margin": 3.6,
+       "margin": 3.9,
        "close": false,
-       "why": "In the week-4 lineup. Benching him costs 3.6 projected points."
+       "why": "In the week-4 lineup. Benching him costs 3.9 projected points."
       },
       "bye": 7,
       "adp": 68.3,
@@ -3755,6 +3774,11 @@
      {
       "name": "Jayden Daniels",
       "pos": "QB",
+      "status": "Out"
+     },
+     {
+      "name": "Zay Flowers",
+      "pos": "WR",
       "status": "Questionable"
      }
     ],
@@ -3762,7 +3786,7 @@
      {
       "name": "Jayden Daniels",
       "pos": "QB",
-      "score": 0.799,
+      "score": 0.7,
       "why": "2025 missed significant time (7 games); cause not separately verified this pass. Flagged for the final-weeks re-check."
      },
      {
@@ -3818,7 +3842,7 @@
      "team": "CHI",
      "pts": 173,
      "round": 7,
-     "week_pts": 10.5,
+     "week_pts": 10.1,
      "week_actual": null,
      "game": {
       "week": 4,
@@ -3831,9 +3855,9 @@
      },
      "week_call": {
       "start": false,
-      "margin": 1.2,
-      "close": true,
-      "why": "Out of the week-4 lineup by 1.2, against Tetairoa McMillan — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
+      "margin": 1.6,
+      "close": false,
+      "why": "1.6 short of Tetairoa McMillan, the weakest starter he could replace in week 4."
      },
      "bye": 10,
      "starts_on": 6,
@@ -3911,7 +3935,7 @@
      "team": "IND",
      "pts": 137.3,
      "round": 11,
-     "week_pts": 10.9,
+     "week_pts": 10.6,
      "week_actual": null,
      "game": {
       "week": 4,
@@ -3924,9 +3948,9 @@
      },
      "week_call": {
       "start": false,
-      "margin": 0.8,
+      "margin": 1.1,
       "close": true,
-      "why": "Out of the week-4 lineup by 0.8, against Tetairoa McMillan — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
+      "why": "Out of the week-4 lineup by 1.1, against Tetairoa McMillan — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
      },
      "bye": 13,
      "starts_on": 2,
@@ -3941,7 +3965,7 @@
      "team": "WAS",
      "pts": 111.1,
      "round": 12,
-     "week_pts": 7.5,
+     "week_pts": null,
      "week_actual": null,
      "game": {
       "week": 4,
@@ -3954,9 +3978,9 @@
      },
      "week_call": {
       "start": false,
-      "margin": 3.7,
+      "margin": null,
       "close": false,
-      "why": "3.7 short of Rhamondre Stevenson, the weakest starter he could replace in week 4."
+      "why": "Sleeper lists him Out. Availability is decided before points. If the designation clears, the next build puts him back."
      },
      "bye": 7,
      "starts_on": 0,
@@ -4097,15 +4121,15 @@
    "bench_pts": 882.8,
    "week": {
     "n": 4,
-    "starter_pts": 116.2,
+    "starter_pts": 116.3,
     "starter_n": 10,
     "starter_of": 10,
-    "bench_pts": 39.4,
+    "bench_pts": 39.5,
     "bench_n": 4,
     "bench_of": 6,
     "scored_pts": 32.6,
     "scored_n": 2,
-    "optimal_pts": 122.3,
+    "optimal_pts": 122.4,
     "changes": {
      "in": [
       "Juwan Johnson",
@@ -4178,9 +4202,9 @@
       },
       "week_call": {
        "start": true,
-       "margin": 15.8,
+       "margin": 15.7,
        "close": false,
-       "why": "In the week-4 lineup. Benching him costs 15.8 projected points."
+       "why": "In the week-4 lineup. Benching him costs 15.7 projected points."
       },
       "bye": 6,
       "adp": 1.9,
@@ -4214,9 +4238,9 @@
       },
       "week_call": {
        "start": true,
-       "margin": 3.2,
+       "margin": 3.1,
        "close": false,
-       "why": "In the week-4 lineup. Benching him costs 3.2 projected points."
+       "why": "In the week-4 lineup. Benching him costs 3.1 projected points."
       },
       "bye": 11,
       "adp": 47.2,
@@ -4253,7 +4277,7 @@
       },
       "bye": 8,
       "adp": 21,
-      "injury": "Questionable"
+      "injury": null
      },
      "rank": 6,
      "vs_median": -1.3
@@ -4267,7 +4291,7 @@
       "team": "LAR",
       "pts": 161,
       "round": 5,
-      "week_pts": 12.4,
+      "week_pts": 12.5,
       "week_actual": null,
       "game": {
        "week": 4,
@@ -4280,9 +4304,9 @@
       },
       "week_call": {
        "start": true,
-       "margin": 4.3,
+       "margin": 4.4,
        "close": false,
-       "why": "In the week-4 lineup. Benching him costs 4.3 projected points."
+       "why": "In the week-4 lineup. Benching him costs 4.4 projected points."
       },
       "bye": 11,
       "adp": 54.5,
@@ -4523,13 +4547,7 @@
    ],
    "risks": {
     "bye_stacks": [],
-    "injured": [
-     {
-      "name": "Nico Collins",
-      "pos": "WR",
-      "status": "Questionable"
-     }
-    ],
+    "injured": [],
     "fragile": [
      {
       "name": "Joe Burrow",
@@ -4546,7 +4564,7 @@
      {
       "name": "Nico Collins",
       "pos": "WR",
-      "score": 0.867,
+      "score": 0.894,
       "why": "MISSED TIME IN ALL FIVE NFL SEASONS: chronic soft-tissue availability concern. Ceiling is a Tier-1 WR if he ever plays 17."
      }
     ],
@@ -4590,7 +4608,7 @@
      "team": "TB",
      "pts": 128.8,
      "round": 11,
-     "week_pts": 6.5,
+     "week_pts": 6.6,
      "week_actual": null,
      "game": {
       "week": 4,
@@ -4603,9 +4621,9 @@
      },
      "week_call": {
       "start": false,
-      "margin": 1.8,
+      "margin": 1.7,
       "close": false,
-      "why": "1.8 short of Dalton Schultz, the weakest starter he could replace in week 4."
+      "why": "1.7 short of Dalton Schultz, the weakest starter he could replace in week 4."
      },
      "bye": 10,
      "starts_on": 0,
@@ -4695,7 +4713,7 @@
       "start": false,
       "margin": null,
       "close": false,
-      "why": "Sleeper lists him Doubtful. Availability is decided before points. If the designation clears, the next build puts him back."
+      "why": "Sleeper lists him Out. Availability is decided before points. If the designation clears, the next build puts him back."
      },
      "bye": 10,
      "starts_on": 0,
@@ -4877,24 +4895,26 @@
    "bench_pts": 569.3,
    "week": {
     "n": 4,
-    "starter_pts": 123.4,
+    "starter_pts": 123.8,
     "starter_n": 10,
     "starter_of": 10,
-    "bench_pts": 40.3,
+    "bench_pts": 42,
     "bench_n": 4,
     "bench_of": 5,
     "scored_pts": 0,
     "scored_n": 0,
-    "optimal_pts": 126.8,
+    "optimal_pts": 128.2,
     "changes": {
      "in": [
+      "Jacory Croskey-Merritt",
       "Michael Wilson"
      ],
      "out": [
+      "Rashee Rice",
       "TreVeyon Henderson"
      ],
-     "gain": 3.4,
-     "close": 1,
+     "gain": 4.4,
+     "close": 3,
      "unavailable": [],
      "unfilled": []
     }
@@ -4943,7 +4963,7 @@
       "team": "BUF",
       "pts": 245.3,
       "round": 1,
-      "week_pts": 16.3,
+      "week_pts": 16.5,
       "week_actual": null,
       "game": {
        "week": 4,
@@ -4956,9 +4976,9 @@
       },
       "week_call": {
        "start": true,
-       "margin": 4.8,
+       "margin": 4.9,
        "close": false,
-       "why": "In the week-4 lineup. Benching him costs 4.8 projected points."
+       "why": "In the week-4 lineup. Benching him costs 4.9 projected points."
       },
       "bye": 7,
       "adp": 7.9,
@@ -4989,9 +5009,9 @@
       },
       "week_call": {
        "start": true,
-       "margin": 2.4,
+       "margin": 2.3,
        "close": false,
-       "why": "In the week-4 lineup. Benching him costs 2.4 projected points."
+       "why": "In the week-4 lineup. Benching him costs 2.3 projected points."
       },
       "bye": 8,
       "adp": 41.8,
@@ -5022,9 +5042,9 @@
       },
       "week_call": {
        "start": true,
-       "margin": 2.9,
+       "margin": 2.8,
        "close": false,
-       "why": "In the week-4 lineup. Benching him costs 2.9 projected points."
+       "why": "In the week-4 lineup. Benching him costs 2.8 projected points."
       },
       "bye": 14,
       "adp": 11.7,
@@ -5055,9 +5075,9 @@
       },
       "week_call": {
        "start": true,
-       "margin": 4.7,
+       "margin": 4.6,
        "close": false,
-       "why": "In the week-4 lineup. Benching him costs 4.7 projected points."
+       "why": "In the week-4 lineup. Benching him costs 4.6 projected points."
       },
       "bye": 8,
       "adp": 29.1,
@@ -5120,10 +5140,10 @@
        "completed": false
       },
       "week_call": {
-       "start": true,
-       "margin": 0.1,
+       "start": false,
+       "margin": 0.6,
        "close": true,
-       "why": "In the week-4 lineup, but only by 0.1 — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
+       "why": "Out of the week-4 lineup by 0.6, against Michael Wilson — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
       },
       "bye": 5,
       "adp": 31.3,
@@ -5141,7 +5161,7 @@
       "team": "NE",
       "pts": 153.5,
       "round": 6,
-      "week_pts": 8.7,
+      "week_pts": 8.9,
       "week_actual": null,
       "game": {
        "week": 4,
@@ -5154,9 +5174,9 @@
       },
       "week_call": {
        "start": false,
-       "margin": 2.9,
+       "margin": 3.3,
        "close": false,
-       "why": "2.9 short of Rashee Rice, the weakest starter he could replace in week 4."
+       "why": "3.3 short of Michael Wilson, the weakest starter he could replace in week 4."
       },
       "bye": 11,
       "adp": 59.4,
@@ -5336,7 +5356,7 @@
      "team": "ARI",
      "pts": 136.5,
      "round": 9,
-     "week_pts": 12.1,
+     "week_pts": 12.2,
      "week_actual": null,
      "game": {
       "week": 4,
@@ -5382,9 +5402,9 @@
      },
      "week_call": {
       "start": false,
-      "margin": 4.2,
+      "margin": 4.8,
       "close": false,
-      "why": "4.2 short of Rashee Rice, the weakest starter he could replace in week 4."
+      "why": "4.8 short of Michael Wilson, the weakest starter he could replace in week 4."
      },
      "bye": 11,
      "starts_on": 0,
@@ -5399,7 +5419,7 @@
      "team": "WAS",
      "pts": 125.3,
      "round": 12,
-     "week_pts": 9.3,
+     "week_pts": 9.7,
      "week_actual": null,
      "game": {
       "week": 4,
@@ -5412,9 +5432,9 @@
      },
      "week_call": {
       "start": false,
-      "margin": 2.3,
+      "margin": 2.5,
       "close": false,
-      "why": "2.3 short of Rashee Rice, the weakest starter he could replace in week 4."
+      "why": "2.5 short of Michael Wilson, the weakest starter he could replace in week 4."
      },
      "bye": 7,
      "starts_on": 0,
@@ -5429,7 +5449,7 @@
      "team": "WAS",
      "pts": 118.4,
      "round": 10,
-     "week_pts": 11.5,
+     "week_pts": 12.7,
      "week_actual": null,
      "game": {
       "week": 4,
@@ -5441,10 +5461,10 @@
       "completed": false
      },
      "week_call": {
-      "start": false,
-      "margin": 0.1,
+      "start": true,
+      "margin": 1.1,
       "close": true,
-      "why": "Out of the week-4 lineup by 0.1, against Rashee Rice — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
+      "why": "In the week-4 lineup, but only by 1.1 — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
      },
      "bye": 7,
      "starts_on": 0,
@@ -5576,12 +5596,12 @@
     "starter_pts": 115.7,
     "starter_n": 10,
     "starter_of": 10,
-    "bench_pts": 57.7,
+    "bench_pts": 57.9,
     "bench_n": 5,
     "bench_of": 6,
     "scored_pts": 0,
     "scored_n": 0,
-    "optimal_pts": 121.7,
+    "optimal_pts": 121.9,
     "changes": {
      "in": [
       "Trevor Lawrence",
@@ -5593,7 +5613,7 @@
       "Jameson Williams",
       "Carnell Tate"
      ],
-     "gain": 6,
+     "gain": 6.2,
      "close": 3,
      "unavailable": [],
      "unfilled": []
@@ -5728,7 +5748,7 @@
       },
       "bye": 11,
       "adp": 6.2,
-      "injury": "Questionable"
+      "injury": null
      },
      "rank": 1,
      "vs_median": 37.7
@@ -6024,11 +6044,6 @@
     ],
     "injured": [
      {
-      "name": "Puka Nacua",
-      "pos": "WR",
-      "status": "Questionable"
-     },
-     {
       "name": "Ladd McConkey",
       "pos": "WR",
       "status": "Questionable"
@@ -6040,12 +6055,6 @@
       "pos": "RB",
       "score": 0.682,
       "why": "2025 ankle (8 games); expected full participation early in camp."
-     },
-     {
-      "name": "Puka Nacua",
-      "pos": "WR",
-      "score": 0.89,
-      "why": "2024 PCL sprain (knee), re-aggravated from a joint practice, missed 6+; played 16 in 2025. Re-aggravation pattern is the watch."
      }
     ],
     "flagged": [
@@ -6096,7 +6105,7 @@
      "team": "GB",
      "pts": 141,
      "round": 15,
-     "week_pts": 9.9,
+     "week_pts": 10.1,
      "week_actual": null,
      "game": {
       "week": 4,
@@ -6109,9 +6118,9 @@
      },
      "week_call": {
       "start": true,
-      "margin": 0.4,
+      "margin": 0.6,
       "close": true,
-      "why": "In the week-4 lineup, but only by 0.4 — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
+      "why": "In the week-4 lineup, but only by 0.6 — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
      },
      "bye": 11,
      "starts_on": 2,
@@ -6440,15 +6449,15 @@
    "bench_pts": 512.2,
    "week": {
     "n": 4,
-    "starter_pts": 117.6,
-    "starter_n": 10,
+    "starter_pts": 111.5,
+    "starter_n": 9,
     "starter_of": 10,
-    "bench_pts": 56.5,
+    "bench_pts": 57.1,
     "bench_n": 6,
     "bench_of": 6,
     "scored_pts": 0,
     "scored_n": 0,
-    "optimal_pts": 124.5,
+    "optimal_pts": 126.5,
     "changes": {
      "in": [
       "Aaron Jones",
@@ -6458,9 +6467,11 @@
       "Jadarian Price",
       "Malik Nabers"
      ],
-     "gain": 6.9,
-     "close": 3,
-     "unavailable": [],
+     "gain": 15,
+     "close": 2,
+     "unavailable": [
+      "Jadarian Price (Out)"
+     ],
      "unfilled": []
     }
    },
@@ -6475,7 +6486,7 @@
       "team": "BUF",
       "pts": 361.5,
       "round": 4,
-      "week_pts": 23.2,
+      "week_pts": 23.6,
       "week_actual": null,
       "game": {
        "week": 4,
@@ -6488,9 +6499,9 @@
       },
       "week_call": {
        "start": true,
-       "margin": 23.2,
+       "margin": 23.6,
        "close": false,
-       "why": "In the week-4 lineup. Benching him costs 23.2 projected points."
+       "why": "In the week-4 lineup. Benching him costs 23.6 projected points."
       },
       "bye": 7,
       "adp": 20,
@@ -6508,7 +6519,7 @@
       "team": "LAC",
       "pts": 218.9,
       "round": 2,
-      "week_pts": 8.6,
+      "week_pts": 9.6,
       "week_actual": null,
       "game": {
        "week": 4,
@@ -6521,9 +6532,9 @@
       },
       "week_call": {
        "start": true,
-       "margin": 0.7,
-       "close": true,
-       "why": "In the week-4 lineup, but only by 0.7 — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
+       "margin": 1.7,
+       "close": false,
+       "why": "In the week-4 lineup. Benching him costs 1.7 projected points."
       },
       "bye": 7,
       "adp": 15.9,
@@ -6541,7 +6552,7 @@
       "team": "SEA",
       "pts": 160.5,
       "round": 6,
-      "week_pts": 7.6,
+      "week_pts": null,
       "week_actual": null,
       "game": {
        "week": 4,
@@ -6554,13 +6565,13 @@
       },
       "week_call": {
        "start": false,
-       "margin": 1,
-       "close": true,
-       "why": "Out of the week-4 lineup by 1, against Omarion Hampton — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
+       "margin": null,
+       "close": false,
+       "why": "Sleeper lists him Out. Availability is decided before points. If the designation clears, the next build puts him back."
       },
       "bye": 11,
       "adp": 51.6,
-      "injury": "Questionable"
+      "injury": "Out"
      },
      "rank": 8,
      "vs_median": -24.4
@@ -6620,9 +6631,9 @@
       },
       "week_call": {
        "start": false,
-       "margin": 0.5,
+       "margin": 0.6,
        "close": true,
-       "why": "Out of the week-4 lineup by 0.5, against Mike Evans — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
+       "why": "Out of the week-4 lineup by 0.6, against Mike Evans — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
       },
       "bye": 8,
       "adp": 28.4,
@@ -6673,7 +6684,7 @@
       "team": "SF",
       "pts": 187.2,
       "round": 7,
-      "week_pts": 11.8,
+      "week_pts": 11.9,
       "week_actual": null,
       "game": {
        "week": 4,
@@ -6686,9 +6697,9 @@
       },
       "week_call": {
        "start": true,
-       "margin": 0.5,
+       "margin": 0.6,
        "close": true,
-       "why": "In the week-4 lineup, but only by 0.5 — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
+       "why": "In the week-4 lineup, but only by 0.6 — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
       },
       "bye": 8,
       "adp": 63.5,
@@ -6900,7 +6911,7 @@
      {
       "name": "Jadarian Price",
       "pos": "RB",
-      "status": "Questionable"
+      "status": "Out"
      },
      {
       "name": "Mike Evans",
@@ -6938,7 +6949,7 @@
      "team": "GB",
      "pts": 137,
      "round": null,
-     "week_pts": 7.2,
+     "week_pts": 7.3,
      "week_actual": null,
      "game": {
       "week": 4,
@@ -6951,9 +6962,9 @@
      },
      "week_call": {
       "start": false,
-      "margin": 1.4,
-      "close": true,
-      "why": "Out of the week-4 lineup by 1.4, against Omarion Hampton — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
+      "margin": 2.3,
+      "close": false,
+      "why": "2.3 short of Omarion Hampton, the weakest starter he could replace in week 4."
      },
      "bye": 11,
      "starts_on": 1,
@@ -6998,7 +7009,7 @@
      "team": "MIN",
      "pts": 120.1,
      "round": 10,
-     "week_pts": 13.4,
+     "week_pts": 13.9,
      "week_actual": null,
      "game": {
       "week": 4,
@@ -7011,9 +7022,9 @@
      },
      "week_call": {
       "start": true,
-      "margin": 5.5,
+      "margin": 6,
       "close": false,
-      "why": "In the week-4 lineup. Benching him costs 5.5 projected points."
+      "why": "In the week-4 lineup. Benching him costs 6 projected points."
      },
      "bye": 6,
      "starts_on": 0,
@@ -7041,9 +7052,9 @@
      },
      "week_call": {
       "start": false,
-      "margin": 0.7,
-      "close": true,
-      "why": "Out of the week-4 lineup by 0.7, against Omarion Hampton — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
+      "margin": 1.7,
+      "close": false,
+      "why": "1.7 short of Omarion Hampton, the weakest starter he could replace in week 4."
      },
      "bye": 8,
      "starts_on": 0,
@@ -7058,7 +7069,7 @@
      "team": "CHI",
      "pts": 23.2,
      "round": null,
-     "week_pts": 8.2,
+     "week_pts": 8,
      "week_actual": null,
      "game": {
       "week": 4,
@@ -7071,9 +7082,9 @@
      },
      "week_call": {
       "start": false,
-      "margin": 3.6,
+      "margin": 3.9,
       "close": false,
-      "why": "3.6 short of Mike Evans, the weakest starter he could replace in week 4."
+      "why": "3.9 short of Mike Evans, the weakest starter he could replace in week 4."
      },
      "bye": null,
      "starts_on": 0,
@@ -7088,7 +7099,7 @@
      "team": "MIA",
      "pts": 21.7,
      "round": null,
-     "week_pts": 7.4,
+     "week_pts": 7.6,
      "week_actual": null,
      "game": {
       "week": 4,
@@ -7101,9 +7112,9 @@
      },
      "week_call": {
       "start": false,
-      "margin": 1.2,
-      "close": true,
-      "why": "Out of the week-4 lineup by 1.2, against Omarion Hampton — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
+      "margin": 2,
+      "close": false,
+      "why": "2 short of Omarion Hampton, the weakest starter he could replace in week 4."
      },
      "bye": null,
      "starts_on": 0,
@@ -7143,30 +7154,32 @@
    "starter_pts": 1913.2,
    "starter_rank": 1,
    "vs_league_median": 76.2,
-   "bench_pts": 554.3,
+   "bench_pts": 610.6,
    "week": {
     "n": 4,
-    "starter_pts": 120.2,
+    "starter_pts": 120.1,
     "starter_n": 9,
     "starter_of": 10,
-    "bench_pts": 21.9,
+    "bench_pts": 25.2,
     "bench_n": 4,
     "bench_of": 5,
     "scored_pts": 0,
     "scored_n": 0,
-    "optimal_pts": 128,
+    "optimal_pts": 129.6,
     "changes": {
      "in": [
-      "Brian Thomas",
+      "Jakobi Meyers",
       "Dalton Kincaid"
      ],
      "out": [
       "DeVonta Smith",
       "Tucker Kraft"
      ],
-     "gain": 7.8,
+     "gain": 9.5,
      "close": 2,
-     "unavailable": [],
+     "unavailable": [
+      "DeVonta Smith (Out)"
+     ],
      "unfilled": []
     }
    },
@@ -7227,9 +7240,9 @@
       },
       "week_call": {
        "start": true,
-       "margin": 8,
+       "margin": 7.9,
        "close": false,
-       "why": "In the week-4 lineup. Benching him costs 8 projected points."
+       "why": "In the week-4 lineup. Benching him costs 7.9 projected points."
       },
       "bye": 8,
       "adp": 4.4,
@@ -7260,9 +7273,9 @@
       },
       "week_call": {
        "start": true,
-       "margin": 9.3,
+       "margin": 9.2,
        "close": false,
-       "why": "In the week-4 lineup. Benching him costs 9.3 projected points."
+       "why": "In the week-4 lineup. Benching him costs 9.2 projected points."
       },
       "bye": 5,
       "adp": 17.9,
@@ -7295,11 +7308,11 @@
        "start": false,
        "margin": null,
        "close": false,
-       "why": "No week-4 projection published. Not a judgment about him, just nothing to rank."
+       "why": "Sleeper lists him Out. Availability is decided before points. If the designation clears, the next build puts him back."
       },
       "bye": 10,
       "adp": 33,
-      "injury": "Questionable"
+      "injury": "Out"
      },
      "rank": 10,
      "vs_median": -32.1
@@ -7313,7 +7326,7 @@
       "team": "GB",
       "pts": 176.1,
       "round": 7,
-      "week_pts": 12.9,
+      "week_pts": 13.2,
       "week_actual": null,
       "game": {
        "week": 4,
@@ -7326,9 +7339,9 @@
       },
       "week_call": {
        "start": true,
-       "margin": 12.9,
+       "margin": 6.7,
        "close": false,
-       "why": "In the week-4 lineup. Benching him costs 12.9 projected points."
+       "why": "In the week-4 lineup. Benching him costs 6.7 projected points."
       },
       "bye": 11,
       "adp": 65.4,
@@ -7346,7 +7359,7 @@
       "team": "GB",
       "pts": 140.9,
       "round": 9,
-      "week_pts": 8.5,
+      "week_pts": 8.6,
       "week_actual": null,
       "game": {
        "week": 4,
@@ -7359,9 +7372,9 @@
       },
       "week_call": {
        "start": false,
-       "margin": 1.3,
+       "margin": 1.4,
        "close": true,
-       "why": "Out of the week-4 lineup by 1.3, against Dalton Kincaid — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
+       "why": "Out of the week-4 lineup by 1.4, against Dalton Kincaid — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
       },
       "bye": 11,
       "adp": 66.5,
@@ -7392,9 +7405,9 @@
       },
       "week_call": {
        "start": true,
-       "margin": 4.1,
+       "margin": 4,
        "close": false,
-       "why": "In the week-4 lineup. Benching him costs 4.1 projected points."
+       "why": "In the week-4 lineup. Benching him costs 4 projected points."
       },
       "bye": 11,
       "adp": 23.5,
@@ -7412,7 +7425,7 @@
       "team": "CHI",
       "pts": 189.5,
       "round": 6,
-      "week_pts": 15.6,
+      "week_pts": 15.1,
       "week_actual": null,
       "game": {
        "week": 4,
@@ -7425,13 +7438,13 @@
       },
       "week_call": {
        "start": true,
-       "margin": 7.1,
+       "margin": 6.5,
        "close": false,
-       "why": "In the week-4 lineup. Benching him costs 7.1 projected points."
+       "why": "In the week-4 lineup. Benching him costs 6.5 projected points."
       },
       "bye": 10,
       "adp": 45.2,
-      "injury": "Questionable"
+      "injury": null
      },
      "rank": 1,
      "vs_median": 36.4
@@ -7491,9 +7504,9 @@
       },
       "week_call": {
        "start": true,
-       "margin": 0.7,
-       "close": true,
-       "why": "In the week-4 lineup, but only by 0.7 — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
+       "margin": 5.7,
+       "close": false,
+       "why": "In the week-4 lineup. Benching him costs 5.7 projected points."
       },
       "bye": 11,
       "adp": 95,
@@ -7526,7 +7539,7 @@
      "rank": 9,
      "vs_median": -238.3,
      "starters": 2,
-     "rostered": 4
+     "rostered": 5
     },
     {
      "pos": "TE",
@@ -7550,7 +7563,7 @@
      "rank": 1,
      "vs_median": 12.5,
      "starters": 1,
-     "rostered": 2
+     "rostered": 1
     }
    ],
    "strengths": [
@@ -7578,7 +7591,7 @@
      "rank": 9,
      "vs_median": -238.3,
      "starters": 2,
-     "rostered": 4
+     "rostered": 5
     }
    ],
    "risks": {
@@ -7598,12 +7611,7 @@
      {
       "name": "DeVonta Smith",
       "pos": "WR",
-      "status": "Questionable"
-     },
-     {
-      "name": "D'Andre Swift",
-      "pos": "RB",
-      "status": "Questionable"
+      "status": "Out"
      }
     ],
     "fragile": [
@@ -7614,16 +7622,16 @@
       "why": "2024 lost 13 games to bilateral Achilles tendinitis (soft-tissue, both legs) + late PCL sprain; answered with a 17-game RB1 season in 2025. Age 30 + Achilles history is the recurrence/decline risk, not a current injury."
      },
      {
+      "name": "DeVonta Smith",
+      "pos": "WR",
+      "score": 0.8,
+      "why": null
+     },
+     {
       "name": "Christian Watson",
       "pos": "WR",
       "score": 0.8,
       "why": "20 games missed over 4 seasons, but the recurring hamstrings were tied to a biomechanical asymmetry reportedly corrected ~2 years ago, and his ACL was a 'clean' tear. Enters 2026 fully healthy for the first time in a while."
-     },
-     {
-      "name": "Tucker Kraft",
-      "pos": "TE",
-      "score": 0.894,
-      "why": "2025 missed time (8 games); cause not separately verified this pass. Flagged for re-check."
      }
     ],
     "flagged": []
@@ -7648,10 +7656,10 @@
       "completed": false
      },
      "week_call": {
-      "start": true,
-      "margin": 6.5,
+      "start": false,
+      "margin": 1.6,
       "close": false,
-      "why": "In the week-4 lineup. Benching him costs 6.5 projected points."
+      "why": "1.6 short of Jakobi Meyers, the weakest starter he could replace in week 4."
      },
      "bye": 7,
      "starts_on": 6,
@@ -7690,13 +7698,43 @@
      "own_cost": 0
     },
     {
+     "id": "5947",
+     "name": "Jakobi Meyers",
+     "pos": "WR",
+     "team": "JAX",
+     "pts": 137.3,
+     "round": 11,
+     "week_pts": 8.1,
+     "week_actual": null,
+     "game": {
+      "week": 4,
+      "opp": "CIN",
+      "home": false,
+      "kickoff": "2026-10-04T17:00Z",
+      "date": "2026-10-04",
+      "status": "STATUS_SCHEDULED",
+      "completed": false
+     },
+     "week_call": {
+      "start": true,
+      "margin": 1.6,
+      "close": false,
+      "why": "In the week-4 lineup. Benching him costs 1.6 projected points."
+     },
+     "bye": 7,
+     "starts_on": 2,
+     "best_gain": 2.1,
+     "best_team": 1,
+     "own_cost": 0
+    },
+    {
      "id": "10236",
      "name": "Dalton Kincaid",
      "pos": "TE",
      "team": "BUF",
      "pts": 130.6,
      "round": 12,
-     "week_pts": 9.8,
+     "week_pts": 10,
      "week_actual": null,
      "game": {
       "week": 4,
@@ -7709,44 +7747,14 @@
      },
      "week_call": {
       "start": true,
-      "margin": 1.3,
+      "margin": 1.4,
       "close": true,
-      "why": "In the week-4 lineup, but only by 1.3 — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
+      "why": "In the week-4 lineup, but only by 1.4 — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
      },
      "bye": 7,
      "starts_on": 2,
      "best_gain": 11.7,
      "best_team": 5,
-     "own_cost": 0
-    },
-    {
-     "id": "CAR",
-     "name": "Carolina Panthers",
-     "pos": "DEF",
-     "team": "CAR",
-     "pts": 81,
-     "round": null,
-     "week_pts": 5,
-     "week_actual": null,
-     "game": {
-      "week": 4,
-      "opp": "DET",
-      "home": true,
-      "kickoff": "2026-10-05T00:20Z",
-      "date": "2026-10-04",
-      "status": "STATUS_SCHEDULED",
-      "completed": false
-     },
-     "week_call": {
-      "start": false,
-      "margin": 0.7,
-      "close": true,
-      "why": "Out of the week-4 lineup by 0.7, against Los Angeles Rams — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
-     },
-     "bye": 5,
-     "starts_on": 0,
-     "best_gain": 0,
-     "best_team": null,
      "own_cost": 0
     },
     {
@@ -7814,15 +7822,15 @@
    "bench_pts": 716.9,
    "week": {
     "n": 4,
-    "starter_pts": 119.1,
+    "starter_pts": 118.6,
     "starter_n": 10,
     "starter_of": 10,
     "bench_pts": 42.8,
-    "bench_n": 5,
+    "bench_n": 4,
     "bench_of": 5,
     "scored_pts": 0,
     "scored_n": 0,
-    "optimal_pts": 123.7,
+    "optimal_pts": 123.5,
     "changes": {
      "in": [
       "Bhayshul Tuten"
@@ -7830,8 +7838,8 @@
      "out": [
       "Rome Odunze"
      ],
-     "gain": 4.6,
-     "close": 1,
+     "gain": 4.9,
+     "close": 0,
      "unavailable": [],
      "unfilled": []
     }
@@ -7880,7 +7888,7 @@
       "team": "IND",
       "pts": 254.3,
       "round": 1,
-      "week_pts": 20.5,
+      "week_pts": 20.1,
       "week_actual": null,
       "game": {
        "week": 4,
@@ -7893,9 +7901,9 @@
       },
       "week_call": {
        "start": true,
-       "margin": 13.3,
+       "margin": 12.9,
        "close": false,
-       "why": "In the week-4 lineup. Benching him costs 13.3 projected points."
+       "why": "In the week-4 lineup. Benching him costs 12.9 projected points."
       },
       "bye": 13,
       "adp": 5,
@@ -7959,9 +7967,9 @@
       },
       "week_call": {
        "start": true,
-       "margin": 4.8,
+       "margin": 5.1,
        "close": false,
-       "why": "In the week-4 lineup. Benching him costs 4.8 projected points."
+       "why": "In the week-4 lineup. Benching him costs 5.1 projected points."
       },
       "bye": 14,
       "adp": 25.4,
@@ -7979,7 +7987,7 @@
       "team": "TB",
       "pts": 185.5,
       "round": 4,
-      "week_pts": 8.4,
+      "week_pts": 8.6,
       "week_actual": null,
       "game": {
        "week": 4,
@@ -7992,9 +8000,9 @@
       },
       "week_call": {
        "start": true,
-       "margin": 1.2,
-       "close": true,
-       "why": "In the week-4 lineup, but only by 1.2 — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
+       "margin": 1.7,
+       "close": false,
+       "why": "In the week-4 lineup. Benching him costs 1.7 projected points."
       },
       "bye": 10,
       "adp": 42.3,
@@ -8064,7 +8072,7 @@
       },
       "bye": 10,
       "adp": 47.9,
-      "injury": "Questionable"
+      "injury": null
      },
      "rank": 7,
      "vs_median": -4.2
@@ -8078,7 +8086,7 @@
       "team": "CHI",
       "pts": 173.9,
       "round": 7,
-      "week_pts": 7.2,
+      "week_pts": 6.9,
       "week_actual": null,
       "game": {
        "week": 4,
@@ -8091,9 +8099,9 @@
       },
       "week_call": {
        "start": false,
-       "margin": 1.2,
-       "close": true,
-       "why": "Out of the week-4 lineup by 1.2, against Emeka Egbuka — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
+       "margin": 1.7,
+       "close": false,
+       "why": "1.7 short of Emeka Egbuka, the weakest starter he could replace in week 4."
       },
       "bye": 10,
       "adp": 64,
@@ -8252,25 +8260,19 @@
       ]
      }
     ],
-    "injured": [
-     {
-      "name": "Bucky Irving",
-      "pos": "RB",
-      "status": "Questionable"
-     }
-    ],
+    "injured": [],
     "fragile": [
-     {
-      "name": "Bucky Irving",
-      "pos": "RB",
-      "score": 0.85,
-      "why": "2025 foot + shoulder injuries wrecked the year (10 games, 588 yds); listed 1A with Gainwell 1B. Camp health is the swing variable."
-     },
      {
       "name": "Jonathan Taylor",
       "pos": "RB",
       "score": 0.856,
       "why": "Recurring high-ankle sprains (2022 surgery, 2024 re-injury), a documented re-injury pattern; played 17 in 2025, currently healthy."
+     },
+     {
+      "name": "Bucky Irving",
+      "pos": "RB",
+      "score": 0.876,
+      "why": "2025 foot + shoulder injuries wrecked the year (10 games, 588 yds); listed 1A with Gainwell 1B. Camp health is the swing variable."
      },
      {
       "name": "Sam LaPorta",
@@ -8392,9 +8394,9 @@
      },
      "week_call": {
       "start": false,
-      "margin": 3,
+      "margin": 3.2,
       "close": false,
-      "why": "3 short of Emeka Egbuka, the weakest starter he could replace in week 4."
+      "why": "3.2 short of Emeka Egbuka, the weakest starter he could replace in week 4."
      },
      "bye": 8,
      "starts_on": 0,
@@ -8409,7 +8411,7 @@
      "team": "NYJ",
      "pts": 80.8,
      "round": null,
-     "week_pts": 0,
+     "week_pts": null,
      "week_actual": null,
      "game": {
       "week": 4,
@@ -8424,7 +8426,7 @@
       "start": false,
       "margin": null,
       "close": false,
-      "why": "Sleeper lists him Doubtful, so he is out of the lineup whatever his 0-point projection says. Availability is decided before points. If the designation clears, the next build puts him back."
+      "why": "Sleeper lists him Out. Availability is decided before points. If the designation clears, the next build puts him back."
      },
      "bye": 13,
      "starts_on": 0,
