@@ -29,21 +29,21 @@
   "display_week": 5,
   "rolled_forward": false,
   "teams_playing": 30,
-  "projected": 131,
+  "projected": 130,
   "close_band": 1.5,
   "of_rostered": 157,
   "schedule_source": "pairings from Sleeper's regular-season schedule, kickoff times from ESPN's public scoreboard",
   "projection_source": "Sleeper week-5 projected stat lines re-scored with The HBGBs's exact scoring_settings — the same arithmetic as the season column, over a different stat line.",
   "result_source": "The HBGBs's own week-5 matchup rows — Sleeper's scoring of each player in this league's settings, read as published rather than recomputed here.",
-  "games_final": 2,
-  "results": 11,
+  "games_final": 20,
+  "results": 127,
   "canceled": [],
   "warnings": []
  },
  "coverage": {
   "rostered": 157,
   "priced": 157,
-  "off_board_priced": 12,
+  "off_board_priced": 13,
   "league_median_starters": 1840
  },
  "slot_table": [
@@ -62,7 +62,7 @@
   {
    "slot": "RB",
    "index": 2,
-   "median": 184.9,
+   "median": 180.1,
    "best": 228.7
   },
   {
@@ -113,7 +113,7 @@
    "median": 307.4
   },
   "RB": {
-   "median": 522
+   "median": 498.9
   },
   "WR": {
    "median": 603.6
@@ -320,11 +320,11 @@
   ],
   "partial": {
    "week": 5,
-   "my_pts": 68.2,
-   "my_left": 7,
+   "my_pts": 143.3,
+   "my_left": 1,
    "opp_owner": "StoneBone69",
-   "opp_pts": 0,
-   "opp_left": 10
+   "opp_pts": 108.1,
+   "opp_left": 5
   },
   "league": [
    {
@@ -495,7 +495,7 @@
      "l": 24,
      "t": 0
     },
-    "strength_rank": 7,
+    "strength_rank": 8,
     "pf_rank": 9,
     "ap_rank": 9,
     "gap_pg": -4,
@@ -517,7 +517,7 @@
      "l": 15,
      "t": 0
     },
-    "strength_rank": 8,
+    "strength_rank": 7,
     "pf_rank": 3,
     "ap_rank": 3,
     "gap_pg": 10.8,
@@ -675,8 +675,8 @@
   "blind_spots": [],
   "sources": {
    "waivers": {
-    "generated": "2026-10-10",
-    "age_days": 1,
+    "generated": "2026-10-11",
+    "age_days": 0,
     "stale": false
    },
    "trades": "10 proposal(s) from this build's trade search"
@@ -705,13 +705,13 @@
     "metric": "touch_share",
     "last": 0.28,
     "window": 0.29,
-    "rostered_with_usage": 46
+    "rostered_with_usage": 45
    },
    "WR": {
     "metric": "target_share",
     "last": 0.22,
-    "window": 0.23,
-    "rostered_with_usage": 52
+    "window": 0.22,
+    "rostered_with_usage": 53
    },
    "TE": {
     "metric": "target_share",
@@ -782,6 +782,33 @@
     }
    },
    {
+    "id": "7571",
+    "name": "Rashod Bateman",
+    "pos": "WR",
+    "team": "BAL",
+    "injury": null,
+    "metric": "target_share",
+    "last": {
+     "w": 4,
+     "share": null,
+     "snap_share": null,
+     "tgt": 2,
+     "touch": 2
+    },
+    "window": {
+     "weeks": [
+      2,
+      3,
+      4
+     ],
+     "share": 0.245,
+     "snap_share": 0.902
+    },
+    "reason": "window",
+    "margin": 0.025,
+    "jump": null
+   },
+   {
     "id": "13294",
     "name": "Makai Lemon",
     "pos": "WR",
@@ -842,33 +869,6 @@
     }
    },
    {
-    "id": "7571",
-    "name": "Rashod Bateman",
-    "pos": "WR",
-    "team": "BAL",
-    "injury": null,
-    "metric": "target_share",
-    "last": {
-     "w": 4,
-     "share": null,
-     "snap_share": null,
-     "tgt": 2,
-     "touch": 2
-    },
-    "window": {
-     "weeks": [
-      2,
-      3,
-      4
-     ],
-     "share": 0.245,
-     "snap_share": 0.902
-    },
-    "reason": "window",
-    "margin": 0.015,
-    "jump": null
-   },
-   {
     "id": "13301",
     "name": "Antonio Williams",
     "pos": "WR",
@@ -926,36 +926,6 @@
     "jump": {
      "from": 0.125,
      "to": 0.348
-    }
-   },
-   {
-    "id": "13330",
-    "name": "Kenyon Sadiq",
-    "pos": "TE",
-    "team": "NYJ",
-    "injury": null,
-    "metric": "target_share",
-    "last": {
-     "w": 4,
-     "share": 0.267,
-     "snap_share": 0.688,
-     "tgt": 4,
-     "touch": 4
-    },
-    "window": {
-     "weeks": [
-      2,
-      3,
-      4
-     ],
-     "share": 0.172,
-     "snap_share": 0.506
-    },
-    "reason": "last_week",
-    "margin": 0.047,
-    "jump": {
-     "from": 0.153,
-     "to": 0.267
     }
    },
    {
@@ -1058,15 +1028,15 @@
    "bench_pts": 694.4,
    "week": {
     "n": 5,
-    "starter_pts": 104,
+    "starter_pts": 108.7,
     "starter_n": 9,
     "starter_of": 10,
-    "bench_pts": 53.8,
+    "bench_pts": 54.2,
     "bench_n": 5,
     "bench_of": 5,
-    "scored_pts": 13.2,
-    "scored_n": 1,
-    "optimal_pts": 122.4,
+    "scored_pts": 81,
+    "scored_n": 8,
+    "optimal_pts": 127.2,
     "changes": {
      "in": [
       "Tyler Shough",
@@ -1076,13 +1046,15 @@
       "Caleb Williams",
       "Wan'Dale Robinson"
      ],
-     "gain": 18.4,
+     "gain": 18.5,
      "close": 1,
-     "unavailable": [],
+     "unavailable": [
+      "Caleb Williams (Out)"
+     ],
      "unfilled": []
     }
    },
-   "summary": "9th of 10 in projected starting points (1752), -88 against the league median. Built on RB: 772 starting points, 2nd in the league, +250 on the median. WR is the hole — 341 points, 10th, -263 behind. No bench player would start on four other teams, so there is little here to trade from.",
+   "summary": "9th of 10 in projected starting points (1752), -88 against the league median. Built on RB: 772 starting points, 2nd in the league, +273 on the median. WR is the hole — 341 points, 10th, -263 behind. No bench player would start on four other teams, so there is little here to trade from.",
    "slots": [
     {
      "slot": "QB",
@@ -1094,25 +1066,28 @@
       "pts": 299.3,
       "round": 8,
       "week_pts": null,
-      "week_actual": null,
+      "week_actual": {
+       "pts": 0,
+       "final": true
+      },
       "game": {
        "week": 5,
        "opp": "GB",
        "home": false,
        "kickoff": "2026-10-11T17:00Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
-       "completed": false
+       "status": "STATUS_FINAL",
+       "completed": true
       },
       "week_call": {
        "start": false,
        "margin": null,
        "close": false,
-       "why": "No week-5 projection published. Not a judgment about him, just nothing to rank."
+       "why": "Sleeper lists him Out. Availability is decided before points. If the designation clears, the next build puts him back."
       },
       "bye": 10,
       "adp": 74.2,
-      "injury": "Questionable"
+      "injury": "Out"
      },
      "rank": 9,
      "vs_median": -8.1
@@ -1126,7 +1101,7 @@
       "team": "BAL",
       "pts": 238.4,
       "round": 1,
-      "week_pts": 17.1,
+      "week_pts": 17.2,
       "week_actual": null,
       "game": {
        "week": 5,
@@ -1175,16 +1150,16 @@
       },
       "week_call": {
        "start": true,
-       "margin": 6.3,
+       "margin": 6.2,
        "close": false,
-       "why": "In the week-5 lineup. Benching him costs 6.3 projected points."
+       "why": "In the week-5 lineup. Benching him costs 6.2 projected points."
       },
       "bye": 14,
       "adp": 30,
       "injury": null
      },
      "rank": 3,
-     "vs_median": 8.1
+     "vs_median": 12.9
     },
     {
      "slot": "WR",
@@ -1196,25 +1171,28 @@
       "pts": 205.4,
       "round": 2,
       "week_pts": 13.4,
-      "week_actual": null,
+      "week_actual": {
+       "pts": 15.8,
+       "final": true
+      },
       "game": {
        "week": 5,
        "opp": "NO",
        "home": false,
        "kickoff": "2026-10-11T17:00Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
-       "completed": false
+       "status": "STATUS_FINAL",
+       "completed": true
       },
       "week_call": {
        "start": true,
-       "margin": 4.1,
+       "margin": 3.9,
        "close": false,
-       "why": "In the week-5 lineup. Benching him costs 4.1 projected points."
+       "why": "In the week-5 lineup. Benching him costs 3.9 projected points."
       },
       "bye": 6,
       "adp": 12.2,
-      "injury": "Questionable"
+      "injury": null
      },
      "rank": 8,
      "vs_median": -15.9
@@ -1229,21 +1207,24 @@
       "pts": 135.2,
       "round": 5,
       "week_pts": 7.5,
-      "week_actual": null,
+      "week_actual": {
+       "pts": 8.3,
+       "final": true
+      },
       "game": {
        "week": 5,
        "opp": "HOU",
        "home": true,
        "kickoff": "2026-10-11T17:00Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
-       "completed": false
+       "status": "STATUS_FINAL",
+       "completed": true
       },
       "week_call": {
        "start": false,
-       "margin": 3.2,
+       "margin": 3.3,
        "close": false,
-       "why": "3.2 short of Romeo Doubs, the weakest starter he could replace in week 5."
+       "why": "3.3 short of Romeo Doubs, the weakest starter he could replace in week 5."
       },
       "bye": 9,
       "adp": 123,
@@ -1262,15 +1243,18 @@
       "pts": 173.4,
       "round": 6,
       "week_pts": 8,
-      "week_actual": null,
+      "week_actual": {
+       "pts": 2.9,
+       "final": true
+      },
       "game": {
        "week": 5,
        "opp": "GB",
        "home": false,
        "kickoff": "2026-10-11T17:00Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
-       "completed": false
+       "status": "STATUS_FINAL",
+       "completed": true
       },
       "week_call": {
        "start": true,
@@ -1294,15 +1278,18 @@
       "team": "ARI",
       "pts": 188.3,
       "round": 4,
-      "week_pts": 11.7,
-      "week_actual": null,
+      "week_pts": 11.8,
+      "week_actual": {
+       "pts": 2,
+       "final": false
+      },
       "game": {
        "week": 5,
        "opp": "DET",
        "home": true,
        "kickoff": "2026-10-11T20:25Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
+       "status": "STATUS_IN_PROGRESS",
        "completed": false
       },
       "week_call": {
@@ -1327,22 +1314,25 @@
       "team": "PIT",
       "pts": 152.6,
       "round": 7,
-      "week_pts": 13.6,
-      "week_actual": null,
+      "week_pts": 18.1,
+      "week_actual": {
+       "pts": 33.8,
+       "final": true
+      },
       "game": {
        "week": 5,
        "opp": "IND",
        "home": true,
        "kickoff": "2026-10-11T17:00Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
-       "completed": false
+       "status": "STATUS_FINAL",
+       "completed": true
       },
       "week_call": {
        "start": true,
-       "margin": 2,
+       "margin": 6.4,
        "close": false,
-       "why": "In the week-5 lineup. Benching him costs 2 projected points."
+       "why": "In the week-5 lineup. Benching him costs 6.4 projected points."
       },
       "bye": 9,
       "adp": 67.4,
@@ -1361,15 +1351,18 @@
       "pts": 75,
       "round": null,
       "week_pts": 7.9,
-      "week_actual": null,
+      "week_actual": {
+       "pts": 5,
+       "final": true
+      },
       "game": {
        "week": 5,
        "opp": "NE",
        "home": false,
        "kickoff": "2026-10-11T17:00Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
-       "completed": false
+       "status": "STATUS_FINAL",
+       "completed": true
       },
       "week_call": {
        "start": true,
@@ -1394,15 +1387,18 @@
       "pts": 91,
       "round": 15,
       "week_pts": 6.9,
-      "week_actual": null,
+      "week_actual": {
+       "pts": 2,
+       "final": true
+      },
       "game": {
        "week": 5,
        "opp": "PHI",
        "home": true,
        "kickoff": "2026-10-11T13:30Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
-       "completed": false
+       "status": "STATUS_FINAL",
+       "completed": true
       },
       "week_call": {
        "start": true,
@@ -1431,7 +1427,7 @@
      "pos": "RB",
      "pts": 772.3,
      "rank": 2,
-     "vs_median": 250.3,
+     "vs_median": 273.4,
      "starters": 4,
      "rostered": 5
     },
@@ -1473,7 +1469,7 @@
      "pos": "RB",
      "pts": 772.3,
      "rank": 2,
-     "vs_median": 250.3,
+     "vs_median": 273.4,
      "starters": 4,
      "rostered": 5
     },
@@ -1510,26 +1506,21 @@
      {
       "name": "Caleb Williams",
       "pos": "QB",
-      "status": "Questionable"
-     },
-     {
-      "name": "Justin Jefferson",
-      "pos": "WR",
-      "status": "Questionable"
+      "status": "Out"
      }
     ],
     "fragile": [
+     {
+      "name": "Caleb Williams",
+      "pos": "QB",
+      "score": 0.85,
+      "why": "No significant missed time (--/17/17)."
+     },
      {
       "name": "Derrick Henry",
       "pos": "RB",
       "score": 0.85,
       "why": "Remarkably durable (17/17/17); the flag is age (32), not health."
-     },
-     {
-      "name": "Justin Jefferson",
-      "pos": "WR",
-      "score": 0.89,
-      "why": "2023 hamstring (IR, soft-tissue, reinjury-prone class); durable since (17/17). Annual hamstring-flare watch."
      }
     ],
     "flagged": []
@@ -1543,15 +1534,18 @@
      "pts": 270.9,
      "round": null,
      "week_pts": 15.2,
-     "week_actual": null,
+     "week_actual": {
+      "pts": 1.84,
+      "final": true
+     },
      "game": {
       "week": 5,
       "opp": "MIN",
       "home": true,
       "kickoff": "2026-10-11T17:00Z",
       "date": "2026-10-11",
-      "status": "STATUS_SCHEDULED",
-      "completed": false
+      "status": "STATUS_FINAL",
+      "completed": true
      },
      "week_call": {
       "start": true,
@@ -1572,22 +1566,25 @@
      "team": "NE",
      "pts": 132.7,
      "round": 14,
-     "week_pts": 10.7,
-     "week_actual": null,
+     "week_pts": 10.8,
+     "week_actual": {
+      "pts": 2.1,
+      "final": true
+     },
      "game": {
       "week": 5,
       "opp": "LV",
       "home": true,
       "kickoff": "2026-10-11T17:00Z",
       "date": "2026-10-11",
-      "status": "STATUS_SCHEDULED",
-      "completed": false
+      "status": "STATUS_FINAL",
+      "completed": true
      },
      "week_call": {
       "start": true,
-      "margin": 1.4,
+      "margin": 1.3,
       "close": true,
-      "why": "In the week-5 lineup, but only by 1.4 — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
+      "why": "In the week-5 lineup, but only by 1.3 — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
      },
      "bye": 11,
      "starts_on": 0,
@@ -1632,22 +1629,25 @@
      "team": "MIA",
      "pts": 107.3,
      "round": null,
-     "week_pts": 9.3,
-     "week_actual": null,
+     "week_pts": 9.5,
+     "week_actual": {
+      "pts": 9.1,
+      "final": true
+     },
      "game": {
       "week": 5,
       "opp": "CIN",
       "home": true,
       "kickoff": "2026-10-11T17:00Z",
       "date": "2026-10-11",
-      "status": "STATUS_SCHEDULED",
-      "completed": false
+      "status": "STATUS_FINAL",
+      "completed": true
      },
      "week_call": {
       "start": false,
-      "margin": 1.4,
+      "margin": 1.3,
       "close": true,
-      "why": "Out of the week-5 lineup by 1.4, against Romeo Doubs — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
+      "why": "Out of the week-5 lineup by 1.3, against Romeo Doubs — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
      },
      "bye": null,
      "starts_on": 0,
@@ -1662,15 +1662,18 @@
      "team": "SEA",
      "pts": 51,
      "round": null,
-     "week_pts": 11.6,
-     "week_actual": null,
+     "week_pts": 11.7,
+     "week_actual": {
+      "pts": 9,
+      "final": false
+     },
      "game": {
       "week": 5,
       "opp": "SF",
       "home": true,
       "kickoff": "2026-10-11T20:25Z",
       "date": "2026-10-11",
-      "status": "STATUS_SCHEDULED",
+      "status": "STATUS_IN_PROGRESS",
       "completed": false
      },
      "week_call": {
@@ -1839,40 +1842,40 @@
    "user_id": "601589173350096896",
    "is_me": false,
    "draft_slot": 10,
-   "starter_pts": 1806.9,
-   "starter_rank": 7,
-   "vs_league_median": -33.1,
-   "bench_pts": 641.7,
+   "starter_pts": 1760.9,
+   "starter_rank": 8,
+   "vs_league_median": -79.1,
+   "bench_pts": 591.4,
    "week": {
     "n": 5,
-    "starter_pts": 93.1,
+    "starter_pts": 93.8,
     "starter_n": 8,
     "starter_of": 10,
-    "bench_pts": 22.9,
+    "bench_pts": 23.7,
     "bench_n": 3,
     "bench_of": 6,
-    "scored_pts": 6,
-    "scored_n": 2,
-    "optimal_pts": 109.9,
+    "scored_pts": 21.4,
+    "scored_n": 6,
+    "optimal_pts": 111.4,
     "changes": {
      "in": [
       "Alvin Kamara",
-      "Jordan Addison"
+      "Tre' Harris"
      ],
      "out": [
       "Saquon Barkley",
-      "Travis Etienne"
+      "Jordan Mason"
      ],
-     "gain": 16.8,
+     "gain": 17.6,
      "close": 0,
      "unavailable": [
       "Saquon Barkley (Out)",
-      "Travis Etienne (IR)"
+      "Jordan Mason (IR)"
      ],
      "unfilled": []
     }
    },
-   "summary": "7th of 10 in projected starting points (1807), -33 against the league median. Built on TE: 187 starting points, 1st in the league, +36 on the median. QB is the hole — 303 points, 8th, -4 behind. No bench player would start on four other teams, so there is little here to trade from. Week 14 takes 3 starters off the field at once, and five bench spots do not cover that.",
+   "summary": "8th of 10 in projected starting points (1761), -79 against the league median. Built on TE: 187 starting points, 1st in the league, +36 on the median. QB is the hole — 303 points, 8th, -4 behind. No bench player would start on four other teams, so there is little here to trade from. Week 14 takes 3 starters off the field at once, and five bench spots do not cover that.",
    "slots": [
     {
      "slot": "QB",
@@ -1883,22 +1886,25 @@
       "team": "SF",
       "pts": 303.2,
       "round": 12,
-      "week_pts": 17.3,
-      "week_actual": null,
+      "week_pts": 17.6,
+      "week_actual": {
+       "pts": 5.48,
+       "final": false
+      },
       "game": {
        "week": 5,
        "opp": "SEA",
        "home": false,
        "kickoff": "2026-10-11T20:25Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
+       "status": "STATUS_IN_PROGRESS",
        "completed": false
       },
       "week_call": {
        "start": true,
-       "margin": 17.3,
+       "margin": 17.6,
        "close": false,
-       "why": "In the week-5 lineup. Benching him costs 17.3 projected points."
+       "why": "In the week-5 lineup. Benching him costs 17.6 projected points."
       },
       "bye": 8,
       "adp": 128,
@@ -1917,15 +1923,18 @@
       "pts": 228.2,
       "round": 2,
       "week_pts": null,
-      "week_actual": null,
+      "week_actual": {
+       "pts": 0,
+       "final": true
+      },
       "game": {
        "week": 5,
        "opp": "JAX",
        "home": false,
        "kickoff": "2026-10-11T13:30Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
-       "completed": false
+       "status": "STATUS_FINAL",
+       "completed": true
       },
       "week_call": {
        "start": false,
@@ -1943,35 +1952,38 @@
     {
      "slot": "RB",
      "player": {
-      "id": "7543",
-      "name": "Travis Etienne",
+      "id": "5967",
+      "name": "Tony Pollard",
       "pos": "RB",
-      "team": "NO",
-      "pts": 189.7,
-      "round": 4,
-      "week_pts": null,
-      "week_actual": null,
+      "team": "TEN",
+      "pts": 146.1,
+      "round": 7,
+      "week_pts": 8.8,
+      "week_actual": {
+       "pts": 5.2,
+       "final": true
+      },
       "game": {
        "week": 5,
-       "opp": "MIN",
+       "opp": "HOU",
        "home": true,
        "kickoff": "2026-10-11T17:00Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
-       "completed": false
+       "status": "STATUS_FINAL",
+       "completed": true
       },
       "week_call": {
-       "start": false,
-       "margin": null,
+       "start": true,
+       "margin": 8.8,
        "close": false,
-       "why": "Sleeper lists him IR. Availability is decided before points. If the designation clears, the next build puts him back."
+       "why": "In the week-5 lineup. Benching him costs 8.8 projected points."
       },
-      "bye": 8,
-      "adp": 37.4,
-      "injury": "IR"
+      "bye": 9,
+      "adp": 76.3,
+      "injury": null
      },
-     "rank": 5,
-     "vs_median": 4.8
+     "rank": 10,
+     "vs_median": -34
     },
     {
      "slot": "WR",
@@ -1982,22 +1994,25 @@
       "team": "DET",
       "pts": 227.5,
       "round": 1,
-      "week_pts": 17.6,
-      "week_actual": null,
+      "week_pts": 17.8,
+      "week_actual": {
+       "pts": 0,
+       "final": false
+      },
       "game": {
        "week": 5,
        "opp": "ARI",
        "home": false,
        "kickoff": "2026-10-11T20:25Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
+       "status": "STATUS_IN_PROGRESS",
        "completed": false
       },
       "week_call": {
        "start": true,
-       "margin": 17.6,
+       "margin": 17.8,
        "close": false,
-       "why": "In the week-5 lineup. Benching him costs 17.6 projected points."
+       "why": "In the week-5 lineup. Benching him costs 17.8 projected points."
       },
       "bye": 6,
       "adp": 7.5,
@@ -2015,26 +2030,29 @@
       "team": "WAS",
       "pts": 176.8,
       "round": 5,
-      "week_pts": 9.8,
-      "week_actual": null,
+      "week_pts": 9.6,
+      "week_actual": {
+       "pts": 10.2,
+       "final": true
+      },
       "game": {
        "week": 5,
        "opp": "NYG",
        "home": true,
        "kickoff": "2026-10-11T17:00Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
-       "completed": false
+       "status": "STATUS_FINAL",
+       "completed": true
       },
       "week_call": {
        "start": true,
-       "margin": 9.8,
+       "margin": 9.6,
        "close": false,
-       "why": "In the week-5 lineup. Benching him costs 9.8 projected points."
+       "why": "In the week-5 lineup. Benching him costs 9.6 projected points."
       },
       "bye": 7,
       "adp": 55.4,
-      "injury": "Questionable"
+      "injury": null
      },
      "rank": 7,
      "vs_median": -9.4
@@ -2048,22 +2066,25 @@
       "team": "ARI",
       "pts": 186.9,
       "round": 3,
-      "week_pts": 14.3,
-      "week_actual": null,
+      "week_pts": 14.4,
+      "week_actual": {
+       "pts": 1.6,
+       "final": false
+      },
       "game": {
        "week": 5,
        "opp": "DET",
        "home": true,
        "kickoff": "2026-10-11T20:25Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
+       "status": "STATUS_IN_PROGRESS",
        "completed": false
       },
       "week_call": {
        "start": true,
-       "margin": 14.3,
+       "margin": 14.4,
        "close": false,
-       "why": "In the week-5 lineup. Benching him costs 14.3 projected points."
+       "why": "In the week-5 lineup. Benching him costs 14.4 projected points."
       },
       "bye": 14,
       "adp": 26,
@@ -2108,35 +2129,38 @@
     {
      "slot": "FLEX",
      "player": {
-      "id": "5967",
-      "name": "Tony Pollard",
+      "id": "8408",
+      "name": "Jordan Mason",
       "pos": "RB",
-      "team": "TEN",
-      "pts": 146.1,
-      "round": 7,
-      "week_pts": 8.5,
-      "week_actual": null,
+      "team": "MIN",
+      "pts": 143.7,
+      "round": 8,
+      "week_pts": null,
+      "week_actual": {
+       "pts": 0,
+       "final": true
+      },
       "game": {
        "week": 5,
-       "opp": "HOU",
-       "home": true,
+       "opp": "NO",
+       "home": false,
        "kickoff": "2026-10-11T17:00Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
-       "completed": false
+       "status": "STATUS_FINAL",
+       "completed": true
       },
       "week_call": {
-       "start": true,
-       "margin": 8.5,
+       "start": false,
+       "margin": null,
        "close": false,
-       "why": "In the week-5 lineup. Benching him costs 8.5 projected points."
+       "why": "Sleeper lists him IR. Availability is decided before points. If the designation clears, the next build puts him back."
       },
-      "bye": 9,
-      "adp": 76.3,
-      "injury": null
+      "bye": 6,
+      "adp": 91.5,
+      "injury": "IR"
      },
-     "rank": 8,
-     "vs_median": -7
+     "rank": 9,
+     "vs_median": -9.4
     },
     {
      "slot": "K",
@@ -2222,11 +2246,11 @@
     },
     {
      "pos": "RB",
-     "pts": 564,
+     "pts": 518,
      "rank": 5,
-     "vs_median": 42,
+     "vs_median": 19.1,
      "starters": 3,
-     "rostered": 6
+     "rostered": 5
     },
     {
      "pos": "WR",
@@ -2234,7 +2258,7 @@
      "rank": 8,
      "vs_median": -51.8,
      "starters": 3,
-     "rostered": 5
+     "rostered": 6
     },
     {
      "pos": "TE",
@@ -2286,7 +2310,7 @@
      "rank": 8,
      "vs_median": -51.8,
      "starters": 3,
-     "rostered": 5
+     "rostered": 6
     }
    ],
    "risks": {
@@ -2308,19 +2332,14 @@
       "status": "Out"
      },
      {
-      "name": "Travis Etienne",
-      "pos": "RB",
-      "status": "IR"
-     },
-     {
-      "name": "Terry McLaurin",
-      "pos": "WR",
-      "status": "Questionable"
-     },
-     {
       "name": "DJ Moore",
       "pos": "WR",
       "status": "Questionable"
+     },
+     {
+      "name": "Jordan Mason",
+      "pos": "RB",
+      "status": "IR"
      }
     ],
     "fragile": [
@@ -2331,15 +2350,15 @@
       "why": "Durable recently (14/16/16), no chronic pattern; the flag is age (29) not health."
      },
      {
-      "name": "Travis Etienne",
+      "name": "Jordan Mason",
       "pos": "RB",
-      "score": 0.805,
-      "why": "No significant missed time (17/15/17)."
+      "score": 0.766,
+      "why": null
      },
      {
       "name": "Terry McLaurin",
       "pos": "WR",
-      "score": 0.837,
+      "score": 0.863,
       "why": "2025 missed time (10 games)."
      }
     ],
@@ -2355,36 +2374,6 @@
    },
    "bench": [
     {
-     "id": "8408",
-     "name": "Jordan Mason",
-     "pos": "RB",
-     "team": "MIN",
-     "pts": 143.7,
-     "round": 8,
-     "week_pts": null,
-     "week_actual": null,
-     "game": {
-      "week": 5,
-      "opp": "NO",
-      "home": false,
-      "kickoff": "2026-10-11T17:00Z",
-      "date": "2026-10-11",
-      "status": "STATUS_SCHEDULED",
-      "completed": false
-     },
-     "week_call": {
-      "start": false,
-      "margin": null,
-      "close": false,
-      "why": "Sleeper lists him IR. Availability is decided before points. If the designation clears, the next build puts him back."
-     },
-     "bye": 6,
-     "starts_on": 1,
-     "best_gain": 6.8,
-     "best_team": 3,
-     "own_cost": 0
-    },
-    {
      "id": "12534",
      "name": "Kyle Monangai",
      "pos": "RB",
@@ -2392,15 +2381,18 @@
      "pts": 143.1,
      "round": 10,
      "week_pts": null,
-     "week_actual": null,
+     "week_actual": {
+      "pts": 0,
+      "final": true
+     },
      "game": {
       "week": 5,
       "opp": "GB",
       "home": false,
       "kickoff": "2026-10-11T17:00Z",
       "date": "2026-10-11",
-      "status": "STATUS_SCHEDULED",
-      "completed": false
+      "status": "STATUS_FINAL",
+      "completed": true
      },
      "week_call": {
       "start": false,
@@ -2421,27 +2413,63 @@
      "team": "MIN",
      "pts": 141.7,
      "round": 9,
-     "week_pts": 7.1,
-     "week_actual": null,
+     "week_pts": null,
+     "week_actual": {
+      "pts": 0,
+      "final": true
+     },
      "game": {
       "week": 5,
       "opp": "NO",
       "home": false,
       "kickoff": "2026-10-11T17:00Z",
       "date": "2026-10-11",
-      "status": "STATUS_SCHEDULED",
-      "completed": false
+      "status": "STATUS_FINAL",
+      "completed": true
      },
      "week_call": {
-      "start": true,
-      "margin": 7.1,
+      "start": false,
+      "margin": null,
       "close": false,
-      "why": "In the week-5 lineup. Benching him costs 7.1 projected points."
+      "why": "Sleeper lists him Out. Availability is decided before points. If the designation clears, the next build puts him back."
      },
      "bye": 6,
      "starts_on": 2,
      "best_gain": 6.5,
      "best_team": 1,
+     "own_cost": 0
+    },
+    {
+     "id": "12509",
+     "name": "Tre' Harris",
+     "pos": "WR",
+     "team": "LAC",
+     "pts": 93.4,
+     "round": null,
+     "week_pts": 7.9,
+     "week_actual": {
+      "pts": 2.6,
+      "final": false
+     },
+     "game": {
+      "week": 5,
+      "opp": "DEN",
+      "home": true,
+      "kickoff": "2026-10-11T20:05Z",
+      "date": "2026-10-11",
+      "status": "STATUS_IN_PROGRESS",
+      "completed": false
+     },
+     "week_call": {
+      "start": true,
+      "margin": 7.9,
+      "close": false,
+      "why": "In the week-5 lineup. Benching him costs 7.9 projected points."
+     },
+     "bye": null,
+     "starts_on": 0,
+     "best_gain": 0,
+     "best_team": null,
      "own_cost": 0
     },
     {
@@ -2504,15 +2532,18 @@
      "pts": 53,
      "round": 14,
      "week_pts": 9.7,
-     "week_actual": null,
+     "week_actual": {
+      "pts": 1.6,
+      "final": true
+     },
      "game": {
       "week": 5,
       "opp": "MIN",
       "home": true,
       "kickoff": "2026-10-11T17:00Z",
       "date": "2026-10-11",
-      "status": "STATUS_SCHEDULED",
-      "completed": false
+      "status": "STATUS_FINAL",
+      "completed": true
      },
      "week_call": {
       "start": true,
@@ -2553,9 +2584,9 @@
       "team": "JAX",
       "pts": 158.8,
       "round": 6,
-      "gain": 12.7,
+      "gain": 15.1,
       "cost": 0,
-      "net": 12.7
+      "net": 15.1
      },
      {
       "id": "11620",
@@ -2564,9 +2595,9 @@
       "team": "CHI",
       "pts": 173.9,
       "round": 7,
-      "gain": 27.8,
+      "gain": 30.2,
       "cost": 15.1,
-      "net": 12.7
+      "net": 15.1
      },
      {
       "id": "11584",
@@ -2575,9 +2606,9 @@
       "team": "TB",
       "pts": 179.3,
       "round": 5,
-      "gain": 33.2,
+      "gain": 35.6,
       "cost": 20.5,
-      "net": 12.7
+      "net": 15.1
      },
      {
       "id": "12514",
@@ -2586,9 +2617,9 @@
       "team": "TB",
       "pts": 185.5,
       "round": 4,
-      "gain": 39.4,
+      "gain": 41.8,
       "cost": 26.7,
-      "net": 12.7
+      "net": 15.1
      },
      {
       "id": "8137",
@@ -2597,12 +2628,12 @@
       "team": "DAL",
       "pts": 205.7,
       "round": 3,
-      "gain": 59.6,
+      "gain": 62,
       "cost": 46.9,
-      "net": 12.7
+      "net": 15.1
      }
     ],
-    "note": "One-way fit the other way — you hold surplus they could use and they hold none you can use. Sell, do not swap. Every name on your side nets the same +12.7 — they all fill the same slot over there, so the one to actually send is the cheapest, Bhayshul Tuten."
+    "note": "One-way fit the other way — you hold surplus they could use and they hold none you can use. Sell, do not swap. Every name on your side nets the same +15.1 — they all fill the same slot over there, so the one to actually send is the cheapest, Bhayshul Tuten."
    }
   },
   {
@@ -2620,12 +2651,12 @@
     "starter_pts": 93.7,
     "starter_n": 8,
     "starter_of": 10,
-    "bench_pts": 33.5,
+    "bench_pts": 34.9,
     "bench_n": 4,
     "bench_of": 6,
-    "scored_pts": 0,
-    "scored_n": 0,
-    "optimal_pts": 116.4,
+    "scored_pts": 91.6,
+    "scored_n": 6,
+    "optimal_pts": 116.7,
     "changes": {
      "in": [
       "Braelon Allen",
@@ -2635,7 +2666,7 @@
       "Breece Hall",
       "Chuba Hubbard"
      ],
-     "gain": 22.7,
+     "gain": 23,
      "close": 1,
      "unavailable": [
       "Breece Hall (Out)"
@@ -2654,22 +2685,25 @@
       "team": "NE",
       "pts": 320.8,
       "round": 7,
-      "week_pts": 19.1,
-      "week_actual": null,
+      "week_pts": 19.2,
+      "week_actual": {
+       "pts": 39.46,
+       "final": true
+      },
       "game": {
        "week": 5,
        "opp": "LV",
        "home": true,
        "kickoff": "2026-10-11T17:00Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
-       "completed": false
+       "status": "STATUS_FINAL",
+       "completed": true
       },
       "week_call": {
        "start": true,
-       "margin": 19.1,
+       "margin": 19.2,
        "close": false,
-       "why": "In the week-5 lineup. Benching him costs 19.1 projected points."
+       "why": "In the week-5 lineup. Benching him costs 19.2 projected points."
       },
       "bye": 11,
       "adp": 52.7,
@@ -2688,15 +2722,18 @@
       "pts": 192.5,
       "round": 3,
       "week_pts": null,
-      "week_actual": null,
+      "week_actual": {
+       "pts": 0,
+       "final": true
+      },
       "game": {
        "week": 5,
        "opp": "CLE",
        "home": true,
        "kickoff": "2026-10-11T17:00Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
-       "completed": false
+       "status": "STATUS_FINAL",
+       "completed": true
       },
       "week_call": {
        "start": false,
@@ -2721,14 +2758,17 @@
       "pts": 147.2,
       "round": 9,
       "week_pts": 8.6,
-      "week_actual": null,
+      "week_actual": {
+       "pts": 9.2,
+       "final": false
+      },
       "game": {
        "week": 5,
        "opp": "LAC",
        "home": false,
        "kickoff": "2026-10-11T20:05Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
+       "status": "STATUS_IN_PROGRESS",
        "completed": false
       },
       "week_call": {
@@ -2741,8 +2781,8 @@
       "adp": 84.2,
       "injury": null
      },
-     "rank": 10,
-     "vs_median": -37.7
+     "rank": 9,
+     "vs_median": -32.9
     },
     {
      "slot": "WR",
@@ -2753,22 +2793,25 @@
       "team": "SEA",
       "pts": 235.1,
       "round": 1,
-      "week_pts": 19.6,
-      "week_actual": null,
+      "week_pts": 19.8,
+      "week_actual": {
+       "pts": 5.9,
+       "final": false
+      },
       "game": {
        "week": 5,
        "opp": "SF",
        "home": true,
        "kickoff": "2026-10-11T20:25Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
+       "status": "STATUS_IN_PROGRESS",
        "completed": false
       },
       "week_call": {
        "start": true,
-       "margin": 11.4,
+       "margin": 11.6,
        "close": false,
-       "why": "In the week-5 lineup. Benching him costs 11.4 projected points."
+       "why": "In the week-5 lineup. Benching him costs 11.6 projected points."
       },
       "bye": 11,
       "adp": 8.7,
@@ -2786,26 +2829,29 @@
       "team": "CIN",
       "pts": 186.9,
       "round": 4,
-      "week_pts": 12.1,
-      "week_actual": null,
+      "week_pts": 12.5,
+      "week_actual": {
+       "pts": 3.2,
+       "final": true
+      },
       "game": {
        "week": 5,
        "opp": "MIA",
        "home": false,
        "kickoff": "2026-10-11T17:00Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
-       "completed": false
+       "status": "STATUS_FINAL",
+       "completed": true
       },
       "week_call": {
        "start": true,
-       "margin": 3.9,
+       "margin": 4.3,
        "close": false,
-       "why": "In the week-5 lineup. Benching him costs 3.9 projected points."
+       "why": "In the week-5 lineup. Benching him costs 4.3 projected points."
       },
       "bye": 6,
       "adp": 39,
-      "injury": "Questionable"
+      "injury": null
      },
      "rank": 5,
      "vs_median": 0.7
@@ -2819,22 +2865,25 @@
       "team": "IND",
       "pts": 159.6,
       "round": 6,
-      "week_pts": 8.4,
-      "week_actual": null,
+      "week_pts": 8.2,
+      "week_actual": {
+       "pts": 17.9,
+       "final": true
+      },
       "game": {
        "week": 5,
        "opp": "PIT",
        "home": false,
        "kickoff": "2026-10-11T17:00Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
-       "completed": false
+       "status": "STATUS_FINAL",
+       "completed": true
       },
       "week_call": {
        "start": true,
-       "margin": 8.4,
+       "margin": 8.2,
        "close": false,
-       "why": "In the week-5 lineup. Benching him costs 8.4 projected points."
+       "why": "In the week-5 lineup. Benching him costs 8.2 projected points."
       },
       "bye": 13,
       "adp": 50.9,
@@ -2853,14 +2902,17 @@
       "pts": 182.5,
       "round": 5,
       "week_pts": 9.9,
-      "week_actual": null,
+      "week_actual": {
+       "pts": 2.2,
+       "final": false
+      },
       "game": {
        "week": 5,
        "opp": "LAC",
        "home": false,
        "kickoff": "2026-10-11T20:05Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
+       "status": "STATUS_IN_PROGRESS",
        "completed": false
       },
       "week_call": {
@@ -2918,22 +2970,25 @@
       "team": "IND",
       "pts": 73,
       "round": null,
-      "week_pts": 9,
-      "week_actual": null,
+      "week_pts": 8.4,
+      "week_actual": {
+       "pts": 21,
+       "final": true
+      },
       "game": {
        "week": 5,
        "opp": "PIT",
        "home": false,
        "kickoff": "2026-10-11T17:00Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
-       "completed": false
+       "status": "STATUS_FINAL",
+       "completed": true
       },
       "week_call": {
        "start": true,
-       "margin": 9,
+       "margin": 8.4,
        "close": false,
-       "why": "In the week-5 lineup. Benching him costs 9 projected points."
+       "why": "In the week-5 lineup. Benching him costs 8.4 projected points."
       },
       "bye": null,
       "adp": null,
@@ -2951,22 +3006,25 @@
       "team": "CIN",
       "pts": 79,
       "round": null,
-      "week_pts": 7,
-      "week_actual": null,
+      "week_pts": 7.1,
+      "week_actual": {
+       "pts": 10,
+       "final": true
+      },
       "game": {
        "week": 5,
        "opp": "MIA",
        "home": false,
        "kickoff": "2026-10-11T17:00Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
-       "completed": false
+       "status": "STATUS_FINAL",
+       "completed": true
       },
       "week_call": {
        "start": true,
-       "margin": 7,
+       "margin": 7.1,
        "close": false,
-       "why": "In the week-5 lineup. Benching him costs 7 projected points."
+       "why": "In the week-5 lineup. Benching him costs 7.1 projected points."
       },
       "bye": 6,
       "adp": 648.8,
@@ -2989,7 +3047,7 @@
      "pos": "RB",
      "pts": 476.6,
      "rank": 7,
-     "vs_median": -45.4,
+     "vs_median": -22.3,
      "starters": 3,
      "rostered": 5
     },
@@ -3044,11 +3102,6 @@
       "name": "Breece Hall",
       "pos": "RB",
       "status": "Out"
-     },
-     {
-      "name": "Tee Higgins",
-      "pos": "WR",
-      "status": "Questionable"
      }
     ],
     "fragile": [
@@ -3067,7 +3120,7 @@
      {
       "name": "Tee Higgins",
       "pos": "WR",
-      "score": 0.833,
+      "score": 0.859,
       "why": "Recurring soft-tissue history: hamstring (missed 2 to start a season) and a high-ankle sprain (3 games); expected 100% for Week 1. Perennial 'needs better injury luck' profile."
      }
     ],
@@ -3142,21 +3195,24 @@
      "pts": 127.7,
      "round": null,
      "week_pts": 8.2,
-     "week_actual": null,
+     "week_actual": {
+      "pts": 2.3,
+      "final": false
+     },
      "game": {
       "week": 5,
       "opp": "SEA",
       "home": false,
       "kickoff": "2026-10-11T20:25Z",
       "date": "2026-10-11",
-      "status": "STATUS_SCHEDULED",
+      "status": "STATUS_IN_PROGRESS",
       "completed": false
      },
      "week_call": {
       "start": false,
       "margin": 0.4,
       "close": true,
-      "why": "Out of the week-5 lineup by 0.4, against Keaton Mitchell — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
+      "why": "Out of the week-5 lineup by 0.4, against J.K. Dobbins — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
      },
      "bye": 8,
      "starts_on": 0,
@@ -3171,22 +3227,25 @@
      "team": "LAC",
      "pts": 87.9,
      "round": null,
-     "week_pts": 8.6,
-     "week_actual": null,
+     "week_pts": 8.9,
+     "week_actual": {
+      "pts": 0.7,
+      "final": false
+     },
      "game": {
       "week": 5,
       "opp": "DEN",
       "home": true,
       "kickoff": "2026-10-11T20:05Z",
       "date": "2026-10-11",
-      "status": "STATUS_SCHEDULED",
+      "status": "STATUS_IN_PROGRESS",
       "completed": false
      },
      "week_call": {
       "start": true,
-      "margin": 0.4,
+      "margin": 0.7,
       "close": true,
-      "why": "In the week-5 lineup, but only by 0.4 — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
+      "why": "In the week-5 lineup, but only by 0.7 — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
      },
      "bye": 7,
      "starts_on": 0,
@@ -3202,15 +3261,18 @@
      "pts": 47.2,
      "round": null,
      "week_pts": 14.1,
-     "week_actual": null,
+     "week_actual": {
+      "pts": 18.1,
+      "final": true
+     },
      "game": {
       "week": 5,
       "opp": "CLE",
       "home": true,
       "kickoff": "2026-10-11T17:00Z",
       "date": "2026-10-11",
-      "status": "STATUS_SCHEDULED",
-      "completed": false
+      "status": "STATUS_FINAL",
+      "completed": true
      },
      "week_call": {
       "start": true,
@@ -3231,22 +3293,25 @@
      "team": "CIN",
      "pts": 27.5,
      "round": null,
-     "week_pts": 2.6,
-     "week_actual": null,
+     "week_pts": 3.7,
+     "week_actual": {
+      "pts": 2.2,
+      "final": true
+     },
      "game": {
       "week": 5,
       "opp": "MIA",
       "home": false,
       "kickoff": "2026-10-11T17:00Z",
       "date": "2026-10-11",
-      "status": "STATUS_SCHEDULED",
-      "completed": false
+      "status": "STATUS_FINAL",
+      "completed": true
      },
      "week_call": {
       "start": false,
-      "margin": 6,
+      "margin": 4.9,
       "close": false,
-      "why": "6 short of Keaton Mitchell, the weakest starter he could replace in week 5."
+      "why": "4.9 short of J.K. Dobbins, the weakest starter he could replace in week 5."
      },
      "bye": null,
      "starts_on": 0,
@@ -3482,15 +3547,15 @@
    "bench_pts": 987,
    "week": {
     "n": 5,
-    "starter_pts": 111.2,
+    "starter_pts": 111.3,
     "starter_n": 9,
     "starter_of": 10,
-    "bench_pts": 54.8,
-    "bench_n": 5,
+    "bench_pts": 45.9,
+    "bench_n": 4,
     "bench_of": 6,
-    "scored_pts": 0,
-    "scored_n": 0,
-    "optimal_pts": 125.3,
+    "scored_pts": 83.6,
+    "scored_n": 5,
+    "optimal_pts": 125.7,
     "changes": {
      "in": [
       "Jared Goff",
@@ -3500,13 +3565,13 @@
       "Jayden Daniels",
       "Tetairoa McMillan"
      ],
-     "gain": 14.1,
+     "gain": 14.4,
      "close": 1,
      "unavailable": [],
      "unfilled": []
     }
    },
-   "summary": "5th of 10 in projected starting points (1861), +21 against the league median. Built on WR: 754 starting points, 3rd in the league, +150 on the median. RB is the hole — 447 points, 8th, -75 behind. 1 bench player would start on four or more other teams (Luther Burden) — that is the tradeable surplus. Week 11 takes 5 starters off the field at once, and five bench spots do not cover that.",
+   "summary": "5th of 10 in projected starting points (1861), +21 against the league median. Built on WR: 754 starting points, 3rd in the league, +150 on the median. RB is the hole — 447 points, 8th, -52 behind. 1 bench player would start on four or more other teams (Luther Burden) — that is the tradeable surplus. Week 11 takes 5 starters off the field at once, and five bench spots do not cover that.",
    "slots": [
     {
      "slot": "QB",
@@ -3517,22 +3582,25 @@
       "team": "WAS",
       "pts": 308.7,
       "round": 10,
-      "week_pts": 17,
-      "week_actual": null,
+      "week_pts": 16.9,
+      "week_actual": {
+       "pts": 32.26,
+       "final": true
+      },
       "game": {
        "week": 5,
        "opp": "NYG",
        "home": true,
        "kickoff": "2026-10-11T17:00Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
-       "completed": false
+       "status": "STATUS_FINAL",
+       "completed": true
       },
       "week_call": {
        "start": false,
-       "margin": 4.5,
+       "margin": 4.9,
        "close": false,
-       "why": "4.5 short of Jared Goff, the weakest starter he could replace in week 5."
+       "why": "4.9 short of Jared Goff, the weakest starter he could replace in week 5."
       },
       "bye": 7,
       "adp": 71.6,
@@ -3563,9 +3631,9 @@
       },
       "week_call": {
        "start": true,
-       "margin": 13.3,
+       "margin": 16,
        "close": false,
-       "why": "In the week-5 lineup. Benching him costs 13.3 projected points."
+       "why": "In the week-5 lineup. Benching him costs 16 projected points."
       },
       "bye": 11,
       "adp": 2.9,
@@ -3584,28 +3652,31 @@
       "pts": 154.5,
       "round": 6,
       "week_pts": 11.7,
-      "week_actual": null,
+      "week_actual": {
+       "pts": 16,
+       "final": true
+      },
       "game": {
        "week": 5,
        "opp": "LV",
        "home": true,
        "kickoff": "2026-10-11T17:00Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
-       "completed": false
+       "status": "STATUS_FINAL",
+       "completed": true
       },
       "week_call": {
        "start": true,
-       "margin": 2.8,
+       "margin": 5.5,
        "close": false,
-       "why": "In the week-5 lineup. Benching him costs 2.8 projected points."
+       "why": "In the week-5 lineup. Benching him costs 5.5 projected points."
       },
       "bye": 11,
       "adp": 69.3,
-      "injury": "Questionable"
+      "injury": null
      },
-     "rank": 9,
-     "vs_median": -30.4
+     "rank": 8,
+     "vs_median": -25.6
     },
     {
      "slot": "WR",
@@ -3629,9 +3700,9 @@
       },
       "week_call": {
        "start": true,
-       "margin": 5.4,
+       "margin": 5.9,
        "close": false,
-       "why": "In the week-5 lineup. Benching him costs 5.4 projected points."
+       "why": "In the week-5 lineup. Benching him costs 5.9 projected points."
       },
       "bye": 11,
       "adp": 21.9,
@@ -3649,7 +3720,7 @@
       "team": "BAL",
       "pts": 187.7,
       "round": 4,
-      "week_pts": 11.6,
+      "week_pts": 11.7,
       "week_actual": null,
       "game": {
        "week": 5,
@@ -3662,9 +3733,9 @@
       },
       "week_call": {
        "start": true,
-       "margin": 2.7,
+       "margin": 3.3,
        "close": false,
-       "why": "In the week-5 lineup. Benching him costs 2.7 projected points."
+       "why": "In the week-5 lineup. Benching him costs 3.3 projected points."
       },
       "bye": 13,
       "adp": 40.2,
@@ -3682,22 +3753,25 @@
       "team": "CLE",
       "pts": 143.4,
       "round": 11,
-      "week_pts": 8.7,
-      "week_actual": null,
+      "week_pts": 8.8,
+      "week_actual": {
+       "pts": 0.9,
+       "final": true
+      },
       "game": {
        "week": 5,
        "opp": "NYJ",
        "home": false,
        "kickoff": "2026-10-11T17:00Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
-       "completed": false
+       "status": "STATUS_FINAL",
+       "completed": true
       },
       "week_call": {
        "start": true,
-       "margin": 8.7,
+       "margin": 8.8,
        "close": false,
-       "why": "In the week-5 lineup. Benching him costs 8.7 projected points."
+       "why": "In the week-5 lineup. Benching him costs 8.8 projected points."
       },
       "bye": 11,
       "adp": 77.7,
@@ -3749,21 +3823,24 @@
       "pts": 176.4,
       "round": 8,
       "week_pts": 11.7,
-      "week_actual": null,
+      "week_actual": {
+       "pts": 27.4,
+       "final": true
+      },
       "game": {
        "week": 5,
        "opp": "PHI",
        "home": true,
        "kickoff": "2026-10-11T13:30Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
-       "completed": false
+       "status": "STATUS_FINAL",
+       "completed": true
       },
       "week_call": {
        "start": true,
-       "margin": 2.8,
+       "margin": 3.3,
        "close": false,
-       "why": "In the week-5 lineup. Benching him costs 2.8 projected points."
+       "why": "In the week-5 lineup. Benching him costs 3.3 projected points."
       },
       "bye": 7,
       "adp": 68.9,
@@ -3782,15 +3859,18 @@
       "pts": 105,
       "round": null,
       "week_pts": 8.5,
-      "week_actual": null,
+      "week_actual": {
+       "pts": 7,
+       "final": true
+      },
       "game": {
        "week": 5,
        "opp": "MIA",
        "home": false,
        "kickoff": "2026-10-11T17:00Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
-       "completed": false
+       "status": "STATUS_FINAL",
+       "completed": true
       },
       "week_call": {
        "start": true,
@@ -3815,14 +3895,17 @@
       "pts": 103,
       "round": 11,
       "week_pts": 5.5,
-      "week_actual": null,
+      "week_actual": {
+       "pts": 6,
+       "final": false
+      },
       "game": {
        "week": 5,
        "opp": "SF",
        "home": true,
        "kickoff": "2026-10-11T20:25Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
+       "status": "STATUS_IN_PROGRESS",
        "completed": false
       },
       "week_call": {
@@ -3852,7 +3935,7 @@
      "pos": "RB",
      "pts": 447.4,
      "rank": 8,
-     "vs_median": -74.6,
+     "vs_median": -51.5,
      "starters": 2,
      "rostered": 4
     },
@@ -3904,7 +3987,7 @@
      "pos": "RB",
      "pts": 447.4,
      "rank": 8,
-     "vs_median": -74.6,
+     "vs_median": -51.5,
      "starters": 2,
      "rostered": 4
     }
@@ -3925,11 +4008,6 @@
     ],
     "injured": [
      {
-      "name": "Rhamondre Stevenson",
-      "pos": "RB",
-      "status": "Questionable"
-     },
-     {
       "name": "Zay Flowers",
       "pos": "WR",
       "status": "Questionable"
@@ -3937,16 +4015,16 @@
     ],
     "fragile": [
      {
-      "name": "Rhamondre Stevenson",
-      "pos": "RB",
-      "score": 0.805,
-      "why": "No significant missed time (12/15/14)."
-     },
-     {
       "name": "Jayden Daniels",
       "pos": "QB",
       "score": 0.824,
       "why": "2025 missed significant time (7 games); cause not separately verified this pass. Flagged for the final-weeks re-check."
+     },
+     {
+      "name": "Rhamondre Stevenson",
+      "pos": "RB",
+      "score": 0.829,
+      "why": "No significant missed time (12/15/14)."
      },
      {
       "name": "Parker Washington",
@@ -3965,22 +4043,25 @@
      "team": "DET",
      "pts": 283.5,
      "round": null,
-     "week_pts": 21.5,
-     "week_actual": null,
+     "week_pts": 21.8,
+     "week_actual": {
+      "pts": 0.76,
+      "final": false
+     },
      "game": {
       "week": 5,
       "opp": "ARI",
       "home": false,
       "kickoff": "2026-10-11T20:25Z",
       "date": "2026-10-11",
-      "status": "STATUS_SCHEDULED",
+      "status": "STATUS_IN_PROGRESS",
       "completed": false
      },
      "week_call": {
       "start": true,
-      "margin": 4.5,
+      "margin": 4.9,
       "close": false,
-      "why": "In the week-5 lineup. Benching him costs 4.5 projected points."
+      "why": "In the week-5 lineup. Benching him costs 4.9 projected points."
      },
      "bye": 6,
      "starts_on": 0,
@@ -3995,22 +4076,25 @@
      "team": "CHI",
      "pts": 173,
      "round": 7,
-     "week_pts": 9.6,
-     "week_actual": null,
+     "week_pts": 9.5,
+     "week_actual": {
+      "pts": 6.9,
+      "final": true
+     },
      "game": {
       "week": 5,
       "opp": "GB",
       "home": false,
       "kickoff": "2026-10-11T17:00Z",
       "date": "2026-10-11",
-      "status": "STATUS_SCHEDULED",
-      "completed": false
+      "status": "STATUS_FINAL",
+      "completed": true
      },
      "week_call": {
       "start": true,
-      "margin": 0.7,
+      "margin": 1.1,
       "close": true,
-      "why": "In the week-5 lineup, but only by 0.7 — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
+      "why": "In the week-5 lineup, but only by 1.1 — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
      },
      "bye": 10,
      "starts_on": 6,
@@ -4025,22 +4109,25 @@
      "team": "PIT",
      "pts": 142.1,
      "round": 9,
-     "week_pts": 8.9,
-     "week_actual": null,
+     "week_pts": null,
+     "week_actual": {
+      "pts": 0,
+      "final": true
+     },
      "game": {
       "week": 5,
       "opp": "IND",
       "home": true,
       "kickoff": "2026-10-11T17:00Z",
       "date": "2026-10-11",
-      "status": "STATUS_SCHEDULED",
-      "completed": false
+      "status": "STATUS_FINAL",
+      "completed": true
      },
      "week_call": {
       "start": false,
-      "margin": 0.7,
-      "close": true,
-      "why": "Out of the week-5 lineup by 0.7, against Luther Burden — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
+      "margin": null,
+      "close": false,
+      "why": "Sleeper lists him Out. Availability is decided before points. If the designation clears, the next build puts him back."
      },
      "bye": 9,
      "starts_on": 1,
@@ -4056,15 +4143,18 @@
      "pts": 140,
      "round": 3,
      "week_pts": null,
-     "week_actual": null,
+     "week_actual": {
+      "pts": 0,
+      "final": true
+     },
      "game": {
       "week": 5,
       "opp": "LV",
       "home": true,
       "kickoff": "2026-10-11T17:00Z",
       "date": "2026-10-11",
-      "status": "STATUS_SCHEDULED",
-      "completed": false
+      "status": "STATUS_FINAL",
+      "completed": true
      },
      "week_call": {
       "start": false,
@@ -4085,22 +4175,25 @@
      "team": "IND",
      "pts": 137.3,
      "round": 11,
-     "week_pts": 8.6,
-     "week_actual": null,
+     "week_pts": 8.4,
+     "week_actual": {
+      "pts": 6.2,
+      "final": true
+     },
      "game": {
       "week": 5,
       "opp": "PIT",
       "home": false,
       "kickoff": "2026-10-11T17:00Z",
       "date": "2026-10-11",
-      "status": "STATUS_SCHEDULED",
-      "completed": false
+      "status": "STATUS_FINAL",
+      "completed": true
      },
      "week_call": {
       "start": false,
-      "margin": 1,
+      "margin": 1.1,
       "close": true,
-      "why": "Out of the week-5 lineup by 1, against Luther Burden — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
+      "why": "Out of the week-5 lineup by 1.1, against Luther Burden — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
      },
      "bye": 13,
      "starts_on": 2,
@@ -4116,21 +4209,24 @@
      "pts": 111.1,
      "round": 12,
      "week_pts": 6.2,
-     "week_actual": null,
+     "week_actual": {
+      "pts": 2.5,
+      "final": true
+     },
      "game": {
       "week": 5,
       "opp": "NYG",
       "home": true,
       "kickoff": "2026-10-11T17:00Z",
       "date": "2026-10-11",
-      "status": "STATUS_SCHEDULED",
-      "completed": false
+      "status": "STATUS_FINAL",
+      "completed": true
      },
      "week_call": {
       "start": false,
-      "margin": 3.4,
+      "margin": 3.3,
       "close": false,
-      "why": "3.4 short of Luther Burden, the weakest starter he could replace in week 5."
+      "why": "3.3 short of Luther Burden, the weakest starter he could replace in week 5."
      },
      "bye": 7,
      "starts_on": 0,
@@ -4266,20 +4362,20 @@
    "is_me": false,
    "draft_slot": 1,
    "starter_pts": 1794.4,
-   "starter_rank": 8,
+   "starter_rank": 7,
    "vs_league_median": -45.6,
    "bench_pts": 882.4,
    "week": {
     "n": 5,
-    "starter_pts": 115.3,
+    "starter_pts": 116.2,
     "starter_n": 9,
     "starter_of": 10,
-    "bench_pts": 50,
+    "bench_pts": 49.6,
     "bench_n": 5,
     "bench_of": 6,
-    "scored_pts": 0,
-    "scored_n": 0,
-    "optimal_pts": 124.2,
+    "scored_pts": 54.6,
+    "scored_n": 7,
+    "optimal_pts": 124.7,
     "changes": {
      "in": [
       "Denzel Boston"
@@ -4287,7 +4383,7 @@
      "out": [
       "Marvin Harrison"
      ],
-     "gain": 8.9,
+     "gain": 8.5,
      "close": 1,
      "unavailable": [
       "Marvin Harrison (Out)"
@@ -4295,7 +4391,7 @@
      "unfilled": []
     }
    },
-   "summary": "8th of 10 in projected starting points (1794), -46 against the league median. TE is the hole — 113 points, 10th, -38 behind. No bench player would start on four other teams, so there is little here to trade from.",
+   "summary": "7th of 10 in projected starting points (1794), -46 against the league median. TE is the hole — 113 points, 10th, -38 behind. No bench player would start on four other teams, so there is little here to trade from. Week 8 takes 3 starters off the field at once, and five bench spots do not cover that.",
    "slots": [
     {
      "slot": "QB",
@@ -4306,22 +4402,25 @@
       "team": "CIN",
       "pts": 306.1,
       "round": 7,
-      "week_pts": 19.7,
-      "week_actual": null,
+      "week_pts": 19.9,
+      "week_actual": {
+       "pts": 24.6,
+       "final": true
+      },
       "game": {
        "week": 5,
        "opp": "MIA",
        "home": false,
        "kickoff": "2026-10-11T17:00Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
-       "completed": false
+       "status": "STATUS_FINAL",
+       "completed": true
       },
       "week_call": {
        "start": true,
-       "margin": 1,
+       "margin": 1.2,
        "close": true,
-       "why": "In the week-5 lineup, but only by 1 — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
+       "why": "In the week-5 lineup, but only by 1.2 — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
       },
       "bye": 6,
       "adp": 53.2,
@@ -4339,22 +4438,25 @@
       "team": "DET",
       "pts": 299.9,
       "round": 1,
-      "week_pts": 23.2,
-      "week_actual": null,
+      "week_pts": 23.3,
+      "week_actual": {
+       "pts": 10.9,
+       "final": false
+      },
       "game": {
        "week": 5,
        "opp": "ARI",
        "home": false,
        "kickoff": "2026-10-11T20:25Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
+       "status": "STATUS_IN_PROGRESS",
        "completed": false
       },
       "week_call": {
        "start": true,
-       "margin": 15.7,
+       "margin": 15.8,
        "close": false,
-       "why": "In the week-5 lineup. Benching him costs 15.7 projected points."
+       "why": "In the week-5 lineup. Benching him costs 15.8 projected points."
       },
       "bye": 6,
       "adp": 1.3,
@@ -4373,15 +4475,18 @@
       "pts": 180,
       "round": 4,
       "week_pts": 10.5,
-      "week_actual": null,
+      "week_actual": {
+       "pts": 6.5,
+       "final": true
+      },
       "game": {
        "week": 5,
        "opp": "NYJ",
        "home": false,
        "kickoff": "2026-10-11T17:00Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
-       "completed": false
+       "status": "STATUS_FINAL",
+       "completed": true
       },
       "week_call": {
        "start": true,
@@ -4391,10 +4496,10 @@
       },
       "bye": 11,
       "adp": 48.5,
-      "injury": null
+      "injury": "Questionable"
      },
-     "rank": 7,
-     "vs_median": -4.9
+     "rank": 6,
+     "vs_median": -0.1
     },
     {
      "slot": "WR",
@@ -4405,22 +4510,25 @@
       "team": "HOU",
       "pts": 220,
       "round": 3,
-      "week_pts": 14.1,
-      "week_actual": null,
+      "week_pts": 14.9,
+      "week_actual": {
+       "pts": 8.1,
+       "final": true
+      },
       "game": {
        "week": 5,
        "opp": "TEN",
        "home": false,
        "kickoff": "2026-10-11T17:00Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
-       "completed": false
+       "status": "STATUS_FINAL",
+       "completed": true
       },
       "week_call": {
        "start": true,
-       "margin": 6.1,
+       "margin": 6.9,
        "close": false,
-       "why": "In the week-5 lineup. Benching him costs 6.1 projected points."
+       "why": "In the week-5 lineup. Benching him costs 6.9 projected points."
       },
       "bye": 8,
       "adp": 22,
@@ -4472,15 +4580,18 @@
       "pts": 112.9,
       "round": null,
       "week_pts": 8.4,
-      "week_actual": null,
+      "week_actual": {
+       "pts": 3.6,
+       "final": true
+      },
       "game": {
        "week": 5,
        "opp": "MIN",
        "home": true,
        "kickoff": "2026-10-11T17:00Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
-       "completed": false
+       "status": "STATUS_FINAL",
+       "completed": true
       },
       "week_call": {
        "start": true,
@@ -4501,19 +4612,22 @@
       "id": "11628",
       "name": "Marvin Harrison",
       "pos": "WR",
-      "team": "ARI",
+      "team": "HOU",
       "pts": 155.2,
       "round": 6,
       "week_pts": null,
-      "week_actual": null,
+      "week_actual": {
+       "pts": 0,
+       "final": true
+      },
       "game": {
        "week": 5,
-       "opp": "DET",
-       "home": true,
-       "kickoff": "2026-10-11T20:25Z",
+       "opp": "TEN",
+       "home": false,
+       "kickoff": "2026-10-11T17:00Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
-       "completed": false
+       "status": "STATUS_FINAL",
+       "completed": true
       },
       "week_call": {
        "start": false,
@@ -4521,7 +4635,7 @@
        "close": false,
        "why": "Sleeper lists him Out. Availability is decided before points. If the designation clears, the next build puts him back."
       },
-      "bye": 14,
+      "bye": 8,
       "adp": 73.2,
       "injury": "Out"
      },
@@ -4537,22 +4651,25 @@
       "team": "PIT",
       "pts": 152.3,
       "round": 8,
-      "week_pts": 11,
-      "week_actual": null,
+      "week_pts": 10.8,
+      "week_actual": {
+       "pts": 3.8,
+       "final": true
+      },
       "game": {
        "week": 5,
        "opp": "IND",
        "home": true,
        "kickoff": "2026-10-11T17:00Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
-       "completed": false
+       "status": "STATUS_FINAL",
+       "completed": true
       },
       "week_call": {
        "start": true,
-       "margin": 3,
+       "margin": 2.8,
        "close": false,
-       "why": "In the week-5 lineup. Benching him costs 3 projected points."
+       "why": "In the week-5 lineup. Benching him costs 2.8 projected points."
       },
       "bye": 9,
       "adp": 78.9,
@@ -4571,15 +4688,18 @@
       "pts": 111,
       "round": 13,
       "week_pts": 8.5,
-      "week_actual": null,
+      "week_actual": {
+       "pts": 8,
+       "final": true
+      },
       "game": {
        "week": 5,
        "opp": "PHI",
        "home": true,
        "kickoff": "2026-10-11T13:30Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
-       "completed": false
+       "status": "STATUS_FINAL",
+       "completed": true
       },
       "week_call": {
        "start": true,
@@ -4604,14 +4724,17 @@
       "pts": 96,
       "round": 15,
       "week_pts": 6.5,
-      "week_actual": null,
+      "week_actual": {
+       "pts": 11,
+       "final": false
+      },
       "game": {
        "week": 5,
        "opp": "LAC",
        "home": false,
        "kickoff": "2026-10-11T20:05Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
+       "status": "STATUS_IN_PROGRESS",
        "completed": false
       },
       "week_call": {
@@ -4641,7 +4764,7 @@
      "pos": "RB",
      "pts": 479.9,
      "rank": 6,
-     "vs_median": -42.1,
+     "vs_median": -19,
      "starters": 2,
      "rostered": 5
     },
@@ -4690,8 +4813,23 @@
     }
    ],
    "risks": {
-    "bye_stacks": [],
+    "bye_stacks": [
+     {
+      "week": 8,
+      "n": 3,
+      "players": [
+       "Nico Collins (WR)",
+       "Juwan Johnson (TE)",
+       "Marvin Harrison (WR)"
+      ]
+     }
+    ],
     "injured": [
+     {
+      "name": "Quinshon Judkins",
+      "pos": "RB",
+      "status": "Questionable"
+     },
      {
       "name": "Marvin Harrison",
       "pos": "WR",
@@ -4741,9 +4879,9 @@
      },
      "week_call": {
       "start": false,
-      "margin": 1,
+      "margin": 1.2,
       "close": true,
-      "why": "Out of the week-5 lineup by 1, against Joe Burrow — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
+      "why": "Out of the week-5 lineup by 1.2, against Joe Burrow — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
      },
      "bye": 11,
      "starts_on": 0,
@@ -4774,9 +4912,9 @@
      },
      "week_call": {
       "start": false,
-      "margin": 1.4,
+      "margin": 1,
       "close": true,
-      "why": "Out of the week-5 lineup by 1.4, against Denzel Boston — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
+      "why": "Out of the week-5 lineup by 1, against Denzel Boston — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
      },
      "bye": 10,
      "starts_on": 0,
@@ -4792,15 +4930,18 @@
      "pts": 127.9,
      "round": 2,
      "week_pts": null,
-     "week_actual": null,
+     "week_actual": {
+      "pts": 0,
+      "final": true
+     },
      "game": {
       "week": 5,
       "opp": "CHI",
       "home": true,
       "kickoff": "2026-10-11T17:00Z",
       "date": "2026-10-11",
-      "status": "STATUS_SCHEDULED",
-      "completed": false
+      "status": "STATUS_FINAL",
+      "completed": true
      },
      "week_call": {
       "start": false,
@@ -4834,9 +4975,9 @@
      },
      "week_call": {
       "start": false,
-      "margin": 2,
+      "margin": 1.6,
       "close": false,
-      "why": "2 short of Denzel Boston, the weakest starter he could replace in week 5."
+      "why": "1.6 short of Denzel Boston, the weakest starter he could replace in week 5."
      },
      "bye": 11,
      "starts_on": 0,
@@ -4852,15 +4993,18 @@
      "pts": 109.5,
      "round": 10,
      "week_pts": 8,
-     "week_actual": null,
+     "week_actual": {
+      "pts": 6.8,
+      "final": true
+     },
      "game": {
       "week": 5,
       "opp": "JAX",
       "home": false,
       "kickoff": "2026-10-11T13:30Z",
       "date": "2026-10-11",
-      "status": "STATUS_SCHEDULED",
-      "completed": false
+      "status": "STATUS_FINAL",
+      "completed": true
      },
      "week_call": {
       "start": false,
@@ -4881,22 +5025,25 @@
      "team": "CLE",
      "pts": 108.2,
      "round": null,
-     "week_pts": 8.9,
-     "week_actual": null,
+     "week_pts": 8.5,
+     "week_actual": {
+      "pts": 12.1,
+      "final": true
+     },
      "game": {
       "week": 5,
       "opp": "NYJ",
       "home": false,
       "kickoff": "2026-10-11T17:00Z",
       "date": "2026-10-11",
-      "status": "STATUS_SCHEDULED",
-      "completed": false
+      "status": "STATUS_FINAL",
+      "completed": true
      },
      "week_call": {
       "start": true,
-      "margin": 0.9,
+      "margin": 0.5,
       "close": true,
-      "why": "In the week-5 lineup, but only by 0.9 — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
+      "why": "In the week-5 lineup, but only by 0.5 — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
      },
      "bye": 11,
      "starts_on": 0,
@@ -4995,26 +5142,34 @@
    "bench_pts": 691.3,
    "week": {
     "n": 5,
-    "starter_pts": 111.8,
+    "starter_pts": 111.5,
     "starter_n": 9,
     "starter_of": 10,
-    "bench_pts": 37.3,
+    "bench_pts": 38.2,
     "bench_n": 4,
     "bench_of": 6,
-    "scored_pts": 16.5,
-    "scored_n": 2,
-    "optimal_pts": 125.3,
+    "scored_pts": 66.4,
+    "scored_n": 7,
+    "optimal_pts": 111.9,
     "changes": {
      "in": [
+      "Jacory Croskey-Merritt",
       "Michael Wilson"
      ],
      "out": [
-      "Rashee Rice"
+      "David Montgomery",
+      "Rashee Rice",
+      "TreVeyon Henderson"
      ],
-     "gain": 13.5,
+     "gain": 22.4,
      "close": 0,
-     "unavailable": [],
-     "unfilled": []
+     "unavailable": [
+      "David Montgomery (Out)",
+      "TreVeyon Henderson (Out)"
+     ],
+     "unfilled": [
+      "FLEX"
+     ]
     }
    },
    "summary": "6th of 10 in projected starting points (1819), -21 against the league median. TE is the hole — 126 points, 9th, -25 behind. No bench player would start on four other teams, so there is little here to trade from. Week 8 takes 3 starters off the field at once, and five bench spots do not cover that.",
@@ -5077,9 +5232,9 @@
       },
       "week_call": {
        "start": true,
-       "margin": 6.2,
+       "margin": 14.7,
        "close": false,
-       "why": "In the week-5 lineup. Benching him costs 6.2 projected points."
+       "why": "In the week-5 lineup. Benching him costs 14.7 projected points."
       },
       "bye": 7,
       "adp": 8.7,
@@ -5097,29 +5252,32 @@
       "team": "HOU",
       "pts": 190.1,
       "round": 5,
-      "week_pts": 12,
-      "week_actual": null,
+      "week_pts": 11.9,
+      "week_actual": {
+       "pts": 1.1,
+       "final": true
+      },
       "game": {
        "week": 5,
        "opp": "TEN",
        "home": false,
        "kickoff": "2026-10-11T17:00Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
-       "completed": false
+       "status": "STATUS_FINAL",
+       "completed": true
       },
       "week_call": {
-       "start": true,
-       "margin": 3.5,
+       "start": false,
+       "margin": null,
        "close": false,
-       "why": "In the week-5 lineup. Benching him costs 3.5 projected points."
+       "why": "Sleeper lists him Out, so he is out of the lineup whatever his 11.9-point projection says. Availability is decided before points. If the designation clears, the next build puts him back."
       },
       "bye": 8,
       "adp": 41.6,
-      "injury": null
+      "injury": "Out"
      },
      "rank": 4,
-     "vs_median": 5.2
+     "vs_median": 10
     },
     {
      "slot": "WR",
@@ -5146,9 +5304,9 @@
       },
       "week_call": {
        "start": true,
-       "margin": 8.9,
+       "margin": 17.4,
        "close": false,
-       "why": "In the week-5 lineup. Benching him costs 8.9 projected points."
+       "why": "In the week-5 lineup. Benching him costs 17.4 projected points."
       },
       "bye": 14,
       "adp": 11.7,
@@ -5167,21 +5325,24 @@
       "pts": 194.9,
       "round": 4,
       "week_pts": 13.5,
-      "week_actual": null,
+      "week_actual": {
+       "pts": 6.6,
+       "final": true
+      },
       "game": {
        "week": 5,
        "opp": "MIN",
        "home": true,
        "kickoff": "2026-10-11T17:00Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
-       "completed": false
+       "status": "STATUS_FINAL",
+       "completed": true
       },
       "week_call": {
        "start": true,
-       "margin": 5,
+       "margin": 13.5,
        "close": false,
-       "why": "In the week-5 lineup. Benching him costs 5 projected points."
+       "why": "In the week-5 lineup. Benching him costs 13.5 projected points."
       },
       "bye": 8,
       "adp": 29.6,
@@ -5199,22 +5360,25 @@
       "team": "NYG",
       "pts": 126.3,
       "round": null,
-      "week_pts": 9.5,
-      "week_actual": null,
+      "week_pts": 9.3,
+      "week_actual": {
+       "pts": 26.9,
+       "final": true
+      },
       "game": {
        "week": 5,
        "opp": "WAS",
        "home": false,
        "kickoff": "2026-10-11T17:00Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
-       "completed": false
+       "status": "STATUS_FINAL",
+       "completed": true
       },
       "week_call": {
        "start": true,
-       "margin": 1.8,
+       "margin": 9.3,
        "close": false,
-       "why": "In the week-5 lineup. Benching him costs 1.8 projected points."
+       "why": "In the week-5 lineup. Benching him costs 9.3 projected points."
       },
       "bye": 8,
       "adp": 107.4,
@@ -5266,25 +5430,28 @@
       "pts": 153.5,
       "round": 6,
       "week_pts": 10.1,
-      "week_actual": null,
+      "week_actual": {
+       "pts": 4.3,
+       "final": true
+      },
       "game": {
        "week": 5,
        "opp": "LV",
        "home": true,
        "kickoff": "2026-10-11T17:00Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
-       "completed": false
+       "status": "STATUS_FINAL",
+       "completed": true
       },
       "week_call": {
-       "start": true,
-       "margin": 1.6,
+       "start": false,
+       "margin": null,
        "close": false,
-       "why": "In the week-5 lineup. Benching him costs 1.6 projected points."
+       "why": "Sleeper lists him Out, so he is out of the lineup whatever his 10.1-point projection says. Availability is decided before points. If the designation clears, the next build puts him back."
       },
       "bye": 11,
       "adp": 59.4,
-      "injury": null
+      "injury": "Out"
      },
      "rank": 5,
      "vs_median": 0.4
@@ -5332,15 +5499,18 @@
       "pts": 92,
       "round": null,
       "week_pts": 5.8,
-      "week_actual": null,
+      "week_actual": {
+       "pts": 11,
+       "final": true
+      },
       "game": {
        "week": 5,
        "opp": "NO",
        "home": false,
        "kickoff": "2026-10-11T17:00Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
-       "completed": false
+       "status": "STATUS_FINAL",
+       "completed": true
       },
       "week_call": {
        "start": true,
@@ -5369,7 +5539,7 @@
      "pos": "RB",
      "pts": 588.9,
      "rank": 4,
-     "vs_median": 66.9,
+     "vs_median": 90,
      "starters": 3,
      "rostered": 5
     },
@@ -5431,6 +5601,11 @@
     ],
     "injured": [
      {
+      "name": "David Montgomery",
+      "pos": "RB",
+      "status": "Out"
+     },
+     {
       "name": "CeeDee Lamb",
       "pos": "WR",
       "status": "Questionable"
@@ -5439,6 +5614,11 @@
       "name": "Rashee Rice",
       "pos": "WR",
       "status": "Questionable"
+     },
+     {
+      "name": "TreVeyon Henderson",
+      "pos": "RB",
+      "status": "Out"
      }
     ],
     "fragile": [
@@ -5457,7 +5637,7 @@
      {
       "name": "David Montgomery",
       "pos": "RB",
-      "score": 0.846,
+      "score": 0.719,
       "why": "No significant missed time (14/14/17)."
      }
     ],
@@ -5471,22 +5651,25 @@
      "team": "ARI",
      "pts": 136.5,
      "round": 9,
-     "week_pts": 13.5,
-     "week_actual": null,
+     "week_pts": 13.6,
+     "week_actual": {
+      "pts": 2.18,
+      "final": false
+     },
      "game": {
       "week": 5,
       "opp": "DET",
       "home": true,
       "kickoff": "2026-10-11T20:25Z",
       "date": "2026-10-11",
-      "status": "STATUS_SCHEDULED",
+      "status": "STATUS_IN_PROGRESS",
       "completed": false
      },
      "week_call": {
       "start": true,
-      "margin": 5,
+      "margin": 13.6,
       "close": false,
-      "why": "In the week-5 lineup. Benching him costs 5 projected points."
+      "why": "In the week-5 lineup. Benching him costs 13.6 projected points."
      },
      "bye": 14,
      "starts_on": 1,
@@ -5502,21 +5685,24 @@
      "pts": 127.4,
      "round": 11,
      "week_pts": 7.6,
-     "week_actual": null,
+     "week_actual": {
+      "pts": 1,
+      "final": true
+     },
      "game": {
       "week": 5,
       "opp": "NYJ",
       "home": false,
       "kickoff": "2026-10-11T17:00Z",
       "date": "2026-10-11",
-      "status": "STATUS_SCHEDULED",
-      "completed": false
+      "status": "STATUS_FINAL",
+      "completed": true
      },
      "week_call": {
       "start": false,
-      "margin": 2.5,
+      "margin": null,
       "close": false,
-      "why": "2.5 short of TreVeyon Henderson, the weakest starter he could replace in week 5."
+      "why": "Sleeper lists him Out, so he is out of the lineup whatever his 7.6-point projection says. Availability is decided before points. If the designation clears, the next build puts him back."
      },
      "bye": 11,
      "starts_on": 0,
@@ -5532,15 +5718,18 @@
      "pts": 125.3,
      "round": 12,
      "week_pts": null,
-     "week_actual": null,
+     "week_actual": {
+      "pts": 0,
+      "final": true
+     },
      "game": {
       "week": 5,
       "opp": "NYG",
       "home": true,
       "kickoff": "2026-10-11T17:00Z",
       "date": "2026-10-11",
-      "status": "STATUS_SCHEDULED",
-      "completed": false
+      "status": "STATUS_FINAL",
+      "completed": true
      },
      "week_call": {
       "start": false,
@@ -5561,22 +5750,25 @@
      "team": "MIN",
      "pts": 122,
      "round": null,
-     "week_pts": 7.7,
-     "week_actual": null,
+     "week_pts": 8.2,
+     "week_actual": {
+      "pts": 1.2,
+      "final": true
+     },
      "game": {
       "week": 5,
       "opp": "NO",
       "home": false,
       "kickoff": "2026-10-11T17:00Z",
       "date": "2026-10-11",
-      "status": "STATUS_SCHEDULED",
-      "completed": false
+      "status": "STATUS_FINAL",
+      "completed": true
      },
      "week_call": {
       "start": false,
-      "margin": 1.8,
+      "margin": null,
       "close": false,
-      "why": "1.8 short of Isaiah Likely, the weakest starter he could replace in week 5."
+      "why": "Sleeper lists him Out, so he is out of the lineup whatever his 8.2-point projection says. Availability is decided before points. If the designation clears, the next build puts him back."
      },
      "bye": 6,
      "starts_on": 1,
@@ -5591,22 +5783,25 @@
      "team": "WAS",
      "pts": 118.4,
      "round": 10,
-     "week_pts": 8.5,
-     "week_actual": null,
+     "week_pts": 8.8,
+     "week_actual": {
+      "pts": 14.2,
+      "final": true
+     },
      "game": {
       "week": 5,
       "opp": "NYG",
       "home": true,
       "kickoff": "2026-10-11T17:00Z",
       "date": "2026-10-11",
-      "status": "STATUS_SCHEDULED",
-      "completed": false
+      "status": "STATUS_FINAL",
+      "completed": true
      },
      "week_call": {
-      "start": false,
-      "margin": 1.6,
+      "start": true,
+      "margin": 8.8,
       "close": false,
-      "why": "1.6 short of TreVeyon Henderson, the weakest starter he could replace in week 5."
+      "why": "In the week-5 lineup. Benching him costs 8.8 projected points."
      },
      "bye": 7,
      "starts_on": 0,
@@ -5622,14 +5817,17 @@
      "pts": 61.7,
      "round": 14,
      "week_pts": null,
-     "week_actual": null,
+     "week_actual": {
+      "pts": 0,
+      "final": false
+     },
      "game": {
       "week": 5,
       "opp": "SF",
       "home": true,
       "kickoff": "2026-10-11T20:25Z",
       "date": "2026-10-11",
-      "status": "STATUS_SCHEDULED",
+      "status": "STATUS_IN_PROGRESS",
       "completed": false
      },
      "week_call": {
@@ -5735,15 +5933,15 @@
    "bench_pts": 611.9,
    "week": {
     "n": 5,
-    "starter_pts": 115.9,
+    "starter_pts": 107.6,
     "starter_n": 10,
     "starter_of": 10,
     "bench_pts": 37.6,
     "bench_n": 4,
     "bench_of": 6,
-    "scored_pts": 0,
-    "scored_n": 0,
-    "optimal_pts": 118.3,
+    "scored_pts": 60.7,
+    "scored_n": 6,
+    "optimal_pts": 118.8,
     "changes": {
      "in": [
       "Matthew Golden",
@@ -5753,13 +5951,13 @@
       "Ladd McConkey",
       "Carnell Tate"
      ],
-     "gain": 2.4,
-     "close": 4,
+     "gain": 11.2,
+     "close": 3,
      "unavailable": [],
      "unfilled": []
     }
    },
-   "summary": "4th of 10 in projected starting points (1864), +24 against the league median. Built on WR: 768 starting points, 2nd in the league, +164 on the median. RB is the hole — 407 points, 9th, -115 behind. No bench player would start on four other teams, so there is little here to trade from.",
+   "summary": "4th of 10 in projected starting points (1864), +24 against the league median. Built on WR: 768 starting points, 2nd in the league, +164 on the median. RB is the hole — 407 points, 9th, -92 behind. No bench player would start on four other teams, so there is little here to trade from.",
    "slots": [
     {
      "slot": "QB",
@@ -5771,15 +5969,18 @@
       "pts": 310.5,
       "round": 7,
       "week_pts": 14.9,
-      "week_actual": null,
+      "week_actual": {
+       "pts": 13,
+       "final": true
+      },
       "game": {
        "week": 5,
        "opp": "JAX",
        "home": false,
        "kickoff": "2026-10-11T13:30Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
-       "completed": false
+       "status": "STATUS_FINAL",
+       "completed": true
       },
       "week_call": {
        "start": true,
@@ -5803,22 +6004,25 @@
       "team": "CIN",
       "pts": 226.7,
       "round": 2,
-      "week_pts": 15.7,
-      "week_actual": null,
+      "week_pts": 15.8,
+      "week_actual": {
+       "pts": 5.5,
+       "final": true
+      },
       "game": {
        "week": 5,
        "opp": "MIA",
        "home": false,
        "kickoff": "2026-10-11T17:00Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
-       "completed": false
+       "status": "STATUS_FINAL",
+       "completed": true
       },
       "week_call": {
        "start": true,
-       "margin": 6,
+       "margin": 6.2,
        "close": false,
-       "why": "In the week-5 lineup. Benching him costs 6 projected points."
+       "why": "In the week-5 lineup. Benching him costs 6.2 projected points."
       },
       "bye": 6,
       "adp": 16.4,
@@ -5836,29 +6040,32 @@
       "team": "NYG",
       "pts": 180.2,
       "round": 4,
-      "week_pts": 11.6,
-      "week_actual": null,
+      "week_pts": 11.8,
+      "week_actual": {
+       "pts": 6.1,
+       "final": true
+      },
       "game": {
        "week": 5,
        "opp": "WAS",
        "home": false,
        "kickoff": "2026-10-11T17:00Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
-       "completed": false
+       "status": "STATUS_FINAL",
+       "completed": true
       },
       "week_call": {
        "start": true,
-       "margin": 1.9,
+       "margin": 2.2,
        "close": false,
-       "why": "In the week-5 lineup. Benching him costs 1.9 projected points."
+       "why": "In the week-5 lineup. Benching him costs 2.2 projected points."
       },
       "bye": 8,
       "adp": 35.1,
       "injury": null
      },
-     "rank": 6,
-     "vs_median": -4.7
+     "rank": 5,
+     "vs_median": 0.1
     },
     {
      "slot": "WR",
@@ -5882,9 +6089,9 @@
       },
       "week_call": {
        "start": true,
-       "margin": 7.8,
+       "margin": 7.9,
        "close": false,
-       "why": "In the week-5 lineup. Benching him costs 7.8 projected points."
+       "why": "In the week-5 lineup. Benching him costs 7.9 projected points."
       },
       "bye": 11,
       "adp": 6.4,
@@ -5902,26 +6109,29 @@
       "team": "LAC",
       "pts": 187.7,
       "round": 5,
-      "week_pts": 8.7,
-      "week_actual": null,
+      "week_pts": 0,
+      "week_actual": {
+       "pts": 0,
+       "final": false
+      },
       "game": {
        "week": 5,
        "opp": "DEN",
        "home": true,
        "kickoff": "2026-10-11T20:05Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
+       "status": "STATUS_IN_PROGRESS",
        "completed": false
       },
       "week_call": {
        "start": false,
-       "margin": 1.3,
-       "close": true,
-       "why": "Out of the week-5 lineup by 1.3, against RJ Harvey — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
+       "margin": 10,
+       "close": false,
+       "why": "10 short of RJ Harvey, the weakest starter he could replace in week 5."
       },
       "bye": 7,
       "adp": 35.9,
-      "injury": "Questionable"
+      "injury": null
      },
      "rank": 4,
      "vs_median": 1.5
@@ -5935,22 +6145,25 @@
       "team": "LV",
       "pts": 180.5,
       "round": 3,
-      "week_pts": 12.5,
-      "week_actual": null,
+      "week_pts": 12.6,
+      "week_actual": {
+       "pts": 19,
+       "final": true
+      },
       "game": {
        "week": 5,
        "opp": "NE",
        "home": false,
        "kickoff": "2026-10-11T17:00Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
-       "completed": false
+       "status": "STATUS_FINAL",
+       "completed": true
       },
       "week_call": {
        "start": true,
-       "margin": 12.5,
+       "margin": 12.6,
        "close": false,
-       "why": "In the week-5 lineup. Benching him costs 12.5 projected points."
+       "why": "In the week-5 lineup. Benching him costs 12.6 projected points."
       },
       "bye": 13,
       "adp": 23,
@@ -5968,22 +6181,25 @@
       "team": "DET",
       "pts": 176.2,
       "round": 6,
-      "week_pts": 10,
-      "week_actual": null,
+      "week_pts": 10.1,
+      "week_actual": {
+       "pts": 0,
+       "final": false
+      },
       "game": {
        "week": 5,
        "opp": "ARI",
        "home": false,
        "kickoff": "2026-10-11T20:25Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
+       "status": "STATUS_IN_PROGRESS",
        "completed": false
       },
       "week_call": {
        "start": true,
-       "margin": 0.3,
+       "margin": 0.5,
        "close": true,
-       "why": "In the week-5 lineup, but only by 0.3 — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
+       "why": "In the week-5 lineup, but only by 0.5 — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
       },
       "bye": 6,
       "adp": 57.6,
@@ -6001,28 +6217,31 @@
       "team": "TEN",
       "pts": 144.8,
       "round": 8,
-      "week_pts": 9.7,
-      "week_actual": null,
+      "week_pts": 9.6,
+      "week_actual": {
+       "pts": 1.1,
+       "final": true
+      },
       "game": {
        "week": 5,
        "opp": "HOU",
        "home": true,
        "kickoff": "2026-10-11T17:00Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
-       "completed": false
+       "status": "STATUS_FINAL",
+       "completed": true
       },
       "week_call": {
        "start": false,
-       "margin": 0.3,
+       "margin": 0.4,
        "close": true,
-       "why": "Out of the week-5 lineup by 0.3, against RJ Harvey — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
+       "why": "Out of the week-5 lineup by 0.4, against RJ Harvey — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
       },
       "bye": 9,
       "adp": 70.9,
-      "injury": "Questionable"
+      "injury": null
      },
-     "rank": 9,
+     "rank": 8,
      "vs_median": -8.3
     },
     {
@@ -6068,15 +6287,18 @@
       "pts": 104,
       "round": 12,
       "week_pts": 7.2,
-      "week_actual": null,
+      "week_actual": {
+       "pts": 16,
+       "final": true
+      },
       "game": {
        "week": 5,
        "opp": "TEN",
        "home": false,
        "kickoff": "2026-10-11T17:00Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
-       "completed": false
+       "status": "STATUS_FINAL",
+       "completed": true
       },
       "week_call": {
        "start": true,
@@ -6105,7 +6327,7 @@
      "pos": "RB",
      "pts": 406.9,
      "rank": 9,
-     "vs_median": -115.1,
+     "vs_median": -92,
      "starters": 2,
      "rostered": 4
     },
@@ -6165,25 +6387,14 @@
      "pos": "RB",
      "pts": 406.9,
      "rank": 9,
-     "vs_median": -115.1,
+     "vs_median": -92,
      "starters": 2,
      "rostered": 4
     }
    ],
    "risks": {
     "bye_stacks": [],
-    "injured": [
-     {
-      "name": "Ladd McConkey",
-      "pos": "WR",
-      "status": "Questionable"
-     },
-     {
-      "name": "Carnell Tate",
-      "pos": "WR",
-      "status": "Questionable"
-     }
-    ],
+    "injured": [],
     "fragile": [
      {
       "name": "Cam Skattebo",
@@ -6211,21 +6422,24 @@
      "pts": 141,
      "round": 15,
      "week_pts": 10.8,
-     "week_actual": null,
+     "week_actual": {
+      "pts": 17.3,
+      "final": true
+     },
      "game": {
       "week": 5,
       "opp": "CHI",
       "home": true,
       "kickoff": "2026-10-11T17:00Z",
       "date": "2026-10-11",
-      "status": "STATUS_SCHEDULED",
-      "completed": false
+      "status": "STATUS_FINAL",
+      "completed": true
      },
      "week_call": {
       "start": true,
-      "margin": 1.1,
+      "margin": 1.2,
       "close": true,
-      "why": "In the week-5 lineup, but only by 1.1 — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
+      "why": "In the week-5 lineup, but only by 1.2 — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
      },
      "bye": 11,
      "starts_on": 2,
@@ -6271,21 +6485,24 @@
      "pts": 125.6,
      "round": 9,
      "week_pts": 10,
-     "week_actual": null,
+     "week_actual": {
+      "pts": 0.6,
+      "final": false
+     },
      "game": {
       "week": 5,
       "opp": "LAC",
       "home": false,
       "kickoff": "2026-10-11T20:05Z",
       "date": "2026-10-11",
-      "status": "STATUS_SCHEDULED",
+      "status": "STATUS_IN_PROGRESS",
       "completed": false
      },
      "week_call": {
       "start": true,
-      "margin": 0.3,
+      "margin": 0.4,
       "close": true,
-      "why": "In the week-5 lineup, but only by 0.3 — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
+      "why": "In the week-5 lineup, but only by 0.4 — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
      },
      "bye": 10,
      "starts_on": 0,
@@ -6301,15 +6518,18 @@
      "pts": 90.5,
      "round": 10,
      "week_pts": null,
-     "week_actual": null,
+     "week_actual": {
+      "pts": 0,
+      "final": true
+     },
      "game": {
       "week": 5,
       "opp": "MIN",
       "home": true,
       "kickoff": "2026-10-11T17:00Z",
       "date": "2026-10-11",
-      "status": "STATUS_SCHEDULED",
-      "completed": false
+      "status": "STATUS_FINAL",
+      "completed": true
      },
      "week_call": {
       "start": false,
@@ -6331,15 +6551,18 @@
      "pts": 89.6,
      "round": null,
      "week_pts": 7.8,
-     "week_actual": null,
+     "week_actual": {
+      "pts": 4.6,
+      "final": true
+     },
      "game": {
       "week": 5,
       "opp": "MIN",
       "home": true,
       "kickoff": "2026-10-11T17:00Z",
       "date": "2026-10-11",
-      "status": "STATUS_SCHEDULED",
-      "completed": false
+      "status": "STATUS_FINAL",
+      "completed": true
      },
      "week_call": {
       "start": false,
@@ -6361,21 +6584,24 @@
      "pts": 28.8,
      "round": null,
      "week_pts": 9,
-     "week_actual": null,
+     "week_actual": {
+      "pts": 7.8,
+      "final": true
+     },
      "game": {
       "week": 5,
       "opp": "JAX",
       "home": false,
       "kickoff": "2026-10-11T13:30Z",
       "date": "2026-10-11",
-      "status": "STATUS_SCHEDULED",
-      "completed": false
+      "status": "STATUS_FINAL",
+      "completed": true
      },
      "week_call": {
       "start": false,
-      "margin": 1,
-      "close": true,
-      "why": "Out of the week-5 lineup by 1, against RJ Harvey — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
+      "margin": null,
+      "close": false,
+      "why": "Sleeper lists him Out, so he is out of the lineup whatever his 9-point projection says. Availability is decided before points. If the designation clears, the next build puts him back."
      },
      "bye": null,
      "starts_on": 0,
@@ -6543,15 +6769,15 @@
    "bench_pts": 510.6,
    "week": {
     "n": 5,
-    "starter_pts": 107.8,
+    "starter_pts": 108,
     "starter_n": 9,
     "starter_of": 10,
-    "bench_pts": 47.1,
+    "bench_pts": 48,
     "bench_n": 5,
     "bench_of": 6,
-    "scored_pts": 0,
-    "scored_n": 0,
-    "optimal_pts": 123.2,
+    "scored_pts": 60.2,
+    "scored_n": 3,
+    "optimal_pts": 124,
     "changes": {
      "in": [
       "Aaron Jones",
@@ -6561,7 +6787,7 @@
       "Omarion Hampton",
       "Jadarian Price"
      ],
-     "gain": 15.4,
+     "gain": 16,
      "close": 0,
      "unavailable": [
       "Jadarian Price (IR)"
@@ -6569,7 +6795,7 @@
      "unfilled": []
     }
    },
-   "summary": "2nd of 10 in projected starting points (1894), +54 against the league median. Built on QB: 362 starting points, 1st in the league, +54 on the median. RB is the hole — 379 points, 10th, -143 behind. No bench player would start on four other teams, so there is little here to trade from. Week 8 takes 4 starters off the field at once, and five bench spots do not cover that.",
+   "summary": "2nd of 10 in projected starting points (1894), +54 against the league median. Built on QB: 362 starting points, 1st in the league, +54 on the median. RB is the hole — 379 points, 10th, -120 behind. No bench player would start on four other teams, so there is little here to trade from. Week 8 takes 4 starters off the field at once, and five bench spots do not cover that.",
    "slots": [
     {
      "slot": "QB",
@@ -6613,22 +6839,25 @@
       "team": "LAC",
       "pts": 218.9,
       "round": 2,
-      "week_pts": 8.8,
-      "week_actual": null,
+      "week_pts": 9.2,
+      "week_actual": {
+       "pts": 2.9,
+       "final": false
+      },
       "game": {
        "week": 5,
        "opp": "DEN",
        "home": true,
        "kickoff": "2026-10-11T20:05Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
+       "status": "STATUS_IN_PROGRESS",
        "completed": false
       },
       "week_call": {
        "start": false,
-       "margin": 2.5,
+       "margin": 2.2,
        "close": false,
-       "why": "2.5 short of Mike Evans, the weakest starter he could replace in week 5."
+       "why": "2.2 short of Mike Evans, the weakest starter he could replace in week 5."
       },
       "bye": 7,
       "adp": 15.8,
@@ -6647,14 +6876,17 @@
       "pts": 160.5,
       "round": 6,
       "week_pts": null,
-      "week_actual": null,
+      "week_actual": {
+       "pts": 0,
+       "final": false
+      },
       "game": {
        "week": 5,
        "opp": "SF",
        "home": true,
        "kickoff": "2026-10-11T20:25Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
+       "status": "STATUS_IN_PROGRESS",
        "completed": false
       },
       "week_call": {
@@ -6667,8 +6899,8 @@
       "adp": 51.7,
       "injury": "IR"
      },
-     "rank": 8,
-     "vs_median": -24.4
+     "rank": 7,
+     "vs_median": -19.6
     },
     {
      "slot": "WR",
@@ -6679,26 +6911,29 @@
       "team": "CIN",
       "pts": 256.6,
       "round": 1,
-      "week_pts": 16.5,
-      "week_actual": null,
+      "week_pts": 16.7,
+      "week_actual": {
+       "pts": 16.7,
+       "final": true
+      },
       "game": {
        "week": 5,
        "opp": "MIA",
        "home": false,
        "kickoff": "2026-10-11T17:00Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
-       "completed": false
+       "status": "STATUS_FINAL",
+       "completed": true
       },
       "week_call": {
        "start": true,
-       "margin": 7.6,
+       "margin": 7.5,
        "close": false,
-       "why": "In the week-5 lineup. Benching him costs 7.6 projected points."
+       "why": "In the week-5 lineup. Benching him costs 7.5 projected points."
       },
       "bye": 6,
       "adp": 3.9,
-      "injury": "Questionable"
+      "injury": null
      },
      "rank": 2,
      "vs_median": 35.3
@@ -6712,22 +6947,25 @@
       "team": "NYG",
       "pts": 193.7,
       "round": 3,
-      "week_pts": 11.8,
-      "week_actual": null,
+      "week_pts": 11.5,
+      "week_actual": {
+       "pts": 23.6,
+       "final": true
+      },
       "game": {
        "week": 5,
        "opp": "WAS",
        "home": false,
        "kickoff": "2026-10-11T17:00Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
-       "completed": false
+       "status": "STATUS_FINAL",
+       "completed": true
       },
       "week_call": {
        "start": true,
-       "margin": 2.9,
+       "margin": 2.3,
        "close": false,
-       "why": "In the week-5 lineup. Benching him costs 2.9 projected points."
+       "why": "In the week-5 lineup. Benching him costs 2.3 projected points."
       },
       "bye": 8,
       "adp": 28.6,
@@ -6746,14 +6984,17 @@
       "pts": 138.3,
       "round": 8,
       "week_pts": 10.4,
-      "week_actual": null,
+      "week_actual": {
+       "pts": 0,
+       "final": false
+      },
       "game": {
        "week": 5,
        "opp": "SEA",
        "home": false,
        "kickoff": "2026-10-11T20:25Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
+       "status": "STATUS_IN_PROGRESS",
        "completed": false
       },
       "week_call": {
@@ -6778,22 +7019,25 @@
       "team": "SF",
       "pts": 187.2,
       "round": 7,
-      "week_pts": 11.3,
-      "week_actual": null,
+      "week_pts": 11.4,
+      "week_actual": {
+       "pts": 8.5,
+       "final": false
+      },
       "game": {
        "week": 5,
        "opp": "SEA",
        "home": false,
        "kickoff": "2026-10-11T20:25Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
+       "status": "STATUS_IN_PROGRESS",
        "completed": false
       },
       "week_call": {
        "start": true,
-       "margin": 2.4,
+       "margin": 2.2,
        "close": false,
-       "why": "In the week-5 lineup. Benching him costs 2.4 projected points."
+       "why": "In the week-5 lineup. Benching him costs 2.2 projected points."
       },
       "bye": 8,
       "adp": 63,
@@ -6811,22 +7055,25 @@
       "team": "NYJ",
       "pts": 183.4,
       "round": 5,
-      "week_pts": 12.9,
-      "week_actual": null,
+      "week_pts": 12.7,
+      "week_actual": {
+       "pts": 19.9,
+       "final": true
+      },
       "game": {
        "week": 5,
        "opp": "CLE",
        "home": true,
        "kickoff": "2026-10-11T17:00Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
-       "completed": false
+       "status": "STATUS_FINAL",
+       "completed": true
       },
       "week_call": {
        "start": true,
-       "margin": 4,
+       "margin": 3.5,
        "close": false,
-       "why": "In the week-5 lineup. Benching him costs 4 projected points."
+       "why": "In the week-5 lineup. Benching him costs 3.5 projected points."
       },
       "bye": 13,
       "adp": 46.9,
@@ -6845,14 +7092,17 @@
       "pts": 110,
       "round": 13,
       "week_pts": 8.6,
-      "week_actual": null,
+      "week_actual": {
+       "pts": 5,
+       "final": false
+      },
       "game": {
        "week": 5,
        "opp": "SF",
        "home": true,
        "kickoff": "2026-10-11T20:25Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
+       "status": "STATUS_IN_PROGRESS",
        "completed": false
       },
       "week_call": {
@@ -6878,14 +7128,17 @@
       "pts": 84,
       "round": null,
       "week_pts": 5.6,
-      "week_actual": null,
+      "week_actual": {
+       "pts": 8,
+       "final": false
+      },
       "game": {
        "week": 5,
        "opp": "SEA",
        "home": false,
        "kickoff": "2026-10-11T20:25Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
+       "status": "STATUS_IN_PROGRESS",
        "completed": false
       },
       "week_call": {
@@ -6915,7 +7168,7 @@
      "pos": "RB",
      "pts": 379.4,
      "rank": 10,
-     "vs_median": -142.6,
+     "vs_median": -119.5,
      "starters": 2,
      "rostered": 6
     },
@@ -6975,7 +7228,7 @@
      "pos": "RB",
      "pts": 379.4,
      "rank": 10,
-     "vs_median": -142.6,
+     "vs_median": -119.5,
      "starters": 2,
      "rostered": 6
     },
@@ -7006,11 +7259,6 @@
       "name": "Jadarian Price",
       "pos": "RB",
       "status": "IR"
-     },
-     {
-      "name": "Ja'Marr Chase",
-      "pos": "WR",
-      "status": "Questionable"
      }
     ],
     "fragile": [
@@ -7044,21 +7292,24 @@
      "pts": 137,
      "round": null,
      "week_pts": 8.9,
-     "week_actual": null,
+     "week_actual": {
+      "pts": 16.2,
+      "final": true
+     },
      "game": {
       "week": 5,
       "opp": "CHI",
       "home": true,
       "kickoff": "2026-10-11T17:00Z",
       "date": "2026-10-11",
-      "status": "STATUS_SCHEDULED",
-      "completed": false
+      "status": "STATUS_FINAL",
+      "completed": true
      },
      "week_call": {
       "start": false,
-      "margin": 2.4,
+      "margin": 2.5,
       "close": false,
-      "why": "2.4 short of Mike Evans, the weakest starter he could replace in week 5."
+      "why": "2.5 short of Mike Evans, the weakest starter he could replace in week 5."
      },
      "bye": 11,
      "starts_on": 1,
@@ -7103,22 +7354,25 @@
      "team": "MIN",
      "pts": 120.1,
      "round": 10,
-     "week_pts": 12.7,
-     "week_actual": null,
+     "week_pts": 13.5,
+     "week_actual": {
+      "pts": 17.2,
+      "final": true
+     },
      "game": {
       "week": 5,
       "opp": "NO",
       "home": false,
       "kickoff": "2026-10-11T17:00Z",
       "date": "2026-10-11",
-      "status": "STATUS_SCHEDULED",
-      "completed": false
+      "status": "STATUS_FINAL",
+      "completed": true
      },
      "week_call": {
       "start": true,
-      "margin": 3.8,
+      "margin": 4.3,
       "close": false,
-      "why": "In the week-5 lineup. Benching him costs 3.8 projected points."
+      "why": "In the week-5 lineup. Benching him costs 4.3 projected points."
      },
      "bye": 6,
      "starts_on": 0,
@@ -7134,21 +7388,24 @@
      "pts": 72.7,
      "round": 12,
      "week_pts": 7.8,
-     "week_actual": null,
+     "week_actual": {
+      "pts": 0.2,
+      "final": false
+     },
      "game": {
       "week": 5,
       "opp": "DET",
       "home": true,
       "kickoff": "2026-10-11T20:25Z",
       "date": "2026-10-11",
-      "status": "STATUS_SCHEDULED",
+      "status": "STATUS_IN_PROGRESS",
       "completed": false
      },
      "week_call": {
       "start": false,
-      "margin": 3.5,
+      "margin": 3.6,
       "close": false,
-      "why": "3.5 short of Mike Evans, the weakest starter he could replace in week 5."
+      "why": "3.6 short of Mike Evans, the weakest starter he could replace in week 5."
      },
      "bye": 14,
      "starts_on": 0,
@@ -7163,22 +7420,25 @@
      "team": "CHI",
      "pts": 23.2,
      "round": null,
-     "week_pts": 6.2,
-     "week_actual": null,
+     "week_pts": 6.1,
+     "week_actual": {
+      "pts": 1.9,
+      "final": true
+     },
      "game": {
       "week": 5,
       "opp": "GB",
       "home": false,
       "kickoff": "2026-10-11T17:00Z",
       "date": "2026-10-11",
-      "status": "STATUS_SCHEDULED",
-      "completed": false
+      "status": "STATUS_FINAL",
+      "completed": true
      },
      "week_call": {
       "start": false,
-      "margin": 5.1,
+      "margin": 5.3,
       "close": false,
-      "why": "5.1 short of Mike Evans, the weakest starter he could replace in week 5."
+      "why": "5.3 short of Mike Evans, the weakest starter he could replace in week 5."
      },
      "bye": null,
      "starts_on": 0,
@@ -7193,22 +7453,25 @@
      "team": "MIA",
      "pts": 21.7,
      "round": null,
-     "week_pts": 11.5,
-     "week_actual": null,
+     "week_pts": 11.7,
+     "week_actual": {
+      "pts": 14.8,
+      "final": true
+     },
      "game": {
       "week": 5,
       "opp": "CIN",
       "home": true,
       "kickoff": "2026-10-11T17:00Z",
       "date": "2026-10-11",
-      "status": "STATUS_SCHEDULED",
-      "completed": false
+      "status": "STATUS_FINAL",
+      "completed": true
      },
      "week_call": {
       "start": true,
-      "margin": 2.6,
+      "margin": 2.5,
       "close": false,
-      "why": "In the week-5 lineup. Benching him costs 2.6 projected points."
+      "why": "In the week-5 lineup. Benching him costs 2.5 projected points."
      },
      "bye": null,
      "starts_on": 0,
@@ -7251,15 +7514,15 @@
    "bench_pts": 470.2,
    "week": {
     "n": 5,
-    "starter_pts": 86.7,
+    "starter_pts": 87.1,
     "starter_n": 7,
     "starter_of": 10,
-    "bench_pts": 48,
+    "bench_pts": 48.2,
     "bench_n": 5,
     "bench_of": 5,
-    "scored_pts": 0,
-    "scored_n": 0,
-    "optimal_pts": 118.2,
+    "scored_pts": 70.7,
+    "scored_n": 5,
+    "optimal_pts": 118.7,
     "changes": {
      "in": [
       "Kirk Cousins",
@@ -7271,7 +7534,7 @@
       "Kenneth Walker",
       "DeVonta Smith"
      ],
-     "gain": 31.5,
+     "gain": 31.6,
      "close": 2,
      "unavailable": [
       "Lamar Jackson (Out)",
@@ -7280,7 +7543,7 @@
      "unfilled": []
     }
    },
-   "summary": "1st of 10 in projected starting points (1913), +73 against the league median. Built on RB: 863 starting points, 1st in the league, +341 on the median. WR is the hole — 365 points, 9th, -238 behind. No bench player would start on four other teams, so there is little here to trade from. Week 11 takes 4 starters off the field at once, and five bench spots do not cover that.",
+   "summary": "1st of 10 in projected starting points (1913), +73 against the league median. Built on RB: 863 starting points, 1st in the league, +364 on the median. WR is the hole — 365 points, 9th, -238 behind. No bench player would start on four other teams, so there is little here to trade from. Week 11 takes 4 starters off the field at once, and five bench spots do not cover that.",
    "slots": [
     {
      "slot": "QB",
@@ -7324,22 +7587,25 @@
       "team": "SF",
       "pts": 256,
       "round": 1,
-      "week_pts": 15.8,
-      "week_actual": null,
+      "week_pts": 16.5,
+      "week_actual": {
+       "pts": 3.6,
+       "final": false
+      },
       "game": {
        "week": 5,
        "opp": "SEA",
        "home": false,
        "kickoff": "2026-10-11T20:25Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
+       "status": "STATUS_IN_PROGRESS",
        "completed": false
       },
       "week_call": {
        "start": true,
-       "margin": 7.5,
+       "margin": 8.2,
        "close": false,
-       "why": "In the week-5 lineup. Benching him costs 7.5 projected points."
+       "why": "In the week-5 lineup. Benching him costs 8.2 projected points."
       },
       "bye": 8,
       "adp": 4.6,
@@ -7379,7 +7645,7 @@
       "injury": null
      },
      "rank": 2,
-     "vs_median": 40.6
+     "vs_median": 45.4
     },
     {
      "slot": "WR",
@@ -7391,15 +7657,18 @@
       "pts": 189.2,
       "round": 4,
       "week_pts": null,
-      "week_actual": null,
+      "week_actual": {
+       "pts": 0,
+       "final": true
+      },
       "game": {
        "week": 5,
        "opp": "JAX",
        "home": false,
        "kickoff": "2026-10-11T13:30Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
-       "completed": false
+       "status": "STATUS_FINAL",
+       "completed": true
       },
       "week_call": {
        "start": false,
@@ -7424,15 +7693,18 @@
       "pts": 176.1,
       "round": 7,
       "week_pts": 13.6,
-      "week_actual": null,
+      "week_actual": {
+       "pts": 29.3,
+       "final": true
+      },
       "game": {
        "week": 5,
        "opp": "CHI",
        "home": true,
        "kickoff": "2026-10-11T17:00Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
-       "completed": false
+       "status": "STATUS_FINAL",
+       "completed": true
       },
       "week_call": {
        "start": true,
@@ -7456,22 +7728,25 @@
       "team": "GB",
       "pts": 140.9,
       "round": 9,
-      "week_pts": 9,
-      "week_actual": null,
+      "week_pts": 8.9,
+      "week_actual": {
+       "pts": 9.1,
+       "final": true
+      },
       "game": {
        "week": 5,
        "opp": "CHI",
        "home": true,
        "kickoff": "2026-10-11T17:00Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
-       "completed": false
+       "status": "STATUS_FINAL",
+       "completed": true
       },
       "week_call": {
        "start": true,
-       "margin": 0.7,
+       "margin": 0.6,
        "close": true,
-       "why": "In the week-5 lineup, but only by 0.7 — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
+       "why": "In the week-5 lineup, but only by 0.6 — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
       },
       "bye": 11,
       "adp": 66.9,
@@ -7522,22 +7797,25 @@
       "team": "CHI",
       "pts": 189.5,
       "round": 6,
-      "week_pts": 17,
-      "week_actual": null,
+      "week_pts": 16.9,
+      "week_actual": {
+       "pts": 15.3,
+       "final": true
+      },
       "game": {
        "week": 5,
        "opp": "GB",
        "home": false,
        "kickoff": "2026-10-11T17:00Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
-       "completed": false
+       "status": "STATUS_FINAL",
+       "completed": true
       },
       "week_call": {
        "start": true,
-       "margin": 8.7,
+       "margin": 8.6,
        "close": false,
-       "why": "In the week-5 lineup. Benching him costs 8.7 projected points."
+       "why": "In the week-5 lineup. Benching him costs 8.6 projected points."
       },
       "bye": 10,
       "adp": 44.4,
@@ -7555,22 +7833,25 @@
       "team": "HOU",
       "pts": 112,
       "round": 13,
-      "week_pts": 8.7,
-      "week_actual": null,
+      "week_pts": 8.6,
+      "week_actual": {
+       "pts": 17,
+       "final": true
+      },
       "game": {
        "week": 5,
        "opp": "TEN",
        "home": false,
        "kickoff": "2026-10-11T17:00Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
-       "completed": false
+       "status": "STATUS_FINAL",
+       "completed": true
       },
       "week_call": {
        "start": true,
-       "margin": 8.7,
+       "margin": 8.6,
        "close": false,
-       "why": "In the week-5 lineup. Benching him costs 8.7 projected points."
+       "why": "In the week-5 lineup. Benching him costs 8.6 projected points."
       },
       "bye": 8,
       "adp": 141.4,
@@ -7626,7 +7907,7 @@
      "pos": "RB",
      "pts": 863,
      "rank": 1,
-     "vs_median": 341,
+     "vs_median": 364.1,
      "starters": 4,
      "rostered": 5
     },
@@ -7668,7 +7949,7 @@
      "pos": "RB",
      "pts": 863,
      "rank": 1,
-     "vs_median": 341,
+     "vs_median": 364.1,
      "starters": 4,
      "rostered": 5
     },
@@ -7809,22 +8090,25 @@
      "team": "LV",
      "pts": 89.5,
      "round": 13,
-     "week_pts": 8.2,
-     "week_actual": null,
+     "week_pts": 8.3,
+     "week_actual": {
+      "pts": 1.5,
+      "final": true
+     },
      "game": {
       "week": 5,
       "opp": "NE",
       "home": false,
       "kickoff": "2026-10-11T17:00Z",
       "date": "2026-10-11",
-      "status": "STATUS_SCHEDULED",
-      "completed": false
+      "status": "STATUS_FINAL",
+      "completed": true
      },
      "week_call": {
       "start": false,
-      "margin": 0.2,
+      "margin": 0.1,
       "close": true,
-      "why": "Out of the week-5 lineup by 0.2, against Dalton Kincaid — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
+      "why": "Out of the week-5 lineup by 0.1, against Dalton Kincaid — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
      },
      "bye": 13,
      "starts_on": 0,
@@ -7869,22 +8153,25 @@
      "team": "LV",
      "pts": 39.2,
      "round": null,
-     "week_pts": 14.7,
-     "week_actual": null,
+     "week_pts": 14.8,
+     "week_actual": {
+      "pts": 13.72,
+      "final": true
+     },
      "game": {
       "week": 5,
       "opp": "NE",
       "home": false,
       "kickoff": "2026-10-11T17:00Z",
       "date": "2026-10-11",
-      "status": "STATUS_SCHEDULED",
-      "completed": false
+      "status": "STATUS_FINAL",
+      "completed": true
      },
      "week_call": {
       "start": true,
-      "margin": 14.7,
+      "margin": 14.8,
       "close": false,
-      "why": "In the week-5 lineup. Benching him costs 14.7 projected points."
+      "why": "In the week-5 lineup. Benching him costs 14.8 projected points."
      },
      "bye": null,
      "starts_on": 0,
@@ -7927,14 +8214,14 @@
    "bench_pts": 716.9,
    "week": {
     "n": 5,
-    "starter_pts": 95.2,
+    "starter_pts": 95.4,
     "starter_n": 9,
     "starter_of": 10,
-    "bench_pts": 39.6,
+    "bench_pts": 39.3,
     "bench_n": 4,
     "bench_of": 5,
-    "scored_pts": 68.2,
-    "scored_n": 3,
+    "scored_pts": 113.6,
+    "scored_n": 8,
     "optimal_pts": 114.4,
     "changes": {
      "in": [
@@ -7945,13 +8232,13 @@
       "Patrick Mahomes",
       "Rome Odunze"
      ],
-     "gain": 19.2,
+     "gain": 19,
      "close": 1,
      "unavailable": [],
      "unfilled": []
     }
    },
-   "summary": "3rd of 10 in projected starting points (1879), +39 against the league median. Built on RB: 662 starting points, 3rd in the league, +140 on the median. QB is the hole — 287 points, 10th, -21 behind. 1 bench player would start on four or more other teams (Bhayshul Tuten) — that is the tradeable surplus. Week 10 takes 4 starters off the field at once, and five bench spots do not cover that.",
+   "summary": "3rd of 10 in projected starting points (1879), +39 against the league median. Built on RB: 662 starting points, 3rd in the league, +163 on the median. QB is the hole — 287 points, 10th, -21 behind. 1 bench player would start on four or more other teams (Bhayshul Tuten) — that is the tradeable surplus. Week 10 takes 4 starters off the field at once, and five bench spots do not cover that.",
    "slots": [
     {
      "slot": "QB",
@@ -7995,22 +8282,25 @@
       "team": "IND",
       "pts": 254.3,
       "round": 1,
-      "week_pts": 17.6,
-      "week_actual": null,
+      "week_pts": 17.7,
+      "week_actual": {
+       "pts": 9.7,
+       "final": true
+      },
       "game": {
        "week": 5,
        "opp": "PIT",
        "home": false,
        "kickoff": "2026-10-11T17:00Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
-       "completed": false
+       "status": "STATUS_FINAL",
+       "completed": true
       },
       "week_call": {
        "start": true,
-       "margin": 9.6,
+       "margin": 9.7,
        "close": false,
-       "why": "In the week-5 lineup. Benching him costs 9.6 projected points."
+       "why": "In the week-5 lineup. Benching him costs 9.7 projected points."
       },
       "bye": 13,
       "adp": 5.2,
@@ -8028,29 +8318,32 @@
       "team": "LV",
       "pts": 228.7,
       "round": 2,
-      "week_pts": 11.2,
-      "week_actual": null,
+      "week_pts": 11.1,
+      "week_actual": {
+       "pts": 9.2,
+       "final": true
+      },
       "game": {
        "week": 5,
        "opp": "NE",
        "home": false,
        "kickoff": "2026-10-11T17:00Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
-       "completed": false
+       "status": "STATUS_FINAL",
+       "completed": true
       },
       "week_call": {
        "start": true,
-       "margin": 3.2,
+       "margin": 3.1,
        "close": false,
-       "why": "In the week-5 lineup. Benching him costs 3.2 projected points."
+       "why": "In the week-5 lineup. Benching him costs 3.1 projected points."
       },
       "bye": 13,
       "adp": 17.9,
-      "injury": "Questionable"
+      "injury": null
      },
      "rank": 1,
-     "vs_median": 43.8
+     "vs_median": 48.6
     },
     {
      "slot": "WR",
@@ -8133,22 +8426,25 @@
       "team": "DET",
       "pts": 158.5,
       "round": 8,
-      "week_pts": 10.5,
-      "week_actual": null,
+      "week_pts": 10.7,
+      "week_actual": {
+       "pts": 1.7,
+       "final": false
+      },
       "game": {
        "week": 5,
        "opp": "ARI",
        "home": false,
        "kickoff": "2026-10-11T20:25Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
+       "status": "STATUS_IN_PROGRESS",
        "completed": false
       },
       "week_call": {
        "start": true,
-       "margin": 2.9,
+       "margin": 3.1,
        "close": false,
-       "why": "In the week-5 lineup. Benching him costs 2.9 projected points."
+       "why": "In the week-5 lineup. Benching him costs 3.1 projected points."
       },
       "bye": 6,
       "adp": 62.9,
@@ -8203,15 +8499,18 @@
       "pts": 173.9,
       "round": 7,
       "week_pts": 8,
-      "week_actual": null,
+      "week_actual": {
+       "pts": 3.5,
+       "final": true
+      },
       "game": {
        "week": 5,
        "opp": "GB",
        "home": false,
        "kickoff": "2026-10-11T17:00Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
-       "completed": false
+       "status": "STATUS_FINAL",
+       "completed": true
       },
       "week_call": {
        "start": false,
@@ -8236,15 +8535,18 @@
       "pts": 108,
       "round": 14,
       "week_pts": 8.8,
-      "week_actual": null,
+      "week_actual": {
+       "pts": 16,
+       "final": true
+      },
       "game": {
        "week": 5,
        "opp": "NO",
        "home": false,
        "kickoff": "2026-10-11T17:00Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
-       "completed": false
+       "status": "STATUS_FINAL",
+       "completed": true
       },
       "week_call": {
        "start": true,
@@ -8269,15 +8571,18 @@
       "pts": 98,
       "round": 12,
       "week_pts": 4.9,
-      "week_actual": null,
+      "week_actual": {
+       "pts": 7,
+       "final": true
+      },
       "game": {
        "week": 5,
        "opp": "JAX",
        "home": false,
        "kickoff": "2026-10-11T13:30Z",
        "date": "2026-10-11",
-       "status": "STATUS_SCHEDULED",
-       "completed": false
+       "status": "STATUS_FINAL",
+       "completed": true
       },
       "week_call": {
        "start": true,
@@ -8306,7 +8611,7 @@
      "pos": "RB",
      "pts": 662.3,
      "rank": 3,
-     "vs_median": 140.3,
+     "vs_median": 163.4,
      "starters": 3,
      "rostered": 4
     },
@@ -8348,7 +8653,7 @@
      "pos": "RB",
      "pts": 662.3,
      "rank": 3,
-     "vs_median": 140.3,
+     "vs_median": 163.4,
      "starters": 3,
      "rostered": 4
     }
@@ -8376,13 +8681,7 @@
       ]
      }
     ],
-    "injured": [
-     {
-      "name": "Ashton Jeanty",
-      "pos": "RB",
-      "status": "Questionable"
-     }
-    ],
+    "injured": [],
     "fragile": [
      {
       "name": "Jonathan Taylor",
@@ -8413,22 +8712,25 @@
      "team": "HOU",
      "pts": 247.8,
      "round": null,
-     "week_pts": 15.4,
-     "week_actual": null,
+     "week_pts": 15.2,
+     "week_actual": {
+      "pts": 20.94,
+      "final": true
+     },
      "game": {
       "week": 5,
       "opp": "TEN",
       "home": false,
       "kickoff": "2026-10-11T17:00Z",
       "date": "2026-10-11",
-      "status": "STATUS_SCHEDULED",
-      "completed": false
+      "status": "STATUS_FINAL",
+      "completed": true
      },
      "week_call": {
       "start": true,
-      "margin": 15.4,
+      "margin": 15.2,
       "close": false,
-      "why": "In the week-5 lineup. Benching him costs 15.4 projected points."
+      "why": "In the week-5 lineup. Benching him costs 15.2 projected points."
      },
      "bye": 8,
      "starts_on": 0,
@@ -8444,15 +8746,18 @@
      "pts": 158.8,
      "round": 6,
      "week_pts": 11.8,
-     "week_actual": null,
+     "week_actual": {
+      "pts": 10.6,
+      "final": true
+     },
      "game": {
       "week": 5,
       "opp": "PHI",
       "home": true,
       "kickoff": "2026-10-11T13:30Z",
       "date": "2026-10-11",
-      "status": "STATUS_SCHEDULED",
-      "completed": false
+      "status": "STATUS_FINAL",
+      "completed": true
      },
      "week_call": {
       "start": true,
@@ -8489,9 +8794,9 @@
      },
      "week_call": {
       "start": false,
-      "margin": 2.9,
+      "margin": 3.1,
       "close": false,
-      "why": "2.9 short of Sam LaPorta, the weakest starter he could replace in week 5."
+      "why": "3.1 short of Sam LaPorta, the weakest starter he could replace in week 5."
      },
      "bye": 14,
      "starts_on": 1,
@@ -8506,22 +8811,25 @@
      "team": "HOU",
      "pts": 104.7,
      "round": null,
-     "week_pts": 4.8,
-     "week_actual": null,
+     "week_pts": 4.7,
+     "week_actual": {
+      "pts": 5.3,
+      "final": true
+     },
      "game": {
       "week": 5,
       "opp": "TEN",
       "home": false,
       "kickoff": "2026-10-11T17:00Z",
       "date": "2026-10-11",
-      "status": "STATUS_SCHEDULED",
-      "completed": false
+      "status": "STATUS_FINAL",
+      "completed": true
      },
      "week_call": {
       "start": false,
-      "margin": 4.1,
+      "margin": 4.2,
       "close": false,
-      "why": "4.1 short of Emeka Egbuka, the weakest starter he could replace in week 5."
+      "why": "4.2 short of Emeka Egbuka, the weakest starter he could replace in week 5."
      },
      "bye": 8,
      "starts_on": 0,
@@ -8537,15 +8845,18 @@
      "pts": 80.8,
      "round": null,
      "week_pts": null,
-     "week_actual": null,
+     "week_actual": {
+      "pts": 0,
+      "final": true
+     },
      "game": {
       "week": 5,
       "opp": "CLE",
       "home": true,
       "kickoff": "2026-10-11T17:00Z",
       "date": "2026-10-11",
-      "status": "STATUS_SCHEDULED",
-      "completed": false
+      "status": "STATUS_FINAL",
+      "completed": true
      },
      "week_call": {
       "start": false,
