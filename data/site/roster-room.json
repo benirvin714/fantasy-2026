@@ -104,7 +104,7 @@
   {
    "slot": "DEF",
    "index": 9,
-   "median": 94,
+   "median": 90,
    "best": 106
   }
  ],
@@ -125,7 +125,7 @@
    "median": 107
   },
   "DEF": {
-   "median": 94
+   "median": 90
   }
  },
  "trade_history": {
@@ -181,7 +181,7 @@
   "strength": {
    "rank": 4,
    "of": 10,
-   "starter_pts": 1878.6
+   "starter_pts": 1866.6
   },
   "metrics": {
    "record": {
@@ -589,7 +589,7 @@
    }
   ],
   "byes": {
-   "threshold": 6.3,
+   "threshold": 6.1,
    "window": [
     8,
     9,
@@ -600,36 +600,6 @@
     14
    ],
    "flagged": [
-    {
-     "week": 10,
-     "why": "window",
-     "off": [
-      {
-       "name": "Bucky Irving",
-       "pos": "RB"
-      },
-      {
-       "name": "Rome Odunze",
-       "pos": "WR"
-      },
-      {
-       "name": "Emeka Egbuka",
-       "pos": "WR"
-      },
-      {
-       "name": "Philadelphia Eagles",
-       "pos": "DEF"
-      }
-     ],
-     "loss": 8.6,
-     "bench_loss": 14.2,
-     "fix": {
-      "name": "Baltimore Ravens",
-      "pos": "DEF",
-      "team": "BAL",
-      "gain": 5.6
-     }
-    },
     {
      "week": 13,
      "why": "post_deadline",
@@ -648,12 +618,12 @@
       }
      ],
      "loss": 9.4,
-     "bench_loss": 11.5,
+     "bench_loss": 11.4,
      "fix": {
       "name": "Brian Thomas Jr.",
       "pos": "WR",
       "team": "JAX",
-      "gain": 2.1
+      "gain": 2
      }
     }
    ],
@@ -667,27 +637,44 @@
        "pos": "WR"
       }
      ],
-     "loss": -0.5,
+     "loss": -0.7,
      "bench_loss": 0,
      "fix": {
-      "name": "Bo Nix",
-      "pos": "QB",
-      "team": "DEN",
-      "gain": 0.5
+      "name": "Philadelphia Eagles",
+      "pos": "DEF",
+      "team": "PHI",
+      "gain": 0.7
+     }
+    },
+    {
+     "week": 10,
+     "why": "window",
+     "off": [
+      {
+       "name": "Bucky Irving",
+       "pos": "RB"
+      },
+      {
+       "name": "Rome Odunze",
+       "pos": "WR"
+      },
+      {
+       "name": "Emeka Egbuka",
+       "pos": "WR"
+      }
+     ],
+     "loss": 5.1,
+     "bench_loss": 8.4,
+     "fix": {
+      "name": "Brian Thomas Jr.",
+      "pos": "WR",
+      "team": "JAX",
+      "gain": 3.4
      }
     }
    ]
   },
   "actions": [
-   {
-    "kind": "trade",
-    "panel": "rosters",
-    "gain": 6.6,
-    "text": "Bucky Irving + Rome Odunze to Stipe for Nico Collins — worth 6.6 a game in week 10.",
-    "gaps": [
-     "Week 10 bye (8.6 a game short)"
-    ]
-   },
    {
     "kind": "trade",
     "panel": "rosters",
@@ -710,11 +697,11 @@
   "blind_spots": [],
   "sources": {
    "waivers": {
-    "generated": "2026-10-25",
-    "age_days": 1,
+    "generated": "2026-10-26",
+    "age_days": 0,
     "stale": false
    },
-   "trades": "10 proposal(s) from this build's trade search"
+   "trades": "11 proposal(s) from this build's trade search"
   },
   "basis": {
    "standing": "Results from The HBGBs's own weekly matchup rows, final weeks only (every game marked complete by ESPN). Seeded by wins, then points for; 6 of 10 make the playoffs.",
@@ -723,7 +710,7 @@
    "all_play": "Your record had you played every other team each week: the schedule-luck check.",
    "proj_gap": "Skill starters' (QB/RB/WR/TE) scored points against their pre-week projections in this league's scoring. K and DEF are left out: DEF points-allowed tiers never project, so they would book a structural gap as luck.",
    "efficiency": "Hindsight-optimal lineup from everyone rostered that week, scored by Sleeper, against what the started lineup scored.",
-   "byes": "Replacement-aware: the loss after the better of your bench and one free-agent pickup, per game on season projections. Flagged at or above 6.3 a game, this league's 75th percentile. Window: the next 3 unplayed week(s), plus weeks 13-14 pinned until the week-12 deadline. Availability designations are not applied to future weeks.",
+   "byes": "Replacement-aware: the loss after the better of your bench and one free-agent pickup, per game on season projections. Flagged at or above 6.1 a game, this league's 75th percentile. Window: the next 3 unplayed week(s), plus weeks 13-14 pinned until the week-12 deadline. Availability designations are not applied to future weeks.",
    "actions": "Routed, never generated: each one is lifted from this league's published waiver board or this build's trade search. When neither addresses a gap, the line says so.",
    "blind_spots": "A free agent the waiver board does not list at all, beating the best routed action for the same gap by at least 5 season points (0.3 a game). Named as a gap in the board, not recommended."
   }
@@ -1003,7 +990,7 @@
    "bench_pts": 595.5,
    "week": {
     "n": 7,
-    "starter_pts": 112.5,
+    "starter_pts": 112.7,
     "starter_n": 9,
     "starter_of": 10,
     "bench_pts": 48.6,
@@ -1011,7 +998,7 @@
     "bench_of": 6,
     "scored_pts": 77.2,
     "scored_n": 9,
-    "optimal_pts": 122.9,
+    "optimal_pts": 123.1,
     "changes": {
      "in": [
       "Jordan Love",
@@ -1112,7 +1099,7 @@
       "team": "DAL",
       "pts": 193,
       "round": 3,
-      "week_pts": 16.5,
+      "week_pts": 16.7,
       "week_actual": null,
       "game": {
        "week": 7,
@@ -1125,9 +1112,9 @@
       },
       "week_call": {
        "start": true,
-       "margin": 8.5,
+       "margin": 8.7,
        "close": false,
-       "why": "In the week-7 lineup. Benching him costs 8.5 projected points."
+       "why": "In the week-7 lineup. Benching him costs 8.7 projected points."
       },
       "bye": 14,
       "adp": 30.5,
@@ -1386,7 +1373,7 @@
       "injury": null
      },
      "rank": 10,
-     "vs_median": -30
+     "vs_median": -26
     }
    ],
    "by_pos": [
@@ -1434,7 +1421,7 @@
      "pos": "DEF",
      "pts": 64,
      "rank": 10,
-     "vs_median": -30,
+     "vs_median": -26,
      "starters": 1,
      "rostered": 1
     }
@@ -2015,7 +2002,7 @@
       },
       "bye": 6,
       "adp": 7.4,
-      "injury": null
+      "injury": "Questionable"
      },
      "rank": 4,
      "vs_median": 6.2
@@ -2227,8 +2214,8 @@
       "adp": 157.4,
       "injury": null
      },
-     "rank": 6,
-     "vs_median": -2
+     "rank": 5,
+     "vs_median": 2
     }
    ],
    "by_pos": [
@@ -2275,8 +2262,8 @@
     {
      "pos": "DEF",
      "pts": 92,
-     "rank": 6,
-     "vs_median": -2,
+     "rank": 5,
+     "vs_median": 2,
      "starters": 1,
      "rostered": 1
     }
@@ -2325,6 +2312,11 @@
      {
       "name": "Saquon Barkley",
       "pos": "RB",
+      "status": "Questionable"
+     },
+     {
+      "name": "Amon-Ra St. Brown",
+      "pos": "WR",
       "status": "Questionable"
      },
      {
@@ -3005,8 +2997,8 @@
       "adp": 159.4,
       "injury": null
      },
-     "rank": 7,
-     "vs_median": -6
+     "rank": 6,
+     "vs_median": -2
     }
    ],
    "by_pos": [
@@ -3053,8 +3045,8 @@
     {
      "pos": "DEF",
      "pts": 88,
-     "rank": 7,
-     "vs_median": -6,
+     "rank": 6,
+     "vs_median": -2,
      "starters": 1,
      "rostered": 1
     }
@@ -3929,7 +3921,7 @@
       "injury": null
      },
      "rank": 3,
-     "vs_median": 9
+     "vs_median": 13
     }
    ],
    "by_pos": [
@@ -3977,7 +3969,7 @@
      "pos": "DEF",
      "pts": 103,
      "rank": 3,
-     "vs_median": 9,
+     "vs_median": 13,
      "starters": 1,
      "rostered": 1
     }
@@ -4277,12 +4269,12 @@
     "starter_pts": 104.1,
     "starter_n": 8,
     "starter_of": 10,
-    "bench_pts": 52.3,
+    "bench_pts": 52.4,
     "bench_n": 5,
     "bench_of": 5,
     "scored_pts": 97.6,
     "scored_n": 8,
-    "optimal_pts": 123.3,
+    "optimal_pts": 123.4,
     "changes": {
      "in": [
       "Dallas Goedert",
@@ -4294,7 +4286,7 @@
       "Jakobi Meyers",
       "Cam Little"
      ],
-     "gain": 19.2,
+     "gain": 19.3,
      "close": 3,
      "unavailable": [],
      "unfilled": []
@@ -4653,8 +4645,8 @@
       "adp": 121.2,
       "injury": null
      },
-     "rank": 5,
-     "vs_median": 2
+     "rank": 4,
+     "vs_median": 6
     }
    ],
    "by_pos": [
@@ -4701,8 +4693,8 @@
     {
      "pos": "DEF",
      "pts": 96,
-     "rank": 5,
-     "vs_median": 2,
+     "rank": 4,
+     "vs_median": 6,
      "starters": 1,
      "rostered": 1
     }
@@ -4826,7 +4818,7 @@
      "team": "PHI",
      "pts": 109.5,
      "round": 10,
-     "week_pts": 9.6,
+     "week_pts": 9.7,
      "week_actual": null,
      "game": {
       "week": 7,
@@ -4839,9 +4831,9 @@
      },
      "week_call": {
       "start": true,
-      "margin": 1.3,
+      "margin": 1.4,
       "close": true,
-      "why": "In the week-7 lineup, but only by 1.3 — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
+      "why": "In the week-7 lineup, but only by 1.4 — inside the 1.5-point band where the projection cannot separate two players. Treat it as a coin flip."
      },
      "bye": 10,
      "starts_on": 0,
@@ -5033,6 +5025,40 @@
      "my_gain": 19.4,
      "their_gain": 11.5,
      "frees_bench": 1
+    },
+    {
+     "kind": "2-for-1",
+     "give": [
+      {
+       "id": "12490",
+       "name": "Bhayshul Tuten",
+       "pos": "RB",
+       "team": "JAX",
+       "pts": 158.8,
+       "round": 6
+      },
+      {
+       "id": "DAL",
+       "name": "Dallas Cowboys",
+       "pos": "DEF",
+       "team": "DAL",
+       "pts": 86,
+       "round": null
+      }
+     ],
+     "get": [
+      {
+       "id": "DEN",
+       "name": "Denver Broncos",
+       "pos": "DEF",
+       "team": "DEN",
+       "pts": 96,
+       "round": 15
+      }
+     ],
+     "my_gain": 10,
+     "their_gain": 20.9,
+     "frees_bench": 1
     }
    ],
    "fit": {
@@ -5109,7 +5135,7 @@
    "bench_pts": 670.1,
    "week": {
     "n": 7,
-    "starter_pts": 73.9,
+    "starter_pts": 74.2,
     "starter_n": 7,
     "starter_of": 10,
     "bench_pts": 22.8,
@@ -5117,7 +5143,7 @@
     "bench_of": 6,
     "scored_pts": 24.1,
     "scored_n": 7,
-    "optimal_pts": 96.7,
+    "optimal_pts": 97,
     "changes": {
      "in": [
       "Tyrone Tracy Jr.",
@@ -5149,7 +5175,7 @@
       "team": "DAL",
       "pts": 303.9,
       "round": 8,
-      "week_pts": 16,
+      "week_pts": 16.2,
       "week_actual": null,
       "game": {
        "week": 7,
@@ -5162,9 +5188,9 @@
       },
       "week_call": {
        "start": true,
-       "margin": 16,
+       "margin": 16.2,
        "close": false,
-       "why": "In the week-7 lineup. Benching him costs 16 projected points."
+       "why": "In the week-7 lineup. Benching him costs 16.2 projected points."
       },
       "bye": 14,
       "adp": 86.6,
@@ -5251,7 +5277,7 @@
       "team": "DAL",
       "pts": 222.5,
       "round": 2,
-      "week_pts": 14.2,
+      "week_pts": 14.3,
       "week_actual": null,
       "game": {
        "week": 7,
@@ -5264,9 +5290,9 @@
       },
       "week_call": {
        "start": true,
-       "margin": 14.2,
+       "margin": 14.3,
        "close": false,
-       "why": "In the week-7 lineup. Benching him costs 14.2 projected points."
+       "why": "In the week-7 lineup. Benching him costs 14.3 projected points."
       },
       "bye": 14,
       "adp": 11.3,
@@ -5488,8 +5514,8 @@
       "adp": 218.4,
       "injury": null
      },
-     "rank": 8,
-     "vs_median": -7
+     "rank": 7,
+     "vs_median": -3
     }
    ],
    "by_pos": [
@@ -5536,8 +5562,8 @@
     {
      "pos": "DEF",
      "pts": 87,
-     "rank": 8,
-     "vs_median": -7,
+     "rank": 7,
+     "vs_median": -3,
      "starters": 1,
      "rostered": 1
     }
@@ -6265,7 +6291,7 @@
       "injury": null
      },
      "rank": 2,
-     "vs_median": 10
+     "vs_median": 14
     }
    ],
    "by_pos": [
@@ -6313,7 +6339,7 @@
      "pos": "DEF",
      "pts": 104,
      "rank": 2,
-     "vs_median": 10,
+     "vs_median": 14,
      "starters": 1,
      "rostered": 1
     }
@@ -7094,7 +7120,7 @@
       "injury": null
      },
      "rank": 9,
-     "vs_median": -10
+     "vs_median": -6
     }
    ],
    "by_pos": [
@@ -7142,7 +7168,7 @@
      "pos": "DEF",
      "pts": 84,
      "rank": 9,
-     "vs_median": -10,
+     "vs_median": -6,
      "starters": 1,
      "rostered": 1
     }
@@ -7850,7 +7876,7 @@
       "injury": null
      },
      "rank": 1,
-     "vs_median": 12
+     "vs_median": 16
     }
    ],
    "by_pos": [
@@ -7898,7 +7924,7 @@
      "pos": "DEF",
      "pts": 106,
      "rank": 1,
-     "vs_median": 12,
+     "vs_median": 16,
      "starters": 1,
      "rostered": 2
     }
@@ -8172,13 +8198,13 @@
    "user_id": "603035152494436352",
    "is_me": true,
    "draft_slot": 4,
-   "starter_pts": 1878.6,
+   "starter_pts": 1866.6,
    "starter_rank": 4,
-   "vs_league_median": 43.4,
+   "vs_league_median": 31.4,
    "bench_pts": 657.9,
    "week": {
     "n": 7,
-    "starter_pts": 106.6,
+    "starter_pts": 107.2,
     "starter_n": 9,
     "starter_of": 10,
     "bench_pts": 19,
@@ -8186,7 +8212,7 @@
     "bench_of": 6,
     "scored_pts": 89.3,
     "scored_n": 8,
-    "optimal_pts": 114.4,
+    "optimal_pts": 115,
     "changes": {
      "in": [
       "Malik Washington"
@@ -8202,7 +8228,7 @@
      "unfilled": []
     }
    },
-   "summary": "4th of 10 in projected starting points (1879), +43 against the league median. Built on RB: 662 starting points, 3rd in the league, +64 on the median. QB is the hole — 287 points, 10th, -18 behind. 1 bench player would start on four or more other teams (Bhayshul Tuten) — that is the tradeable surplus. Week 10 takes 4 starters off the field at once, and five bench spots do not cover that.",
+   "summary": "4th of 10 in projected starting points (1867), +31 against the league median. Built on RB: 662 starting points, 3rd in the league, +64 on the median. QB is the hole — 287 points, 10th, -18 behind. 1 bench player would start on four or more other teams (Bhayshul Tuten) — that is the tradeable surplus. Week 10 takes 3 starters off the field at once, and five bench spots do not cover that.",
    "slots": [
     {
      "slot": "QB",
@@ -8528,18 +8554,18 @@
     {
      "slot": "DEF",
      "player": {
-      "id": "PHI",
-      "name": "Philadelphia Eagles",
+      "id": "DAL",
+      "name": "Dallas Cowboys",
       "pos": "DEF",
-      "team": "PHI",
-      "pts": 98,
-      "round": 12,
-      "week_pts": 5.3,
+      "team": "DAL",
+      "pts": 86,
+      "round": null,
+      "week_pts": 5.9,
       "week_actual": null,
       "game": {
        "week": 7,
-       "opp": "DAL",
-       "home": true,
+       "opp": "PHI",
+       "home": false,
        "kickoff": "2026-10-27T00:15Z",
        "date": "2026-10-26",
        "status": "STATUS_SCHEDULED",
@@ -8547,16 +8573,16 @@
       },
       "week_call": {
        "start": true,
-       "margin": 5.3,
+       "margin": 5.9,
        "close": false,
-       "why": "In the week-7 lineup. Benching him costs 5.3 projected points."
+       "why": "In the week-7 lineup. Benching him costs 5.9 projected points."
       },
-      "bye": 10,
-      "adp": 132,
+      "bye": 14,
+      "adp": 199.6,
       "injury": null
      },
-     "rank": 4,
-     "vs_median": 4
+     "rank": 8,
+     "vs_median": -4
     }
    ],
    "by_pos": [
@@ -8602,9 +8628,9 @@
     },
     {
      "pos": "DEF",
-     "pts": 98,
-     "rank": 4,
-     "vs_median": 4,
+     "pts": 86,
+     "rank": 8,
+     "vs_median": -4,
      "starters": 1,
      "rostered": 1
     }
@@ -8633,12 +8659,11 @@
     "bye_stacks": [
      {
       "week": 10,
-      "n": 4,
+      "n": 3,
       "players": [
        "Emeka Egbuka (WR)",
        "Bucky Irving (RB)",
-       "Rome Odunze (WR)",
-       "Philadelphia Eagles (DEF)"
+       "Rome Odunze (WR)"
       ]
      }
     ],
